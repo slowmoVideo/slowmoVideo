@@ -1,0 +1,21 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+          float2 st0 : TEXCOORD0,
+          float4 st1 : TEXCOORD1,
+          float4 st2 : TEXCOORD2,
+          uniform float2 wh,
+          out float4 color : COLOR)
+{
+   float4 vals;
+
+   //st1 += 0.5f / wh.xyxy;
+   //st2 += 0.5f / wh.xyxy;
+
+   vals.x = pack_4ubyte(tex2D(src_tex, st1.xy));
+   vals.y = pack_4ubyte(tex2D(src_tex, st1.zw));
+   vals.z = pack_4ubyte(tex2D(src_tex, st2.xy));
+   vals.w = pack_4ubyte(tex2D(src_tex, st2.zw));
+
+   vals = (vals > float4(0)) ? float4(1) : float4(0);
+
+   color = vals;
+}

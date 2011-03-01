@@ -1,0 +1,132 @@
+#ifndef HALF_WIDTH
+# define HALF_WIDTH 3
+#endif
+#define FULL_WIDTH (2*(HALF_WIDTH)+1)
+
+#ifndef N_LEVELS
+# define N_LEVELS 4
+#endif
+
+// Default is coarsest level + base level.
+#ifndef LEVEL_SKIP
+# define LEVEL_SKIP (N_LEVELS-1)
+#endif
+
+// Number of iteration per level
+#ifndef N_ITERATIONS
+#define N_ITERATIONS 5
+#endif
+
+#define INITIAL_MULTIPLIER (1 << (N_LEVELS-1))
+
+//#define PREFETCH_I0 1
+
+void main(uniform sampler2D features_tex : TEXUNIT0,
+          uniform sampler2D im0_tex :      TEXUNIT1,
+          uniform sampler2D im1_tex :      TEXUNIT2,
+          float2 st0 : TEXCOORD0,
+          uniform float2 ds,
+          uniform float2 wh, // width + height
+          uniform float sqrConvergenceThreshold,
+          uniform float SSD_Threshold,
+          uniform float4 validRegion,
+          out float4 color : COLOR)
+{
+   float2 X0 = tex2D(features_tex, st0).xy;
+   float2 X1 = X0;
+
+#if !defined(PREFETCH_I0)
+   float3 I0;
+#else
+   float3 I0[FULL_WIDTH][FULL_WIDTH];
+#endif
+   float3 I1;
+   float3 IJ, abc, rhs; // rhs+error
+   float4 st;
+
+   bool invalidate = (X1.x < 0);
+   float sqrUpdateLength, SSD;
+
+   float multiplier = INITIAL_MULTIPLIER;
+
+   // Downward loops with integer loop variables are not handled correctly by the Cg compiler :(
+   for (float level = N_LEVELS-1; level >= 0; level -= LEVEL_SKIP)
+   //int level = N_LEVELS-1;
+   {
+      float2 ds_cur = ds*multiplier;
+
+#if defined(PREFETCH_I0)
+      for (int y = -HALF_WIDTH; y <= HALF_WIDTH; ++y)
+      {
+         st.y = X0.y + y*ds_cur.y;
+         for (int x = -HALF_WIDTH; x <= HALF_WIDTH; ++x)
+         {
+            int x_ = x+HALF_WIDTH;
+            int y_ = y+HALF_WIDTH;
+
+            st.x = X0.x + x*ds_cur.x;
+            I0[y_][x_] = tex2Dlod(im0_tex, float4(st.xy, 0, level)).xyz;
+         }
+      }
+#endif
+
+      for (int iter = 0; iter < N_ITERATIONS; ++iter)
+      {
+         abc = (0).xxx;
+         rhs = (0).xxx;
+         SSD = 0;
+
+         for (int y = -HALF_WIDTH; y <= HALF_WIDTH; ++y)
+         {
+            st.y = X0.y + y*ds_cur.y;
+            st.w = X1.y + y*ds_cur.y;
+
+            for (int x = -HALF_WIDTH; x <= HALF_WIDTH; ++x)
+            {
+               st.x = X0.x + x*ds_cur.x;
+               st.z = X1.x + x*ds_cur.x;
+
+#if !defined(PREFETCH_I0)
+               I0 = tex2Dlod(im0_tex, float4(st.xy, 0, level)).xyz;
+               I1 = tex2Dlod(im1_tex, float4(st.zw, 0, level)).xyz;
+
+               IJ.x = I0.x - I1.x;
+               IJ.yz = (I0.yz + I1.yz) * wh / 2;
+#else
+               I1 = tex2Dlod(im1_tex, float4(st.zw, 0, level)).xyz;
+
+               int x_ = x+HALF_WIDTH;
+               int y_ = y+HALF_WIDTH;
+
+               IJ.x = I0[y_][x_].x - I1.x;
+               IJ.yz = (I0[y_][x_].yz + I1.yz) * wh / 2;
+#endif
+
+               abc += IJ.yyz * IJ.yzz;
+               rhs += IJ.x * IJ.yzx;
+               SSD += IJ.x*IJ.x;
+            } // end for (x)
+         } // end for (y)
+
+         float const det = abc.x*abc.z - abc.y*abc.y;
+
+         invalidate = invalidate || (det < 0.00001);
+
+         float2 dX = 1.0f/det * float2(abc.z*rhs.x - abc.y*rhs.y, -abc.y*rhs.x + abc.x*rhs.y);
+
+         X1 += dX;
+
+         dX *= wh;
+         sqrUpdateLength = dot(dX, dX);
+      } // end for (iter)
+
+      invalidate = invalidate || (sqrUpdateLength > sqrConvergenceThreshold);
+      invalidate = invalidate || (SSD > SSD_Threshold);
+
+      multiplier /= (1 << LEVEL_SKIP);
+   } // end for (level)
+
+   invalidate = invalidate || (any(X1 < validRegion.xy) || any(X1 > validRegion.zw));
+
+   color = invalidate ? float4(-1) : float4(X1, X0);
+} // end main()

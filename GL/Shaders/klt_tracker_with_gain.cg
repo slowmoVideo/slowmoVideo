@@ -1,0 +1,148 @@
+#ifndef HALF_WIDTH
+# define HALF_WIDTH 3
+#endif
+#define FULL_WIDTH (2*(HALF_WIDTH)+1)
+
+#ifndef BETA_HALF_WIDTH
+# define BETA_HALF_WIDTH 2
+#endif
+
+float sqr(float x) { return x*x; }
+
+float det3x3symm(float3 abc, float3 def)
+{
+   float const a = abc.x;
+   float const b = abc.y;
+   float const c = abc.z;
+   float const d = def.x;
+   float const e = def.y;
+   float const f = def.z;
+
+   float res = a*d*f + 2*b*c*e;
+   res -= a*e*e + b*b*f + c*c*d;
+   return res;
+}
+
+void adjoint3x3symm(float3 abc, float3 def, out float3 ABC, out float3 DEF)
+{
+   float const a = abc.x;
+   float const b = abc.y;
+   float const c = abc.z;
+   float const d = def.x;
+   float const e = def.y;
+   float const f = def.z;
+   ABC.x = d*f - e*e;
+   ABC.y = c*e - b*f;
+   ABC.z = b*e - c*d;
+   DEF.x = a*f - c*c;
+   DEF.y = b*c - a*e;
+   DEF.z = a*d - b*b;
+}
+
+void main(uniform sampler2D features_tex :  TEXUNIT0,
+          uniform sampler2D im0_tex :       TEXUNIT1,
+          uniform sampler2D im1_tex :       TEXUNIT2,
+          uniform sampler2D features0_tex : TEXUNIT3,
+          float2 st0 : TEXCOORD0,
+          uniform float2 ds,
+          uniform float2 ds0,
+          uniform float2 wh, // width + height
+          uniform float sqrConvergenceThreshold,
+          uniform float SSD_Threshold,
+          uniform float4 validRegion,
+          uniform float lambda,
+          uniform float delta,
+          out float3 color : COLOR)
+{
+   float2 const X0 = tex2D(features0_tex, st0).xy;
+   float3 const features_val = tex2D(features_tex, st0).xyz;
+
+   float2 X1   = features_val.xy;
+   float  beta = features_val.z;
+   float4 betaN1, betaN2;
+
+   betaN1.x = tex2D(features_tex, st0 + ds0.x).z;
+   betaN1.y = tex2D(features_tex, st0 - ds0.x).z;
+   betaN1.z = tex2D(features_tex, st0 + ds0.y).z;
+   betaN1.w = tex2D(features_tex, st0 - ds0.y).z;
+
+   betaN2.x = tex2D(features_tex, st0 + float2(ds0.x, 0)).z;
+   betaN2.y = tex2D(features_tex, st0 - float2(ds0.x, 0)).z;
+   betaN2.z = tex2D(features_tex, st0 + float2(0, ds0.y)).z;
+   betaN2.w = tex2D(features_tex, st0 - float2(0, ds0.y)).z;
+
+   betaN1 = (betaN1 < float4(0)) ? float4(beta) : betaN1;
+   betaN2 = (betaN2 < float4(0)) ? float4(beta) : betaN2;
+
+   bool invalidate = (X1.x < 0) || (X0.x < 0);
+
+   float3 I0, I1, IJ;
+   float3 abc = float3(0);
+   float3 def = float3(0);
+   float3 rhs = float3(0);
+   float SSD = 0;
+   float4 st;
+
+   for (int y = -HALF_WIDTH; y <= HALF_WIDTH; ++y)
+   {
+      st.y = X0.y + y*ds.y;
+      st.w = X1.y + y*ds.y;
+
+      for (int x = -HALF_WIDTH; x <= HALF_WIDTH; ++x)
+      {
+         st.x = X0.x + x*ds.x;
+         st.z = X1.x + x*ds.x;
+
+         I0 = tex2D(im0_tex, st.xy).xyz;
+         I1 = tex2D(im1_tex, st.zw).xyz;
+
+         IJ.x  = beta*I0.x - I1.x;
+         IJ.yz = (beta*I0.yz + I1.yz) * wh / 2;
+
+         float const gradI0len = length(I0.yz);
+         float const gradI1len = length(I1.yz);
+
+#if 1
+         abc    += IJ.y * float3(IJ.yz, -I0.x);
+         def.xy += IJ.z * float2(IJ.z, -I0.x);
+         def.z  += I0.x*I0.x + lambda*gradI0len*gradI0len + delta*8;
+
+         rhs.xy += IJ.x * IJ.yz;
+         rhs.z  += -IJ.x*I0.x + lambda*gradI0len*(gradI1len - beta*gradI0len) + delta*(dot(float4(1), betaN1+betaN2-2*beta));
+#else
+         abc.xy += IJ.y * IJ.yz;
+         def.x  += IJ.z * IJ.z;
+         def.z  += 1; 
+
+         rhs.xy += IJ.x * IJ.yz;
+         rhs.z  += 0;
+#endif
+
+         SSD += IJ.x*IJ.x;
+      } // end for (x)
+   } // end for (y)
+
+   float const det = det3x3symm(abc, def);
+   float const rcpDet = 1.0f / det;
+
+   float3 ABC, DEF;
+   adjoint3x3symm(abc, def, ABC, DEF);
+
+   float3 dX;
+   dX.x = dot(ABC, rhs);
+   dX.y = dot(float3(ABC.y, DEF.xy), rhs);
+   dX.z = dot(float3(ABC.z, DEF.yz), rhs);
+   dX *= rcpDet;
+
+   X1 += dX.xy;
+
+   dX.xy *= wh;
+   float const sqrUpdateLength = dot(dX.xy, dX.xy);
+
+   invalidate = invalidate || (det < 0.00001);
+   invalidate = invalidate || (SSD > SSD_Threshold);
+   invalidate = invalidate || (sqrUpdateLength > sqrConvergenceThreshold);
+   invalidate = invalidate || (any(X1 < validRegion.xy) || any(X1 > validRegion.zw));
+
+   color = invalidate ? float3(-1) : float3(X1, beta + dX.z);
+}

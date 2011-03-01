@@ -1,0 +1,27 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+                            float4 st0 : TEXCOORD0,
+                            float4 st1 : TEXCOORD1,
+                            float4 st2 : TEXCOORD2,
+                            float4 st3 : TEXCOORD3,
+                        out float4 color : COLOR)
+{
+   // This is the (odd) binomial kernel [1 4 6 4 1]
+   float4 const f1 = float4(1, 4, 6, 4) / 16.0f;
+   float  const f2 = 1.0 / 16.0f;
+
+   float4 g1;
+   float  g2;
+
+   g1.x = tex2D(src_tex, st0.zw).x;
+   g1.y = tex2D(src_tex, st1.xy).x;
+   g1.z = tex2D(src_tex, st1.zw).x;
+   g1.w = tex2D(src_tex, st2.xy).x;
+   g2   = tex2D(src_tex, st2.zw).x;
+
+   g1 *= 255.0f;
+   g2 *= 255.0f;
+
+   float v = dot(f1, g1) + f2*g2;
+
+   color = unpack_4ubyte(v);
+}

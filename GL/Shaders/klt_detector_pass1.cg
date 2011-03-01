@@ -1,0 +1,33 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+                            float4 st0 : TEXCOORD0,
+                            float4 st1 : TEXCOORD1,
+                            float4 st2 : TEXCOORD2,
+                            float4 st3 : TEXCOORD3,
+                        out float3 color : COLOR)
+{
+   float3 res = float3(0, 0, 0);
+   float3 I_Ix_Iy;
+
+   I_Ix_Iy = tex2D(src_tex, st0.xy);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st0.zw);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st1.xy);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st1.zw);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st2.xy);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st2.zw);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   I_Ix_Iy = tex2D(src_tex, st3.xy);
+   res += I_Ix_Iy.yyz * I_Ix_Iy.yzz;
+
+   color = res;
+}

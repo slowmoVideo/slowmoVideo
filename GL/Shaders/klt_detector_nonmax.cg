@@ -1,0 +1,27 @@
+#ifndef MIN_DIST
+# define MIN_DIST 5
+#endif
+
+void main(uniform sampler2D src_tex : TEXUNIT0,
+          float2 st0 : TEXCOORD0,
+          uniform float2 ds,
+          out float4 color : COLOR)
+{
+   // A final value < 0 indicates, that the maximum value was from the neighboring pixels.
+
+   float maxCornerness = pack_4ubyte(tex2D(src_tex, st0));
+
+   for (int i = -MIN_DIST; i < 0; ++i)
+   {
+      float cornerness = abs(pack_4ubyte(tex2D(src_tex, st0 + i*ds)));
+      maxCornerness = (cornerness >= abs(maxCornerness)) ? (-cornerness) : maxCornerness;
+   }
+
+   for (int i = 1; i <= MIN_DIST; ++i)
+   {
+      float cornerness = abs(pack_4ubyte(tex2D(src_tex, st0 + i*ds)));
+      maxCornerness = (cornerness >= abs(maxCornerness)) ? (-cornerness) : maxCornerness;
+   }
+
+   color = unpack_4ubyte(maxCornerness);
+}

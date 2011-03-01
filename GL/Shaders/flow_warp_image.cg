@@ -1,0 +1,80 @@
+float signum(float x)
+{
+   return (x < 0) ? -1 : 1;
+}
+
+void main(uniform sampler2D uv_src : TEXTURE0, // (u, v)
+          uniform sampler2D I0_tex : TEXTURE1, // grayscale
+          uniform sampler2D I1_tex : TEXTURE2, // grayscale + Ix + Iy
+          float2 st0 : TEXCOORD0,
+          float3 st3 : TEXCOORD3, // Holds 1/w, 1/h, 2^level
+          out float4 color_out : COLOR)
+{
+   float const eps = 0.001f;
+   //float const eps = 0.1f;
+
+   float2 uv = tex2D(uv_src, st0).xy;
+   float3 I0 = tex2D(I0_tex, st0);
+   float3 I1 = tex2D(I1_tex, st0 + st3.xy*uv);
+   //float3 I1 = tex2D(I1_tex, st0);
+   I1.yz *= st3.z;
+
+#if 0
+   // One central differences
+   float2 const ds = float2(0.5, 0);
+   float2 const dt = float2(0, 0.5);
+   float2 I1grad;
+   I1grad.x = tex2D(I1_tex, st0 + st3.xy*(uv+ds)).x - tex2D(I1_tex, st0 + st3.xy*(uv-ds)).x;
+   I1grad.y = tex2D(I1_tex, st0 + st3.xy*(uv+dt)).x - tex2D(I1_tex, st0 + st3.xy*(uv-dt)).x;
+   I1.yz = I1grad;
+#elif 0
+   // One sided forward differences
+   float2 const ds = float2(1, 0);
+   float2 const dt = float2(0, 1);
+   float2 I1grad;
+   I1grad.x = tex2D(I1_tex, st0 + st3.xy*(uv+ds)).x - I1.x;
+   I1grad.y = tex2D(I1_tex, st0 + st3.xy*(uv+dt)).x - I1.x;
+   I1.yz = I1grad;
+#elif 0
+   // One sided backward differences
+   float2 const ds = float2(-1, 0);
+   float2 const dt = float2(0, -1);
+   float2 I1grad;
+   I1grad.x = I1.x - tex2D(I1_tex, st0 + st3.xy*(uv+ds)).x;
+   I1grad.y = I1.x - tex2D(I1_tex, st0 + st3.xy*(uv+dt)).x;
+   I1.yz = I1grad;
+#elif 1
+   // Central differences and use gradients from both images
+   float2 const ds0 = float2(1, 0); // I0_tex has nearest texture filtering
+   float2 const dt0 = float2(0, 1);
+   float2 const ds = float2(0.5, 0);
+   float2 const dt = float2(0, 0.5);
+   float2 I0grad, I1grad;
+   I0grad.x = 0.5f * (tex2D(I0_tex, st0 + st3.xy*ds0).x - tex2D(I0_tex, st0 - st3.xy*ds0).x);
+   I0grad.y = 0.5f * (tex2D(I0_tex, st0 + st3.xy*dt0).x - tex2D(I0_tex, st0 - st3.xy*dt0).x);
+   I1grad.x = tex2D(I1_tex, st0 + st3.xy*(uv+ds)).x - tex2D(I1_tex, st0 + st3.xy*(uv-ds)).x;
+   I1grad.y = tex2D(I1_tex, st0 + st3.xy*(uv+dt)).x - tex2D(I1_tex, st0 + st3.xy*(uv-dt)).x;
+   I1.yz = 0.5f * (I0grad + I1grad);
+#endif
+
+   // Optional symmetrization of gradients
+   //I1.yz = 0.5f * (I1.yz + I0.yz);
+
+   // Avoid zero gradients
+   I1.yz = (abs(I1.yz) < eps) ? (signum(I1.yz) * eps) : I1.yz;
+
+#if 1
+   color_out.x = I1.x - dot(I1.yz, uv) - I0.x;
+   //color_out.x = I1.x - I1.y*uv.x - I1.z*uv.y - I0.x;
+   color_out.yz = I1.yz;
+   color_out.w = abs(I1.x-I0.x);
+   //color_out.w = abs(I1grad - I1.yz).y/16;
+   //color_out.w = abs(I1grad.x)/16;
+   //color_out.w = abs(I1.z)/16;
+#else
+   float const len = length(I1.yz);
+   color_out.w  = len;
+   color_out.x  = (I1.x - dot(I1.yz, uv) - I0.x) / len;
+   color_out.yz = I1.yz / len;
+#endif
+}

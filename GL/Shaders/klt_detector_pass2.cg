@@ -1,0 +1,34 @@
+float sqr(float x) { return x*x; }
+
+void main(uniform sampler2D src_tex : TEXUNIT0,
+          float4 st0 : TEXCOORD0,
+          float4 st1 : TEXCOORD1,
+          float4 st2 : TEXCOORD2,
+          float4 st3 : TEXCOORD3,
+          uniform float minCornerness,
+          uniform float4 validRegion,
+          out float4 color : COLOR)
+{
+   float3 abc = float3(0);
+
+   abc += tex2D(src_tex, st0.xy).xyz;
+   abc += tex2D(src_tex, st0.zw).xyz;
+   abc += tex2D(src_tex, st1.xy).xyz;
+   abc += tex2D(src_tex, st1.zw).xyz;
+   abc += tex2D(src_tex, st2.xy).xyz;
+   abc += tex2D(src_tex, st2.zw).xyz;
+   abc += tex2D(src_tex, st3.xy).xyz;
+
+   float a = abc.x;
+   float b = abc.y;
+   float c = abc.z;
+
+   float cornerness = 0.5f*(a+c - sqrt(sqr(a-c) + 4*sqr(b)));
+   //cornerness = (cornerness >= minCornerness) ? cornerness : 0.0f;
+   cornerness = max(cornerness - minCornerness, float4(0));
+
+   float2 st = st1.zw;
+   cornerness = (all(st >= validRegion.xy) && all(st <= validRegion.zw)) ? cornerness : 0.0f;
+
+   color = unpack_4ubyte(cornerness);
+}

@@ -1,0 +1,25 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+                            float4 st0 : TEXCOORD0,
+                            float4 st1 : TEXCOORD1,
+                            float4 st2 : TEXCOORD2,
+                            float4 st3 : TEXCOORD3,
+                        out float4 color : COLOR)
+{
+   // This is the (odd) binomial kernel [1 4 6 4 1]
+   float4 const f1 = float4(1, 4, 6, 4) / 16.0f;
+   float3 const f2 = 1 / 16.0f;
+
+   float4 g1;
+   float  g2;
+
+   g1.x = pack_4ubyte(tex2D(src_tex, st0.zw));
+   g1.y = pack_4ubyte(tex2D(src_tex, st1.xy));
+   g1.z = pack_4ubyte(tex2D(src_tex, st1.zw));
+   g1.w = pack_4ubyte(tex2D(src_tex, st2.xy));
+   g2   = pack_4ubyte(tex2D(src_tex, st2.zw));
+
+   float v = dot(f1, g1) + f2*g2;
+
+   //color = unpack_4ubyte(v);
+   color = unpack_4ubyte(v).zyxw; // BRGA for faster transfers.
+}

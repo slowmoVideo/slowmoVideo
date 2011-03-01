@@ -1,0 +1,88 @@
+#ifndef PYR_LEVELS
+# define PYR_LEVELS 10
+#endif
+
+void main(uniform sampler2D histpyr_tex : TEXUNIT0,
+          uniform sampler2D cornerness_tex : TEXUNIT1,
+          float2 st0 : TEXCOORD0,
+          uniform float nFeatures,
+          uniform float pointListWidth,
+          uniform float  pyrW, // width (& height) of the pyramid
+          uniform float2 srcWH, // width & height of the original image
+          out float4 color : COLOR)
+{
+   float const start_ix = st0.y * pointListWidth + st0.x + 0.5; // in case of rounding errors.
+   float ix = start_ix;
+
+   if (ix >= nFeatures) discard;
+
+   float2 lookup = float2(0.5f, 0.5f); // center of 1x1 texture
+   float  multiplier = 0.25f;
+
+   float4 histogram, elem;
+   float2 dx;
+
+   for (int level = PYR_LEVELS-1; level >= 0; --level)
+   {
+      histogram = tex2Dlod(histpyr_tex, float4(lookup, 0, level));
+#if 1
+      histogram.y += histogram.x;
+      histogram.z += histogram.y;
+      histogram.w += histogram.z;
+
+      //if (ix >= histogram.w) discard; // Not really needed
+
+      float3 isRight = (ix >= histogram.xyz) ? float3(1) : float3(0);
+      float3 isLeft  = (ix < histogram.xyz) ? float3(1) : float3(0);
+      elem = float4(1, isRight) * float4(isLeft, 1);
+      //elem = (elem > float4(0.5f)) ? float4(1) : float4(0);
+
+      dx.x = dot(elem, float4(-1, 1, -1, 1));
+      dx.y = dot(elem, float4(-1, -1, 1, 1));
+      dx *= multiplier;
+
+      lookup += dx;
+      multiplier *= 0.5f;
+      ix -= dot(elem.yzw, histogram.xyz);
+#else
+      // Heavy reference version with nested ifs.
+      if (ix < histogram.x)
+      {
+         lookup += multiplier*float2(-1, -1);
+      }
+      else
+      {
+         ix -= histogram.x;
+         if (ix < histogram.y)
+         {
+            lookup += multiplier*float2(1, -1);
+         }
+         else
+         {
+            ix -= histogram.y;
+            if (ix < histogram.z)
+            {
+               lookup += multiplier*float2(-1, 1);
+            }
+            else
+            {
+               ix -= histogram.z;
+               if (ix < histogram.w)
+               {
+                  lookup += multiplier*float2(1, 1);
+               }
+               else
+                  discard;
+            }
+         }
+      }
+      multiplier *= 0.5f;
+#endif
+   } // end for (level)
+
+   //color.xy = lookup;
+   // Incorporate aspect ratio between 2^n*2^n pyramid tex and src tex.
+   float2 st = 2*(lookup * pyrW) / srcWH;
+   color.xy = st;
+   color.z = pack_4ubyte(tex2D(cornerness_tex, st));
+}

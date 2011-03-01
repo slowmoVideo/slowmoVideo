@@ -1,0 +1,61 @@
+float thresholdingStep(float a2, float b, float lambda_theta)
+{
+   float lam_a2 = lambda_theta * a2;
+   return (b + lam_a2 < 0) ? lambda_theta : ((b - lam_a2 > 0) ? -lambda_theta : (-b/a2));
+}
+
+float evalObjective(float3 Ix, float lambda_theta, float2 u0, float2 u)
+{
+   return dot(u - u0, u - u0)/2 + lambda_theta * abs(dot(Ix, float3(1, u)));
+}
+
+float evalObjective2(float3 Ix, float lambda_theta, float2 u, float2 div_p)
+{
+   return lambda_theta * abs(dot(Ix, float3(1, u))) - dot(u, div_p);
+}
+
+void main(uniform sampler2D uv_src     : TEXUNIT0, // (u, v)
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D warped_tex : TEXUNIT2, // (c, Ix, Iy)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float lambda_theta,
+          uniform float theta,
+              out float4 uv_out : COLOR0)
+{
+   float3 warped = tex2D(warped_tex, st0).xyz;
+   warped /= 255; // Normalize here to allow lower precision for the warped buffer
+   float r2 = dot(warped.yz, warped.yz);
+   //float r2 = warped.y*warped.y + warped.z*warped.z;
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float2 uv = tex2D(uv_src, st0).xy;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   // new u and v
+   float b = dot(warped, float3(1, uv));
+   //float b = warped.x + warped.y*uv.x + warped.z*uv.y;
+   float step = thresholdingStep(r2, b, lambda_theta);
+   float2 UV = uv + step * warped.yz;
+
+   uv_out.xy = UV + theta * div_p;
+   uv_out.z  = 0;
+}

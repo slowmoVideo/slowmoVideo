@@ -1,0 +1,18 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+          float2 st0 : TEXCOORD0,
+          float4 st1 : TEXCOORD1,
+          float4 st2 : TEXCOORD2,
+          out float4 color : COLOR)
+{
+   float4 vals00, vals01, vals10, vals11;
+
+   vals00 = tex2D(src_tex, st1.xy);
+   vals01 = tex2D(src_tex, st1.zw);
+   vals10 = tex2D(src_tex, st2.xy);
+   vals11 = tex2D(src_tex, st2.zw);
+
+   color.x = dot(float4(1), vals00);
+   color.y = dot(float4(1), vals01);
+   color.z = dot(float4(1), vals10);
+   color.w = dot(float4(1), vals11);
+}

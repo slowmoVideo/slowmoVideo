@@ -1,0 +1,63 @@
+void main(uniform sampler2D src_tex : TEXUNIT0,
+          float2 st0 : TEXCOORD0,
+          uniform float4 f, // fx and fy, 1/fx, 1/fy
+          uniform float2 k, // k1 and k2
+          uniform float2 p, // tangential parameters,
+          uniform float2 center,
+          uniform float4 wh, // with & height of the image, 1/w, 1/h
+          out float3 color : COLOR)
+{
+   //float2 const x = st0 * wh.xy - float2(0.5);
+   float2 const x = st0 - float2(0.5);
+
+   // Points must be Bougouet-normalized
+   // (subtract principal point, then divide by focal length)
+   float2 const n = (x - center) * f.zw;
+
+   float const twoxy = 2*n.x*n.y;
+   //float const r2    = dot(n, n);
+   float const r2    = n.x*n.x + n.y*n.y;
+  
+   // radial distortion:
+   float const raddist  = 1 + k.x*r2 + k.y*r2*r2;
+
+   // tangential distortion:
+   float2 const tandist = p*twoxy + p.yx * (r2 + 2*n*n);
+
+   // apply distortion:
+   float2 dist = raddist*n + tandist;
+      
+   // invert Bougouet-normalization
+   dist = f.xy*dist + center;
+
+#if 1
+   // This is the path using bilinear interpolation of the texunits.
+   // Go back to texture coords
+   float2 const st = (dist + float2(0.5)) * wh.zw;
+
+   // Texture lookup
+   color = tex2D(src_tex, st).xyz;
+#else
+   // Here we do bilinear interpolation on our own.
+   float2 ST = dist;
+
+   float2 st00 = (floor(ST) + float2(0.5)) * wh.zw;
+   float2 st11 = st00 + wh.zw;
+   float2 st01 = float2(st00.x, st11.y);
+   float2 st10 = float2(st11.x, st00.y);
+   float2 W1 = frac(ST);
+   float2 W2 = (1).xx - W1;
+   float4 W = float4(0, 0, 0, 0);
+   W.x = W2.x * W2.y;
+   W.y = W2.x * W1.y;
+   W.z = W1.x * W2.y;
+   W.w = W1.x * W1.y;
+
+   float3 res = float3(0, 0, 0);
+   res += W.x * tex2D(src_tex, st00).xyz;
+   res += W.y * tex2D(src_tex, st01).xyz;
+   res += W.z * tex2D(src_tex, st10).xyz;
+   res += W.w * tex2D(src_tex, st11).xyz;
+   color = res;
+#endif
+}

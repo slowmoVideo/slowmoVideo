@@ -1,0 +1,196 @@
+#ifndef PRESMOOTHING
+#define PRESMOOTHING 0
+#endif
+
+void main(uniform sampler2D src_tex : TEXUNIT0,
+                            float4 st0 : TEXCOORD0,
+                            float4 st1 : TEXCOORD1,
+                            float4 st2 : TEXCOORD2,
+                            float4 st3 : TEXCOORD3,
+                        out float4 color : COLOR)
+{
+#if PRESMOOTHING==3
+   // This is the (odd) binomial kernel [0 1 6 15 20 15 6 1 0]
+   float4 const f1 = float4(0, 1, 6, 15) / 64.0f;
+   float4 const f2 = float4(20, 15, 6, 1) / 64.0f;
+
+   float4 const df = float4(1, 6, 14, 14) / 128.0f;
+
+   float2 ds = st0.zw - st0.xy;
+
+   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5, rawVal6, rawVal7, rawVal8, rawVal9;
+
+   rawVal1 = tex2D(src_tex, st0.xy - ds);
+   rawVal2 = tex2D(src_tex, st0.xy);
+   rawVal3 = tex2D(src_tex, st0.zw);
+   rawVal4 = tex2D(src_tex, st1.xy);
+   rawVal5 = tex2D(src_tex, st1.zw);
+   rawVal6 = tex2D(src_tex, st2.xy);
+   rawVal7 = tex2D(src_tex, st2.zw);
+   rawVal8 = tex2D(src_tex, st3.xy);
+   rawVal9 = tex2D(src_tex, st3.zw);
+
+   float4 g1, g2, dg1, dg2;
+   float  g3, dg3;
+   g1.x  = pack_2half(rawVal1.xy);
+   dg1.x = pack_2half(rawVal1.zw);
+   g1.y  = pack_2half(rawVal2.xy);
+   dg1.y = pack_2half(rawVal2.zw);
+   g1.z  = pack_2half(rawVal3.xy);
+   dg1.z = pack_2half(rawVal3.zw);
+   g1.w  = pack_2half(rawVal4.xy);
+   dg1.w = pack_2half(rawVal4.zw);
+   g2.x  = pack_2half(rawVal5.xy);
+   dg2.x = pack_2half(rawVal5.zw);
+   g2.y  = pack_2half(rawVal6.xy);
+   dg2.y = pack_2half(rawVal6.zw);
+   g2.z  = pack_2half(rawVal7.xy);
+   dg2.z = pack_2half(rawVal7.zw);
+   g2.w  = pack_2half(rawVal8.xy);
+   dg2.w = pack_2half(rawVal8.zw);
+   g3    = pack_2half(rawVal9.xy);
+   dg3   = pack_2half(rawVal9.zw);
+
+   float v = dot(f1, g1) + dot(f2, g2);
+   float dv_dx = -dot(df, g1) + dot(df, float4(g2.yzw, g3));
+   float dv_dy = dot(f1, dg1) + dot(f2, dg2);
+#elif PRESMOOTHING==2
+   // This is the (odd) binomial kernel [0 1 4 6 4 1 0]
+   float4 const f1 = float4(0, 1, 4, 6) / 16.0f;
+   float3 const f2 = float3(4, 1, 0) / 16.0f;
+
+   float4 const df1 = float4(-1, -4, -5, 0) / 32.0f;
+   float3 const df2 = float3(5, 4, 1) / 32.0f;
+
+   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5, rawVal6, rawVal7;
+
+   rawVal1 = tex2D(src_tex, st0.xy);
+   rawVal2 = tex2D(src_tex, st0.zw);
+   rawVal3 = tex2D(src_tex, st1.xy);
+   rawVal4 = tex2D(src_tex, st1.zw);
+   rawVal5 = tex2D(src_tex, st2.xy);
+   rawVal6 = tex2D(src_tex, st2.zw);
+   rawVal7 = tex2D(src_tex, st3.xy);
+
+   float4 g1, dg1;
+   float3 g2, dg2;
+
+   g1.x  = pack_2half(rawVal1.xy);
+   dg1.x = pack_2half(rawVal1.zw);
+   g1.y  = pack_2half(rawVal2.xy);
+   dg1.y = pack_2half(rawVal2.zw);
+   g1.z  = pack_2half(rawVal3.xy);
+   dg1.z = pack_2half(rawVal3.zw);
+   g1.w  = pack_2half(rawVal4.xy);
+   dg1.w = pack_2half(rawVal4.zw);
+   g2.x  = pack_2half(rawVal5.xy);
+   dg2.x = pack_2half(rawVal5.zw);
+   g2.y  = pack_2half(rawVal6.xy);
+   dg2.y = pack_2half(rawVal6.zw);
+   g2.z  = pack_2half(rawVal7.xy);
+   dg2.z = pack_2half(rawVal7.zw);
+
+   float v = dot(f1, g1) + dot(f2, g2);
+   float dv_dx = dot(df1, g1) + dot(df2, g2);
+   float dv_dy = dot(f1, dg1) + dot(f2, dg2);
+#elif PRESMOOTHING==1
+   // This is the (odd) binomial kernel [0 1 2 1 0]
+   float4 const f1 = float4(0, 1, 2, 1) / 4.0f;
+   // Note: f2 = 0.
+
+   float4 const df1 = float4(-1, -2, 0, 2) / 8.0f;
+   float  const df2 = 1.0 / 8.0f;
+
+   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5;
+
+   rawVal1 = tex2D(src_tex, st0.zw);
+   rawVal2 = tex2D(src_tex, st1.xy);
+   rawVal3 = tex2D(src_tex, st1.zw);
+   rawVal4 = tex2D(src_tex, st2.xy);
+   rawVal5 = tex2D(src_tex, st2.zw);
+
+   float4 g1, dg1;
+   float  g2, dg2;
+
+   g1.x  = pack_2half(rawVal1.xy);
+   dg1.x = pack_2half(rawVal1.zw);
+   g1.y  = pack_2half(rawVal2.xy);
+   dg1.y = pack_2half(rawVal2.zw);
+   g1.z  = pack_2half(rawVal3.xy);
+   dg1.z = pack_2half(rawVal3.zw);
+   g1.w  = pack_2half(rawVal4.xy);
+   dg1.w = pack_2half(rawVal4.zw);
+   g2    = pack_2half(rawVal5.xy);
+   dg2   = pack_2half(rawVal5.zw);
+
+   float v = dot(f1, g1);
+   float dv_dx = dot(df1, g1) + df2*g2;
+   float dv_dy = dot(f1, dg1);
+#elif PRESMOOTHING==4
+   // This is the (odd) kernel [0 1 6 1 0]
+   float4 const f1 = float4(0, 1, 6, 1) / 8.0f;
+   // Note: f2 = 0.
+
+   float4 const df1 = float4(-1, -6, 0, 6) / 16.0f;
+   float  const df2 = 1.0 / 16.0f;
+
+   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5;
+
+   rawVal1 = tex2D(src_tex, st0.zw);
+   rawVal2 = tex2D(src_tex, st1.xy);
+   rawVal3 = tex2D(src_tex, st1.zw);
+   rawVal4 = tex2D(src_tex, st2.xy);
+   rawVal5 = tex2D(src_tex, st2.zw);
+
+   float4 g1, dg1;
+   float  g2, dg2;
+
+   g1.x  = pack_2half(rawVal1.xy);
+   dg1.x = pack_2half(rawVal1.zw);
+   g1.y  = pack_2half(rawVal2.xy);
+   dg1.y = pack_2half(rawVal2.zw);
+   g1.z  = pack_2half(rawVal3.xy);
+   dg1.z = pack_2half(rawVal3.zw);
+   g1.w  = pack_2half(rawVal4.xy);
+   dg1.w = pack_2half(rawVal4.zw);
+   g2    = pack_2half(rawVal5.xy);
+   dg2   = pack_2half(rawVal5.zw);
+
+   float v = dot(f1, g1);
+   float dv_dx = dot(df1, g1) + df2*g2;
+   float dv_dy = dot(f1, dg1);
+#else
+   // This is the (odd and degenerate) binomial kernel [0 0 1 0 0]
+   float4 const f1 = float4(0, 0, 1, 0);
+   // Note: f2 = 0.
+
+   float4 const df1 = float4(0, -1, 0, 1) / 2.0f;
+
+   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5;
+
+   rawVal1 = tex2D(src_tex, st0.zw);
+   rawVal2 = tex2D(src_tex, st1.xy);
+   rawVal3 = tex2D(src_tex, st1.zw);
+   rawVal4 = tex2D(src_tex, st2.xy);
+   rawVal5 = tex2D(src_tex, st2.zw);
+
+   float4 g1, dg1;
+
+   g1.x  = pack_2half(rawVal1.xy);
+   dg1.x = pack_2half(rawVal1.zw);
+   g1.y  = pack_2half(rawVal2.xy);
+   dg1.y = pack_2half(rawVal2.zw);
+   g1.z  = pack_2half(rawVal3.xy);
+   dg1.z = pack_2half(rawVal3.zw);
+   g1.w  = pack_2half(rawVal4.xy);
+   dg1.w = pack_2half(rawVal4.zw);
+
+   float v = dot(f1, g1);
+   float dv_dx = dot(df1, g1);
+   float dv_dy = dot(f1, dg1);
+#endif
+
+   color.x = v;
+   color.y = dv_dx;
+   color.z = dv_dy;
+}
