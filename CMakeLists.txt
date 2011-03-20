@@ -57,6 +57,43 @@ set (ALL_SRC
   ${GL_SRC}
 )
 
+
+set (SHADERS
+    ./GL/Shaders/klt_detector_nonmax.cg
+    ./GL/Shaders/klt_detector_traverse_histpyr.cg
+    ./GL/Shaders/pyramid_with_derivative_pass2.cg
+    ./GL/Shaders/klt_detector_pass1.cg
+    ./GL/Shaders/klt_detector_pass2.cg
+    ./GL/Shaders/klt_tracker_with_gain.cg
+    ./GL/Shaders/klt_detector_discriminator.cg
+    ./GL/Shaders/klt_detector_build_histpyr.cg
+    ./GL/Shaders/klt_tracker.cg
+    ./GL/Shaders/pyramid_pass2.cg
+    ./GL/Shaders/undistort_parametric.cg
+    ./GL/Shaders/pyramid_with_derivative_pass1v.cg
+    ./GL/Shaders/pyramid_with_derivative_pass1h.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_p.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_compute_UV.cg
+    ./GL/Shaders/pyramid_pass1v.cg
+    ./GL/Shaders/pyramid_pass1h.cg
+    ./GL/Shaders/flow_warp_image.cg
+)
+
+message("-- Copying files")
+macro(copy_files FILELIST)
+  foreach (FILENAME ${FILELIST})
+    set(FILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
+    set(FILE_DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
+    message("   Copying " ${FILENAME} " to " ${FILE_DST})
+
+    configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)
+  endforeach(FILENAME)
+endmacro(copy_files)
+copy_files("${SHADERS}")
+
+
+
 add_library(V3D ${ALL_SRC})
 add_subdirectory(Apps)
 target_link_libraries(V3D ${OpenCV_LIBS})
