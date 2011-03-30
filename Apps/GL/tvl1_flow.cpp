@@ -219,7 +219,7 @@ namespace
       float const scale = 0.1f; // Walking
       //float const scale = 0.2f; // Pentagon
       //displayMotionAsColor(flowEstimator->getFlowFieldTextureID(), scale * (1 << startLevel), false);
-      displayMotionAsColorLight(flowEstimator->getFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel), true);
+      displayMotionAsColorLight2(flowEstimator->getFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel), true);
 
       //displayMotionAsColorDark(flowEstimator->getFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel));
       //displayMotionAsColorDark(flowEstimator->getAlternateFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel));
@@ -230,6 +230,7 @@ namespace
 
       {
          Image<unsigned char> flowIm(scrwidth/2, scrheight, 3);
+         cout << "Image size: " << flowIm.width() << "x" << flowIm.height() << endl;
          glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_RED, GL_UNSIGNED_BYTE, &flowIm(0, 0, 0));
          glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_GREEN, GL_UNSIGNED_BYTE, &flowIm(0, 0, 1));
          glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_BLUE, GL_UNSIGNED_BYTE, &flowIm(0, 0, 2));
@@ -292,6 +293,7 @@ main( int argc, char** argv)
       return -1;
    }
 
+   reshape(W, H);
    glutReshapeFunc(reshape);
    glutDisplayFunc(drawscene);
    //glutIdleFunc(drawscene);

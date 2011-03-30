@@ -479,6 +479,61 @@ namespace V3D_GPU
       checkGLErrorsHere0();
    } // end displayMotionAsColorLight()
 
+
+   void
+   displayMotionAsColorLight2(unsigned textureID, float scale, bool useSqrtMap)
+   {
+      static Cg_FragmentProgram * shader = 0;
+      static ImageTexture2D colorMapTex;
+
+      if (shader == 0)
+      {
+         shader = new Cg_FragmentProgram("v3d_gpuflow::displayMotionAsColorLight::shader");
+         char const * source =
+            "void main(uniform sampler2D uv_tex : TEXTURE0, \n"
+            "                  sampler2D color_map_tex : TEXTURE1, \n"
+            "                  float2 st0 : TEXCOORD0, \n"
+            "          uniform float  scale, \n"
+            "          uniform float  useSqrtMap, \n"
+            "              out float4 color_out : COLOR0) \n"
+            "{ \n"
+            "   float2 uv = tex2D(uv_tex, st0).xy; \n"
+                 "   float mx = max(abs(uv.x), abs(uv.y)); \n"
+                 "   float b = (mx > 0) ? clamp(mx/255.0f, 0,1) : 0; \n"
+                 "   mx = (mx == 0) ? 1.0 : mx; \n"
+                 "   float r = clamp((uv.x/mx)+.5f, 0,1); \n"
+                 "   float g = clamp((uv.y/mx)+.5f, 0,1); \n"
+            "   color_out.x = r; color_out.y = g; color_out.z = b; \n"
+            "   color_out.w = 1;"
+            "} \n";
+         shader->setProgram(source);
+         shader->compile();
+         checkGLErrorsHere0();
+
+         colorMapTex.allocateID();
+
+         V3D::Image<unsigned char> const im  = V3D::makeColorWheelImage();
+
+         colorMapTex.reserve(im.width(), im.height(), TextureSpecification("rgb=8"));
+         colorMapTex.overwriteWith(&im(0, 0, 0), &im(0, 0, 1), &im(0, 0, 2));
+      }
+
+      setupNormalizedProjection(true);
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, textureID);
+      glEnable(GL_TEXTURE_2D);
+      colorMapTex.enable(GL_TEXTURE1);
+      shader->parameter("scale", scale);
+      shader->parameter("useSqrtMap", useSqrtMap ? 1.0f : 0.0f);
+      shader->enable();
+      renderNormalizedQuad();
+      shader->disable();
+      glActiveTexture(GL_TEXTURE0);
+      glDisable(GL_TEXTURE_2D);
+      colorMapTex.disable(GL_TEXTURE1);
+      checkGLErrorsHere0();
+   } // end displayMotionAsColorLight()
+
    void
    displayMotionAsColorDark(unsigned textureID, float scale, bool invert)
    {
