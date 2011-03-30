@@ -92,7 +92,7 @@ macro(copy_files FILELIST)
     configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)
   endforeach(FILENAME)
 endmacro(copy_files)
-copy_files("${SHADERS}")
+#copy_files("${SHADERS}")
 
 
 
