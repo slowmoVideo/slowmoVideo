@@ -132,7 +132,7 @@ namespace
    void
    reshape(int width, int height)
    {
-      cout << "reshape" << endl;
+       cout << "reshape to " << width << "x" << height << endl;
 
       scrwidth = width;
       scrheight = height;
@@ -151,6 +151,7 @@ namespace
 
       int const w = leftImage.width();
       int const h = leftImage.height();
+
 
       if (!initialized)
       {
@@ -176,6 +177,7 @@ namespace
 
          initialized = true;
          cout << "done." << endl;
+
       } // end if (initialized)
 
       leftPyr.buildPyramidForGrayscaleImage(&leftImage(0, 0));
@@ -260,28 +262,33 @@ namespace
 int
 main( int argc, char** argv) 
 {
+
+
+    if (argc != 4 && argc != 5)
+    {
+       cout << "Usage: " << argv[0] << " <left image> <right image> <lambda> [<nIterations>]" << endl;
+       return -1;
+    }
+
+    loadImageFile(argv[1], leftImage);
+    loadImageFile(argv[2], rightImage);
+    lambda = atof(argv[3]);
+
    unsigned int win;
 
    //int const W = 320; int const H = 240;
    //int const W = 640; int const H = 480;
    //int const W = 512; int const H = 512;
    //int const W = 512; int const H = 384;
-   int const W = 584; int const H = 388;
+   //int const W = 584; int const H = 388;
    //int const W = 420; int const H = 380; // Venus
+
+   const int W = leftImage.width();
+   const int H = leftImage.height();
 
    glutInitWindowPosition(0, 0);
    glutInitWindowSize(2*W, H);
    glutInit(&argc, argv);
-
-   if (argc != 4 && argc != 5)
-   {
-      cout << "Usage: " << argv[0] << " <left image> <right image> <lambda> [<nIterations>]" << endl;
-      return -1;
-   }
-
-   loadImageFile(argv[1], leftImage);
-   loadImageFile(argv[2], rightImage);
-   lambda = atof(argv[3]);
 
    if (argc == 5) nIterations = atoi(argv[4]);
 
@@ -293,7 +300,7 @@ main( int argc, char** argv)
       return -1;
    }
 
-   reshape(W, H);
+   //reshape(W*2, H);
    glutReshapeFunc(reshape);
    glutDisplayFunc(drawscene);
    //glutIdleFunc(drawscene);
