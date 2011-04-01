@@ -488,7 +488,7 @@ namespace V3D_GPU
 
       if (shader == 0)
       {
-         shader = new Cg_FragmentProgram("v3d_gpuflow::displayMotionAsColorLight::shader");
+         shader = new Cg_FragmentProgram("v3d_gpuflow::displayMotionAsColorLight2::shader");
          char const * source =
             "void main(uniform sampler2D uv_tex : TEXTURE0, \n"
             "                  sampler2D color_map_tex : TEXTURE1, \n"

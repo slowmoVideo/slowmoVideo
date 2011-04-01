@@ -289,6 +289,7 @@ main( int argc, char** argv)
    glutInitWindowPosition(0, 0);
    glutInitWindowSize(2*W, H);
    glutInit(&argc, argv);
+   reshape(W*2, H);
 
    if (argc == 5) nIterations = atoi(argv[4]);
 
@@ -300,7 +301,6 @@ main( int argc, char** argv)
       return -1;
    }
 
-   //reshape(W*2, H);
    glutReshapeFunc(reshape);
    glutDisplayFunc(drawscene);
    //glutIdleFunc(drawscene);
