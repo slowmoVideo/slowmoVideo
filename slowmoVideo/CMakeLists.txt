@@ -9,6 +9,11 @@ set(CMAKE_CXX_FLAGS
   -Wall
 )
 
+set(SOURCES
+  main.cpp
+  interpolateSV.cpp
+)
+
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
@@ -29,5 +34,5 @@ copy_files(
   fetch.sh
 )
 
-add_executable(slowmoVideo main.cpp)
+add_executable(slowmoVideo ${SOURCES})
 target_link_libraries(slowmoVideo ${QT_LIBRARIES})
