@@ -481,7 +481,7 @@ namespace V3D_GPU
 
 
    void
-   displayMotionAsColorLight2(unsigned textureID, float scale, bool useSqrtMap)
+   displayMotionAsColorLight2(unsigned textureID, bool useSqrtMap)
    {
       static Cg_FragmentProgram * shader = 0;
       static ImageTexture2D colorMapTex;
@@ -493,7 +493,6 @@ namespace V3D_GPU
             "void main(uniform sampler2D uv_tex : TEXTURE0, \n"
             "                  sampler2D color_map_tex : TEXTURE1, \n"
             "                  float2 st0 : TEXCOORD0, \n"
-            "          uniform float  scale, \n"
             "          uniform float  useSqrtMap, \n"
             "              out float4 color_out : COLOR0) \n"
             "{ \n"
@@ -523,7 +522,6 @@ namespace V3D_GPU
       glBindTexture(GL_TEXTURE_2D, textureID);
       glEnable(GL_TEXTURE_2D);
       colorMapTex.enable(GL_TEXTURE1);
-      shader->parameter("scale", scale);
       shader->parameter("useSqrtMap", useSqrtMap ? 1.0f : 0.0f);
       shader->enable();
       renderNormalizedQuad();

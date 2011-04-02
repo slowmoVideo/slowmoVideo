@@ -1,3 +1,13 @@
+/*
+slowmoVideo creates slow-motion videos from normal-speed videos.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "interpolateSV.h"
 
 #include <cmath>
@@ -66,7 +76,7 @@ QColor interpolate(const QImage& in, float x, float y)
 #endif
 
 
-void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage output)
+void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage& output)
 {
 #ifdef INTERPOLATE
     const int Wmax = left.width()-1;
@@ -97,8 +107,8 @@ void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QI
 	    posY = CLAMP(posY, 0, Hmax);
 	    colLeft = interpolate(left, posX, posY);
 	    
-	    posX = x - pos*backward.moveX;
-	    posY = y - pos*backward.moveY;
+            posX = x - (1-pos)*backward.moveX;
+            posY = y - (1-pos)*backward.moveY;
 	    posX = CLAMP(posX, 0, Wmax);
 	    posY = CLAMP(posY, 0, Hmax);
 	    colRight = interpolate(right, posX, posY);
@@ -119,7 +129,7 @@ void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QI
     }
 }
 
-void forwardFlow(const QImage& left, const QImage& right, const QImage& flow, float pos, QImage output)
+void InterpolateSV::forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output)
 {
 #ifdef INTERPOLATE
     float posX, posY;

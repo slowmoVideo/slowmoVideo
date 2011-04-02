@@ -106,17 +106,19 @@ namespace
       checkGLErrorsHere0();
    } // end displayResidual()
 
-   int const nLevels = 4;
+   int const nLevels = 6;
    int const startLevel = 0;
    int       nIterations = 200;
    int const nOuterIterations = 10;
    float const theta = 0.02f;
    float const beta = 0.0f;
    float const lambdaScale = 1.0;
+   bool exitOnFileWritten = false;
 
-   int win, scrwidth = 0, scrheight = 0;
+   int scrwidth = 0, scrheight = 0;
 
    Image<unsigned char> leftImage, rightImage;
+   const char *outImage;
 
    int const nTimingIterations = 1;
    float lambda = 1.0f;
@@ -155,7 +157,7 @@ namespace
 
       if (!initialized)
       {
-         cout << "Start initialization..." << endl;
+         cout << "Start initialization for " << w << "x" << h << " picture ..." << endl;
 
          glewInit();
          Cg_ProgramBase::initializeCg();
@@ -218,28 +220,33 @@ namespace
       //float const scale = 0.25f;
       //float const scale = 0.15f;
       //float const scale = 0.21414f; // Dimetrodon
-      float const scale = 0.1f; // Walking
+      //float const scale = 0.1f; // Walking
       //float const scale = 0.2f; // Pentagon
       //displayMotionAsColor(flowEstimator->getFlowFieldTextureID(), scale * (1 << startLevel), false);
-      displayMotionAsColorLight2(flowEstimator->getFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel), true);
-
-      //displayMotionAsColorDark(flowEstimator->getFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel));
-      //displayMotionAsColorDark(flowEstimator->getAlternateFlowFieldTextureID(), sqrtf(scale) * (1 << startLevel));
+      displayMotionAsColorLight2(flowEstimator->getFlowFieldTextureID(), true);
 
       //displayTexture(flowEstimator->getFlowFieldTextureID(), 0.01f);
       //displayTexture(flowEstimator->getWarpedBuffer(0)->textureID(), 0.25f);
       //displayResidual(flowEstimator->getWarpedBuffer(startLevel)->textureID(), 8.0f);
 
       {
-         Image<unsigned char> flowIm(scrwidth/2, scrheight, 3);
+          int left = scrwidth/2;
+          int w = scrwidth/2;
+          int h = scrheight;
+         Image<unsigned char> flowIm(w, h, 3);
          cout << "Image size: " << flowIm.width() << "x" << flowIm.height() << endl;
-         glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_RED, GL_UNSIGNED_BYTE, &flowIm(0, 0, 0));
-         glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_GREEN, GL_UNSIGNED_BYTE, &flowIm(0, 0, 1));
-         glReadPixels(scrwidth/2, 0, scrwidth/2, scrheight, GL_BLUE, GL_UNSIGNED_BYTE, &flowIm(0, 0, 2));
+         glReadPixels(left, 0, w, h, GL_RED, GL_UNSIGNED_BYTE, &flowIm(0, 0, 0));
+         glReadPixels(left, 0, w, h, GL_GREEN, GL_UNSIGNED_BYTE, &flowIm(0, 0, 1));
+         glReadPixels(left, 0, w, h, GL_BLUE, GL_UNSIGNED_BYTE, &flowIm(0, 0, 2));
 
          flipImageUpsideDown(flowIm);
 
-         saveImageFile(flowIm, "flow_tvl1_GL.png");
+         saveImageFile(flowIm, outImage);
+
+         if (exitOnFileWritten) {
+             cout << "File written, terminating." << endl;
+             exit(0);
+         }
       }
 
       glutSwapBuffers();
@@ -264,24 +271,31 @@ main( int argc, char** argv)
 {
 
 
-    if (argc != 4 && argc != 5)
+    if (argc < 4)
     {
-       cout << "Usage: " << argv[0] << " <left image> <right image> <lambda> [<nIterations>]" << endl;
+       cout << "Usage: " << argv[0] << " <left image> <right image> <lambda> [<nIterations> [<outFilename> [exit] ]]" << endl;
        return -1;
+    }
+    if (getenv("V3D_SHADER_DIR") == NULL) {
+        cout << "V3D_SHADER_DIR environment variable needs to be set!";
+        return -2;
     }
 
     loadImageFile(argv[1], leftImage);
     loadImageFile(argv[2], rightImage);
     lambda = atof(argv[3]);
 
+    if (argc >= 6) {
+        outImage = argv[5];
+        if (argc >= 7) {
+            exitOnFileWritten = true;
+        }
+    } else {
+        outImage = "flow_tvl1_GL.png";
+    }
+
    unsigned int win;
 
-   //int const W = 320; int const H = 240;
-   //int const W = 640; int const H = 480;
-   //int const W = 512; int const H = 512;
-   //int const W = 512; int const H = 384;
-   //int const W = 584; int const H = 388;
-   //int const W = 420; int const H = 380; // Venus
 
    const int W = leftImage.width();
    const int H = leftImage.height();

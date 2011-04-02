@@ -114,7 +114,7 @@ namespace V3D_GPU
                                unsigned int I1_tex, int level, RTT_Buffer& dest);
 
    void displayMotionAsColorLight(unsigned textureID, float scale, bool useSqrtMap = false);
-   void displayMotionAsColorLight2(unsigned textureID, float scale, bool useSqrtMap = false);
+   void displayMotionAsColorLight2(unsigned textureID, bool useSqrtMap = false);
    void displayMotionAsColorDark(unsigned textureID, float scale, bool invert = false);
 
 } // end namespace V3D_GPU

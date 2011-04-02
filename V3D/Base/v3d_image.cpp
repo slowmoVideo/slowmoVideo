@@ -200,6 +200,7 @@ namespace V3D
    void
    saveImageFile(Image<unsigned char> const& image, char const * fileName)
    {
+      cout << "Writing image to " << fileName << endl;
       ImageFileType fileType = determineImageFileType(std::string(fileName));
       switch (fileType)
       {
