@@ -39,8 +39,8 @@ enum FlowMode {
 
 void printUsage() {
     std::cout << "Usage: " << std::endl;
-    std::cout << "\t" << myName << " twoway <left image> <right image> <flow image> <reverse image> [<output pattern>]" << std::endl;
-    std::cout << "\t" << myName << " forward <left image> <flow image> [<output pattern>]" << std::endl;
+    std::cout << "\t" << myName << " twoway <left image> <right image> <flow image> <reverse image> [<output pattern> [numberOffset] ]" << std::endl;
+    std::cout << "\t" << myName << " forward <left image> <flow image> [<output pattern> [numberOffset] ]" << std::endl;
 }
 
 
@@ -118,6 +118,12 @@ int main(int argc, char *argv[])
         std::cout << "Error: Output pattern must contain a %1 for the image number. Example: output%1.png." << std::endl;
         return RET_WRONG_PARAM;
     }
+    bool ok;
+    int numberOffset = QString(nextOptArg(argc, argi, argv, "0")).toInt(&ok);
+    if (!ok) {
+        std::cout << "Error converting argument to number." << std::endl;
+        return RET_WRONG_PARAM;
+    }
 
     switch (mode) {
     case FlowMode_Twoway:
@@ -158,8 +164,9 @@ int main(int argc, char *argv[])
 
 
 
-    const unsigned int steps = 50;
-    const int stepLog = ceil(log10(steps));
+    const unsigned int steps = 25;
+    //const int stepLog = ceil(log10(numberOffset + steps));
+    const int stepLog = 8;
     float pos;
     const QChar fillChar = QLatin1Char('0');
     qDebug() << stepLog << ": max length";
@@ -172,7 +179,7 @@ int main(int argc, char *argv[])
         } else if (mode == FlowMode_Forward) {
             InterpolateSV::forwardFlow(left, flow, pos, output);
         }
-        filename = pattern.arg(QString::number(step), stepLog, fillChar);
+        filename = pattern.arg(QString::number(numberOffset + step), stepLog, fillChar);
         qDebug() << "Saving position " << pos << " to image " << filename;
         output.save(filename);
     }

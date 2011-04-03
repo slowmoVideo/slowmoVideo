@@ -10,6 +10,8 @@ parser = OptionParser()
 parser.add_option("-i", "--input", dest="inDir", help="Input Directory", metavar="DIR")
 parser.add_option("-o", "--output", dest="outDir", help="Output Directory", metavar="DIR")
 parser.add_option("--flow", dest="flowExecutable", help="Executable for optical flow")
+parser.add_option("--forward-only", action="store_true", dest="forwardOnly",  help="Calculate forward flow only")
+parser.add_option("--backward-only", action="store_true", dest="backwardOnly",  help="Calculate backward flow only")
 
 (options, args) = parser.parse_args()
 
@@ -49,7 +51,6 @@ if not os.path.exists(options.outDir) :
     os.makedirs(options.outDir)
 
 
-
 prev = None
 for s in files :
     if frameID(s) != None :
@@ -57,19 +58,21 @@ for s in files :
             leftFile = options.inDir + os.sep + prev
             rightFile = options.inDir + os.sep + s
             
-            outFile = nameForwardFlow(prev, s)
-            #print("Writing to %s." % outFile)
-            cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, leftFile, rightFile, options.outDir + os.sep + outFile)
-            ret = os.system(cmd)
-            print("%s: Returned %s" % (outFile, ret))
-            if ret == 2 :
-                print("SIGINT received, terminating.")
-                exit(2)
-            #print('Cmd: %s' % cmd)
+            if not options.backwardOnly :
+                outFile = nameForwardFlow(prev, s)
+                cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, leftFile, rightFile, options.outDir + os.sep + outFile)
+                ret = os.system(cmd)
+                print("%s: Returned %s" % (outFile, ret))
+                if ret == 2 :
+                    print("SIGINT received, terminating.")
+                    exit(2)
             
-            outFile = nameBackwardFlow(prev, s)
-            #cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, options.outDir + os.sep + outFile)
-            #print('Cmd: %s' % cmd)
-            #ret = os.system(cmd)
-            #print("%s: Returned %s" % (outFile, ret))
+            if not options.forwardOnly :
+                outFile = nameBackwardFlow(prev, s)
+                cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, options.outDir + os.sep + outFile)
+                ret = os.system(cmd)
+                print("%s: Returned %s" % (outFile, ret))
+                if ret == 2 :
+                    print("SIGINT received, terminating.")
+                    exit(2)
         prev = s
