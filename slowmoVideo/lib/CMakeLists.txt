@@ -1,8 +1,6 @@
-
-#find_package(Qt4 REQUIRED)
-#include(${QT_USE_FILE})
-#include_directories(${QT_INCLUDES})
-
+# Static libraries
+# http://www.itk.org/pipermail/insight-users/2007-November/024141.html
+# http://www.linux-magazin.de/Heft-Abo/Ausgaben/2007/02/Mal-ausspannen
 
 set(LIB_SRC
   interpolate_sV.cpp

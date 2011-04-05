@@ -1,3 +1,5 @@
+# Docs: http://www.cmake.org/cmake/help/cmake-2-8-docs.html
+
 cmake_minimum_required(VERSION 2.8)
 
 project(slowmoVideo)
@@ -14,6 +16,7 @@ include_directories(${QT_INCLUDES})
 
 add_subdirectory(lib)
 add_subdirectory(slowmoCLI)
+add_subdirectory(slowmoUI)
 add_subdirectory(test)
 
 set(CMAKE_BUILD_TYPE Debug)
