@@ -8,7 +8,7 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include "interpolateSV.h"
+#include "interpolate_sV.h"
 
 #include <cmath>
 
@@ -76,7 +76,7 @@ QColor interpolate(const QImage& in, float x, float y)
 #endif
 
 
-void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage& output)
+void Interpolate_sV::twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage& output)
 {
 #ifdef INTERPOLATE
     const int Wmax = left.width()-1;
@@ -86,7 +86,7 @@ void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QI
 
     QColor colFlow, colOut, colLeft, colRight;
     float r,g,b;
-    InterpolateSV::Movement forward, backward;
+    Interpolate_sV::Movement forward, backward;
 
     for (int x = 0; x < left.width(); x++) {
 	for (int y = 0; y < left.height(); y++) {
@@ -129,7 +129,7 @@ void InterpolateSV::twowayFlow(const QImage& left, const QImage& right, const QI
     }
 }
 
-void InterpolateSV::forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output)
+void Interpolate_sV::forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output)
 {
 #ifdef INTERPOLATE
     float posX, posY;
@@ -138,7 +138,7 @@ void InterpolateSV::forwardFlow(const QImage& left, const QImage& flow, float po
 #endif
 
     QColor colFlow, colOut;
-    InterpolateSV::Movement forward;    
+    Interpolate_sV::Movement forward;    
 
     for (int x = 0; x < left.width(); x++) {
 	for (int y = 0; y < left.height(); y++) {

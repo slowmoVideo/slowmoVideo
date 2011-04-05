@@ -2,6 +2,20 @@ cmake_minimum_required(VERSION 2.8)
 
 project(slowmoVideo)
 
+set(CMAKE_INSTALL_PREFIX
+  ../..
+)
+
+
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
+include_directories(${QT_INCLUDES})
+
+
+add_subdirectory(lib)
+add_subdirectory(slowmoCLI)
+add_subdirectory(test)
+
 set(CMAKE_BUILD_TYPE Debug)
 
 # To compile with clang:
@@ -12,38 +26,9 @@ set(CMAKE_CXX_FLAGS
   -Wall
 )
 
-set(SOURCES
-  main.cpp
-  interpolateSV.cpp
-  SVproject.cpp
-)
 
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
-include_directories(${QT_INCLUDES})
-
-
-
-macro(copy_files FILELIST)
-  foreach (FILENAME ${FILELIST})
-    set(FILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-    set(FILE_DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-    message("   Copying " ${FILENAME} " to " ${FILE_DST})
-
-    configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)
-  endforeach(FILENAME)
-endmacro(copy_files)
-
+include(cmake/macros.cmake)
 copy_files(
   fetch.sh
 )
-
-add_executable(slowmoVideo ${SOURCES})
-target_link_libraries(slowmoVideo ${QT_LIBRARIES})
-
-project(Test)
-
-set(SOURCES_TEST
-    test.cpp
-)
-add_executable(Test ${SOURCES_TEST})
+install(FILES fetch.sh DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

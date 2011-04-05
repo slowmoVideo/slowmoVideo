@@ -20,7 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 
-#include "interpolateSV.h"
+#include "../lib/interpolate_sV.h"
 
 
 const int RET_MISSING_PARAM = -1;
@@ -175,9 +175,9 @@ int main(int argc, char *argv[])
     for (unsigned int step = 0; step < steps+1; step++) {
 	pos = step/float(steps);
         if (mode == FlowMode_Twoway) {
-            InterpolateSV::twowayFlow(left, right, flow, flowBack, pos, output);
+            Interpolate_sV::twowayFlow(left, right, flow, flowBack, pos, output);
         } else if (mode == FlowMode_Forward) {
-            InterpolateSV::forwardFlow(left, flow, pos, output);
+            Interpolate_sV::forwardFlow(left, flow, pos, output);
         }
         filename = pattern.arg(QString::number(numberOffset + step), stepLog, fillChar);
         qDebug() << "Saving position " << pos << " to image " << filename;

@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class QImage;
 
-class InterpolateSV {
+class Interpolate_sV {
 
  public:
 
