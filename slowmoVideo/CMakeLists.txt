@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS
 set(SOURCES
   main.cpp
   interpolateSV.cpp
+  SVproject.cpp
 )
 
 find_package(Qt4 REQUIRED)
@@ -39,3 +40,10 @@ copy_files(
 
 add_executable(slowmoVideo ${SOURCES})
 target_link_libraries(slowmoVideo ${QT_LIBRARIES})
+
+project(Test)
+
+set(SOURCES_TEST
+    test.cpp
+)
+add_executable(Test ${SOURCES_TEST})
