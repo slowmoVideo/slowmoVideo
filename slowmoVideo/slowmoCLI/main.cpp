@@ -1,5 +1,5 @@
 /*
-slowmoVideo creates slow-motion videos from normal-speed videos.
+slowmoCLI is a command-line interface for slowmoVideo.
 Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
 
 This program is free software: you can redistribute it and/or modify

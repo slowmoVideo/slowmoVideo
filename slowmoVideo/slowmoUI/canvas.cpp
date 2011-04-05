@@ -1,19 +1,43 @@
+/*
+slowmoUI is a user interface for slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "canvas.h"
 #include "ui_canvas.h"
 
+#include <QDebug>
+
 #include <QColor>
 #include <QImage>
+#include <QMouseEvent>
 #include <QPainter>
+
+#include <QPoint>
+#include <QPointF>
 
 Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
-    distLeft(50),
-    distBottom(50),
-    t0x(0),
-    t0y(0)
+    m_lastMousePos(0,0),
+    m_mouseWithinWidget(false),
+    m_distLeft(50),
+    m_distBottom(50),
+    m_t0x(0),
+    m_t0y(0),
+    m_secResX(100),
+    m_secResY(100),
+    m_nodes()
 {
     ui->setupUi(this);
+
+    // Enable mouse tracking (not only when a mouse button is pressed)
+    this->setMouseTracking(true);
 }
 
 Canvas::~Canvas()
@@ -21,10 +45,64 @@ Canvas::~Canvas()
     delete ui;
 }
 
+
+
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter davinci(this);
     QImage im(this->size(), QImage::Format_ARGB32);
     im.fill(QColor(50, 50, 60).rgb());
     davinci.drawImage(0, 0, im);
+    davinci.setPen(QColor::fromRgb(240, 240, 240));
+    if (m_mouseWithinWidget) {
+        qDebug() << "lining.";
+        davinci.drawLine(m_lastMousePos.x(), 0, m_lastMousePos.x(), this->height()-1);
+    }
+
+    for (int i = 0; i < m_nodes.size(); i++) {
+        davinci.drawEllipse(convertTimeToCanvas(m_nodes.at(i)), 3, 3);
+    }
+}
+
+void Canvas::mouseMoveEvent(QMouseEvent *e)
+{
+    m_lastMousePos = e->pos();
+    m_mouseWithinWidget = true;
+    qDebug() << "At " << m_lastMousePos;
+    this->repaint();
+}
+
+void Canvas::mousePressEvent(QMouseEvent *e)
+{
+    QPointF p = convertCanvasToTime(e->pos());
+    convertTimeToCanvas(p);
+    m_nodes.append(p);
+    this->repaint();
+}
+
+void Canvas::leaveEvent(QEvent *)
+{
+    m_mouseWithinWidget = false;
+}
+
+const QPointF Canvas::convertCanvasToTime(const QPoint &p) const
+{
+    QPointF out(
+                m_t0x + float(p.x()-m_distLeft)/m_secResX,
+                m_t0y + float(this->height()-1 - m_distBottom - p.y()) / m_secResY
+            );
+
+    qDebug() << "Time: " << out;
+
+    return out;
+}
+
+const QPoint Canvas::convertTimeToCanvas(const QPointF &p) const
+{
+    QPoint out(
+                (p.x()-m_t0x)*m_secResX + m_distLeft,
+                this->height()-1 - m_distBottom - (p.y()-m_t0y)*m_secResY
+           );
+    qDebug() << "Point: " << out;
+    return out;
 }
