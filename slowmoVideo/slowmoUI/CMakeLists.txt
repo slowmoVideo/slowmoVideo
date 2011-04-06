@@ -8,6 +8,8 @@ set(SRCS
   main.cpp
   mainwindow.cpp
   canvas.cpp
+  node.cpp
+  nodelist.cpp
 )
 
 set(SRCS_UI

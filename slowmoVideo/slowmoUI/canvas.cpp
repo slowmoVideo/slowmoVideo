@@ -9,6 +9,8 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "canvas.h"
+#include "node.h"
+#include "nodelist.h"
 #include "ui_canvas.h"
 
 #include <QDebug>
@@ -59,8 +61,13 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.drawLine(m_lastMousePos.x(), 0, m_lastMousePos.x(), this->height()-1);
     }
 
+    const Node *prev = NULL;
     for (int i = 0; i < m_nodes.size(); i++) {
         davinci.drawEllipse(convertTimeToCanvas(m_nodes.at(i)), 3, 3);
+        if (prev != NULL) {
+            davinci.drawLine(convertTimeToCanvas(*prev), convertTimeToCanvas(m_nodes.at(i)));
+        }
+        prev = &m_nodes.at(i);
     }
 }
 
@@ -74,10 +81,14 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
-    QPointF p = convertCanvasToTime(e->pos());
-    convertTimeToCanvas(p);
-    m_nodes.append(p);
-    this->repaint();
+    if (e->pos().x() >= m_distLeft && e->pos().y() < this->height()-m_distBottom) {
+        Node p = convertCanvasToTime(e->pos());
+        convertTimeToCanvas(p);
+        m_nodes.add(p);
+        this->repaint();
+    } else {
+        qDebug() << "Not inside bounds.";
+    }
 }
 
 void Canvas::leaveEvent(QEvent *)
@@ -85,19 +96,19 @@ void Canvas::leaveEvent(QEvent *)
     m_mouseWithinWidget = false;
 }
 
-const QPointF Canvas::convertCanvasToTime(const QPoint &p) const
+const Node Canvas::convertCanvasToTime(const QPoint &p) const
 {
-    QPointF out(
+    Node out(
                 m_t0x + float(p.x()-m_distLeft)/m_secResX,
                 m_t0y + float(this->height()-1 - m_distBottom - p.y()) / m_secResY
             );
 
-    qDebug() << "Time: " << out;
+    qDebug() << "Time: " << out.x() << "|" << out.y();
 
     return out;
 }
 
-const QPoint Canvas::convertTimeToCanvas(const QPointF &p) const
+const QPoint Canvas::convertTimeToCanvas(const Node &p) const
 {
     QPoint out(
                 (p.x()-m_t0x)*m_secResX + m_distLeft,

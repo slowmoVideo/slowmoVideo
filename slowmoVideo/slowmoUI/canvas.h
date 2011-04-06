@@ -11,12 +11,13 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef CANVAS_H
 #define CANVAS_H
 
+#include "nodelist.h"
 
 #include <QWidget>
 #include <QList>
 
 class QPoint;
-class QPointF;
+class Node;
 
 namespace Ui {
     class Canvas;
@@ -49,10 +50,10 @@ private:
     unsigned int m_secResX;
     unsigned int m_secResY;
 
-    QList<QPointF> m_nodes;
+    NodeList m_nodes;
 
-    const QPointF convertCanvasToTime(const QPoint &p) const;
-    const QPoint convertTimeToCanvas(const QPointF &p) const;
+    const Node convertCanvasToTime(const QPoint &p) const;
+    const QPoint convertTimeToCanvas(const Node &p) const;
 };
 
 #endif // CANVAS_H
