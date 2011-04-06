@@ -103,7 +103,7 @@ const Node Canvas::convertCanvasToTime(const QPoint &p) const
                 m_t0y + float(this->height()-1 - m_distBottom - p.y()) / m_secResY
             );
 
-    qDebug() << "Time: " << out.x() << "|" << out.y();
+    qDebug() << "Time: " << out;
 
     return out;
 }

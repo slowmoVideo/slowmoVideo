@@ -29,4 +29,6 @@ private:
     qreal m_y;
 };
 
+QDebug operator<<(QDebug qd, const Node& n);
+
 #endif // NODE_H

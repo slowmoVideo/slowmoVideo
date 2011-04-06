@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "node.h"
+#include <QDebug>
 
 Node::Node() :
     m_x(0),
@@ -31,3 +32,8 @@ bool Node::operator <(const Node& other) const
     return m_x < other.x();
 }
 
+QDebug operator<<(QDebug qd, const Node& n)
+{
+    qd.nospace() << "(" << n.x() << "|" << n.y() << ")";
+    return qd.maybeSpace();
+}
