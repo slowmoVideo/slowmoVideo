@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "canvas.h"
 
 #include <QDebug>
 
@@ -23,15 +24,16 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
+    m_wCanvas = new Canvas(this);
+    setCentralWidget(m_wCanvas);
+
+
     // Set up shortcut bindings
-    m_keyList.insert(MainWindow::Add, "a");
-    m_keyList.insert(MainWindow::Add_Clip, "a");
-    m_keyList.insert(MainWindow::Add_Color, "c");
-    m_keyList.insert(MainWindow::Add_Text, "t");
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
-    m_keyList.insert(MainWindow::Help, "h");
-    m_keyList.insert(MainWindow::Help_Help, "h");
+    m_keyList.insert(MainWindow::Delete, "d");
+    m_keyList.insert(MainWindow::Delete_Node, "n");
 
     QList<QString> uniqueKeys;
     QList<QString> keys = m_keyList.values();
@@ -57,8 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
         // Connect shortcut to the signal mapper
         b &= connect(shortcut, SIGNAL(activated()), m_signalMapper, SLOT(map()));
     }
-
     b &= connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(shortcutUsed(QString)));
+
+    b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
 
     Q_ASSERT(b);
 
@@ -97,6 +100,11 @@ void MainWindow::shortcutUsed(QString which)
         if (m_lastShortcut.shortcut == m_keyList[MainWindow::Quit]) {
             if (which == m_keyList[MainWindow::Quit_Quit]) {
                 qApp->quit();
+            }
+        }
+        if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
+            if (which == m_keyList[MainWindow::Delete_Node]) {
+                emit deleteNodes();
             }
         }
 

@@ -20,13 +20,18 @@ public:
     Node(const qreal &x, const qreal &y);
 
     bool operator<(const Node &other) const;
+    bool operator==(const Node &other) const;
 
     qreal x() const;
     qreal y() const;
 
+    void select(bool);
+    bool selected() const;
+
 private:
     qreal m_x;
     qreal m_y;
+    bool m_selected;
 };
 
 QDebug operator<<(QDebug qd, const Node& n);

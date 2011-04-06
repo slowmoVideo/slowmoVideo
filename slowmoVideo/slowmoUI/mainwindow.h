@@ -21,8 +21,7 @@ namespace Ui {
 #include <QList>
 #include <QTime>
 
-class DispWidget;
-class HelpText;
+class Canvas;
 class QShortcut;
 class QSignalMapper;
 
@@ -44,14 +43,10 @@ public:
     ~MainWindow();
 
     enum ShortcutCommands {
-        Add,
-        Add_Clip,
-        Add_Color,
-        Add_Text,
         Quit,
         Quit_Quit,
-        Help,
-        Help_Help
+        Delete,
+        Delete_Node
     };
 
 private:
@@ -64,6 +59,8 @@ private:
     QList<QShortcut *> m_shortcutList;
     QMap<int, QString> m_keyList;
 
+    Canvas *m_wCanvas;
+
 private slots:
     /**
       Handles timed shortcuts.
@@ -71,6 +68,11 @@ private slots:
       between the two key strokes is small enough.
      */
     void shortcutUsed(QString);
+
+
+signals:
+    void deleteNodes();
+
 };
 
 #endif // MAINWINDOW_H

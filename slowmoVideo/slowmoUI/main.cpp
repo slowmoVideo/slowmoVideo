@@ -10,15 +10,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtGui/QApplication>
 #include "mainwindow.h"
-#include "canvas.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-
-    Canvas canvas(NULL);
-    w.setCentralWidget(&canvas);
 
     w.show();
 

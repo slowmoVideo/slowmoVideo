@@ -19,7 +19,8 @@ Node::Node() :
 
 Node::Node(const qreal &x, const qreal &y) :
     m_x(x),
-    m_y(y)
+    m_y(y),
+    m_selected(false)
 {
 
 }
@@ -27,13 +28,26 @@ Node::Node(const qreal &x, const qreal &y) :
 qreal Node::x() const { return m_x; }
 qreal Node::y() const { return m_y; }
 
+void Node::select(bool select)
+{
+    m_selected = select;
+}
+bool Node::selected() const { return m_selected; }
+
 bool Node::operator <(const Node& other) const
 {
     return m_x < other.x();
 }
+bool Node::operator ==(const Node& other) const
+{
+    return m_x == other.x() && m_y == other.y();
+}
 
 QDebug operator<<(QDebug qd, const Node& n)
 {
-    qd.nospace() << "(" << n.x() << "|" << n.y() << ")";
+    qd.nospace() << "(";
+    qd.nospace() << n.x() << "|" << n.y();
+    if (n.selected()) { qd.nospace() << "|s"; }
+    qd.nospace() << ")";
     return qd.maybeSpace();
 }

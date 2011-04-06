@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QWidget>
 #include <QList>
 
+class QColor;
 class QPoint;
 class Node;
 
@@ -30,6 +31,14 @@ class Canvas : public QWidget
 public:
     explicit Canvas(QWidget *parent = 0);
     ~Canvas();
+
+    static QColor lineCol;
+    static QColor nodeCol;
+    static QColor selectedCol;
+    static QColor backgroundCol;
+
+public slots:
+    void slotDeleteNodes();
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -54,6 +63,8 @@ private:
 
     const Node convertCanvasToTime(const QPoint &p) const;
     const QPoint convertTimeToCanvas(const Node &p) const;
+
+    bool selectAt(const QPoint& pos, bool addToSelection = false);
 };
 
 #endif // CANVAS_H

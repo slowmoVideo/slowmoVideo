@@ -23,6 +23,13 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QPoint>
 #include <QPointF>
 
+#define NODE_RADIUS 4
+
+QColor Canvas::selectedCol(200, 200, 255);
+QColor Canvas::lineCol(220, 220, 220);
+QColor Canvas::nodeCol(240, 240, 240);
+QColor Canvas::backgroundCol(30, 30, 40);
+
 Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
@@ -48,25 +55,64 @@ Canvas::~Canvas()
 }
 
 
+bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
+{
+    bool selected = false;
+    uint ti = m_nodes.find(convertCanvasToTime(pos).x());
+    qDebug() << "Nearest node index: " << ti;
+    if (m_nodes.size() > ti) {
+        QPoint p = convertTimeToCanvas(m_nodes.at(ti));
+        if (
+                abs(p.x() - pos.x()) <= NODE_RADIUS &&
+                abs(p.y() - pos.y()) <= NODE_RADIUS
+            ) {
+            qDebug() << "Selected.";
+
+            if (!addToSelection) {
+                m_nodes.unselectAll();
+            }
+            m_nodes[ti].select(true);
+            selected = true;
+        }
+    }
+    return selected;
+}
+
+
 
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter davinci(this);
-    QImage im(this->size(), QImage::Format_ARGB32);
-    im.fill(QColor(50, 50, 60).rgb());
-    davinci.drawImage(0, 0, im);
-    davinci.setPen(QColor::fromRgb(240, 240, 240));
+    davinci.setRenderHint(QPainter::Antialiasing, true);
+
+    davinci.fillRect(0, 0, width(), height(), backgroundCol);
+
+    davinci.setPen(lineCol);
     if (m_mouseWithinWidget) {
-        qDebug() << "lining.";
         davinci.drawLine(m_lastMousePos.x(), 0, m_lastMousePos.x(), this->height()-1);
     }
+    int bottom = height()-1 - m_distBottom;
+    davinci.drawLine(m_distLeft, bottom, width()-1, bottom);
+    davinci.drawLine(m_distLeft, bottom, m_distLeft, 0);
 
     const Node *prev = NULL;
+    const Node *curr = NULL;
     for (int i = 0; i < m_nodes.size(); i++) {
-        davinci.drawEllipse(convertTimeToCanvas(m_nodes.at(i)), 3, 3);
-        if (prev != NULL) {
-            davinci.drawLine(convertTimeToCanvas(*prev), convertTimeToCanvas(m_nodes.at(i)));
+        curr = &m_nodes.at(i);
+
+        QPoint p = convertTimeToCanvas(*curr);
+
+        davinci.setPen(nodeCol);
+        davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
+        if (curr->selected()) {
+            davinci.setPen(selectedCol);
+            davinci.drawRect(p.x()-NODE_RADIUS-1, p.y()-NODE_RADIUS-1, 2*NODE_RADIUS+3, 2*NODE_RADIUS+3);
         }
+        if (prev != NULL) {
+            davinci.setPen(lineCol);
+            davinci.drawLine(convertTimeToCanvas(*prev), p);
+        }
+
         prev = &m_nodes.at(i);
     }
 }
@@ -75,17 +121,21 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 {
     m_lastMousePos = e->pos();
     m_mouseWithinWidget = true;
-    qDebug() << "At " << m_lastMousePos;
-    this->repaint();
+    repaint();
 }
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
     if (e->pos().x() >= m_distLeft && e->pos().y() < this->height()-m_distBottom) {
-        Node p = convertCanvasToTime(e->pos());
-        convertTimeToCanvas(p);
-        m_nodes.add(p);
-        this->repaint();
+        // Try to select a node below the mouse. If there is none, add a point.
+        bool selected = selectAt(e->pos(), e->modifiers() && Qt::ControlModifier);
+        if (!selected) {
+            Node p = convertCanvasToTime(e->pos());
+            convertTimeToCanvas(p);
+            m_nodes.add(p);
+        }
+        repaint();
+        qDebug() << "Node list: " << m_nodes;
     } else {
         qDebug() << "Not inside bounds.";
     }
@@ -94,6 +144,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
 void Canvas::leaveEvent(QEvent *)
 {
     m_mouseWithinWidget = false;
+    repaint();
 }
 
 const Node Canvas::convertCanvasToTime(const QPoint &p) const
@@ -102,9 +153,6 @@ const Node Canvas::convertCanvasToTime(const QPoint &p) const
                 m_t0x + float(p.x()-m_distLeft)/m_secResX,
                 m_t0y + float(this->height()-1 - m_distBottom - p.y()) / m_secResY
             );
-
-    qDebug() << "Time: " << out;
-
     return out;
 }
 
@@ -114,6 +162,16 @@ const QPoint Canvas::convertTimeToCanvas(const Node &p) const
                 (p.x()-m_t0x)*m_secResX + m_distLeft,
                 this->height()-1 - m_distBottom - (p.y()-m_t0y)*m_secResY
            );
-    qDebug() << "Point: " << out;
     return out;
+}
+
+
+void Canvas::slotDeleteNodes()
+{
+    qDebug() << "Will delete";
+    uint nDel = m_nodes.deleteSelected();
+    qDebug() << nDel << " deleted.";
+    if (nDel > 0) {
+        repaint();
+    }
 }
