@@ -10,7 +10,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "canvas.h"
 
 #include <QDebug>
 
@@ -32,8 +31,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Set up shortcut bindings
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
+    m_keyList.insert(MainWindow::Abort, "x");
     m_keyList.insert(MainWindow::Delete, "d");
     m_keyList.insert(MainWindow::Delete_Node, "n");
+    m_keyList.insert(MainWindow::Tool, "t");
+    m_keyList.insert(MainWindow::Tool_Add, "a");
+    m_keyList.insert(MainWindow::Tool_Select, "s");
 
     QList<QString> uniqueKeys;
     QList<QString> keys = m_keyList.values();
@@ -62,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(shortcutUsed(QString)));
 
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
+    b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
+    b &= connect(this, SIGNAL(abort()), m_wCanvas, SLOT(slotAbort()));
 
     Q_ASSERT(b);
 
@@ -102,14 +107,24 @@ void MainWindow::shortcutUsed(QString which)
                 qApp->quit();
             }
         }
-        if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
+        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
             if (which == m_keyList[MainWindow::Delete_Node]) {
                 emit deleteNodes();
             }
         }
-
+        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Tool]) {
+            if (which == m_keyList[MainWindow::Tool_Add]) {
+                emit setMode(Canvas::ToolMode_Add);
+            } else if (which == m_keyList[MainWindow::Tool_Select]) {
+                emit setMode(Canvas::ToolMode_Select);
+            }
+        }
     } else {
-        qDebug() << "(Shortcut timed out.)";
+        if (which == m_keyList[MainWindow::Abort]) {
+            emit abort();
+        } else {
+            qDebug() << "(Shortcut timed out.)";
+        }
     }
 
     m_lastShortcut = ts;

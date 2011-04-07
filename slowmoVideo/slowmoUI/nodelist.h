@@ -30,16 +30,25 @@ public:
 
     void unselectAll();
 
+    void moveSelected(const Node &time);
+    void confirmMove();
+    void abortMove();
+
 
     uint find(qreal time) const;
 
-    const Node& at(int i) const;
+    /**
+      @return A pointer to the node at the given time (or not further
+      than minDist away), or NULL if there is no node at t.
+      */
+    const Node* at(qreal t) const;
+    const Node& at(uint i) const;
     Node& operator[](int i);
     int size() const;
 
 private:
     QList<Node> m_list;
-    float m_minDist;
+    const float m_minDist;
 };
 
 QDebug operator<<(QDebug qd, const NodeList &list);

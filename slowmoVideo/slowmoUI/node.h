@@ -21,16 +21,30 @@ public:
 
     bool operator<(const Node &other) const;
     bool operator==(const Node &other) const;
+    Node operator-(const Node &other) const;
 
     qreal x() const;
     qreal y() const;
+    qreal xUnmoved() const;
+    qreal yUnmoved() const;
+
+    qreal setX(qreal x);
+    qreal setY(qreal y);
 
     void select(bool);
     bool selected() const;
 
+    void move(const Node &dist);
+    void abortMove();
+    void confirmMove();
+
 private:
     qreal m_x;
     qreal m_y;
+
+    qreal m_moveX;
+    qreal m_moveY;
+
     bool m_selected;
 };
 

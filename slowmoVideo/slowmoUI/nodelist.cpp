@@ -62,6 +62,59 @@ void NodeList::unselectAll()
     }
 }
 
+void NodeList::moveSelected(const Node &time)
+{
+    qreal maxRMove = 1000;
+    qreal maxLMove = -1000;
+    const Node *left = NULL;
+    const Node *right;
+    for (uint i = 0; i < m_list.size(); i++) {
+        right = &m_list.at(i);
+
+        if (left != NULL) {
+            if (left->selected() && !right->selected()) {
+                // Move-right distance
+                maxRMove = qMin(maxRMove, right->xUnmoved() - left->xUnmoved());
+            } else if (!left->selected() && right->selected()) {
+                // Move-left distance
+                maxLMove = qMax(maxLMove, left->xUnmoved() - right->xUnmoved());
+            }
+        }
+
+        left = right;
+    }
+    if (m_list.size() > 0) {
+        // Do not allow to move nodes to x < 0
+        maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
+    }
+    qDebug() << "Max move: left " << maxLMove << ", right: " << maxRMove;
+    if (maxLMove <= time.x() && time.x() <= maxRMove) {
+        for (uint i = 0; i < m_list.size(); i++) {
+            if (m_list.at(i).selected()) {
+                m_list[i].move(time);
+            }
+        }
+    } else {
+        qDebug() << "Not within valid range:" << time;
+    }
+}
+void NodeList::confirmMove()
+{
+    for (uint i = 0; i < m_list.size(); i++) {
+        if (m_list.at(i).selected()) {
+            m_list[i].confirmMove();
+        }
+    }
+}
+void NodeList::abortMove()
+{
+    for (uint i = 0; i < m_list.size(); i++) {
+        if (m_list.at(i).selected()) {
+            m_list[i].abortMove();
+        }
+    }
+}
+
 uint NodeList::find(qreal time) const
 {
     uint pos;
@@ -73,13 +126,22 @@ uint NodeList::find(qreal time) const
     return pos;
 }
 
-const Node& NodeList::at(int i) const { return m_list.at(i); }
+const Node* NodeList::at(qreal t) const
+{
+    for (int i = 0; i < m_list.size(); i++) {
+        if (fabs(m_list.at(i).x() - t) < m_minDist) {
+            return &m_list.at(i);
+        }
+    }
+    return NULL;
+}
+const Node& NodeList::at(uint i) const { return m_list.at(i); }
 Node& NodeList::operator[](int i) { return m_list[i]; }
 int NodeList::size() const { return m_list.size(); }
 
 QDebug operator<<(QDebug dbg, const NodeList &list)
 {
-    for (int i = 0; i < list.size(); i++) {
+    for (uint i = 0; i < list.size(); i++) {
         dbg.nospace() << list.at(i) << " ";
     }
     return dbg.maybeSpace();

@@ -20,13 +20,20 @@ Node::Node() :
 Node::Node(const qreal &x, const qreal &y) :
     m_x(x),
     m_y(y),
+    m_moveX(0),
+    m_moveY(0),
     m_selected(false)
 {
 
 }
 
-qreal Node::x() const { return m_x; }
-qreal Node::y() const { return m_y; }
+qreal Node::x() const { return m_x + m_moveX; }
+qreal Node::y() const { return m_y + m_moveY; }
+qreal Node::xUnmoved() const { return m_x; }
+qreal Node::yUnmoved() const { return m_y; }
+
+qreal Node::setX(qreal x) { qreal ret = m_x; m_x = x; return ret; }
+qreal Node::setY(qreal y) { qreal ret = m_y; m_y = y; return ret; }
 
 void Node::select(bool select)
 {
@@ -38,9 +45,34 @@ bool Node::operator <(const Node& other) const
 {
     return m_x < other.x();
 }
+
+void Node::move(const Node &dist)
+{
+    m_moveX = dist.x();
+    m_moveY = dist.y();
+}
+void Node::abortMove()
+{
+    m_moveX = 0;
+    m_moveY = 0;
+}
+void Node::confirmMove()
+{
+    m_x += m_moveX;
+    m_y += m_moveY;
+    m_moveX = 0;
+    m_moveY = 0;
+}
+
 bool Node::operator ==(const Node& other) const
 {
-    return m_x == other.x() && m_y == other.y();
+    return m_x == other.m_x && m_y == other.m_y
+            && m_moveX == other.m_moveX && m_moveY == other.m_moveY;
+}
+
+Node Node::operator -(const Node& other) const
+{
+    return Node(m_x - other.m_x, m_y - other.m_y);
 }
 
 QDebug operator<<(QDebug qd, const Node& n)

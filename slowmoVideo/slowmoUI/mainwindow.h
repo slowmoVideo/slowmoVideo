@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "canvas.h"
 
 namespace Ui {
     class MainWindow;
@@ -45,8 +46,12 @@ public:
     enum ShortcutCommands {
         Quit,
         Quit_Quit,
+        Abort,
         Delete,
-        Delete_Node
+        Delete_Node,
+        Tool,
+        Tool_Add,
+        Tool_Select
     };
 
 private:
@@ -72,6 +77,8 @@ private slots:
 
 signals:
     void deleteNodes();
+    void setMode(const Canvas::ToolMode mode);
+    void abort();
 
 };
 
