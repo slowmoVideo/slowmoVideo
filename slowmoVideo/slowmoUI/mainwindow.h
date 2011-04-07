@@ -47,6 +47,7 @@ public:
         Quit,
         Quit_Quit,
         Abort,
+        Abort_Selection,
         Delete,
         Delete_Node,
         Tool,
@@ -78,7 +79,7 @@ private slots:
 signals:
     void deleteNodes();
     void setMode(const Canvas::ToolMode mode);
-    void abort();
+    void abort(const Canvas::Abort abort);
 
 };
 

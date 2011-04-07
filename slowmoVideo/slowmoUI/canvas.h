@@ -33,6 +33,7 @@ public:
     ~Canvas();
 
     enum ToolMode {ToolMode_Add, ToolMode_Select};
+    enum Abort { Abort_General, Abort_Selection };
 
     static QColor lineCol;
     static QColor nodeCol;
@@ -42,7 +43,7 @@ public:
 
 
 public slots:
-    void slotAbort();
+    void slotAbort(Canvas::Abort abort);
     void slotDeleteNodes();
     void slotSetToolMode(Canvas::ToolMode mode);
 
@@ -84,5 +85,6 @@ private:
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);
+QDebug operator<<(QDebug qd, const Canvas::Abort &abort);
 
 #endif // CANVAS_H

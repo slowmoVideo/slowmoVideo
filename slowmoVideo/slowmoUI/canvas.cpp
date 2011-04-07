@@ -77,10 +77,16 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
             ) {
             qDebug() << "Selected.";
 
-            if (!addToSelection) {
+
+            if (!m_nodes.at(ti).selected() && !addToSelection) {
                 m_nodes.unselectAll();
             }
-            m_nodes[ti].select(true);
+
+            if (addToSelection) {
+                m_nodes[ti].select(!m_nodes.at(ti).selected());
+            } else {
+                m_nodes[ti].select(true);
+            }
             selected = true;
         }
     }
@@ -235,11 +241,21 @@ const QPoint Canvas::convertTimeToCanvas(const Node &p) const
 }
 
 
-void Canvas::slotAbort()
+void Canvas::slotAbort(Canvas::Abort abort)
 {
-    m_moveAborted = true;
-    m_nodes.abortMove();
-    repaint();
+    qDebug() << "Signal: " << abort;
+    switch (abort) {
+    case Abort_General:
+        m_moveAborted = true;
+        m_nodes.abortMove();
+        repaint();
+        break;
+    case Abort_Selection:
+        m_nodes.unselectAll();
+        repaint();
+        break;
+    }
+
 }
 
 void Canvas::slotDeleteNodes()
@@ -258,14 +274,27 @@ void Canvas::slotSetToolMode(ToolMode mode)
     qDebug() << "Mode set to: " << mode;
 }
 
-QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode)
+QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)
 {
     switch(mode) {
     case Canvas::ToolMode_Add:
-        qd << "Add";
+        qd << "Add tool";
         break;
     case Canvas::ToolMode_Select:
-        qd << "Select";
+        qd << "Select tool";
+        break;
+    }
+    return qd.maybeSpace();
+}
+
+QDebug operator <<(QDebug qd, const Canvas::Abort &abort)
+{
+    switch(abort) {
+    case Canvas::Abort_General:
+        qd << "Abort General";
+        break;
+    case Canvas::Abort_Selection:
+        qd << "Abort Selection";
         break;
     }
     return qd.maybeSpace();

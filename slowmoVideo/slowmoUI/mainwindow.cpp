@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
     m_keyList.insert(MainWindow::Abort, "x");
+    m_keyList.insert(MainWindow::Abort_Selection, "s");
     m_keyList.insert(MainWindow::Delete, "d");
     m_keyList.insert(MainWindow::Delete_Node, "n");
     m_keyList.insert(MainWindow::Tool, "t");
@@ -66,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
-    b &= connect(this, SIGNAL(abort()), m_wCanvas, SLOT(slotAbort()));
+    b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
 
     Q_ASSERT(b);
 
@@ -107,6 +108,11 @@ void MainWindow::shortcutUsed(QString which)
                 qApp->quit();
             }
         }
+        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Abort]) {
+            if (which == m_keyList[MainWindow::Abort_Selection]) {
+                emit abort(Canvas::Abort_Selection);
+            }
+        }
         else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
             if (which == m_keyList[MainWindow::Delete_Node]) {
                 emit deleteNodes();
@@ -121,7 +127,7 @@ void MainWindow::shortcutUsed(QString which)
         }
     } else {
         if (which == m_keyList[MainWindow::Abort]) {
-            emit abort();
+            emit abort(Canvas::Abort_General);
         } else {
             qDebug() << "(Shortcut timed out.)";
         }
