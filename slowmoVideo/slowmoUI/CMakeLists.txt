@@ -25,8 +25,9 @@ set(SRCS_MOC
 set(RES
   res/iconAdd.png
   res/iconSel.png
+  res/iconMov.png
 )
-copy_files_basedir("${RES}")
+copy_files("${RES}")
 
 # Generate header files from the .ui files
 qt4_wrap_ui(UI_H ${SRCS_UI})

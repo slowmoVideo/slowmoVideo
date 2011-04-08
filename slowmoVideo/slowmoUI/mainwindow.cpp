@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Tool, "t");
     m_keyList.insert(MainWindow::Tool_Add, "a");
     m_keyList.insert(MainWindow::Tool_Select, "s");
+    m_keyList.insert(MainWindow::Tool_Move, "m");
 
     QList<QString> uniqueKeys;
     QList<QString> keys = m_keyList.values();
@@ -123,6 +124,8 @@ void MainWindow::shortcutUsed(QString which)
                 emit setMode(Canvas::ToolMode_Add);
             } else if (which == m_keyList[MainWindow::Tool_Select]) {
                 emit setMode(Canvas::ToolMode_Select);
+            } else if (which == m_keyList[MainWindow::Tool_Move]) {
+                emit setMode(Canvas::ToolMode_Move);
             }
         }
     } else {

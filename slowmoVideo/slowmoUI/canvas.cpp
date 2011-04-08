@@ -28,7 +28,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define NODE_RADIUS 4
 #define NODE_SEL_DIST 2
 
-QColor Canvas::selectedCol(200, 200, 255);
+QColor Canvas::selectedCol(255, 196, 0);
 QColor Canvas::lineCol(220, 220, 220);
 QColor Canvas::nodeCol(240, 240, 240);
 QColor Canvas::gridCol(100, 100, 100);
@@ -41,7 +41,7 @@ Canvas::Canvas(QWidget *parent) :
     m_lastMousePos(0,0),
     m_mouseStart(0,0),
     m_mouseWithinWidget(false),
-    m_distLeft(50),
+    m_distLeft(90),
     m_distBottom(50),
     m_distRight(20),
     m_distTop(32),
@@ -73,8 +73,8 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
     if (m_nodes.size() > ti) {
         QPoint p = convertTimeToCanvas(m_nodes.at(ti));
         if (
-                abs(p.x() - pos.x()) <= NODE_RADIUS+1 &&
-                abs(p.y() - pos.y()) <= NODE_RADIUS+1
+                abs(p.x() - pos.x()) <= NODE_RADIUS+2 &&
+                abs(p.y() - pos.y()) <= NODE_RADIUS+2
             ) {
             qDebug() << "Selected.";
 
@@ -131,11 +131,7 @@ void Canvas::paintEvent(QPaintEvent *)
         }
     }
 
-    davinci.setOpacity(.5 + ((m_mode == ToolMode_Add) ? .5 : 0));
-    davinci.drawImage(width()-m_distRight-16, 8, QImage("res/iconAdd.png").scaled(16, 16));
-    davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
-    davinci.drawImage(width()-m_distRight-16-24, 8, QImage("res/iconSel.png").scaled(16, 16));
-    davinci.setOpacity(1);
+    drawModes(davinci, 8, width()-1 - m_distRight);
 
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_lastMousePos)) {
@@ -143,7 +139,7 @@ void Canvas::paintEvent(QPaintEvent *)
         Node time = convertCanvasToTime(m_lastMousePos);
         davinci.drawText(m_lastMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_lastMousePos.y(), m_lastMousePos.x(), m_lastMousePos.y());
-        davinci.drawText(8, m_lastMousePos.y(), QString("f %1").arg(time.y()/m_frameRate));
+        davinci.drawText(8, m_lastMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_frameRate, 2, 'f', 2));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -159,8 +155,10 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.setPen(nodeCol);
         davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (curr->selected()) {
-            davinci.setPen(selectedCol);
-            davinci.drawRect(p.x()-NODE_RADIUS-NODE_SEL_DIST, p.y()-NODE_RADIUS-NODE_SEL_DIST, 2*(NODE_RADIUS+NODE_SEL_DIST)+1, 2*(NODE_RADIUS+NODE_SEL_DIST)+1);
+            davinci.setPen(QPen(QBrush(selectedCol), 2.0));
+            davinci.drawRoundedRect(p.x()-NODE_RADIUS-NODE_SEL_DIST, p.y()-NODE_RADIUS-NODE_SEL_DIST,
+                                    2*(NODE_RADIUS+NODE_SEL_DIST)+1, 2*(NODE_RADIUS+NODE_SEL_DIST)+1,
+                                    1, 1);
         }
         if (prev != NULL) {
             davinci.setPen(lineCol);
@@ -169,6 +167,28 @@ void Canvas::paintEvent(QPaintEvent *)
 
         prev = &m_nodes.at(i);
     }
+}
+
+void Canvas::drawModes(QPainter &davinci, int t, int r)
+{
+    qreal opacity = davinci.opacity();
+    int w = 16;
+    int d = 8;
+    int dR = 0;
+
+    dR += w;
+    davinci.setOpacity(.5 + ((m_mode == ToolMode_Add) ? .5 : 0));
+    davinci.drawImage(r - dR, t, QImage("res/iconAdd.png").scaled(16, 16));
+    dR += d+w;
+
+    davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
+    davinci.drawImage(r - dR, t, QImage("res/iconSel.png").scaled(16, 16));
+    dR += d+w;
+
+    davinci.setOpacity(.5 + ((m_mode == ToolMode_Move) ? .5 : 0));
+    davinci.drawImage(r - dR, t, QImage("res/iconMov.png").scaled(16, 16));
+
+    davinci.setOpacity(opacity);
 }
 
 void Canvas::mousePressEvent(QMouseEvent *e)
@@ -214,6 +234,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 }
                 m_nodes.moveSelected(diff);
             }
+        } else if (m_mode == ToolMode_Move) {
+
         }
     }
 
@@ -294,6 +316,9 @@ QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)
         break;
     case Canvas::ToolMode_Select:
         qd << "Select tool";
+        break;
+    case Canvas::ToolMode_Move:
+        qd << "Move tool";
         break;
     }
     return qd.maybeSpace();

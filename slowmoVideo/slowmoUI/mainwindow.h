@@ -52,7 +52,8 @@ public:
         Delete_Node,
         Tool,
         Tool_Add,
-        Tool_Select
+        Tool_Select,
+        Tool_Move
     };
 
 private:

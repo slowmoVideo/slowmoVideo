@@ -32,7 +32,7 @@ public:
     explicit Canvas(QWidget *parent = 0);
     ~Canvas();
 
-    enum ToolMode {ToolMode_Add, ToolMode_Select};
+    enum ToolMode {ToolMode_Add, ToolMode_Select, ToolMode_Move };
     enum Abort { Abort_General, Abort_Selection };
 
     static QColor lineCol;
@@ -83,6 +83,8 @@ private:
     bool insideCanvas(const QPoint& pos);
 
     bool selectAt(const QPoint& pos, bool addToSelection = false);
+
+    void drawModes(QPainter &davinci, int top, int right);
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);
