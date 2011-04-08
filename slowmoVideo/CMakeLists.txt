@@ -9,6 +9,8 @@ set(CMAKE_INSTALL_PREFIX
 )
 
 
+include(cmake/macros.cmake)
+
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
@@ -30,7 +32,6 @@ set(CMAKE_CXX_FLAGS
 )
 
 
-include(cmake/macros.cmake)
 copy_files(
   fetch.sh
 )

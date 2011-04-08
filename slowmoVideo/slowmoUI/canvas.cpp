@@ -36,6 +36,7 @@ QColor Canvas::backgroundCol(30, 30, 40);
 
 Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
+    m_frameRate(30.0f),
     ui(new Ui::Canvas),
     m_lastMousePos(0,0),
     m_mouseStart(0,0),
@@ -43,7 +44,7 @@ Canvas::Canvas(QWidget *parent) :
     m_distLeft(50),
     m_distBottom(50),
     m_distRight(20),
-    m_distTop(20),
+    m_distTop(32),
     m_t0x(0),
     m_t0y(0),
     m_secResX(100),
@@ -130,9 +131,19 @@ void Canvas::paintEvent(QPaintEvent *)
         }
     }
 
+    davinci.setOpacity(.5 + ((m_mode == ToolMode_Add) ? .5 : 0));
+    davinci.drawImage(width()-m_distRight-16, 8, QImage("res/iconAdd.png").scaled(16, 16));
+    davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
+    davinci.drawImage(width()-m_distRight-16-24, 8, QImage("res/iconSel.png").scaled(16, 16));
+    davinci.setOpacity(1);
+
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_lastMousePos)) {
-        davinci.drawLine(m_lastMousePos.x(), m_distTop, m_lastMousePos.x(), height()-1);
+        davinci.drawLine(m_lastMousePos.x(), m_distTop, m_lastMousePos.x(), height()-1 - m_distBottom);
+        Node time = convertCanvasToTime(m_lastMousePos);
+        davinci.drawText(m_lastMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
+        davinci.drawLine(m_distLeft, m_lastMousePos.y(), m_lastMousePos.x(), m_lastMousePos.y());
+        davinci.drawText(8, m_lastMousePos.y(), QString("f %1").arg(time.y()/m_frameRate));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -272,6 +283,7 @@ void Canvas::slotSetToolMode(ToolMode mode)
 {
     m_mode = mode;
     qDebug() << "Mode set to: " << mode;
+    repaint();
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="64"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48+devel r"
+   sodipodi:docname="Icons.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#333333"
+     bordercolor="#909090"
+     borderopacity="1"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="16.204625"
+     inkscape:cx="22.872025"
+     inkscape:cy="64.569491"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1680"
+     inkscape:window-height="999"
+     inkscape:window-x="-2"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3069"
+       empspacing="16"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true"
+       spacingx="1px"
+       spacingy="1px"
+       empcolor="#000000"
+       empopacity="0.39607843"
+       color="#000000"
+       opacity="0.04313725" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-988.36218)">
+    <rect
+       style="color:#000000;fill:#ffffff;fill-opacity:0.64081633;fill-rule:nonzero;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3090"
+       width="16"
+       height="16"
+       x="0"
+       y="0"
+       transform="translate(0,988.36218)"
+       ry="2"
+       rx="2"
+       inkscape:export-filename="/data/cworkspace/slowmoGPU/slowmoVideo/res/iconAdd.png"
+       inkscape:export-xdpi="270"
+       inkscape:export-ydpi="270" />
+    <g
+       id="g3886"
+       inkscape:export-filename="/data/cworkspace/slowmoGPU/slowmoVideo/res/iconAdd.png"
+       inkscape:export-xdpi="270"
+       inkscape:export-ydpi="270">
+      <rect
+         ry="0"
+         rx="0"
+         transform="translate(0,988.36218)"
+         y="2"
+         x="6"
+         height="12"
+         width="4"
+         id="rect3860"
+         style="color:#000000;fill:#5b5b5b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         ry="0"
+         rx="0"
+         transform="translate(0,988.36218)"
+         y="6"
+         x="2"
+         height="4"
+         width="12"
+         id="rect3862"
+         style="color:#000000;fill:#5b5b5b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <rect
+       rx="2"
+       ry="2"
+       y="988.36218"
+       x="32"
+       height="16"
+       width="16"
+       id="rect3898"
+       style="color:#000000;fill:#ffffff;fill-opacity:0.6408163;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/data/cworkspace/slowmoGPU/slowmoVideo/res/iconSel.png"
+       inkscape:export-xdpi="270"
+       inkscape:export-ydpi="270" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#5b5b5b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3906"
+       sodipodi:cx="40"
+       sodipodi:cy="8"
+       sodipodi:rx="6"
+       sodipodi:ry="6"
+       d="M 46,8 A 6,6 0 1 1 34,8 6,6 0 1 1 46,8 z"
+       transform="translate(0,988.36218)"
+       inkscape:export-filename="/data/cworkspace/slowmoGPU/slowmoVideo/res/iconSel.png"
+       inkscape:export-xdpi="270"
+       inkscape:export-ydpi="270" />
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#ffffff;fill-opacity:0.59183675;fill-rule:nonzero;stroke:none;stroke-width:1px;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="path3908"
+       sodipodi:cx="40"
+       sodipodi:cy="8"
+       sodipodi:rx="3"
+       sodipodi:ry="3"
+       d="m 43,8 a 3,3 0 1 1 -6,0 3,3 0 1 1 6,0 z"
+       transform="translate(0,988.36218)"
+       inkscape:export-filename="/data/cworkspace/slowmoGPU/slowmoVideo/res/iconSel.png"
+       inkscape:export-xdpi="270"
+       inkscape:export-ydpi="270" />
+  </g>
+</svg>

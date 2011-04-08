@@ -22,6 +22,12 @@ set(SRCS_MOC
   canvas.h
 )
 
+set(RES
+  res/iconAdd.png
+  res/iconSel.png
+)
+copy_files_basedir("${RES}")
+
 # Generate header files from the .ui files
 qt4_wrap_ui(UI_H ${SRCS_UI})
 qt4_wrap_cpp(MOC_SRC ${SRCS_MOC})
@@ -33,3 +39,4 @@ add_executable(slowmoUI ${SRCS} ${MOC_SRC} ${UI_H})
 target_link_libraries(slowmoUI ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
+install(FILES ${RES} DESTINATION res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
