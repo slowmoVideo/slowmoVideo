@@ -1,0 +1,6 @@
+*.png
+flowScripts/*.avi
+flowScripts/*.pyc
+
+clips
+*/build

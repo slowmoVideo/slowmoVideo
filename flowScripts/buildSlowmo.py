@@ -34,7 +34,7 @@ for frame in frames :
             forwardFlow = options.flowDir + os.sep + nameForwardFlow(prev, frame)
             backwardFlow = options.flowDir + os.sep + nameBackwardFlow(prev, frame)
             
-            cmd = "%s twoway %s %s %s %s %s/f%%1.jpg %s" % (options.slowmoExecutable, leftFrame, rightFrame, forwardFlow, backwardFlow, options.outDir, counter)
+            cmd = "%s twoway %s %s %s %s %s/f%%1.png %s" % (options.slowmoExecutable, leftFrame, rightFrame, forwardFlow, backwardFlow, options.outDir, counter)
             print("Command: %s" % cmd)
             ret = os.system(cmd)
             if ret != 0 :

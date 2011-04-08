@@ -10,7 +10,7 @@ def frameID(name) :
         return o.group('name')
 
 def nameForwardFlow(left, right) :
-    return "flow_%s_%s.jpg" % (frameID(left), frameID(right))
+    return "flow_%s_%s.png" % (frameID(left), frameID(right))
 
 def nameBackwardFlow(left, right) :
-    return "flow_%s_%s_back.jpg" % (frameID(left), frameID(right))
+    return "flow_%s_%s_back.png" % (frameID(left), frameID(right))
