@@ -57,7 +57,7 @@ char* nextArg(int argc, int &argi, char *argv[])
     }
 }
 
-char* nextOptArg(int argc, int &argi, char *argv[], char *defaultParam)
+const char* nextOptArg(int argc, int &argi, char *argv[], const char defaultParam[])
 {
     argi++;
     if (argi < argc) {
