@@ -7,6 +7,9 @@ project(slowmoVideo)
 set(CMAKE_INSTALL_PREFIX
   ../..
 )
+set(CMAKE_MODULE_PATH
+  ${PROJECT_SOURCE_DIR}/cmake
+)
 
 
 include(cmake/macros.cmake)
@@ -15,6 +18,7 @@ find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
+find_package(FFMPEG REQUIRED)
 
 add_subdirectory(lib)
 add_subdirectory(slowmoCLI)
