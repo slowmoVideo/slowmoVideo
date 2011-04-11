@@ -47,6 +47,7 @@ Canvas::Canvas(QWidget *parent) :
     m_distTop(32),
     m_t0x(0),
     m_t0y(0),
+    m_tmaxy(10),
     m_secResX(100),
     m_secResY(100),
     m_nodes(),
@@ -57,11 +58,20 @@ Canvas::Canvas(QWidget *parent) :
 
     // Enable mouse tracking (not only when a mouse button is pressed)
     this->setMouseTracking(true);
+
+    Q_ASSERT(m_secResX > 0);
+    Q_ASSERT(m_secResY > 0);
 }
 
 Canvas::~Canvas()
 {
     delete ui;
+}
+
+void Canvas::load(const Project_sV &project)
+{
+    m_tmaxy = project.videoInfo().framesCount / float(project.videoInfo().frameRateNum) * project.videoInfo().frameRateDen;
+    qDebug() << "tMaxY set to " << m_tmaxy;
 }
 
 
@@ -128,6 +138,13 @@ void Canvas::paintEvent(QPaintEvent *)
         } else {
 //            qDebug() << "Out of canvas: " << pos;
             break;
+        }
+    }
+    {
+        QPoint pos = convertTimeToCanvas(Node(0, m_tmaxy));
+        if (insideCanvas(pos)) {
+            davinci.setPen(QPen(QBrush(lineCol), 2));
+            davinci.drawLine(pos.x(), pos.y(), width()-1-m_distRight, pos.y());
         }
     }
 
@@ -255,11 +272,44 @@ void Canvas::leaveEvent(QEvent *)
     repaint();
 }
 
+void Canvas::wheelEvent(QWheelEvent *e)
+{
+    Node n0 = convertCanvasToTime(e->pos());
+
+    // Update the line resolution
+    int deg = e->delta()/8;
+    m_secResX += deg;
+    m_secResY += deg;
+    if (m_secResX <= 0) { m_secResX = 1; }
+    if (m_secResY <= 0) { m_secResY = 1; }
+
+    // Adjust t0 such that the mouse points to the same time as before
+    Node nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distTop));
+    m_t0x = n0.x() - nDiff.x();
+    m_t0y = n0.y() - nDiff.y();
+    if (m_t0x < 0) { m_t0x = 0; }
+    if (m_t0y < 0) { m_t0y = 0; }
+
+    Q_ASSERT(m_secResX > 0);
+    Q_ASSERT(m_secResY > 0);
+    Q_ASSERT(m_t0x >= 0);
+    Q_ASSERT(m_t0y >= 0);
+
+    repaint();
+}
+
 const Node Canvas::convertCanvasToTime(const QPoint &p) const
 {
+    Q_ASSERT(m_secResX > 0);
+    Q_ASSERT(m_secResY > 0);
+
+    int x = p.x()-m_distLeft;
+    int y = height()-1 - m_distBottom - p.y();
+    x = (x < 0) ? 0 : x;
+    y = (y < 0) ? 0 : y;
     Node out(
-                m_t0x + float(p.x()-m_distLeft)/m_secResX,
-                m_t0y + float(this->height()-1 - m_distBottom - p.y()) / m_secResY
+                m_t0x + float(x) / m_secResX,
+                m_t0y + float(y) / m_secResY
             );
     return out;
 }

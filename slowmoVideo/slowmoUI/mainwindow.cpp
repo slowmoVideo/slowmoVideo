@@ -19,13 +19,15 @@ the Free Software Foundation, either version 3 of the License, or
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_project("/data/Videos/2010-09-14-DSC_5111.AVI")
 {
     ui->setupUi(this);
 
 
     m_wCanvas = new Canvas(this);
     setCentralWidget(m_wCanvas);
+    m_wCanvas->load(m_project);
 
 
     // Set up shortcut bindings
@@ -69,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
+
 
     Q_ASSERT(b);
 

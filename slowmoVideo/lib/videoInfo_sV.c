@@ -36,7 +36,9 @@ VideoInfoSV getInfo(const char filename[])
 	    AVRational fps = pFormatContext->streams[i]->r_frame_rate;
 	    printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
 	    info.frameRateNum = fps.num;
-	    info.frameRateDen = fps.den;
+            info.frameRateDen = fps.den;
+            info.framesCount = pFormatContext->streams[i]->nb_frames;
+            printf("Total frames: %d (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
 	}
     }
     return info;

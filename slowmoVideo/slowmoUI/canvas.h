@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define CANVAS_H
 
 #include "nodelist.h"
+#include "../project/project_sV.h"
 
 #include <QWidget>
 #include <QList>
@@ -41,6 +42,8 @@ public:
     static QColor selectedCol;
     static QColor backgroundCol;
 
+    void load(const Project_sV &project);
+
 
 public slots:
     void slotAbort(Canvas::Abort abort);
@@ -52,6 +55,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
+    void wheelEvent(QWheelEvent *);
     void leaveEvent(QEvent *);
 
 private:
@@ -68,8 +72,8 @@ private:
     float m_t0y;
     float m_tmaxx;
     float m_tmaxy;
-    unsigned int m_secResX;
-    unsigned int m_secResY;
+    int m_secResX;
+    int m_secResY;
 
     bool m_moveAborted;
 

@@ -10,6 +10,7 @@ set(SRCS
   canvas.cpp
   node.cpp
   nodelist.cpp
+  ../project/project_sV.cpp
 )
 
 set(SRCS_UI
@@ -37,7 +38,7 @@ qt4_wrap_cpp(MOC_SRC ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
 add_executable(slowmoUI ${SRCS} ${MOC_SRC} ${UI_H})
-target_link_libraries(slowmoUI ${QT_LIBRARIES})
+target_link_libraries(slowmoUI sVI ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
 install(FILES ${RES} DESTINATION res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

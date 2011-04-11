@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QMainWindow>
 #include "canvas.h"
+#include "../project/project_sV.h"
 
 namespace Ui {
     class MainWindow;
@@ -67,6 +68,8 @@ private:
     QMap<int, QString> m_keyList;
 
     Canvas *m_wCanvas;
+
+    Project_sV m_project;
 
 private slots:
     /**
