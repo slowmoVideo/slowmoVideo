@@ -30,6 +30,7 @@ public:
 
     void unselectAll();
 
+    void shift(qreal after, qreal by);
     void moveSelected(const Node &time);
     void confirmMove();
     void abortMove();
@@ -38,6 +39,11 @@ public:
     uint find(qreal time) const;
 
     /**
+      @return The index of the node whose time is equal or greater than
+      the given time, or -1 if there is no such node.
+      */
+    int nodeAfter(qreal time) const;
+    /**
       @return A pointer to the node at the given time (or not further
       than minDist away), or NULL if there is no node at t.
       */
@@ -45,6 +51,13 @@ public:
     const Node& at(uint i) const;
     Node& operator[](int i);
     int size() const;
+
+    /**
+      @return false if nodes are not in a valid position.
+      Nodes must be ordered, and the minimum distance (on the y axis)
+      must be at least m_minDist.
+      */
+    bool validate() const;
 
 private:
     QList<Node> m_list;

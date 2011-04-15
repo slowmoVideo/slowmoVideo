@@ -62,6 +62,23 @@ void NodeList::unselectAll()
     }
 }
 
+
+bool NodeList::validate() const
+{
+    bool valid = true;
+    qreal last = -m_minDist;
+    for (int i = 0; i < m_list.size() && valid; i++) {
+        valid = m_list.at(i).x() >= 0
+                && m_list.at(i).x() - last >= m_minDist;
+        last = m_list.at(i).x();
+        Q_ASSERT(valid);
+    }
+    return valid;
+}
+
+
+////////// Moving
+
 void NodeList::moveSelected(const Node &time)
 {
     qreal maxRMove = 1000;
@@ -98,12 +115,30 @@ void NodeList::moveSelected(const Node &time)
         qDebug() << "Not within valid range:" << time;
     }
 }
+void NodeList::shift(qreal after, qreal by)
+{
+    int pos = nodeAfter(after);
+    if (pos >= 0) {
+        if (pos > 0) {
+            qDebug() << "Max of " << by << " and " << m_list.at(pos-1).xUnmoved() - m_list.at(pos).xUnmoved() + m_minDist;
+            by = qMax(by, m_list.at(pos-1).xUnmoved() - m_list.at(pos).xUnmoved() + m_minDist);
+        }
+        if (pos == 0) {
+            by = qMax(by, -m_list.at(pos).xUnmoved());
+        }
+        for (; pos < m_list.size(); pos++) {
+            m_list[pos].move(Node(by, 0));
+        }
+    }
+    if (!validate()) {
+        qDebug() << "Invalid node configuration! (This should not happen.)";
+    }
+}
+
 void NodeList::confirmMove()
 {
     for (uint i = 0; i < m_list.size(); i++) {
-        if (m_list.at(i).selected()) {
-            m_list[i].confirmMove();
-        }
+        m_list[i].confirmMove();
     }
 }
 void NodeList::abortMove()
@@ -114,6 +149,11 @@ void NodeList::abortMove()
         }
     }
 }
+
+
+
+
+////////// Access
 
 uint NodeList::find(qreal time) const
 {
@@ -126,6 +166,21 @@ uint NodeList::find(qreal time) const
     return pos;
 }
 
+int NodeList::nodeAfter(qreal time) const
+{
+    int pos = 0;
+    while (m_list.size() > pos) {
+        if (m_list.at(pos).xUnmoved() >= time) {
+            break;
+        }
+        pos++;
+    }
+    if (pos >= m_list.size()) {
+        pos = -1;
+    }
+    Q_ASSERT(pos < 0 || m_list.at(pos).xUnmoved() >= time);
+    return pos;
+}
 const Node* NodeList::at(qreal t) const
 {
     for (int i = 0; i < m_list.size(); i++) {

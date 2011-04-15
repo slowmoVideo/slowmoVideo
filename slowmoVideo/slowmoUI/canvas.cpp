@@ -36,8 +36,8 @@ QColor Canvas::backgroundCol(30, 30, 40);
 
 Canvas::Canvas(QWidget *parent) :
     QWidget(parent),
-    m_frameRate(30.0f),
     ui(new Ui::Canvas),
+    m_frameRate(30.0f),
     m_lastMousePos(0,0),
     m_mouseStart(0,0),
     m_mouseWithinWidget(false),
@@ -50,9 +50,9 @@ Canvas::Canvas(QWidget *parent) :
     m_tmaxy(10),
     m_secResX(100),
     m_secResY(100),
-    m_nodes(),
     m_moveAborted(false),
-    m_mode(ToolMode_Add)
+    m_mode(ToolMode_Add),
+    m_nodes()
 {
     ui->setupUi(this);
 
@@ -239,11 +239,13 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
     m_mouseWithinWidget = true;
 
     if (e->buttons() && Qt::LeftButton != 0) {
+
+        qDebug() << m_mouseStart << "to" << e->pos();
+        Node diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
+        qDebug() << "Diff: " << diff;
+
         if (m_mode == ToolMode_Select) {
             if (!m_moveAborted) {
-                qDebug() << m_mouseStart << "to" << e->pos();
-                Node diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
-                qDebug() << "Diff: " << diff;
                 if (qAbs(diff.x()) < qAbs(diff.y())) {
                     diff.setX(0);
                 } else {
@@ -252,7 +254,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 m_nodes.moveSelected(diff);
             }
         } else if (m_mode == ToolMode_Move) {
-
+            if (!m_moveAborted) {
+                m_nodes.shift(convertCanvasToTime(m_mouseStart).x(), diff.x());
+            }
         }
     }
 
@@ -261,8 +265,11 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *)
 {
-    if (m_mode == ToolMode_Select && !m_moveAborted) {
-        m_nodes.confirmMove();
+    if (!m_moveAborted) {
+        if (m_mode == ToolMode_Select || m_mode == ToolMode_Move) {
+            m_nodes.confirmMove();
+            qDebug() << "Move confirmed.";
+        }
     }
 }
 
@@ -280,8 +287,8 @@ void Canvas::wheelEvent(QWheelEvent *e)
     int deg = e->delta()/8;
     m_secResX += deg;
     m_secResY += deg;
-    if (m_secResX <= 0) { m_secResX = 1; }
-    if (m_secResY <= 0) { m_secResY = 1; }
+    if (m_secResX < 4) { m_secResX = 4; }
+    if (m_secResY < 4) { m_secResY = 4; }
 
     // Adjust t0 such that the mouse points to the same time as before
     Node nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distTop));
@@ -305,8 +312,8 @@ const Node Canvas::convertCanvasToTime(const QPoint &p) const
 
     int x = p.x()-m_distLeft;
     int y = height()-1 - m_distBottom - p.y();
-    x = (x < 0) ? 0 : x;
-    y = (y < 0) ? 0 : y;
+//    x = (x < 0) ? 0 : x;
+//    y = (y < 0) ? 0 : y;
     Node out(
                 m_t0x + float(x) / m_secResX,
                 m_t0y + float(y) / m_secResY
