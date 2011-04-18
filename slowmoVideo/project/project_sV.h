@@ -2,6 +2,7 @@
 #define PROJECT_SV_H
 
 #include <QFile>
+#include <QDir>
 #include <QString>
 
 extern "C" {
@@ -11,12 +12,15 @@ extern "C" {
 class Project_sV
 {
 public:
-    Project_sV(const char filename[]);
+    Project_sV(const char filename[], const char projectDir[]);
 
     const VideoInfoSV& videoInfo() const;
 
+    bool extractFrames() const;
+
 private:
     QFile m_inFile;
+    QDir m_projDir;
     VideoInfoSV m_videoInfo;
 };
 

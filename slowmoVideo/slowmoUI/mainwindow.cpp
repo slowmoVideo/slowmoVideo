@@ -37,7 +37,7 @@ void MainWindow::fillCommandList()
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_project("/data/Videos/2010-09-14-DSC_5111.AVI")
+    m_project("/data/Videos/2010-09-14-DSC_5111.AVI", "/tmp")
 {
     ui->setupUi(this);
 

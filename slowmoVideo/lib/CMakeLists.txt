@@ -9,7 +9,6 @@ set(CMAKE_C_FLAGS
 
 set(LIB_SRC
   interpolate_sV.cpp
-  project_sV.cpp
 )
 
 set(LIB_SRC_VI
