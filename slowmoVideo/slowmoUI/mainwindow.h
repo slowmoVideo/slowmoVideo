@@ -54,8 +54,12 @@ public:
         Tool,
         Tool_Add,
         Tool_Select,
-        Tool_Move
+        Tool_Move,
+        Help
     };
+
+    static void displayHelp(QPainter &davinci);
+    static QStringList m_commands;
 
 private:
     Ui::MainWindow *ui;
@@ -70,6 +74,9 @@ private:
     Canvas *m_wCanvas;
 
     Project_sV m_project;
+
+
+    static void fillCommandList();
 
 private slots:
     /**

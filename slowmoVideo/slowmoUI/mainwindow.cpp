@@ -17,6 +17,23 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QSignalMapper>
 #include <QTime>
 
+#include <QPainter>
+
+QStringList MainWindow::m_commands;
+
+void MainWindow::fillCommandList()
+{
+    m_commands.clear();
+    m_commands << "h:\tHelp";
+    m_commands << "q-q:\tQuit";
+    m_commands << "x:\tAbort current action";
+    m_commands << "x-s:\tAbort selection";
+    m_commands << "d-n:\tDelete selected nodes";
+    m_commands << "t-s:\tSelect tool";
+    m_commands << "t-a:\tAdd tool";
+    m_commands << "t-m:\tMove tool";
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -31,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Set up shortcut bindings
+    m_keyList.insert(MainWindow::Help, "h");
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
     m_keyList.insert(MainWindow::Abort, "x");
@@ -41,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Tool_Add, "a");
     m_keyList.insert(MainWindow::Tool_Select, "s");
     m_keyList.insert(MainWindow::Tool_Move, "m");
+    fillCommandList();
 
     QList<QString> uniqueKeys;
     QList<QString> keys = m_keyList.values();
@@ -85,6 +104,19 @@ MainWindow::~MainWindow()
     for (int i = 0; i < m_shortcutList.length(); i++) {
         delete m_shortcutList[i];
     }
+}
+
+
+void MainWindow::displayHelp(QPainter &davinci)
+{
+    QRect content(10, 10, 400, 200);
+    QRect text(content.topLeft() + QPoint(10, 10), content.size() - QSize(20,20));
+    davinci.fillRect(content, QColor(0,0,40, 200));
+    QString helpText;
+    for (int i = 0; i < m_commands.size(); i++) {
+        helpText.append(m_commands.at(i) + "\n");
+    }
+    davinci.drawText(text, helpText);
 }
 
 
@@ -137,6 +169,9 @@ void MainWindow::shortcutUsed(QString which)
         } else {
             qDebug() << "(Shortcut timed out.)";
         }
+    }
+    if (which == m_keyList[MainWindow::Help]) {
+        m_wCanvas->toggleHelp();
     }
 
     m_lastShortcut = ts;

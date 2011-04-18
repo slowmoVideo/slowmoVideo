@@ -44,6 +44,7 @@ public:
 
     void load(const Project_sV &project);
 
+    void toggleHelp();
 
 public slots:
     void slotAbort(Canvas::Abort abort);
@@ -76,6 +77,7 @@ private:
     int m_secResY;
 
     bool m_moveAborted;
+    bool m_showHelp;
 
     ToolMode m_mode;
 

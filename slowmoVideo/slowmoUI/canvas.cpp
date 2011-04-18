@@ -13,6 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "nodelist.h"
 #include "ui_canvas.h"
 
+#include "mainwindow.h"
+
 #include <cmath>
 
 #include <QDebug>
@@ -51,6 +53,7 @@ Canvas::Canvas(QWidget *parent) :
     m_secResX(100),
     m_secResY(100),
     m_moveAborted(false),
+    m_showHelp(false),
     m_mode(ToolMode_Add),
     m_nodes()
 {
@@ -72,6 +75,12 @@ void Canvas::load(const Project_sV &project)
 {
     m_tmaxy = project.videoInfo().framesCount / float(project.videoInfo().frameRateNum) * project.videoInfo().frameRateDen;
     qDebug() << "tMaxY set to " << m_tmaxy;
+}
+
+void Canvas::toggleHelp()
+{
+    m_showHelp = !m_showHelp;
+    repaint();
 }
 
 
@@ -122,26 +131,26 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.fillRect(0, 0, width(), height(), backgroundCol);
 
     davinci.setPen(gridCol);
+    // x grid
     for (int tx = ceil(m_t0x); true; tx++) {
         QPoint pos = convertTimeToCanvas(Node(tx, m_t0y));
         if (insideCanvas(pos)) {
             davinci.drawLine(pos.x(), pos.y(), pos.x(), m_distTop);
         } else {
-//            qDebug() << "Out of canvas: " << pos;
             break;
         }
     }
+    // y grid
     for (int ty = ceil(m_t0y); true; ty++) {
         QPoint pos = convertTimeToCanvas(Node(m_t0x, ty));
         if (insideCanvas(pos)) {
             davinci.drawLine(pos.x(), pos.y(), width()-1 - m_distRight, pos.y());
         } else {
-//            qDebug() << "Out of canvas: " << pos;
             break;
         }
     }
     {
-        QPoint pos = convertTimeToCanvas(Node(0, m_tmaxy));
+        QPoint pos = convertTimeToCanvas(Node(m_t0x, m_tmaxy));
         if (insideCanvas(pos)) {
             davinci.setPen(QPen(QBrush(lineCol), 2));
             davinci.drawLine(pos.x(), pos.y(), width()-1-m_distRight, pos.y());
@@ -150,6 +159,7 @@ void Canvas::paintEvent(QPaintEvent *)
 
     drawModes(davinci, 8, width()-1 - m_distRight);
 
+    // Frames/seconds
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_lastMousePos)) {
         davinci.drawLine(m_lastMousePos.x(), m_distTop, m_lastMousePos.x(), height()-1 - m_distBottom);
@@ -162,6 +172,7 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
 
+    // Nodes
     const Node *prev = NULL;
     const Node *curr = NULL;
     for (uint i = 0; i < m_nodes.size(); i++) {
@@ -183,6 +194,10 @@ void Canvas::paintEvent(QPaintEvent *)
         }
 
         prev = &m_nodes.at(i);
+    }
+
+    if (m_showHelp) {
+        MainWindow::displayHelp(davinci);
     }
 }
 
@@ -238,7 +253,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
     m_lastMousePos = e->pos();
     m_mouseWithinWidget = true;
 
-    if (e->buttons() && Qt::LeftButton != 0) {
+    if (e->buttons().testFlag(Qt::LeftButton)) {
 
         qDebug() << m_mouseStart << "to" << e->pos();
         Node diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
@@ -281,21 +296,35 @@ void Canvas::leaveEvent(QEvent *)
 
 void Canvas::wheelEvent(QWheelEvent *e)
 {
-    Node n0 = convertCanvasToTime(e->pos());
-
-    // Update the line resolution
+    // Mouse wheel movement in degrees
     int deg = e->delta()/8;
-    m_secResX += deg;
-    m_secResY += deg;
-    if (m_secResX < 4) { m_secResX = 4; }
-    if (m_secResY < 4) { m_secResY = 4; }
 
-    // Adjust t0 such that the mouse points to the same time as before
-    Node nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distTop));
-    m_t0x = n0.x() - nDiff.x();
-    m_t0y = n0.y() - nDiff.y();
-    if (m_t0x < 0) { m_t0x = 0; }
-    if (m_t0y < 0) { m_t0y = 0; }
+    qDebug() << "Modifiers: " << e->modifiers();
+    if (e->modifiers().testFlag(Qt::ControlModifier)) {
+        qDebug() << "Ctrl";
+        Node n0 = convertCanvasToTime(e->pos());
+
+        // Update the line resolution
+        m_secResX += deg;
+        m_secResY += deg;
+        if (m_secResX < 4) { m_secResX = 4; }
+        if (m_secResY < 4) { m_secResY = 4; }
+
+        // Adjust t0 such that the mouse points to the same time as before
+        Node nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distTop));
+        m_t0x = n0.x() - nDiff.x();
+        m_t0y = n0.y() - nDiff.y();
+        if (m_t0x < 0) { m_t0x = 0; }
+        if (m_t0y < 0) { m_t0y = 0; }
+    } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+        qDebug() << "Shift";
+        m_t0y += (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x();
+        if (m_t0y < 0) { m_t0y = 0; }
+        if (m_t0y > m_tmaxy) { m_t0y = m_tmaxy; }
+    } else {
+        m_t0x -= (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x();
+        if (m_t0x < 0) { m_t0x = 0; }
+    }
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
