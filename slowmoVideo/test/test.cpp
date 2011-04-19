@@ -11,5 +11,6 @@ Test::Test()
 int main()
 {
     Project_sV proj("/data/Videos/2010-09-14-DSC_5111.AVI", "/tmp");
-    proj.extractFrames();
+//    proj.extractFrames();
+    proj.frameAt(1);
 }

@@ -10,17 +10,20 @@ set(SRCS
   canvas.cpp
   node.cpp
   nodelist.cpp
+  newprojectdialog.cpp
   ../project/project_sV.cpp
 )
 
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
+  newprojectdialog.ui
 )
 
 set(SRCS_MOC
   mainwindow.h
   canvas.h
+  newprojectdialog.h
 )
 
 set(RES

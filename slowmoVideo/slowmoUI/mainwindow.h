@@ -55,7 +55,8 @@ public:
         Tool_Add,
         Tool_Select,
         Tool_Move,
-        Help
+        Help,
+        Open
     };
 
     static void displayHelp(QPainter &davinci);
@@ -77,6 +78,8 @@ private:
 
 
     static void fillCommandList();
+
+    void newProject();
 
 private slots:
     /**

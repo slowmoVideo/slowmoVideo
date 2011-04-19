@@ -11,6 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "newprojectdialog.h"
+
 #include <QDebug>
 
 #include <QShortcut>
@@ -26,6 +28,7 @@ void MainWindow::fillCommandList()
     m_commands.clear();
     m_commands << "h:\tHelp";
     m_commands << "q-q:\tQuit";
+    m_commands << "o:\tOpen";
     m_commands << "x:\tAbort current action";
     m_commands << "x-s:\tAbort selection";
     m_commands << "d-n:\tDelete selected nodes";
@@ -51,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Help, "h");
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
+    m_keyList.insert(MainWindow::Open, "o");
     m_keyList.insert(MainWindow::Abort, "x");
     m_keyList.insert(MainWindow::Abort_Selection, "s");
     m_keyList.insert(MainWindow::Delete, "d");
@@ -119,6 +123,14 @@ void MainWindow::displayHelp(QPainter &davinci)
     davinci.drawText(text, helpText);
 }
 
+void MainWindow::newProject()
+{
+    NewProjectDialog npd(this);
+    if (npd.exec() == QDialog::Accepted) {
+        Project_sV newProject(npd.m_inputFile, npd.m_projectDir);
+    }
+}
+
 
 void MainWindow::shortcutUsed(QString which)
 {
@@ -172,6 +184,8 @@ void MainWindow::shortcutUsed(QString which)
     }
     if (which == m_keyList[MainWindow::Help]) {
         m_wCanvas->toggleHelp();
+    } else if (which == m_keyList[MainWindow::Open]) {
+        newProject();
     }
 
     m_lastShortcut = ts;

@@ -9,7 +9,6 @@ set(CMAKE_C_FLAGS
 )
 set(SOURCES_VINFO
   videoInfo.cpp
-  ../lib/videoInfo_sV.c
 )
 
 add_executable(slowmoVideo ${SOURCES_MAIN})

@@ -8,6 +8,7 @@ typedef struct VideoInfoSV {
     int frameRateNum;
     int frameRateDen;
     int64_t framesCount;
+    int streamsCount;
 } VideoInfoSV;
 
 VideoInfoSV getInfo(const char filename[]);

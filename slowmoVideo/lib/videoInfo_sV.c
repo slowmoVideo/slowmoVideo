@@ -11,6 +11,7 @@ VideoInfoSV getInfo(const char filename[])
     VideoInfoSV info;
     info.frameRateNum = 0;
     info.frameRateDen = 0;
+    info.streamsCount = 0;
 
     av_register_all();
 
@@ -30,7 +31,7 @@ VideoInfoSV getInfo(const char filename[])
     AVCodecContext *pCodecContext;
     int videoStream = -1;
     for (int i = 0; i < pFormatContext->nb_streams; i++) {
-	if (pFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
+        if (pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
 	    videoStream = i;
 	    pCodecContext = pFormatContext->streams[i]->codec;
 	    AVRational fps = pFormatContext->streams[i]->r_frame_rate;
@@ -38,6 +39,7 @@ VideoInfoSV getInfo(const char filename[])
 	    info.frameRateNum = fps.num;
             info.frameRateDen = fps.den;
             info.framesCount = pFormatContext->streams[i]->nb_frames;
+            info.streamsCount++;
             printf("Total frames: %d (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
 	}
     }
