@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "../project/project_sV.h"
+
 extern "C" {
     #include "../lib/videoInfo_sV.h"
 }

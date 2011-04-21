@@ -71,9 +71,9 @@ Canvas::~Canvas()
     delete ui;
 }
 
-void Canvas::load(const Project_sV &project)
+void Canvas::load(const Project_sV *project)
 {
-    m_tmaxy = project.videoInfo().framesCount / float(project.videoInfo().frameRateNum) * project.videoInfo().frameRateDen;
+    m_tmaxy = project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen;
     qDebug() << "tMaxY set to " << m_tmaxy;
 }
 

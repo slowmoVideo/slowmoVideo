@@ -42,7 +42,7 @@ public:
     static QColor selectedCol;
     static QColor backgroundCol;
 
-    void load(const Project_sV &project);
+    void load(const Project_sV *project);
 
     void toggleHelp();
 

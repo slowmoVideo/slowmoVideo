@@ -7,6 +7,8 @@
 typedef struct VideoInfoSV {
     int frameRateNum;
     int frameRateDen;
+    int width;
+    int height;
     int64_t framesCount;
     int streamsCount;
 } VideoInfoSV;

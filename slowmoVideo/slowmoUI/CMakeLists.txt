@@ -12,18 +12,22 @@ set(SRCS
   nodelist.cpp
   newprojectdialog.cpp
   ../project/project_sV.cpp
+  progressDialogExtractFrames.cpp
 )
 
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
   newprojectdialog.ui
+  progressDialogExtractFrames.ui
 )
 
 set(SRCS_MOC
   mainwindow.h
   canvas.h
   newprojectdialog.h
+  ../project/project_sV.h
+  progressDialogExtractFrames.h
 )
 
 set(RES
@@ -34,13 +38,13 @@ set(RES
 copy_files("${RES}")
 
 # Generate header files from the .ui files
-qt4_wrap_ui(UI_H ${SRCS_UI})
-qt4_wrap_cpp(MOC_SRC ${SRCS_MOC})
+qt4_wrap_ui(UI_H_OUT ${SRCS_UI})
+qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
-add_executable(slowmoUI ${SRCS} ${MOC_SRC} ${UI_H})
+add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT})
 target_link_libraries(slowmoUI sVI ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)

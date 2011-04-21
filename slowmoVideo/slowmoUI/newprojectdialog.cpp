@@ -66,7 +66,9 @@ void NewProjectDialog::slotUpdateVideoInfo()
     QFile file(ui->inputVideo->text());
     if (file.exists()) {
         m_videoInfo = getInfo(ui->inputVideo->text().toStdString().c_str());
-        QString text = QString("Number of video streams: %1\nFrames: %2\n").arg(m_videoInfo.streamsCount).arg(m_videoInfo.framesCount);
+        QString text = QString::fromUtf8("Number of video streams: %1\nFrames: %2\nSize: %3×%4\n")
+                .arg(m_videoInfo.streamsCount).arg(m_videoInfo.framesCount)
+                .arg(m_videoInfo.width).arg(m_videoInfo.height);
         text.append(QString("Frame rate: %1/%2").arg(m_videoInfo.frameRateNum).arg(m_videoInfo.frameRateDen));
         ui->txtVideoInfo->setPlainText(text);
     } else {
@@ -88,6 +90,8 @@ void NewProjectDialog::updateButtonStates()
         ok = false;
     }
     if (ui->projectDir->text().length() > 0) {
+        QDir dir(ui->projectDir->text());
+        ui->cbDirectoryCreated->setChecked(!dir.exists());
         ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
         m_projectDir = ui->projectDir->text();
     } else {

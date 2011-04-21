@@ -38,6 +38,8 @@ VideoInfoSV getInfo(const char filename[])
 	    printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
 	    info.frameRateNum = fps.num;
             info.frameRateDen = fps.den;
+            info.width = pCodecContext->width;
+            info.height = pCodecContext->height;
             info.framesCount = pFormatContext->streams[i]->nb_frames;
             info.streamsCount++;
             printf("Total frames: %d (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));

@@ -74,7 +74,7 @@ private:
 
     Canvas *m_wCanvas;
 
-    Project_sV m_project;
+    Project_sV *m_project;
 
 
     static void fillCommandList();

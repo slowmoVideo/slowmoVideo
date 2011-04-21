@@ -12,7 +12,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include "ui_mainwindow.h"
 
 #include "newprojectdialog.h"
+#include "progressDialogExtractFrames.h"
 
+#include <QtCore>
+#include <QObject>
 #include <QDebug>
 
 #include <QShortcut>
@@ -40,14 +43,13 @@ void MainWindow::fillCommandList()
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_project("/data/Videos/2010-09-14-DSC_5111.AVI", "/tmp")
+    m_project(NULL)
 {
     ui->setupUi(this);
 
 
     m_wCanvas = new Canvas(this);
     setCentralWidget(m_wCanvas);
-    m_wCanvas->load(m_project);
 
 
     // Set up shortcut bindings
@@ -104,6 +106,10 @@ MainWindow::~MainWindow()
 {
     delete ui;
 
+    if (m_project != NULL) {
+        delete m_project;
+    }
+
     delete m_signalMapper;
     for (int i = 0; i < m_shortcutList.length(); i++) {
         delete m_shortcutList[i];
@@ -127,7 +133,23 @@ void MainWindow::newProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {
-        Project_sV newProject(npd.m_inputFile, npd.m_projectDir);
+        Project_sV *newProject = new Project_sV(npd.m_inputFile, npd.m_projectDir);
+        if (newProject->validDirectories()) {
+            if (m_project != NULL) {
+                delete m_project;
+            }
+            m_project = newProject;
+            ProgressDialogExtractFrames progress;
+            connect(
+                        m_project, SIGNAL(signalFramesExtracted(Project_sV::FrameSize)),
+                        &progress, SLOT(slotExtractionFinished(Project_sV::FrameSize))
+                    );
+            m_project->extractFrames();
+            progress.exec();
+        } else {
+            qDebug() << "Project directories not writable.";
+            delete newProject;
+        }
     }
 }
 

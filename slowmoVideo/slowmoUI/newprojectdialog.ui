@@ -31,27 +31,27 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1" colspan="5">
+   <item row="3" column="1" colspan="5">
     <widget class="QPushButton" name="browseInputVideo">
      <property name="text">
       <string>Browse</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLineEdit" name="inputVideo"/>
    </item>
-   <item row="2" column="6">
+   <item row="3" column="6">
     <widget class="QLabel" name="lblInputVideo">
      <property name="text">
       <string>Input video</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="7">
+   <item row="5" column="0" colspan="7">
     <widget class="QPlainTextEdit" name="txtVideoInfo"/>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="lblVideoInfo">
      <property name="text">
       <string>Video information:</string>
@@ -65,7 +65,7 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="7">
+   <item row="6" column="0" colspan="7">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -101,6 +101,22 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="cbDirectoryCreated">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Directory will be created</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
