@@ -18,6 +18,7 @@ public:
 
 public slots:
     void slotExtractionFinished(Project_sV::FrameSize frameSize);
+    void slotProgressUpdated(Project_sV::FrameSize frameSize, int value);
 
 private:
     Ui::ProgressDialogExtractFrames *ui;

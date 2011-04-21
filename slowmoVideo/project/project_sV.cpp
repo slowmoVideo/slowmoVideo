@@ -1,5 +1,7 @@
 #include "project_sV.h"
 
+#include <QRegExp>
+
 #include <QProcess>
 #include <QTimer>
 #include <QDebug>
@@ -7,6 +9,7 @@
 
 QString Project_sV::defaultFramesDir("frames");
 QString Project_sV::defaultThumbFramesDir("framesThumb");
+QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
 Project_sV::Project_sV(QString filename, QString projectDir) :
     QObject(),
@@ -194,12 +197,25 @@ void Project_sV::slotExtractingFinished()
 
 void Project_sV::slotProgressUpdate()
 {
+    QRegExp regex(regexFrameNumber);
+    QString s;
+    int pos;
     qDebug() << "=====Timer=====";
     if (m_ffmpegOrig != NULL) {
-        qDebug() << "ffmpeg Orig: " << m_ffmpegOrig->readAllStandardError();
+        s = QString(m_ffmpegOrig->readAllStandardError());
+        if (regex.indexIn(s) >= 0) {
+            qDebug() << "Frame number: " << regex.cap(1);
+            emit signalProgressUpdated(Project_sV::FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+        }
+        qDebug() << "ffmpeg Orig: " << s;
     }
     if (m_ffmpegSmall != NULL) {
-        qDebug() << "ffmpeg Small: " << m_ffmpegSmall->readAllStandardError();
+        s = QString(m_ffmpegSmall->readAllStandardError());
+        if (regex.indexIn(s) >= 0) {
+            qDebug() << "Frame number: " << regex.cap(1);
+            emit signalProgressUpdated(Project_sV::FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+        }
+        qDebug() << "ffmpeg Small: " << s;
     }
     qDebug() << "====/Timer=====";
 }

@@ -37,3 +37,15 @@ void ProgressDialogExtractFrames::slotExtractionFinished(Project_sV::FrameSize f
         ui->bOk->setEnabled(true);
     }
 }
+
+void ProgressDialogExtractFrames::slotProgressUpdated(Project_sV::FrameSize frameSize, int value)
+{
+    switch(frameSize) {
+    case Project_sV::FrameSize_Orig:
+        ui->progOrig->setValue(value);
+        break;
+    case Project_sV::FrameSize_Small:
+        ui->progThumbs->setValue(value);
+        break;
+    }
+}

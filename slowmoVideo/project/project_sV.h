@@ -13,6 +13,7 @@ extern "C" {
 }
 
 class QProcess;
+class QRegExp;
 class QTimer;
 class Project_sV : public QObject
 {
@@ -50,6 +51,7 @@ public:
 private:
     static QString defaultFramesDir;
     static QString defaultThumbFramesDir;
+    static QRegExp regexFrameNumber;
 
     bool m_canWriteFrames;
 
@@ -71,6 +73,7 @@ private slots:
 
 signals:
     void signalFramesExtracted(Project_sV::FrameSize frameSize);
+    void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
 };
 
 QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize);
