@@ -45,6 +45,8 @@ VideoInfoSV getInfo(const char filename[])
             printf("Total frames: %d (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
 	}
     }
+
+    av_free(pFormatContext);
     return info;
 }
 

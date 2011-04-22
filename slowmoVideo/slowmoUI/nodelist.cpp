@@ -73,6 +73,9 @@ bool NodeList::validate() const
         valid = m_list.at(i).x() >= 0
                 && m_list.at(i).x() - last >= m_minDist;
         last = m_list.at(i).x();
+        if (!valid) {
+            qDebug() << "Invalid node position for node " << i << "; Distance is " << m_list.at(i).x() - last;
+        }
         Q_ASSERT(valid);
     }
     return valid;
@@ -90,19 +93,30 @@ void NodeList::moveSelected(const Node &time)
     for (int i = 0; i < m_list.size(); i++) {
         right = &m_list.at(i);
 
+        /*
+          Get the maximum allowed movement distance here such that there is no
+          overlapping. For moving the selected nodes to the left, only unselected nodes
+          which are directly followed by a selected node need to be taken into account.
+                 O----O
+                /      \               x
+          -----x        \             /
+                         x-----------O
+
+         min(  ^1^,      ^-----2-----^    ) + minDist
+         */
         if (left != NULL) {
             if (left->selected() && !right->selected()) {
                 // Move-right distance
-                maxRMove = qMin(maxRMove, right->xUnmoved() - left->xUnmoved());
+                maxRMove = qMin(maxRMove, right->xUnmoved() - left->xUnmoved() - m_minDist);
             } else if (!left->selected() && right->selected()) {
                 // Move-left distance
-                maxLMove = qMax(maxLMove, left->xUnmoved() - right->xUnmoved());
+                maxLMove = qMax(maxLMove, left->xUnmoved() - right->xUnmoved() + m_minDist);
             }
         }
 
         left = right;
     }
-    if (m_list.size() > 0) {
+    if (m_list.size() > 0 && m_list.at(0).selected()) {
         // Do not allow to move nodes to x < 0
         maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
     }
@@ -142,6 +156,7 @@ void NodeList::confirmMove()
     for (int i = 0; i < m_list.size(); i++) {
         m_list[i].confirmMove();
     }
+    validate();
 }
 void NodeList::abortMove()
 {

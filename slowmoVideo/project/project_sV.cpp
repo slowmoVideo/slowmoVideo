@@ -50,6 +50,14 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     Q_ASSERT(b);
 }
 
+Project_sV::~Project_sV()
+{
+    delete m_signalMapper;
+    delete m_timer;
+    if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
+    if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
+}
+
 bool Project_sV::validDirectories() const
 {
     bool valid = true;
@@ -117,6 +125,8 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegOrig->waitForFinished(2000);
                     m_signalMapper->disconnect(m_ffmpegOrig, 0,0,0);
+                    delete m_ffmpegOrig;
+                    m_ffmpegOrig = NULL;
                 }
                 m_ffmpegOrig = ffmpeg;
 
@@ -141,6 +151,8 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegSmall->waitForFinished(2000);
                     m_signalMapper->disconnect(m_ffmpegSmall, 0,0,0);
+                    delete m_ffmpegSmall;
+                    m_ffmpegSmall = NULL;
                 }
                 m_ffmpegSmall = ffmpeg;
 

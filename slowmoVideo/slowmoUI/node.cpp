@@ -69,10 +69,23 @@ bool Node::operator ==(const Node& other) const
     return m_x == other.m_x && m_y == other.m_y
             && m_moveX == other.m_moveX && m_moveY == other.m_moveY;
 }
-
 Node Node::operator -(const Node& other) const
 {
     return Node(m_x - other.m_x, m_y - other.m_y);
+}
+Node Node::operator +(const Node& other) const
+{
+    return Node(m_x + other.m_x, m_y + other.m_y);
+}
+void Node::operator +=(const Node& other)
+{
+    m_x += other.m_x;
+    m_y += other.m_y;
+}
+void Node::operator -=(const Node& other)
+{
+    m_x -= other.m_x;
+    m_y -= other.m_y;
 }
 
 QDebug operator<<(QDebug qd, const Node& n)

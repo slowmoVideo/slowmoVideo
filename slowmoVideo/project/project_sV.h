@@ -22,6 +22,7 @@ class Project_sV : public QObject
 
 public:
     Project_sV(QString filename, QString projectDir);
+    ~Project_sV();
 
     const VideoInfoSV& videoInfo() const;
 

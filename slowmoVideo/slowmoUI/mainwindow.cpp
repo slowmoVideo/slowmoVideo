@@ -152,6 +152,7 @@ void MainWindow::newProject()
             Q_ASSERT(b);
             m_project->extractFrames();
             progress.exec();
+            m_wCanvas->load(m_project);
         } else {
             qDebug() << "Project directories not writable.";
             delete newProject;

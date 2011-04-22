@@ -22,6 +22,9 @@ public:
     bool operator<(const Node &other) const;
     bool operator==(const Node &other) const;
     Node operator-(const Node &other) const;
+    Node operator+(const Node &other) const;
+    void operator+=(const Node &other);
+    void operator-=(const Node &other);
 
     qreal x() const;
     qreal y() const;
@@ -37,6 +40,7 @@ public:
     void move(const Node &dist);
     void abortMove();
     void confirmMove();
+
 
 private:
     qreal m_x;

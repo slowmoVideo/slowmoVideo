@@ -17,9 +17,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QWidget>
 #include <QList>
 
+#include "node.h"
+
 class QColor;
 class QPoint;
-class Node;
 
 namespace Ui {
     class Canvas;
@@ -69,10 +70,8 @@ private:
     int m_distBottom;
     int m_distRight;
     int m_distTop;
-    float m_t0x;
-    float m_t0y;
-    float m_tmaxx;
-    float m_tmaxy;
+    Node m_t0;
+    Node m_tmax;
     int m_secResX;
     int m_secResY;
 
