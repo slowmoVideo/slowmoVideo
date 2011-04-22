@@ -12,6 +12,7 @@ extern "C" {
 #include "../lib/videoInfo_sV.h"
 }
 
+class QSignalMapper;
 class QProcess;
 class QRegExp;
 class QTimer;
@@ -26,7 +27,9 @@ public:
 
     enum FrameSize { FrameSize_Orig, FrameSize_Small };
 
-
+    /**
+      @return true, iff all required directories exist
+      */
     bool validDirectories() const;
     /**
       Extracts frames for all sizes.
@@ -53,6 +56,16 @@ private:
     static QString defaultThumbFramesDir;
     static QRegExp regexFrameNumber;
 
+    struct {
+        bool origFinished;
+        bool smallFinished;
+        void reset() {
+            origFinished = false;
+            smallFinished = false;
+        }
+        bool allFinished() { return origFinished && smallFinished; }
+    } m_processStatus;
+
     bool m_canWriteFrames;
 
     QFile m_inFile;
@@ -61,6 +74,7 @@ private:
     QDir m_thumbFramesDir;
     VideoInfoSV m_videoInfo;
 
+    QSignalMapper *m_signalMapper;
     QProcess *m_ffmpegOrig;
     QProcess *m_ffmpegSmall;
     QTimer *m_timer;
@@ -68,11 +82,22 @@ private:
 
 
 private slots:
-    void slotExtractingFinished();
+    void slotExtractingFinished(int);
+    /**
+      Checks the progress of the ffmpeg threads by reading their stderr
+      and emits signalProgressUpdated() if necessary.
+      */
     void slotProgressUpdate();
 
 signals:
+    /**
+      Emitted when all frames have been extracted for this frame size.
+      */
     void signalFramesExtracted(Project_sV::FrameSize frameSize);
+    /**
+      Emitted when an ffmpeg thread has made progress (i.e. wrote to stderr).
+      @param progress Number in the range 0...100
+      */
     void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
 };
 

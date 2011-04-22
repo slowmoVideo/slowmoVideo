@@ -65,10 +65,10 @@ private:
     QPoint m_lastMousePos;
     QPoint m_mouseStart;
     bool m_mouseWithinWidget;
-    unsigned int m_distLeft;
-    unsigned int m_distBottom;
-    unsigned int m_distRight;
-    unsigned int m_distTop;
+    int m_distLeft;
+    int m_distBottom;
+    int m_distRight;
+    int m_distTop;
     float m_t0x;
     float m_t0y;
     float m_tmaxx;

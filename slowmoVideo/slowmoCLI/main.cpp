@@ -154,6 +154,9 @@ int main(int argc, char *argv[])
             flow = flow.scaled(left.size());
         }
         break;
+    case FlowMode_Undef:
+        qDebug() << "Undefined flow mode selected.";
+        break;
     }
 
 

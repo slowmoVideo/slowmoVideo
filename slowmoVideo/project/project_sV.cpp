@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QFileInfo>
+#include <QSignalMapper>
 
 QString Project_sV::defaultFramesDir("frames");
 QString Project_sV::defaultThumbFramesDir("framesThumb");
@@ -29,21 +30,23 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
-    if (!m_projDir.exists(defaultFramesDir)) {
-        m_projDir.mkdir(defaultFramesDir);
-    }
     m_framesDir = QDir(m_projDir.absolutePath() + "/" + defaultFramesDir);
-    if (!m_projDir.exists(defaultThumbFramesDir)) {
-        m_projDir.mkdir(defaultThumbFramesDir);
+    if (!m_framesDir.exists()) {
+        m_framesDir.mkpath(".");
     }
     m_thumbFramesDir = QDir(m_projDir.absolutePath() + "/" + defaultThumbFramesDir);
-
+    if (!m_thumbFramesDir.exists()) {
+        m_thumbFramesDir.mkpath(".");
+    }
     m_canWriteFrames = validDirectories();
 
 
     m_timer = new QTimer(this);
+    m_signalMapper = new QSignalMapper(this);
+
     bool b = true;
     b &= connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
+    b &= connect(m_signalMapper, SIGNAL(mapped(int)), this, SLOT(slotExtractingFinished(int)));
     Q_ASSERT(b);
 }
 
@@ -77,15 +80,21 @@ const VideoInfoSV& Project_sV::videoInfo() const
 void Project_sV::extractFrames(bool force)
 {
     m_timer->start(100);
+    m_processStatus.reset();
     if (rebuildRequired(FrameSize_Orig) || force) {
         extractFramesFor(FrameSize_Orig);
     } else {
+        m_processStatus.origFinished = true;
         emit signalFramesExtracted(Project_sV::FrameSize_Orig);
     }
     if (rebuildRequired(FrameSize_Small) || force) {
         extractFramesFor(FrameSize_Small);
     } else {
+        m_processStatus.smallFinished = true;
         emit signalFramesExtracted(Project_sV::FrameSize_Small);
+    }
+    if (m_processStatus.allFinished()) {
+        m_timer->stop();
     }
 }
 
@@ -102,12 +111,20 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
 
         switch (frameSize) {
         case FrameSize_Orig:
-            args << QString("%1/frame%5d.jpg").arg(m_framesDir.absolutePath());
-            if (m_ffmpegOrig != NULL && m_ffmpegOrig->state() != QProcess::NotRunning) {
-                qDebug() << "Shutting down old ffmpeg process";
-                m_ffmpegOrig->waitForFinished(2000);
+            {
+                args << QString("%1/frame%5d.jpg").arg(m_framesDir.absolutePath());
+                if (m_ffmpegOrig != NULL && m_ffmpegOrig->state() != QProcess::NotRunning) {
+                    qDebug() << "Shutting down old ffmpeg process";
+                    m_ffmpegOrig->waitForFinished(2000);
+                    m_signalMapper->disconnect(m_ffmpegOrig, 0,0,0);
+                }
+                m_ffmpegOrig = ffmpeg;
+
+                m_signalMapper->setMapping(m_ffmpegOrig, (int)FrameSize_Orig);
+                bool b = true;
+                b &= connect(m_ffmpegOrig, SIGNAL(finished(int)), m_signalMapper, SLOT(map()));
+                Q_ASSERT(b);
             }
-            m_ffmpegOrig = ffmpeg;
             break;
         case FrameSize_Small:
             {
@@ -123,14 +140,18 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
                 if (m_ffmpegSmall != NULL && m_ffmpegSmall->state() != QProcess::NotRunning) {
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegSmall->waitForFinished(2000);
+                    m_signalMapper->disconnect(m_ffmpegSmall, 0,0,0);
                 }
                 m_ffmpegSmall = ffmpeg;
+
+                m_signalMapper->setMapping(m_ffmpegSmall, (int)FrameSize_Small);
+                bool b = true;
+                b &= connect(m_ffmpegSmall, SIGNAL(finished(int)), m_signalMapper, SLOT(map()));
+                Q_ASSERT(b);
+
             }
             break;
         }
-        bool b = true;
-        b &= connect(ffmpeg, SIGNAL(finished(int)), this, SLOT(slotExtractingFinished()));
-        Q_ASSERT(b);
 
 
         ffmpeg->start("ffmpeg", args);
@@ -173,23 +194,22 @@ QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
     return QImage(filename);
 }
 
-void Project_sV::slotExtractingFinished()
+void Project_sV::slotExtractingFinished(int fs)
 {
-    bool allFinished = true;
-    qDebug() << "Extracting finished!";
-    if (m_ffmpegOrig->state() == QProcess::NotRunning) {
-        qDebug() << "Orig size thread not running.";
-        emit signalFramesExtracted(Project_sV::FrameSize_Orig);
-    } else { allFinished = false; }
-    if (m_ffmpegSmall->state() == QProcess::NotRunning) {
-        qDebug() << "Thumbnail size thread not running.";
-        emit signalFramesExtracted(Project_sV::FrameSize_Small);
-    } else { allFinished = false; }
+    Project_sV::FrameSize frameSize = (FrameSize) fs;
+    qDebug() << "Finished: " << frameSize;
 
-    if (!allFinished && m_ffmpegOrig != NULL && m_ffmpegSmall != NULL) {
-        qDebug() << "ffmpeg Orig: " << m_ffmpegOrig->readAllStandardError();
-        qDebug() << "ffmpeg Small: " << m_ffmpegSmall->readAllStandardError();
-    } else {
+    switch(frameSize) {
+    case FrameSize_Orig:
+        emit signalFramesExtracted(Project_sV::FrameSize_Orig);
+        m_processStatus.origFinished = true;
+        break;
+    case FrameSize_Small:
+        emit signalFramesExtracted(Project_sV::FrameSize_Small);
+        m_processStatus.smallFinished = true;
+        break;
+    }
+    if (m_processStatus.allFinished()) {
         qDebug() << "All finished, stopping timer.";
         m_timer->stop();
     }
@@ -199,25 +219,18 @@ void Project_sV::slotProgressUpdate()
 {
     QRegExp regex(regexFrameNumber);
     QString s;
-    int pos;
-    qDebug() << "=====Timer=====";
     if (m_ffmpegOrig != NULL) {
         s = QString(m_ffmpegOrig->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            qDebug() << "Frame number: " << regex.cap(1);
             emit signalProgressUpdated(Project_sV::FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
         }
-        qDebug() << "ffmpeg Orig: " << s;
     }
     if (m_ffmpegSmall != NULL) {
         s = QString(m_ffmpegSmall->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            qDebug() << "Frame number: " << regex.cap(1);
             emit signalProgressUpdated(Project_sV::FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
         }
-        qDebug() << "ffmpeg Small: " << s;
     }
-    qDebug() << "====/Timer=====";
 }
 
 QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize)

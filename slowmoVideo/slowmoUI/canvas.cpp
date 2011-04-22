@@ -87,7 +87,7 @@ void Canvas::toggleHelp()
 bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
 {
     bool selected = false;
-    uint ti = m_nodes.find(convertCanvasToTime(pos).x());
+    int ti = m_nodes.find(convertCanvasToTime(pos).x());
     qDebug() << "Nearest node index: " << ti;
     if (m_nodes.size() > ti) {
         QPoint p = convertTimeToCanvas(m_nodes.at(ti));
@@ -175,7 +175,7 @@ void Canvas::paintEvent(QPaintEvent *)
     // Nodes
     const Node *prev = NULL;
     const Node *curr = NULL;
-    for (uint i = 0; i < m_nodes.size(); i++) {
+    for (int i = 0; i < m_nodes.size(); i++) {
         curr = &m_nodes.at(i);
 
         QPoint p = convertTimeToCanvas(*curr);

@@ -47,8 +47,8 @@ public:
       @return A pointer to the node at the given time (or not further
       than minDist away), or NULL if there is no node at t.
       */
-    const Node* at(qreal t) const;
-    const Node& at(uint i) const;
+    const Node* near(qreal t) const;
+    const Node& at(int i) const;
     Node& operator[](int i);
     int size() const;
 
