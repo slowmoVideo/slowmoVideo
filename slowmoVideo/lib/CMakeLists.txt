@@ -9,6 +9,8 @@ set(CMAKE_C_FLAGS
 
 set(LIB_SRC
   interpolate_sV.cpp
+  opticalFlowBuilder_sV.h
+  opticalFlowBuilderGPUKLT_sV.cpp
 )
 
 set(LIB_SRC_VI
@@ -20,5 +22,5 @@ set(LIB_SRC_VI
 add_library(sV STATIC ${LIB_SRC})
 target_link_libraries(sV ${QT_LIBRARIES})
 
-add_library(sVI STATIC ${LIB_SRC_VI})
-target_link_libraries(sVI ${FFMPEG_LIBRARIES})
+add_library(sVinfo STATIC ${LIB_SRC_VI})
+target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})

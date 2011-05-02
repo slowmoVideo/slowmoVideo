@@ -8,6 +8,8 @@
 
 #include <QObject>
 
+#include "../lib/opticalFlowBuilder_sV.h"
+
 extern "C" {
 #include "../lib/videoInfo_sV.h"
 }
@@ -16,6 +18,7 @@ class QSignalMapper;
 class QProcess;
 class QRegExp;
 class QTimer;
+class QFile;
 class Project_sV : public QObject
 {
     Q_OBJECT
@@ -52,9 +55,16 @@ public:
       */
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
 
+    QFile* frameFile(int number) const;
+    QFile* thumbFile(int number) const;
+    QFile* flowFile(int number, OpticalFlowBuilder_sV::Direction direction) const;
+
+    void buildFlow() const;
+
 private:
     static QString defaultFramesDir;
     static QString defaultThumbFramesDir;
+    static QString defaultFlowDir;
     static QRegExp regexFrameNumber;
 
     struct {
@@ -73,6 +83,7 @@ private:
     QDir m_projDir;
     QDir m_framesDir;
     QDir m_thumbFramesDir;
+    QDir m_flowDir;
     VideoInfoSV m_videoInfo;
 
     QSignalMapper *m_signalMapper;

@@ -5,11 +5,15 @@
 #include <QProcess>
 #include <QTimer>
 #include <QDebug>
+#include <QFile>
 #include <QFileInfo>
 #include <QSignalMapper>
+#include "../lib/opticalFlowBuilder_sV.h"
+#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 
 QString Project_sV::defaultFramesDir("frames");
 QString Project_sV::defaultThumbFramesDir("framesThumb");
+QString Project_sV::defaultFlowDir("oFlow");
 QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
 Project_sV::Project_sV(QString filename, QString projectDir) :
@@ -37,6 +41,10 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     m_thumbFramesDir = QDir(m_projDir.absolutePath() + "/" + defaultThumbFramesDir);
     if (!m_thumbFramesDir.exists()) {
         m_thumbFramesDir.mkpath(".");
+    }
+    m_flowDir = QDir(m_projDir.absolutePath() + "/" + defaultFlowDir);
+    if (!m_flowDir.exists()) {
+        m_flowDir.mkpath(".");
     }
     m_canWriteFrames = validDirectories();
 
@@ -76,6 +84,12 @@ bool Project_sV::validDirectories() const
         valid = false;
     } else {
         qDebug() << "Frame thumb directory: " << m_thumbFramesDir.absolutePath();
+    }
+    if (!m_flowDir.exists()) {
+        qDebug() << "Could not change to directory " << m_flowDir.absolutePath() << "/" << defaultFlowDir;
+        valid = false;
+    } else {
+        qDebug() << "Flow directory: " << m_flowDir.absolutePath();
     }
     return valid;
 }
@@ -140,7 +154,8 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
             {
                 int w = m_videoInfo.width;
                 int h = m_videoInfo.height;
-                while (w > 640) {
+                // TODO adjust size
+                while (w > 320) {
                     w /= 2;
                     h /= 2;
                 }
@@ -193,17 +208,66 @@ bool Project_sV::rebuildRequired(const FrameSize frameSize) const
 
 QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
 {
-    QString filename;
+    QFile *file;
     switch (frameSize) {
     case FrameSize_Orig:
-        filename = QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(frame, 5, 10, QChar::fromAscii('0')));
+        file = frameFile(frame);
         break;
     case FrameSize_Small:
-        filename = QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(frame, 5, 10, QChar::fromAscii('0')));
+        file = thumbFile(frame);
         break;
     }
 
+    QString filename = file->fileName();
+    delete file;
+
     return QImage(filename);
+}
+
+void Project_sV::buildFlow() const
+{
+    OpticalFlowBuilder_sV *builder = new OpticalFlowBuilderGPUKLT_sV();
+    for (int i = 2; i < m_videoInfo.framesCount; i++) {
+        QFile *left, *right, *forward;
+        left = thumbFile(i-1);
+        right = thumbFile(i);
+        forward = flowFile(i, OpticalFlowBuilder_sV::Direction_Forward);
+        if (!forward->exists()) {
+            builder->buildFlow(
+                        *left, *right, *forward,
+                        OpticalFlowBuilder_sV::Direction_Forward
+                        );
+        } else {
+            qDebug() << "Flow image " << i-1 << "-" << i << " already exists.";
+        }
+
+        delete left;
+        delete right;
+        delete forward;
+    }
+    delete builder;
+}
+
+QFile* Project_sV::frameFile(int number) const
+{
+    return new QFile(QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
+}
+QFile* Project_sV::thumbFile(int number) const
+{
+    return new QFile(QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
+}
+QFile* Project_sV::flowFile(int number, OpticalFlowBuilder_sV::Direction direction) const
+{
+    QFile *file;
+    switch (direction) {
+    case OpticalFlowBuilder_sV::Direction_Forward:
+        file = new QFile(QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
+        break;
+    case OpticalFlowBuilder_sV::Direction_Backward:
+        file = new QFile(QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
+        break;
+    }
+    return file;
 }
 
 void Project_sV::slotExtractingFinished(int fs)
