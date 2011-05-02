@@ -12,15 +12,15 @@ OpticalFlowBuilderGPUKLT_sV::~OpticalFlowBuilderGPUKLT_sV()
 
 }
 
-void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, Direction direction) const
+void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const
 {
     QString program("/data/cworkspace/slowmoGPU/V3D/build/Apps/GL/tvl1_flow");
     QStringList args;
     switch (direction) {
-    case Direction_Forward:
+    case FlowDirection_Forward:
         args << left.fileName() << right.fileName();
         break;
-    case Direction_Backward:
+    case FlowDirection_Backward:
         args << right.fileName() << left.fileName();
         break;
     }

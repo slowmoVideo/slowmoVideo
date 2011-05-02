@@ -8,6 +8,7 @@ set(CMAKE_C_FLAGS
 )
 
 set(LIB_SRC
+  defs_sV.h
   interpolate_sV.cpp
   opticalFlowBuilder_sV.h
   opticalFlowBuilderGPUKLT_sV.cpp

@@ -13,6 +13,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "newprojectdialog.h"
 #include "progressDialogExtractFrames.h"
+#include "progressDialogBuildFlow.h"
+
+#include "../project/flow_sV.h"
 
 #include <QtCore>
 #include <QObject>
@@ -21,8 +24,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QShortcut>
 #include <QSignalMapper>
 #include <QTime>
+#include <QFuture>
 
 #include <QPainter>
+
+#include <functional>
 
 QStringList MainWindow::m_commands;
 
@@ -152,9 +158,39 @@ void MainWindow::newProject()
             Q_ASSERT(b);
             m_project->extractFrames();
             progress.exec();
+
+
+            ProgressDialogBuildFlow flow;
+            flow.setProgressRange(m_project->videoInfo().framesCount-1);
+            Flow_sV flowO;
+            b = true;
+            b &= connect(
+                        &flowO, SIGNAL(signalFlowProgressUpdated(int)),
+                        &flow, SLOT(slotProgressUpdated(int))
+                    );
+            b &= connect(
+                        m_project, SIGNAL(signalFlowFinished()),
+                        &flow, SLOT(slotFlowFinished())
+                        );
+            b &= connect(
+                        m_project, SIGNAL(signalFlowFrame(QString)),
+                        &flow, SLOT(slotCurrentFile(QString))
+                        );
+            Q_ASSERT(b);
+
+//            QtConcurrent::run(std::bind1st(std::mem_fun(&Project_sV::buildFlow), m_project));
+//            QtConcurrent::run(*m_project, &Project_sV::buildFlow);
+            QtConcurrent::run(flowO, &Flow_sV::buildFlow,
+                              m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
+                              FlowDirection_Forward);
+//            m_project->buildFlow();
+            flow.exec();
+//            QtConcurrent::run(flow, &ProgressDialogBuildFlow::exec);
+
+
             m_wCanvas->load(m_project);
 
-            m_project->buildFlow();
+//            m_project->buildFlow();
         } else {
             qDebug() << "Project directories not writable.";
             delete newProject;

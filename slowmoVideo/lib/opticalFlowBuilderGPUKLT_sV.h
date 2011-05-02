@@ -9,7 +9,7 @@ public:
     OpticalFlowBuilderGPUKLT_sV();
     virtual ~OpticalFlowBuilderGPUKLT_sV();
 
-    virtual void buildFlow(const QFile &left, const QFile &right, const QFile &output, Direction direction) const;
+    virtual void buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const;
 };
 
 #endif // OPTICALFLOWBUILDERGPUKLT_SV_H

@@ -208,66 +208,35 @@ bool Project_sV::rebuildRequired(const FrameSize frameSize) const
 
 QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
 {
-    QFile *file;
+    QString filename;
     switch (frameSize) {
     case FrameSize_Orig:
-        file = frameFile(frame);
+        filename = frameFileStr(frame);
         break;
     case FrameSize_Small:
-        file = thumbFile(frame);
+        filename = thumbFileStr(frame);
         break;
     }
-
-    QString filename = file->fileName();
-    delete file;
 
     return QImage(filename);
 }
 
-void Project_sV::buildFlow() const
+const QString Project_sV::frameFileStr(int number) const
 {
-    OpticalFlowBuilder_sV *builder = new OpticalFlowBuilderGPUKLT_sV();
-    for (int i = 2; i < m_videoInfo.framesCount; i++) {
-        QFile *left, *right, *forward;
-        left = thumbFile(i-1);
-        right = thumbFile(i);
-        forward = flowFile(i, OpticalFlowBuilder_sV::Direction_Forward);
-        if (!forward->exists()) {
-            builder->buildFlow(
-                        *left, *right, *forward,
-                        OpticalFlowBuilder_sV::Direction_Forward
-                        );
-        } else {
-            qDebug() << "Flow image " << i-1 << "-" << i << " already exists.";
-        }
-
-        delete left;
-        delete right;
-        delete forward;
-    }
-    delete builder;
+    return QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
 }
-
-QFile* Project_sV::frameFile(int number) const
+const QString Project_sV::thumbFileStr(int number) const
 {
-    return new QFile(QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
+    return QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
 }
-QFile* Project_sV::thumbFile(int number) const
+const QString Project_sV::flowFileStr(int number, FlowDirection direction) const
 {
-    return new QFile(QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
-}
-QFile* Project_sV::flowFile(int number, OpticalFlowBuilder_sV::Direction direction) const
-{
-    QFile *file;
     switch (direction) {
-    case OpticalFlowBuilder_sV::Direction_Forward:
-        file = new QFile(QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
-        break;
-    case OpticalFlowBuilder_sV::Direction_Backward:
-        file = new QFile(QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0'))));
-        break;
+    case FlowDirection_Forward:
+        return QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
+    case FlowDirection_Backward:
+        return QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
     }
-    return file;
 }
 
 void Project_sV::slotExtractingFinished(int fs)

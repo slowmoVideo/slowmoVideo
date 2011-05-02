@@ -7,8 +7,10 @@
 #include <QImage>
 
 #include <QObject>
+#include <QFile>
 
 #include "../lib/opticalFlowBuilder_sV.h"
+#include "../lib/defs_sV.h"
 
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -18,7 +20,6 @@ class QSignalMapper;
 class QProcess;
 class QRegExp;
 class QTimer;
-class QFile;
 class Project_sV : public QObject
 {
     Q_OBJECT
@@ -57,9 +58,11 @@ public:
 
     QFile* frameFile(int number) const;
     QFile* thumbFile(int number) const;
-    QFile* flowFile(int number, OpticalFlowBuilder_sV::Direction direction) const;
+    QFile* flowFile(int number, FlowDirection direction) const;
 
-    void buildFlow() const;
+    const QString frameFileStr(int number) const;
+    const QString thumbFileStr(int number) const;
+    const QString flowFileStr(int number, FlowDirection direction) const;
 
 private:
     static QString defaultFramesDir;
@@ -111,6 +114,7 @@ signals:
       @param progress Number in the range 0...100
       */
     void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
+
 };
 
 QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize);
