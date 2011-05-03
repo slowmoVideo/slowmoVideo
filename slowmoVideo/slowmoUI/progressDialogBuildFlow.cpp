@@ -1,6 +1,8 @@
 #include "progressDialogBuildFlow.h"
 #include "ui_progressDialogBuildFlow.h"
 
+#include <QDebug>
+
 ProgressDialogBuildFlow::ProgressDialogBuildFlow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ProgressDialogBuildFlow)
@@ -33,9 +35,11 @@ void ProgressDialogBuildFlow::slotProgressUpdated(int value)
 {
     Q_ASSERT(value <= 100);
     ui->progressBar->setValue(value);
+    qDebug() << "PDBF: New value: " << value;
 }
 
 void ProgressDialogBuildFlow::slotCurrentFile(const QString &name)
 {
     ui->currentFile->setText(name);
+    qDebug() << "PDBF: Current file: " << name;
 }

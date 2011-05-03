@@ -169,20 +169,22 @@ void MainWindow::newProject()
                         &flow, SLOT(slotProgressUpdated(int))
                     );
             b &= connect(
-                        m_project, SIGNAL(signalFlowFinished()),
+                        &flowO, SIGNAL(signalFlowFinished()),
                         &flow, SLOT(slotFlowFinished())
                         );
             b &= connect(
-                        m_project, SIGNAL(signalFlowFrame(QString)),
+                        &flowO, SIGNAL(signalFlowFrame(QString)),
                         &flow, SLOT(slotCurrentFile(QString))
                         );
             Q_ASSERT(b);
 
 //            QtConcurrent::run(std::bind1st(std::mem_fun(&Project_sV::buildFlow), m_project));
 //            QtConcurrent::run(*m_project, &Project_sV::buildFlow);
+
             QtConcurrent::run(flowO, &Flow_sV::buildFlow,
                               m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
                               FlowDirection_Forward);
+
 //            m_project->buildFlow();
             flow.exec();
 //            QtConcurrent::run(flow, &ProgressDialogBuildFlow::exec);

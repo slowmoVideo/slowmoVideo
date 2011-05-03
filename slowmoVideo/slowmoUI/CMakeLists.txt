@@ -30,6 +30,7 @@ set(SRCS_MOC
   canvas.h
   newprojectdialog.h
   ../project/project_sV.h
+  ../project/flow_sV.h
   progressDialogExtractFrames.h
   progressDialogBuildFlow.h
 )
