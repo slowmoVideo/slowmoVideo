@@ -12,6 +12,11 @@ ProgressDialogBuildFlow::ProgressDialogBuildFlow(QWidget *parent) :
 
     m_progressRange = 100;
     ui->progressBar->setRange(0, m_progressRange);
+    ui->progressBar->setValue(0);
+
+    bool b = true;
+    b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));
+    Q_ASSERT(b);
 }
 
 ProgressDialogBuildFlow::~ProgressDialogBuildFlow()
@@ -28,7 +33,16 @@ void ProgressDialogBuildFlow::setProgressRange(int max)
 
 void ProgressDialogBuildFlow::slotFlowFinished()
 {
-    emit accepted();
+    accept();
+}
+void ProgressDialogBuildFlow::slotFlowAborted()
+{
+    reject();
+}
+void ProgressDialogBuildFlow::slotAbortPressed()
+{
+    ui->bAbort->setEnabled(false);
+    emit signalAbortPressed();
 }
 
 void ProgressDialogBuildFlow::slotProgressUpdated(int value)

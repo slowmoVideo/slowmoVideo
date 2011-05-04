@@ -19,6 +19,7 @@ public:
     void setProgressRange(int value);
 
 public slots:
+    void slotFlowAborted();
     void slotFlowFinished();
     void slotProgressUpdated(int max);
     void slotCurrentFile(const QString &name);
@@ -26,6 +27,12 @@ public slots:
 private:
     Ui::ProgressDialogBuildFlow *ui;
     int m_progressRange;
+
+private slots:
+    void slotAbortPressed();
+
+signals:
+    void signalAbortPressed();
 };
 
 #endif // PROGRESSDIALOGBUILDFLOW_H

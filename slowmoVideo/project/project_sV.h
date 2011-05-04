@@ -64,6 +64,9 @@ public:
     const QString thumbFileStr(int number) const;
     const QString flowFileStr(int number, FlowDirection direction) const;
 
+public slots:
+    void slotFlowCompleted();
+
 private:
     static QString defaultFramesDir;
     static QString defaultThumbFramesDir;
@@ -81,6 +84,7 @@ private:
     } m_processStatus;
 
     bool m_canWriteFrames;
+    bool m_flowComplete;
 
     QFile m_inFile;
     QDir m_projDir;

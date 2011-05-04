@@ -10,12 +10,8 @@
 class Flow_sV : public QObject
 {
     Q_OBJECT
-public:
-    Flow_sV();
-    Flow_sV(const Flow_sV &other);
-    virtual ~Flow_sV() {}
-    Flow_sV& operator=(const Flow_sV &other);
 
+public:
     // See http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.5
     typedef const QString (Project_sV::*ProjectFrameMemFn)(int nr) const;
     typedef const QString (Project_sV::*ProjectFlowMemFn)(int nr, FlowDirection direction) const;
@@ -27,6 +23,15 @@ signals:
     void signalFlowProgressUpdated(int progress);
     void signalFlowFrame(const QString& name);
     void signalFlowFinished();
+    void signalFlowAborted();
+
+public slots:
+    void slotAbort();
+
+private:
+    bool abort;
+    bool aborted;
+
 };
 
 #endif // FLOW_SV_H

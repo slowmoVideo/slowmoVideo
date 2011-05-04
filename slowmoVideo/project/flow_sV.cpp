@@ -8,23 +8,18 @@
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object)->*(ptrToMember))
 
-Flow_sV::Flow_sV()
-{
-    qDebug() << "Bla.";
-}
-Flow_sV::Flow_sV(const Flow_sV &other) {}
-
-Flow_sV& Flow_sV::operator =(const Flow_sV &other)
-{
-    return *this;
-}
-
 void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, ProjectFlowMemFn outName, FlowDirection direction)
 {
+    abort = false;
+    aborted = false;
     int framesCount = project->videoInfo().framesCount;
 
     OpticalFlowBuilder_sV *builder = new OpticalFlowBuilderGPUKLT_sV();
     for (int i = 2; i < framesCount; i++) {
+        if (abort) {
+            aborted = true;
+            break;
+        }
         QString left, right, forward;
         left = CALL_MEMBER_FN(project, frameNames)(i-1);
         right = CALL_MEMBER_FN(project, frameNames)(i);
@@ -43,6 +38,15 @@ void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, Proje
         emit signalFlowProgressUpdated(i);
 
     }
-    emit signalFlowFinished();
+    if (aborted) {
+        emit signalFlowAborted();
+    } else {
+        emit signalFlowFinished();
+    }
     delete builder;
+}
+
+void Flow_sV::slotAbort()
+{
+    abort = true;
 }

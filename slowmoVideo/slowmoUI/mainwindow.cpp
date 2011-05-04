@@ -160,39 +160,43 @@ void MainWindow::newProject()
             progress.exec();
 
 
-            ProgressDialogBuildFlow flow;
-            flow.setProgressRange(m_project->videoInfo().framesCount-1);
+            ProgressDialogBuildFlow flowUI;
+            flowUI.setProgressRange(m_project->videoInfo().framesCount-1);
             Flow_sV flowO;
             b = true;
             b &= connect(
                         &flowO, SIGNAL(signalFlowProgressUpdated(int)),
-                        &flow, SLOT(slotProgressUpdated(int))
+                        &flowUI, SLOT(slotProgressUpdated(int))
                     );
             b &= connect(
                         &flowO, SIGNAL(signalFlowFinished()),
-                        &flow, SLOT(slotFlowFinished())
+                        &flowUI, SLOT(slotFlowFinished())
+                        );
+            b &= connect( // Notify the project if the flow images have been built
+                        &flowO, SIGNAL(signalFlowFinished()),
+                        m_project, SLOT(slotFlowCompleted())
                         );
             b &= connect(
                         &flowO, SIGNAL(signalFlowFrame(QString)),
-                        &flow, SLOT(slotCurrentFile(QString))
+                        &flowUI, SLOT(slotCurrentFile(QString))
+                        );
+            b &= connect(
+                        &flowO, SIGNAL(signalFlowAborted()),
+                        &flowUI, SLOT(slotFlowAborted())
+                        );
+            b &= connect(
+                        &flowUI, SIGNAL(signalAbortPressed()),
+                        &flowO, SLOT(slotAbort())
                         );
             Q_ASSERT(b);
 
-//            QtConcurrent::run(std::bind1st(std::mem_fun(&Project_sV::buildFlow), m_project));
-//            QtConcurrent::run(*m_project, &Project_sV::buildFlow);
-
-            QtConcurrent::run(flowO, &Flow_sV::buildFlow,
+            QtConcurrent::run(&flowO, &Flow_sV::buildFlow,
                               m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
                               FlowDirection_Forward);
-
-//            m_project->buildFlow();
-            flow.exec();
-//            QtConcurrent::run(flow, &ProgressDialogBuildFlow::exec);
-
+            flowUI.exec();
 
             m_wCanvas->load(m_project);
 
-//            m_project->buildFlow();
         } else {
             qDebug() << "Project directories not writable.";
             delete newProject;

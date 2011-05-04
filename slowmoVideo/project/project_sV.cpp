@@ -19,6 +19,7 @@ QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 Project_sV::Project_sV(QString filename, QString projectDir) :
     QObject(),
     m_canWriteFrames(false),
+    m_flowComplete(false),
     m_inFile(filename),
     m_projDir(projectDir),
     m_ffmpegOrig(NULL),
@@ -276,6 +277,11 @@ void Project_sV::slotProgressUpdate()
             emit signalProgressUpdated(Project_sV::FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
         }
     }
+}
+
+void Project_sV::slotFlowCompleted()
+{
+    m_flowComplete = true;
 }
 
 QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize)
