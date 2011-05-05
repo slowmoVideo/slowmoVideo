@@ -88,6 +88,7 @@ private slots:
       between the two key strokes is small enough.
      */
     void shortcutUsed(QString);
+    void showRenderDialog();
 
 
 signals:

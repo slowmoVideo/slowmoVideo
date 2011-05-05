@@ -20,8 +20,12 @@ class NodeList
 {
 public:
     NodeList(float minDist = 1/30.0f);
-
     void setMaxY(qreal time);
+
+    qreal sourceTime(qreal targetTime) const;
+    qreal startTime() const;
+    qreal endTime() const;
+    qreal length() const;
 
     /**
       Add a new node at the given position.
@@ -34,8 +38,19 @@ public:
     void unselectAll();
 
     void shift(qreal after, qreal by);
+    /**
+      Move the selected nodes by the given time vector.
+      Only succeeds if the nodes are still within valid bounds.
+      A move has to be either confirmed or aborted.
+      */
     void moveSelected(const Node &time);
+    /**
+      Confirm the move on all nodes.
+      */
     void confirmMove();
+    /**
+      Abort the move on all nodes. Resets the temporary movement vector.
+      */
     void abortMove();
 
 

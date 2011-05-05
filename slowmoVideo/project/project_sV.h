@@ -45,6 +45,10 @@ public:
 
     enum FrameSize { FrameSize_Orig, FrameSize_Small };
 
+
+    void render(qreal fps);
+
+
     /**
       @return true, iff all required directories exist
       */

@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "newprojectdialog.h"
 #include "progressDialogExtractFrames.h"
 #include "progressDialogBuildFlow.h"
+#include "renderDialog.h"
 
 #include "../project/flow_sV.h"
 
@@ -102,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
+
+    b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(showRenderDialog()));
 
 
     Q_ASSERT(b);
@@ -263,3 +266,11 @@ void MainWindow::shortcutUsed(QString which)
 
     m_lastShortcut = ts;
 }
+
+void MainWindow::showRenderDialog()
+{
+    RenderDialog renderDialog;
+
+    renderDialog.exec();
+}
+

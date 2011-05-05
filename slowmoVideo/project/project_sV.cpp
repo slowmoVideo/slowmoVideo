@@ -115,6 +115,13 @@ bool Project_sV::validDirectories() const
 const VideoInfoSV& Project_sV::videoInfo() const { return m_videoInfo; }
 Flow_sV* Project_sV::flow() const { return m_flow; }
 
+void Project_sV::render(qreal fps)
+{
+    // TODO slots: abort render, continue render
+    //      signals: frame rendered, render finished, render aborted
+
+}
+
 void Project_sV::extractFrames(bool force)
 {
     m_timer->start(100);

@@ -27,6 +27,7 @@
     <property name="title">
      <string>slowmoVideo UI</string>
     </property>
+    <addaction name="actionRender"/>
    </widget>
    <addaction name="menuSlowmoVideo_UI"/>
   </widget>
@@ -39,6 +40,11 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionRender">
+   <property name="text">
+    <string>Render</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

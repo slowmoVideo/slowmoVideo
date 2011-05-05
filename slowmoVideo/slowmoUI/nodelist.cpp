@@ -28,6 +28,32 @@ void NodeList::setMaxY(qreal time)
     m_maxY = time;
 }
 
+inline
+qreal NodeList::startTime() const
+{
+    if (m_list.length() > 0) {
+        return m_list[0].xUnmoved();
+    } else {
+        qDebug() << "No start time available (no nodes)";
+        return 0;
+    }
+}
+inline
+qreal NodeList::endTime() const
+{
+    if (m_list.length() > 0) {
+        return m_list[m_list.length()-1].xUnmoved();
+    } else {
+        qDebug() << "No end time available (no nodes)";
+        return 0;
+    }
+}
+inline
+qreal NodeList::length() const
+{
+    return endTime()-startTime();
+}
+
 bool NodeList::add(const Node &node)
 {
     bool add = true;
