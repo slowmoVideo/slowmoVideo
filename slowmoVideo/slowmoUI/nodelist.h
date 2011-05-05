@@ -20,6 +20,9 @@ class NodeList
 {
 public:
     NodeList(float minDist = 1/30.0f);
+
+    void setMaxY(qreal time);
+
     /**
       Add a new node at the given position.
       @return true if the node has been added. The node is NOT added
@@ -60,6 +63,7 @@ public:
     bool validate() const;
 
 private:
+    qreal m_maxY;
     QList<Node> m_list;
     const float m_minDist;
 };

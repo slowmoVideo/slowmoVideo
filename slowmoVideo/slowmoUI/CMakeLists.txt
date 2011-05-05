@@ -11,8 +11,6 @@ set(SRCS
   node.cpp
   nodelist.cpp
   newprojectdialog.cpp
-  ../project/project_sV.cpp
-  ../project/flow_sV.cpp
   progressDialogExtractFrames.cpp
   progressDialogBuildFlow.cpp
 )
@@ -29,8 +27,6 @@ set(SRCS_MOC
   mainwindow.h
   canvas.h
   newprojectdialog.h
-  ../project/project_sV.h
-  ../project/flow_sV.h
   progressDialogExtractFrames.h
   progressDialogBuildFlow.h
 )
@@ -50,7 +46,7 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
 add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT})
-target_link_libraries(slowmoUI sV sVinfo ${QT_LIBRARIES})
+target_link_libraries(slowmoUI sV sVinfo sVproj ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
 install(FILES ${RES} DESTINATION res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

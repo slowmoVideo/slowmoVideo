@@ -1,3 +1,13 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef PROJECT_SV_H
 #define PROJECT_SV_H
 
@@ -9,6 +19,8 @@
 #include <QObject>
 #include <QFile>
 
+class Flow_sV;
+#include "flow_sV.h"
 #include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/defs_sV.h"
 
@@ -29,6 +41,7 @@ public:
     ~Project_sV();
 
     const VideoInfoSV& videoInfo() const;
+    Flow_sV *flow() const;
 
     enum FrameSize { FrameSize_Orig, FrameSize_Small };
 
@@ -56,13 +69,17 @@ public:
       */
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
 
+    QImage interpolateFrameAt(float time) const;
+
+    QImage requestFlow(int leftFrame, FlowDirection direction, bool forceRebuild = false) const;
+
     QFile* frameFile(int number) const;
     QFile* thumbFile(int number) const;
-    QFile* flowFile(int number, FlowDirection direction) const;
+    QFile* flowFile(int leftFrame, FlowDirection direction) const;
 
     const QString frameFileStr(int number) const;
     const QString thumbFileStr(int number) const;
-    const QString flowFileStr(int number, FlowDirection direction) const;
+    const QString flowFileStr(int leftFrame, FlowDirection direction) const;
 
 public slots:
     void slotFlowCompleted();
@@ -92,11 +109,14 @@ private:
     QDir m_thumbFramesDir;
     QDir m_flowDir;
     VideoInfoSV m_videoInfo;
+    Flow_sV *m_flow;
 
     QSignalMapper *m_signalMapper;
     QProcess *m_ffmpegOrig;
     QProcess *m_ffmpegSmall;
     QTimer *m_timer;
+
+    float timeToFrame(float time) const;
 
 
 

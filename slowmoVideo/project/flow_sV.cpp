@@ -1,52 +1,71 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "flow_sV.h"
 
 #include <QFile>
 #include <QDebug>
 
-#include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object)->*(ptrToMember))
 
+Flow_sV::Flow_sV()
+{
+    m_flowBuilder = new OpticalFlowBuilderGPUKLT_sV();
+}
+
+Flow_sV::~Flow_sV()
+{
+    delete m_flowBuilder;
+}
+
 void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, ProjectFlowMemFn outName, FlowDirection direction)
 {
-    abort = false;
-    aborted = false;
+    m_abort = false;
+    m_aborted = false;
     int framesCount = project->videoInfo().framesCount;
 
-    OpticalFlowBuilder_sV *builder = new OpticalFlowBuilderGPUKLT_sV();
     for (int i = 2; i < framesCount; i++) {
-        if (abort) {
-            aborted = true;
+        if (m_abort) {
+            m_aborted = true;
             break;
         }
-        QString left, right, forward;
+        QString left, right, flowFile;
         left = CALL_MEMBER_FN(project, frameNames)(i-1);
         right = CALL_MEMBER_FN(project, frameNames)(i);
-        forward = CALL_MEMBER_FN(project, outName)(i, direction);
+        flowFile = CALL_MEMBER_FN(project, outName)(i-1, direction);
 
-        emit signalFlowFrame(forward);
+        emit signalFlowFrame(flowFile);
 
-        if (!QFile(forward).exists()) {
-            builder->buildFlow(
-                        left, right, forward,
-                        FlowDirection_Forward
-                        );
+        if (!QFile(flowFile).exists()) {
+            buildFlowImage(left, right, flowFile, direction);
         } else {
-            qDebug() << forward << " already exists.";
+            qDebug() << flowFile << " already exists.";
         }
         emit signalFlowProgressUpdated(i);
 
     }
-    if (aborted) {
+    if (m_aborted) {
         emit signalFlowAborted();
     } else {
         emit signalFlowFinished();
     }
-    delete builder;
+}
+
+void Flow_sV::buildFlowImage(const QString &leftFrame, const QString &rightFrame, const QString &outFrame, FlowDirection direction)
+{
+    m_flowBuilder->buildFlow(leftFrame, rightFrame, outFrame, direction);
 }
 
 void Flow_sV::slotAbort()
 {
-    abort = true;
+    m_abort = true;
 }

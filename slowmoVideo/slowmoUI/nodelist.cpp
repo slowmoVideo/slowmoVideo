@@ -16,9 +16,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDebug>
 
 NodeList::NodeList(float minDist) :
+    m_maxY(10),
     m_list(),
     m_minDist(minDist)
 {
+}
+
+void NodeList::setMaxY(qreal time)
+{
+    Q_ASSERT(time > 0);
+    m_maxY = time;
 }
 
 bool NodeList::add(const Node &node)
@@ -71,7 +78,8 @@ bool NodeList::validate() const
     qreal last = -m_minDist;
     for (int i = 0; i < m_list.size() && valid; i++) {
         valid = m_list.at(i).x() >= 0
-                && m_list.at(i).x() - last >= m_minDist;
+                && m_list.at(i).x() - last >= m_minDist
+                && m_list.at(i).y() >= 0;
         last = m_list.at(i).x();
         if (!valid) {
             qDebug() << "Invalid node position for node " << i << "; Distance is " << m_list.at(i).x() - last;
@@ -88,13 +96,15 @@ void NodeList::moveSelected(const Node &time)
 {
     qreal maxRMove = 1000;
     qreal maxLMove = -1000;
+    qreal maxUMove = 1000;
+    qreal maxDMove = -1000;
     const Node *left = NULL;
     const Node *right;
     for (int i = 0; i < m_list.size(); i++) {
         right = &m_list.at(i);
 
         /*
-          Get the maximum allowed movement distance here such that there is no
+          Get the maximum allowed horizontal movement distance here such that there is no
           overlapping. For moving the selected nodes to the left, only unselected nodes
           which are directly followed by a selected node need to be taken into account.
                  O----O
@@ -103,6 +113,7 @@ void NodeList::moveSelected(const Node &time)
                          x-----------O
 
          min(  ^1^,      ^-----2-----^    ) + minDist
+
          */
         if (left != NULL) {
             if (left->selected() && !right->selected()) {
@@ -114,6 +125,11 @@ void NodeList::moveSelected(const Node &time)
             }
         }
 
+        if (right->selected()) {
+            maxUMove = qMin(maxUMove, m_maxY - right->yUnmoved());
+            maxDMove = qMax(maxDMove, 0-right->yUnmoved());
+        }
+
         left = right;
     }
     if (m_list.size() > 0 && m_list.at(0).selected()) {
@@ -121,7 +137,8 @@ void NodeList::moveSelected(const Node &time)
         maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
     }
     qDebug() << "Max move: left " << maxLMove << ", right: " << maxRMove;
-    if (maxLMove <= time.x() && time.x() <= maxRMove) {
+    if (maxLMove <= time.x() && time.x() <= maxRMove
+            && maxDMove <= time.y() && time.y() <= maxUMove) {
         for (int i = 0; i < m_list.size(); i++) {
             if (m_list.at(i).selected()) {
                 m_list[i].move(time);

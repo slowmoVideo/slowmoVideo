@@ -1,4 +1,16 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "project_sV.h"
+
+#include <cmath>
 
 #include <QRegExp>
 
@@ -10,6 +22,9 @@
 #include <QSignalMapper>
 #include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
+#include "../lib/interpolate_sV.h"
+
+#define MIN_FRAME_DIST .001
 
 QString Project_sV::defaultFramesDir("frames");
 QString Project_sV::defaultThumbFramesDir("framesThumb");
@@ -29,6 +44,7 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     if (m_videoInfo.streamsCount <= 0) {
         qDebug() << "Video info is invalid.";
     }
+    m_flow = new Flow_sV();
 
     // Create directories if necessary
     qDebug() << "Project directory: " << m_projDir.absolutePath();
@@ -63,6 +79,7 @@ Project_sV::~Project_sV()
 {
     delete m_signalMapper;
     delete m_timer;
+    delete m_flow;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
 }
@@ -95,10 +112,8 @@ bool Project_sV::validDirectories() const
     return valid;
 }
 
-const VideoInfoSV& Project_sV::videoInfo() const
-{
-    return m_videoInfo;
-}
+const VideoInfoSV& Project_sV::videoInfo() const { return m_videoInfo; }
+Flow_sV* Project_sV::flow() const { return m_flow; }
 
 void Project_sV::extractFrames(bool force)
 {
@@ -198,10 +213,10 @@ bool Project_sV::rebuildRequired(const FrameSize frameSize) const
 {
     bool needsRebuild = false;
 
-    QImage frame = frameAt(1, frameSize); // Counting starts with 1!
+    QImage frame = frameAt(0, frameSize);
     needsRebuild |= frame.isNull();
 
-    frame = frameAt(m_videoInfo.framesCount, frameSize);
+    frame = frameAt(m_videoInfo.framesCount-1, frameSize);
     needsRebuild |= frame.isNull();
 
     return needsRebuild;
@@ -222,21 +237,63 @@ QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
     return QImage(filename);
 }
 
+QImage Project_sV::interpolateFrameAt(float time) const
+{
+    float framePos = timeToFrame(time);
+    if (framePos > m_videoInfo.framesCount) {
+        qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_videoInfo.framesCount << " frames)";
+        Q_ASSERT(false);
+    }
+    if (framePos-floor(framePos) < MIN_FRAME_DIST) {
+        QImage left(frameFileStr(floor(framePos)));
+        QImage right(frameFileStr(floor(framePos)+1));
+        QImage out(m_videoInfo.width, m_videoInfo.height, QImage::Format_RGB888);
+        Interpolate_sV::forwardFlow(left, right, framePos-floor(framePos), out);
+        return out;
+    } else {
+        return QImage(frameFileStr(floor(framePos)));
+    }
+}
+
+QImage Project_sV::requestFlow(int leftFrame, FlowDirection direction, bool forceRebuild) const
+{
+    Q_ASSERT(leftFrame < m_videoInfo.framesCount-1);
+    const QString outFile = flowFileStr(leftFrame, direction);
+    if (!QFile(outFile).exists() || forceRebuild) {
+        qDebug() << "Building flow for left frame " << leftFrame << " in direction " << direction;
+        const QString left(thumbFileStr(leftFrame));
+        const QString right(thumbFileStr(leftFrame+1));
+        m_flow->buildFlowImage(left, right,
+                               outFile, direction);
+    } else {
+        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " in direction " << direction;
+    }
+    return QImage(outFile);
+}
+
+inline
+float Project_sV::timeToFrame(float time) const
+{
+    Q_ASSERT(time >= 0);
+    return time * m_videoInfo.frameRateNum / m_videoInfo.frameRateDen;
+}
+
 const QString Project_sV::frameFileStr(int number) const
 {
-    return QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
+    // ffmpeg numbering starts with 1, therefore add 1 to the frame number
+    return QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
 }
 const QString Project_sV::thumbFileStr(int number) const
 {
-    return QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
+    return QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
 }
-const QString Project_sV::flowFileStr(int number, FlowDirection direction) const
+const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction) const
 {
     switch (direction) {
     case FlowDirection_Forward:
-        return QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
+        return QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(leftFrame+1, 5, 10, QChar::fromAscii('0')));
     case FlowDirection_Backward:
-        return QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(number, 5, 10, QChar::fromAscii('0')));
+        return QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(leftFrame+2, 5, 10, QChar::fromAscii('0')));
     }
 }
 

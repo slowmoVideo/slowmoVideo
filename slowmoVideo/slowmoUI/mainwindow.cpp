@@ -162,35 +162,35 @@ void MainWindow::newProject()
 
             ProgressDialogBuildFlow flowUI;
             flowUI.setProgressRange(m_project->videoInfo().framesCount-1);
-            Flow_sV flowO;
+            Flow_sV *flowO = m_project->flow();
             b = true;
             b &= connect(
-                        &flowO, SIGNAL(signalFlowProgressUpdated(int)),
+                        flowO, SIGNAL(signalFlowProgressUpdated(int)),
                         &flowUI, SLOT(slotProgressUpdated(int))
                     );
             b &= connect(
-                        &flowO, SIGNAL(signalFlowFinished()),
+                        flowO, SIGNAL(signalFlowFinished()),
                         &flowUI, SLOT(slotFlowFinished())
                         );
             b &= connect( // Notify the project if the flow images have been built
-                        &flowO, SIGNAL(signalFlowFinished()),
+                        flowO, SIGNAL(signalFlowFinished()),
                         m_project, SLOT(slotFlowCompleted())
                         );
             b &= connect(
-                        &flowO, SIGNAL(signalFlowFrame(QString)),
+                        flowO, SIGNAL(signalFlowFrame(QString)),
                         &flowUI, SLOT(slotCurrentFile(QString))
                         );
             b &= connect(
-                        &flowO, SIGNAL(signalFlowAborted()),
+                        flowO, SIGNAL(signalFlowAborted()),
                         &flowUI, SLOT(slotFlowAborted())
                         );
             b &= connect(
                         &flowUI, SIGNAL(signalAbortPressed()),
-                        &flowO, SLOT(slotAbort())
+                        flowO, SLOT(slotAbort())
                         );
             Q_ASSERT(b);
 
-            QtConcurrent::run(&flowO, &Flow_sV::buildFlow,
+            QtConcurrent::run(flowO, &Flow_sV::buildFlow,
                               m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
                               FlowDirection_Forward);
             flowUI.exec();
