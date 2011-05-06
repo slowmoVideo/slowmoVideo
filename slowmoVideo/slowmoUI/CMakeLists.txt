@@ -8,8 +8,6 @@ set(SRCS
   main.cpp
   mainwindow.cpp
   canvas.cpp
-  node.cpp
-  nodelist.cpp
   newprojectdialog.cpp
   progressDialogExtractFrames.cpp
   progressDialogBuildFlow.cpp

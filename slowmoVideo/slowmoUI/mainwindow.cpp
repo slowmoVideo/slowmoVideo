@@ -17,10 +17,13 @@ the Free Software Foundation, either version 3 of the License, or
 #include "renderDialog.h"
 
 #include "../project/flow_sV.h"
+#include "../project/renderTask_sV.h"
 
 #include <QtCore>
 #include <QObject>
 #include <QDebug>
+
+#include <QDir>
 
 #include <QShortcut>
 #include <QSignalMapper>
@@ -49,13 +52,13 @@ void MainWindow::fillCommandList()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    m_project(NULL)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    m_project = new Project_sV(QDir::tempPath() + "/noexist", QDir::tempPath());
 
-    m_wCanvas = new Canvas(this);
+    m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
 
 
@@ -163,6 +166,7 @@ void MainWindow::newProject()
             progress.exec();
 
 
+            /*
             ProgressDialogBuildFlow flowUI;
             flowUI.setProgressRange(m_project->videoInfo().framesCount-1);
             Flow_sV *flowO = m_project->flow();
@@ -197,6 +201,7 @@ void MainWindow::newProject()
                               m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
                               FlowDirection_Forward);
             flowUI.exec();
+            */
 
             m_wCanvas->load(m_project);
 
@@ -270,6 +275,17 @@ void MainWindow::shortcutUsed(QString which)
 void MainWindow::showRenderDialog()
 {
     RenderDialog renderDialog;
+
+    m_project->renderTask();
+
+    bool b = true;
+    b &= connect(&renderDialog, SIGNAL(signalChangeFps(float)), m_project, SLOT(slotSetFps(float)));
+    b &= connect(&renderDialog, SIGNAL(signalAbortRendering()), m_project->renderTask(), SLOT(slotAbortRendering()));
+    b &= connect(&renderDialog, SIGNAL(signalContinueRendering()), m_project->renderTask(), SLOT(slotContinueRendering()));
+    b &= connect(m_project->renderTask(), SIGNAL(signalFrameRendered(qreal,int)), &renderDialog, SLOT(slotFrameRendered(qreal,int)));
+    b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted()), &renderDialog, SLOT(slotRenderingAborted()));
+    b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished()), &renderDialog, SLOT(slotRenderingFinished()));
+    Q_ASSERT(b);
 
     renderDialog.exec();
 }

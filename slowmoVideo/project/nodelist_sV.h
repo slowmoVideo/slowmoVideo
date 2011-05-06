@@ -8,31 +8,31 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#ifndef NODELIST_H
-#define NODELIST_H
+#ifndef NODELIST_SV_H
+#define NODELIST_SV_H
 
 #include <QList>
 #include <QtGlobal>
 
-class Node;
+#include "node_sV.h"
 
-class NodeList
+class NodeList_sV
 {
 public:
-    NodeList(float minDist = 1/30.0f);
+    NodeList_sV(float minDist = 1/30.0f);
     void setMaxY(qreal time);
 
     qreal sourceTime(qreal targetTime) const;
     qreal startTime() const;
     qreal endTime() const;
-    qreal length() const;
+    qreal totalTime() const;
 
     /**
       Add a new node at the given position.
       @return true if the node has been added. The node is NOT added
       if it is too close to another node.
       */
-    bool add(const Node &node);
+    bool add(const Node_sV &node);
     uint deleteSelected();
 
     void unselectAll();
@@ -43,7 +43,7 @@ public:
       Only succeeds if the nodes are still within valid bounds.
       A move has to be either confirmed or aborted.
       */
-    void moveSelected(const Node &time);
+    void moveSelected(const Node_sV &time);
     /**
       Confirm the move on all nodes.
       */
@@ -54,7 +54,11 @@ public:
     void abortMove();
 
 
-    uint find(qreal time) const;
+    /**
+      @return The position of the node whose target time (x()) is <= time,
+      or -1 if there is no such node.
+      */
+    int find(qreal time) const;
 
     /**
       @return The index of the node whose time is equal or greater than
@@ -65,9 +69,9 @@ public:
       @return A pointer to the node at the given time (or not further
       than minDist away), or NULL if there is no node at t.
       */
-    const Node* near(qreal t) const;
-    const Node& at(int i) const;
-    Node& operator[](int i);
+    const Node_sV* near(qreal t) const;
+    const Node_sV& at(int i) const;
+    Node_sV& operator[](int i);
     int size() const;
 
     /**
@@ -79,10 +83,10 @@ public:
 
 private:
     qreal m_maxY;
-    QList<Node> m_list;
+    QList<Node_sV> m_list;
     const float m_minDist;
 };
 
-QDebug operator<<(QDebug qd, const NodeList &list);
+QDebug operator<<(QDebug qd, const NodeList_sV &list);
 
-#endif // NODELIST_H
+#endif // NODELIST_SV_H

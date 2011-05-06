@@ -20,14 +20,14 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 
 class Flow_sV;
-#include "flow_sV.h"
-#include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/defs_sV.h"
 
 extern "C" {
 #include "../lib/videoInfo_sV.h"
 }
 
+class RenderTask_sV;
+class NodeList_sV;
 class QSignalMapper;
 class QProcess;
 class QRegExp;
@@ -40,8 +40,11 @@ public:
     Project_sV(QString filename, QString projectDir);
     ~Project_sV();
 
-    const VideoInfoSV& videoInfo() const;
-    Flow_sV *flow() const;
+    const VideoInfoSV& videoInfo() const { return m_videoInfo; }
+    Flow_sV *flow() const { return m_flow; }
+    NodeList_sV *nodes() const { return m_nodes; }
+    RenderTask_sV *renderTask() { return m_renderTask; }
+    float fps() const { return m_fps; }
 
     enum FrameSize { FrameSize_Orig, FrameSize_Small };
 
@@ -77,21 +80,33 @@ public:
 
     QImage requestFlow(int leftFrame, FlowDirection direction, bool forceRebuild = false) const;
 
-    QFile* frameFile(int number) const;
-    QFile* thumbFile(int number) const;
-    QFile* flowFile(int leftFrame, FlowDirection direction) const;
 
     const QString frameFileStr(int number) const;
     const QString thumbFileStr(int number) const;
     const QString flowFileStr(int leftFrame, FlowDirection direction) const;
+    const QString renderedFileStr(int number) const;
 
 public slots:
     void slotFlowCompleted();
+    void slotSetFps(float fps);
+
+signals:
+    /**
+      Emitted when all frames have been extracted for this frame size.
+      */
+    void signalFramesExtracted(Project_sV::FrameSize frameSize);
+    /**
+      Emitted when an ffmpeg thread has made progress (i.e. wrote to stderr).
+      @param progress Number in the range 0...100
+      */
+    void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
+
 
 private:
     static QString defaultFramesDir;
     static QString defaultThumbFramesDir;
     static QString defaultFlowDir;
+    static QString defaultRenderDir;
     static QRegExp regexFrameNumber;
 
     struct {
@@ -112,13 +127,18 @@ private:
     QDir m_framesDir;
     QDir m_thumbFramesDir;
     QDir m_flowDir;
+    QDir m_renderDir;
     VideoInfoSV m_videoInfo;
     Flow_sV *m_flow;
+    NodeList_sV *m_nodes;
+    RenderTask_sV *m_renderTask;
 
     QSignalMapper *m_signalMapper;
     QProcess *m_ffmpegOrig;
     QProcess *m_ffmpegSmall;
     QTimer *m_timer;
+
+    float m_fps;
 
     float timeToFrame(float time) const;
 
@@ -131,17 +151,6 @@ private slots:
       and emits signalProgressUpdated() if necessary.
       */
     void slotProgressUpdate();
-
-signals:
-    /**
-      Emitted when all frames have been extracted for this frame size.
-      */
-    void signalFramesExtracted(Project_sV::FrameSize frameSize);
-    /**
-      Emitted when an ffmpeg thread has made progress (i.e. wrote to stderr).
-      @param progress Number in the range 0...100
-      */
-    void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
 
 };
 

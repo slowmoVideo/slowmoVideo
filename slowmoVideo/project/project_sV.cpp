@@ -24,11 +24,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
 
+#include "renderTask_sV.h"
+#include "nodelist_sV.h"
+#include "flow_sV.h"
+
 #define MIN_FRAME_DIST .001
 
 QString Project_sV::defaultFramesDir("frames");
 QString Project_sV::defaultThumbFramesDir("framesThumb");
 QString Project_sV::defaultFlowDir("oFlow");
+QString Project_sV::defaultRenderDir("rendered");
 QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
 Project_sV::Project_sV(QString filename, QString projectDir) :
@@ -38,13 +43,16 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     m_inFile(filename),
     m_projDir(projectDir),
     m_ffmpegOrig(NULL),
-    m_ffmpegSmall(NULL)
+    m_ffmpegSmall(NULL),
+    m_fps(24)
 {
     m_videoInfo = getInfo(filename.toStdString().c_str());
     if (m_videoInfo.streamsCount <= 0) {
         qDebug() << "Video info is invalid.";
     }
     m_flow = new Flow_sV();
+    m_nodes = new NodeList_sV();
+    m_renderTask = new RenderTask_sV(this);
 
     // Create directories if necessary
     qDebug() << "Project directory: " << m_projDir.absolutePath();
@@ -63,6 +71,11 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     if (!m_flowDir.exists()) {
         m_flowDir.mkpath(".");
     }
+    m_renderDir = QDir(m_projDir.absolutePath() + "/" + defaultRenderDir);
+    if (!m_renderDir.exists()) {
+        m_renderDir.mkpath(".");
+    }
+
     m_canWriteFrames = validDirectories();
 
 
@@ -80,6 +93,7 @@ Project_sV::~Project_sV()
     delete m_signalMapper;
     delete m_timer;
     delete m_flow;
+    delete m_nodes;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
 }
@@ -112,11 +126,20 @@ bool Project_sV::validDirectories() const
     return valid;
 }
 
-const VideoInfoSV& Project_sV::videoInfo() const { return m_videoInfo; }
-Flow_sV* Project_sV::flow() const { return m_flow; }
-
+/**
+  @todo Delete
+  */
 void Project_sV::render(qreal fps)
 {
+    int counter = 0;
+    QImage rendered;
+    qreal time = m_nodes->startTime();
+    while (time <= m_nodes->endTime() && m_nodes->totalTime() > 0) {
+        rendered = interpolateFrameAt(time);
+        rendered.save(renderedFileStr(counter));
+        time += 1/fps;
+        counter++;
+    }
     // TODO slots: abort render, continue render
     //      signals: frame rendered, render finished, render aborted
 
@@ -250,14 +273,17 @@ QImage Project_sV::interpolateFrameAt(float time) const
     if (framePos > m_videoInfo.framesCount) {
         qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_videoInfo.framesCount << " frames)";
         Q_ASSERT(false);
+    } else {
+        qDebug() << "Source frame @" << time << " is " << framePos;
     }
-    if (framePos-floor(framePos) < MIN_FRAME_DIST) {
+    if (framePos-floor(framePos) > MIN_FRAME_DIST) {
         QImage left(frameFileStr(floor(framePos)));
         QImage right(frameFileStr(floor(framePos)+1));
         QImage out(m_videoInfo.width, m_videoInfo.height, QImage::Format_RGB888);
         Interpolate_sV::forwardFlow(left, right, framePos-floor(framePos), out);
         return out;
     } else {
+        qDebug() << "No interpolation necessary.";
         return QImage(frameFileStr(floor(framePos)));
     }
 }
@@ -298,10 +324,14 @@ const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction) co
 {
     switch (direction) {
     case FlowDirection_Forward:
-        return QString(m_flowDir.absoluteFilePath("forward%1.jpg").arg(leftFrame+1, 5, 10, QChar::fromAscii('0')));
+        return QString(m_flowDir.absoluteFilePath("forward%1.png").arg(leftFrame+1, 5, 10, QChar::fromAscii('0')));
     case FlowDirection_Backward:
-        return QString(m_flowDir.absoluteFilePath("backward%1.jpg").arg(leftFrame+2, 5, 10, QChar::fromAscii('0')));
+        return QString(m_flowDir.absoluteFilePath("backward%1.png").arg(leftFrame+2, 5, 10, QChar::fromAscii('0')));
     }
+}
+const QString Project_sV::renderedFileStr(int number) const
+{
+    return QString(m_renderDir.absoluteFilePath("rendered%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
 }
 
 void Project_sV::slotExtractingFinished(int fs)
@@ -347,6 +377,13 @@ void Project_sV::slotFlowCompleted()
 {
     m_flowComplete = true;
 }
+
+void Project_sV::slotSetFps(float fps)
+{
+    Q_ASSERT(fps > 0);
+    m_fps = fps;
+}
+
 
 QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize)
 {

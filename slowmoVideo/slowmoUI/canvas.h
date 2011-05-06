@@ -11,13 +11,13 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "nodelist.h"
+#include "../project/node_sV.h"
+#include "../project/nodelist_sV.h"
 #include "../project/project_sV.h"
 
 #include <QWidget>
 #include <QList>
 
-#include "node.h"
 
 class QColor;
 class QPoint;
@@ -26,12 +26,13 @@ namespace Ui {
     class Canvas;
 }
 
+class Project_sV;
 class Canvas : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Canvas(QWidget *parent = 0);
+    explicit Canvas(const Project_sV *project, QWidget *parent = 0);
     ~Canvas();
 
     enum ToolMode {ToolMode_Add, ToolMode_Select, ToolMode_Move };
@@ -70,8 +71,8 @@ private:
     int m_distBottom;
     int m_distRight;
     int m_distTop;
-    Node m_t0;
-    Node m_tmax;
+    Node_sV m_t0;
+    Node_sV m_tmax;
     int m_secResX;
     int m_secResY;
 
@@ -80,10 +81,10 @@ private:
 
     ToolMode m_mode;
 
-    NodeList m_nodes;
+    NodeList_sV *m_nodes;
 
-    const Node convertCanvasToTime(const QPoint &p) const;
-    const QPoint convertTimeToCanvas(const Node &p) const;
+    const Node_sV convertCanvasToTime(const QPoint &p) const;
+    const QPoint convertTimeToCanvas(const Node_sV &p) const;
 
     bool insideCanvas(const QPoint& pos);
 

@@ -9,8 +9,6 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "canvas.h"
-#include "node.h"
-#include "nodelist.h"
 #include "ui_canvas.h"
 
 #include "mainwindow.h"
@@ -36,7 +34,7 @@ QColor Canvas::nodeCol(240, 240, 240);
 QColor Canvas::gridCol(100, 100, 100);
 QColor Canvas::backgroundCol(30, 30, 40);
 
-Canvas::Canvas(QWidget *parent) :
+Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
     m_frameRate(30.0f),
@@ -54,7 +52,7 @@ Canvas::Canvas(QWidget *parent) :
     m_moveAborted(false),
     m_showHelp(false),
     m_mode(ToolMode_Add),
-    m_nodes()
+    m_nodes(project->nodes())
 {
     ui->setupUi(this);
 
@@ -72,6 +70,7 @@ Canvas::~Canvas()
 
 void Canvas::load(const Project_sV *project)
 {
+    m_nodes = project->nodes();
     m_tmax.setY(project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen);
     qDebug() << "tMaxY set to " << m_tmax.y();
 }
@@ -86,10 +85,10 @@ void Canvas::toggleHelp()
 bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
 {
     bool selected = false;
-    int ti = m_nodes.find(convertCanvasToTime(pos).x());
+    int ti = m_nodes->find(convertCanvasToTime(pos).x());
     qDebug() << "Nearest node index: " << ti;
-    if (m_nodes.size() > ti) {
-        QPoint p = convertTimeToCanvas(m_nodes.at(ti));
+    if (ti != -1 && m_nodes->size() > ti) {
+        QPoint p = convertTimeToCanvas(m_nodes->at(ti));
         if (
                 abs(p.x() - pos.x()) <= NODE_RADIUS+2 &&
                 abs(p.y() - pos.y()) <= NODE_RADIUS+2
@@ -97,14 +96,14 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
             qDebug() << "Selected.";
 
 
-            if (!m_nodes.at(ti).selected() && !addToSelection) {
-                m_nodes.unselectAll();
+            if (!m_nodes->at(ti).selected() && !addToSelection) {
+                m_nodes->unselectAll();
             }
 
             if (addToSelection) {
-                m_nodes[ti].select(!m_nodes.at(ti).selected());
+                (*m_nodes)[ti].select(!m_nodes->at(ti).selected());
             } else {
-                m_nodes[ti].select(true);
+                (*m_nodes)[ti].select(true);
             }
             selected = true;
         }
@@ -132,7 +131,7 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.setPen(gridCol);
     // x grid
     for (int tx = ceil(m_t0.x()); true; tx++) {
-        QPoint pos = convertTimeToCanvas(Node(tx, m_t0.y()));
+        QPoint pos = convertTimeToCanvas(Node_sV(tx, m_t0.y()));
         if (insideCanvas(pos)) {
             davinci.drawLine(pos.x(), pos.y(), pos.x(), m_distTop);
         } else {
@@ -141,7 +140,7 @@ void Canvas::paintEvent(QPaintEvent *)
     }
     // y grid
     for (int ty = ceil(m_t0.y()); true; ty++) {
-        QPoint pos = convertTimeToCanvas(Node(m_t0.x(), ty));
+        QPoint pos = convertTimeToCanvas(Node_sV(m_t0.x(), ty));
         if (insideCanvas(pos)) {
             davinci.drawLine(pos.x(), pos.y(), width()-1 - m_distRight, pos.y());
         } else {
@@ -149,7 +148,7 @@ void Canvas::paintEvent(QPaintEvent *)
         }
     }
     {
-        QPoint pos = convertTimeToCanvas(Node(m_t0.x(), m_tmax.y()));
+        QPoint pos = convertTimeToCanvas(Node_sV(m_t0.x(), m_tmax.y()));
         if (insideCanvas(pos)) {
             davinci.setPen(QPen(QBrush(lineCol), 2));
             davinci.drawLine(pos.x(), pos.y(), width()-1-m_distRight, pos.y());
@@ -162,7 +161,7 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_lastMousePos)) {
         davinci.drawLine(m_lastMousePos.x(), m_distTop, m_lastMousePos.x(), height()-1 - m_distBottom);
-        Node time = convertCanvasToTime(m_lastMousePos);
+        Node_sV time = convertCanvasToTime(m_lastMousePos);
         davinci.drawText(m_lastMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_lastMousePos.y(), m_lastMousePos.x(), m_lastMousePos.y());
         davinci.drawText(8, m_lastMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_frameRate, 2, 'f', 2));
@@ -172,10 +171,10 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
 
     // Nodes
-    const Node *prev = NULL;
-    const Node *curr = NULL;
-    for (int i = 0; i < m_nodes.size(); i++) {
-        curr = &m_nodes.at(i);
+    const Node_sV *prev = NULL;
+    const Node_sV *curr = NULL;
+    for (int i = 0; i < m_nodes->size(); i++) {
+        curr = &m_nodes->at(i);
 
         QPoint p = convertTimeToCanvas(*curr);
 
@@ -192,7 +191,7 @@ void Canvas::paintEvent(QPaintEvent *)
             davinci.drawLine(convertTimeToCanvas(*prev), p);
         }
 
-        prev = &m_nodes.at(i);
+        prev = &m_nodes->at(i);
     }
 
     if (m_showHelp) {
@@ -230,8 +229,8 @@ void Canvas::mousePressEvent(QMouseEvent *e)
         bool selected = selectAt(e->pos(), e->modifiers() && Qt::ControlModifier);
         if (!selected) {
             if (m_mode == ToolMode_Add) {
-                Node p = convertCanvasToTime(e->pos());
-                m_nodes.add(p);
+                Node_sV p = convertCanvasToTime(e->pos());
+                m_nodes->add(p);
             } else {
                 qDebug() << "Not adding node. Mode is " << m_mode;
             }
@@ -255,7 +254,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
     if (e->buttons().testFlag(Qt::LeftButton)) {
 
         qDebug() << m_mouseStart << "to" << e->pos();
-        Node diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
+        Node_sV diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
         qDebug() << "Diff: " << diff;
 
         if (m_mode == ToolMode_Select) {
@@ -265,11 +264,11 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 } else {
                     diff.setY(0);
                 }
-                m_nodes.moveSelected(diff);
+                m_nodes->moveSelected(diff);
             }
         } else if (m_mode == ToolMode_Move) {
             if (!m_moveAborted) {
-                m_nodes.shift(convertCanvasToTime(m_mouseStart).x(), diff.x());
+                m_nodes->shift(convertCanvasToTime(m_mouseStart).x(), diff.x());
             }
         }
     }
@@ -281,7 +280,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
 {
     if (!m_moveAborted) {
         if (m_mode == ToolMode_Select || m_mode == ToolMode_Move) {
-            m_nodes.confirmMove();
+            m_nodes->confirmMove();
             qDebug() << "Move confirmed.";
         }
     }
@@ -301,7 +300,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
     qDebug() << "Modifiers: " << e->modifiers();
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         qDebug() << "Ctrl";
-        Node n0 = convertCanvasToTime(e->pos());
+        Node_sV n0 = convertCanvasToTime(e->pos());
 
         // Update the line resolution
         m_secResX += deg;
@@ -310,19 +309,19 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_secResY < 4) { m_secResY = 4; }
 
         // Adjust t0 such that the mouse points to the same time as before
-        Node nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
+        Node_sV nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
         m_t0 = n0 - nDiff;
         if (m_t0.x() < 0) { m_t0.setX(0); }
         if (m_t0.y() < 0) { m_t0.setY(0); }
     } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
         //Vertical scrolling
         qDebug() << "Shift";
-        m_t0 += Node(0, (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x());
+        m_t0 += Node_sV(0, (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x());
         if (m_t0.y() < 0) { m_t0.setY(0); }
         if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }
     } else {
         // Horizontal scrolling
-        m_t0 -= Node((convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x(),0);
+        m_t0 -= Node_sV((convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x(),0);
         if (m_t0.x() < 0) { m_t0.setX(0); }
     }
 
@@ -334,21 +333,21 @@ void Canvas::wheelEvent(QWheelEvent *e)
     repaint();
 }
 
-const Node Canvas::convertCanvasToTime(const QPoint &p) const
+const Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
 {
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
     int x = p.x()-m_distLeft;
     int y = height()-1 - m_distBottom - p.y();
-    Node out(
+    Node_sV out(
                 m_t0.x() + float(x) / m_secResX,
                 m_t0.y() + float(y) / m_secResY
             );
     return out;
 }
 
-const QPoint Canvas::convertTimeToCanvas(const Node &p) const
+const QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const
 {
     QPoint out(
                 (p.x()-m_t0.x())*m_secResX + m_distLeft,
@@ -364,11 +363,11 @@ void Canvas::slotAbort(Canvas::Abort abort)
     switch (abort) {
     case Abort_General:
         m_moveAborted = true;
-        m_nodes.abortMove();
+        m_nodes->abortMove();
         repaint();
         break;
     case Abort_Selection:
-        m_nodes.unselectAll();
+        m_nodes->unselectAll();
         repaint();
         break;
     }
@@ -378,7 +377,7 @@ void Canvas::slotAbort(Canvas::Abort abort)
 void Canvas::slotDeleteNodes()
 {
     qDebug() << "Will delete";
-    uint nDel = m_nodes.deleteSelected();
+    uint nDel = m_nodes->deleteSelected();
     qDebug() << nDel << " deleted.";
     if (nDel > 0) {
         repaint();
