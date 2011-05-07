@@ -154,12 +154,12 @@ void MainWindow::newProject()
             ProgressDialogExtractFrames progress;
             bool b = true;
             b &= connect(
-                        m_project, SIGNAL(signalFramesExtracted(Project_sV::FrameSize)),
-                        &progress, SLOT(slotExtractionFinished(Project_sV::FrameSize))
+                        m_project, SIGNAL(signalFramesExtracted(FrameSize)),
+                        &progress, SLOT(slotExtractionFinished(FrameSize))
                     );
             b &= connect(
-                        m_project, SIGNAL(signalProgressUpdated(Project_sV::FrameSize,int)),
-                        &progress, SLOT(slotProgressUpdated(Project_sV::FrameSize,int))
+                        m_project, SIGNAL(signalProgressUpdated(FrameSize,int)),
+                        &progress, SLOT(slotProgressUpdated(FrameSize,int))
                     );
             Q_ASSERT(b);
             m_project->extractFrames();

@@ -22,14 +22,14 @@ ProgressDialogExtractFrames::~ProgressDialogExtractFrames()
     delete ui;
 }
 
-void ProgressDialogExtractFrames::slotExtractionFinished(Project_sV::FrameSize frameSize)
+void ProgressDialogExtractFrames::slotExtractionFinished(FrameSize frameSize)
 {
     qDebug() << "Frame size completed: " << frameSize;
     switch (frameSize) {
-    case Project_sV::FrameSize_Orig:
+    case FrameSize_Orig:
         ui->progOrig->setValue(100);
         break;
-    case Project_sV::FrameSize_Small:
+    case FrameSize_Small:
         ui->progThumbs->setValue(100);
         break;
     }
@@ -38,13 +38,13 @@ void ProgressDialogExtractFrames::slotExtractionFinished(Project_sV::FrameSize f
     }
 }
 
-void ProgressDialogExtractFrames::slotProgressUpdated(Project_sV::FrameSize frameSize, int value)
+void ProgressDialogExtractFrames::slotProgressUpdated(FrameSize frameSize, int value)
 {
     switch(frameSize) {
-    case Project_sV::FrameSize_Orig:
+    case FrameSize_Orig:
         ui->progOrig->setValue(value);
         break;
-    case Project_sV::FrameSize_Small:
+    case FrameSize_Small:
         ui->progThumbs->setValue(value);
         break;
     }

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "../project/project_sV.h"
+#include "../lib/defs_sV.h"
 
 namespace Ui {
     class ProgressDialogExtractFrames;
@@ -17,8 +18,8 @@ public:
     ~ProgressDialogExtractFrames();
 
 public slots:
-    void slotExtractionFinished(Project_sV::FrameSize frameSize);
-    void slotProgressUpdated(Project_sV::FrameSize frameSize, int value);
+    void slotExtractionFinished(FrameSize frameSize);
+    void slotProgressUpdated(FrameSize frameSize, int value);
 
 private:
     Ui::ProgressDialogExtractFrames *ui;

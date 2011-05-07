@@ -37,7 +37,6 @@ QColor Canvas::backgroundCol(30, 30, 40);
 Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
-    m_frameRate(30.0f),
     m_lastMousePos(0,0),
     m_mouseStart(0,0),
     m_mouseWithinWidget(false),
@@ -70,6 +69,7 @@ Canvas::~Canvas()
 
 void Canvas::load(const Project_sV *project)
 {
+    m_project = project;
     m_nodes = project->nodes();
     m_tmax.setY(project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen);
     qDebug() << "tMaxY set to " << m_tmax.y();
@@ -93,7 +93,7 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
                 abs(p.x() - pos.x()) <= NODE_RADIUS+2 &&
                 abs(p.y() - pos.y()) <= NODE_RADIUS+2
             ) {
-            qDebug() << "Selected.";
+            qDebug() << "Selected: " << pos.x() << "/" << pos.y();
 
 
             if (!m_nodes->at(ti).selected() && !addToSelection) {
@@ -164,7 +164,7 @@ void Canvas::paintEvent(QPaintEvent *)
         Node_sV time = convertCanvasToTime(m_lastMousePos);
         davinci.drawText(m_lastMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_lastMousePos.y(), m_lastMousePos.x(), m_lastMousePos.y());
-        davinci.drawText(8, m_lastMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_frameRate, 2, 'f', 2));
+        davinci.drawText(8, m_lastMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);

@@ -42,7 +42,7 @@ void RenderTask_sV::slotContinueRendering(qreal time)
 
 void RenderTask_sV::slotRenderFrom(qreal time)
 {
-    int frameNumber = (time - m_project->nodes()->startTime()) * m_project->fps();
+    int frameNumber = (time - m_project->nodes()->startTime()) * m_project->fpsOut();
     if (!m_stopRendering) {
 
         if (time > m_project->nodes()->endTime()) {
@@ -50,11 +50,11 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             emit signalRenderingFinished();
 
         } else {
-            qreal outTime = m_project->nodes()->sourceTime(time);
-            qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << outTime;
-            QImage rendered = m_project->interpolateFrameAt(outTime);
+            qreal srcTime = m_project->nodes()->sourceTime(time);
+            qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
+            QImage rendered = m_project->interpolateFrameAt(srcTime);
             rendered.save(m_project->renderedFileStr(frameNumber));
-            m_nextFrameTime = time + 1/m_project->fps();
+            m_nextFrameTime = time + 1/m_project->fpsOut();
             emit signalFrameRendered(time, frameNumber);
         }
 

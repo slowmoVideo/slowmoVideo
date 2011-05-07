@@ -44,9 +44,8 @@ public:
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     RenderTask_sV *renderTask() { return m_renderTask; }
-    float fps() const { return m_fps; }
-
-    enum FrameSize { FrameSize_Orig, FrameSize_Small };
+    float fpsOut() const { return m_fps; }
+    float fpsIn() const { return (float)m_videoInfo.frameRateNum/m_videoInfo.frameRateDen; }
 
 
     void render(qreal fps);
@@ -94,12 +93,12 @@ signals:
     /**
       Emitted when all frames have been extracted for this frame size.
       */
-    void signalFramesExtracted(Project_sV::FrameSize frameSize);
+    void signalFramesExtracted(FrameSize frameSize);
     /**
       Emitted when an ffmpeg thread has made progress (i.e. wrote to stderr).
       @param progress Number in the range 0...100
       */
-    void signalProgressUpdated(Project_sV::FrameSize frameSize, int progress);
+    void signalProgressUpdated(FrameSize frameSize, int progress);
 
 
 private:
@@ -153,7 +152,5 @@ private slots:
     void slotProgressUpdate();
 
 };
-
-QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize);
 
 #endif // PROJECT_SV_H

@@ -153,13 +153,13 @@ void Project_sV::extractFrames(bool force)
         extractFramesFor(FrameSize_Orig);
     } else {
         m_processStatus.origFinished = true;
-        emit signalFramesExtracted(Project_sV::FrameSize_Orig);
+        emit signalFramesExtracted(FrameSize_Orig);
     }
     if (rebuildRequired(FrameSize_Small) || force) {
         extractFramesFor(FrameSize_Small);
     } else {
         m_processStatus.smallFinished = true;
-        emit signalFramesExtracted(Project_sV::FrameSize_Small);
+        emit signalFramesExtracted(FrameSize_Small);
     }
     if (m_processStatus.allFinished()) {
         m_timer->stop();
@@ -267,6 +267,9 @@ QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
     return QImage(filename);
 }
 
+/**
+  @todo frame size
+  */
 QImage Project_sV::interpolateFrameAt(float time) const
 {
     float framePos = timeToFrame(time);
@@ -277,10 +280,11 @@ QImage Project_sV::interpolateFrameAt(float time) const
         qDebug() << "Source frame @" << time << " is " << framePos;
     }
     if (framePos-floor(framePos) > MIN_FRAME_DIST) {
-        QImage left(frameFileStr(floor(framePos)));
-        QImage right(frameFileStr(floor(framePos)+1));
-        QImage out(m_videoInfo.width, m_videoInfo.height, QImage::Format_RGB888);
-        Interpolate_sV::forwardFlow(left, right, framePos-floor(framePos), out);
+        QImage left(thumbFileStr(floor(framePos)));
+//        QImage right(frameFileStr(floor(framePos)+1));
+        QImage flow(requestFlow(floor(framePos), FlowDirection_Forward));
+        QImage out(left.size(), QImage::Format_RGB888);
+        Interpolate_sV::forwardFlow(left, flow, framePos-floor(framePos), out);
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
@@ -336,16 +340,16 @@ const QString Project_sV::renderedFileStr(int number) const
 
 void Project_sV::slotExtractingFinished(int fs)
 {
-    Project_sV::FrameSize frameSize = (FrameSize) fs;
+    FrameSize frameSize = (FrameSize) fs;
     qDebug() << "Finished: " << frameSize;
 
     switch(frameSize) {
     case FrameSize_Orig:
-        emit signalFramesExtracted(Project_sV::FrameSize_Orig);
+        emit signalFramesExtracted(FrameSize_Orig);
         m_processStatus.origFinished = true;
         break;
     case FrameSize_Small:
-        emit signalFramesExtracted(Project_sV::FrameSize_Small);
+        emit signalFramesExtracted(FrameSize_Small);
         m_processStatus.smallFinished = true;
         break;
     }
@@ -362,13 +366,13 @@ void Project_sV::slotProgressUpdate()
     if (m_ffmpegOrig != NULL) {
         s = QString(m_ffmpegOrig->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            emit signalProgressUpdated(Project_sV::FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+            emit signalProgressUpdated(FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
         }
     }
     if (m_ffmpegSmall != NULL) {
         s = QString(m_ffmpegSmall->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            emit signalProgressUpdated(Project_sV::FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+            emit signalProgressUpdated(FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
         }
     }
 }
@@ -382,18 +386,4 @@ void Project_sV::slotSetFps(float fps)
 {
     Q_ASSERT(fps > 0);
     m_fps = fps;
-}
-
-
-QDebug operator<<(QDebug qd, const Project_sV::FrameSize &frameSize)
-{
-    switch(frameSize) {
-    case Project_sV::FrameSize_Orig:
-        qd << "Original frame size";
-        break;
-    case Project_sV::FrameSize_Small:
-        qd << "Small frame size";
-        break;
-    }
-    return qd;
 }

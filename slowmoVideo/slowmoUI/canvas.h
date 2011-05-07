@@ -63,7 +63,7 @@ protected:
 
 private:
     Ui::Canvas *ui;
-    float m_frameRate;
+    const Project_sV *m_project;
     QPoint m_lastMousePos;
     QPoint m_mouseStart;
     bool m_mouseWithinWidget;

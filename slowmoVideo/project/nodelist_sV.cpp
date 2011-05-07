@@ -48,7 +48,6 @@ qreal NodeList_sV::endTime() const
         return 0;
     }
 }
-//inline
 qreal NodeList_sV::totalTime() const
 {
     return endTime()-startTime();
@@ -60,12 +59,7 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
     if (index >= 0) {
         if (m_list.size() > index) {
             float ratio = (targetTime-m_list[index].x())/(m_list[index+1].x()-m_list[index].x());
-            srcTime = (1-ratio)*m_list[index].y() + ratio*m_list[index+1].y();
-            qDebug() << "Time: " << m_list[index].y() << "  " << srcTime << "  " << m_list[index+1].y()
-                     << ", factor: " << ratio;
-            srcTime = m_list[index].y() + ratio*(m_list[index+1].y()-m_list[index].y());
-            qDebug() << "Better? " << srcTime;
-            qDebug() << "Times:" << (targetTime-m_list[index].x()) << ", " << (m_list[index+1].x()-targetTime);
+            srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
         } else {
             Q_ASSERT(false);
             srcTime = m_list[index].y();
