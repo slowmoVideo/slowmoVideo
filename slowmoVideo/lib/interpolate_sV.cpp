@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <cmath>
 
+#include <QDebug>
 #include <QImage>
 #include <QColor>
 
@@ -131,6 +132,7 @@ void Interpolate_sV::twowayFlow(const QImage& left, const QImage& right, const Q
 
 void Interpolate_sV::forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output)
 {
+    qDebug() << "Interpolating flow at offset " << pos;
 #ifdef INTERPOLATE
     float posX, posY;
     const int Wmax = left.width()-1;

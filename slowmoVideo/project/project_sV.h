@@ -40,12 +40,19 @@ public:
     Project_sV(QString filename, QString projectDir);
     ~Project_sV();
 
-    const VideoInfoSV& videoInfo() const { return m_videoInfo; }
+    const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     RenderTask_sV *renderTask() { return m_renderTask; }
     float fpsOut() const { return m_fps; }
-    float fpsIn() const { return (float)m_videoInfo.frameRateNum/m_videoInfo.frameRateDen; }
+    float fpsIn() const {
+        if (m_videoInfo->streamsCount > 0) {
+            return (float)m_videoInfo->frameRateNum/m_videoInfo->frameRateDen;
+        } else {
+            return 24;
+        }
+    }
+    const FrameSize renderFrameSize() const { return m_renderFrameSize; }
 
 
     void render(qreal fps);
@@ -75,19 +82,19 @@ public:
       */
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
 
-    QImage interpolateFrameAt(float time) const;
+    QImage interpolateFrameAt(float time, const FrameSize frameSize) const;
 
-    QImage requestFlow(int leftFrame, FlowDirection direction, bool forceRebuild = false) const;
+    QImage requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
 
 
-    const QString frameFileStr(int number) const;
-    const QString thumbFileStr(int number) const;
-    const QString flowFileStr(int leftFrame, FlowDirection direction) const;
-    const QString renderedFileStr(int number) const;
+    const QString frameFileStr(int number, FrameSize size) const;
+    const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
+    const QString renderedFileStr(int number, FrameSize size) const;
 
 public slots:
     void slotFlowCompleted();
     void slotSetFps(float fps);
+    void slotSetRenderFrameSize(const FrameSize size);
 
 signals:
     /**
@@ -102,10 +109,6 @@ signals:
 
 
 private:
-    static QString defaultFramesDir;
-    static QString defaultThumbFramesDir;
-    static QString defaultFlowDir;
-    static QString defaultRenderDir;
     static QRegExp regexFrameNumber;
 
     struct {
@@ -123,11 +126,7 @@ private:
 
     QFile m_inFile;
     QDir m_projDir;
-    QDir m_framesDir;
-    QDir m_thumbFramesDir;
-    QDir m_flowDir;
-    QDir m_renderDir;
-    VideoInfoSV m_videoInfo;
+    VideoInfoSV *m_videoInfo;
     Flow_sV *m_flow;
     NodeList_sV *m_nodes;
     RenderTask_sV *m_renderTask;
@@ -138,8 +137,14 @@ private:
     QTimer *m_timer;
 
     float m_fps;
+    FrameSize m_renderFrameSize;
 
     float timeToFrame(float time) const;
+
+    void createDirectories(FrameSize frameSize) const;
+    const QString framesDirStr(FrameSize frameSize) const;
+    const QString flowDirStr(FrameSize frameSize) const;
+    const QString renderDirStr(FrameSize frameSize) const;
 
 
 

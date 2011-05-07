@@ -30,10 +30,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define MIN_FRAME_DIST .001
 
-QString Project_sV::defaultFramesDir("frames");
-QString Project_sV::defaultThumbFramesDir("framesThumb");
-QString Project_sV::defaultFlowDir("oFlow");
-QString Project_sV::defaultRenderDir("rendered");
 QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
 Project_sV::Project_sV(QString filename, QString projectDir) :
@@ -42,13 +38,18 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     m_flowComplete(false),
     m_inFile(filename),
     m_projDir(projectDir),
+    m_videoInfo(NULL),
     m_ffmpegOrig(NULL),
     m_ffmpegSmall(NULL),
-    m_fps(24)
+    m_fps(24),
+    m_renderFrameSize(FrameSize_Small)
 {
-    m_videoInfo = getInfo(filename.toStdString().c_str());
-    if (m_videoInfo.streamsCount <= 0) {
+    m_videoInfo = new VideoInfoSV();
+    *m_videoInfo = getInfo(filename.toStdString().c_str());
+    if (m_videoInfo->streamsCount <= 0) {
         qDebug() << "Video info is invalid.";
+    } else {
+        m_fps = m_videoInfo->frameRateNum/(float)m_videoInfo->frameRateDen;
     }
     m_flow = new Flow_sV();
     m_nodes = new NodeList_sV();
@@ -59,23 +60,9 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
-    m_framesDir = QDir(m_projDir.absolutePath() + "/" + defaultFramesDir);
-    if (!m_framesDir.exists()) {
-        m_framesDir.mkpath(".");
-    }
-    m_thumbFramesDir = QDir(m_projDir.absolutePath() + "/" + defaultThumbFramesDir);
-    if (!m_thumbFramesDir.exists()) {
-        m_thumbFramesDir.mkpath(".");
-    }
-    m_flowDir = QDir(m_projDir.absolutePath() + "/" + defaultFlowDir);
-    if (!m_flowDir.exists()) {
-        m_flowDir.mkpath(".");
-    }
-    m_renderDir = QDir(m_projDir.absolutePath() + "/" + defaultRenderDir);
-    if (!m_renderDir.exists()) {
-        m_renderDir.mkpath(".");
-    }
 
+    createDirectories(FrameSize_Orig);
+    createDirectories(FrameSize_Small);
     m_canWriteFrames = validDirectories();
 
 
@@ -94,6 +81,8 @@ Project_sV::~Project_sV()
     delete m_timer;
     delete m_flow;
     delete m_nodes;
+    delete m_renderTask;
+    delete m_videoInfo;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
 }
@@ -105,44 +94,17 @@ bool Project_sV::validDirectories() const
         qDebug() << "Project directory could not be created.";
         valid = false;
     }
-    if (!m_framesDir.exists()) {
-        qDebug() << "Could not change to directory " << m_projDir.absolutePath() << "/" << defaultFramesDir;
-        valid = false;
-    } else {
-        qDebug() << "Frame directory: " << m_framesDir.absolutePath();
-    }
-    if (!m_thumbFramesDir.exists()) {
-        qDebug() << "Could not change to directory " << m_projDir.absolutePath() << "/" << defaultThumbFramesDir;
-        valid = false;
-    } else {
-        qDebug() << "Frame thumb directory: " << m_thumbFramesDir.absolutePath();
-    }
-    if (!m_flowDir.exists()) {
-        qDebug() << "Could not change to directory " << m_flowDir.absolutePath() << "/" << defaultFlowDir;
-        valid = false;
-    } else {
-        qDebug() << "Flow directory: " << m_flowDir.absolutePath();
+    QList<QDir> dirList;
+    dirList << QDir(framesDirStr(FrameSize_Orig)) << QDir(flowDirStr(FrameSize_Orig)) << QDir(renderDirStr(FrameSize_Orig))
+               << QDir(framesDirStr(FrameSize_Small)) << QDir(flowDirStr(FrameSize_Small)) << QDir(renderDirStr(FrameSize_Small));
+    for (int i = 0; i < dirList.size(); i++) {
+        if (!dirList.at(i).exists()) {
+            valid = false;
+            qDebug() << "Directory " << dirList.at(i).absolutePath() << " does not exist.";
+            break;
+        }
     }
     return valid;
-}
-
-/**
-  @todo Delete
-  */
-void Project_sV::render(qreal fps)
-{
-    int counter = 0;
-    QImage rendered;
-    qreal time = m_nodes->startTime();
-    while (time <= m_nodes->endTime() && m_nodes->totalTime() > 0) {
-        rendered = interpolateFrameAt(time);
-        rendered.save(renderedFileStr(counter));
-        time += 1/fps;
-        counter++;
-    }
-    // TODO slots: abort render, continue render
-    //      signals: frame rendered, render finished, render aborted
-
 }
 
 void Project_sV::extractFrames(bool force)
@@ -180,7 +142,7 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
         switch (frameSize) {
         case FrameSize_Orig:
             {
-                args << QString("%1/frame%5d.jpg").arg(m_framesDir.absolutePath());
+                args << QString("%1/frame%5d.jpg").arg(framesDirStr(frameSize));
                 if (m_ffmpegOrig != NULL && m_ffmpegOrig->state() != QProcess::NotRunning) {
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegOrig->waitForFinished(2000);
@@ -198,16 +160,16 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
             break;
         case FrameSize_Small:
             {
-                int w = m_videoInfo.width;
-                int h = m_videoInfo.height;
-                // TODO adjust size
+                int w = m_videoInfo->width;
+                int h = m_videoInfo->height;
+                // @todo adjust size
                 while (w > 320) {
                     w /= 2;
                     h /= 2;
                 }
                 qDebug() << "Thumbnail frame size: " << w << "x" << h;
                 args << "-s" << QString("%1x%2").arg(w).arg(h);
-                args << QString("%1/frame%5d.jpg").arg(m_thumbFramesDir.absolutePath());
+                args << QString("%1/frame%5d.jpg").arg(framesDirStr(frameSize));
                 if (m_ffmpegSmall != NULL && m_ffmpegSmall->state() != QProcess::NotRunning) {
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegSmall->waitForFinished(2000);
@@ -246,7 +208,7 @@ bool Project_sV::rebuildRequired(const FrameSize frameSize) const
     QImage frame = frameAt(0, frameSize);
     needsRebuild |= frame.isNull();
 
-    frame = frameAt(m_videoInfo.framesCount-1, frameSize);
+    frame = frameAt(m_videoInfo->framesCount-1, frameSize);
     needsRebuild |= frame.isNull();
 
     return needsRebuild;
@@ -254,56 +216,51 @@ bool Project_sV::rebuildRequired(const FrameSize frameSize) const
 
 QImage Project_sV::frameAt(const uint frame, const FrameSize frameSize) const
 {
-    QString filename;
-    switch (frameSize) {
-    case FrameSize_Orig:
-        filename = frameFileStr(frame);
-        break;
-    case FrameSize_Small:
-        filename = thumbFileStr(frame);
-        break;
-    }
-
-    return QImage(filename);
+    return QImage(frameFileStr(frame, frameSize));
 }
 
 /**
   @todo frame size
   */
-QImage Project_sV::interpolateFrameAt(float time) const
+QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const
 {
     float framePos = timeToFrame(time);
-    if (framePos > m_videoInfo.framesCount) {
-        qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_videoInfo.framesCount << " frames)";
+    if (framePos > m_videoInfo->framesCount) {
+        qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_videoInfo->framesCount << " frames)";
         Q_ASSERT(false);
     } else {
         qDebug() << "Source frame @" << time << " is " << framePos;
     }
     if (framePos-floor(framePos) > MIN_FRAME_DIST) {
-        QImage left(thumbFileStr(floor(framePos)));
+
+        QImage left(frameFileStr(floor(framePos), frameSize));
 //        QImage right(frameFileStr(floor(framePos)+1));
-        QImage flow(requestFlow(floor(framePos), FlowDirection_Forward));
+        QImage flow(requestFlow(floor(framePos), FlowDirection_Forward, frameSize));
         QImage out(left.size(), QImage::Format_RGB888);
+
+        Q_ASSERT(!flow.isNull());
+
         Interpolate_sV::forwardFlow(left, flow, framePos-floor(framePos), out);
+
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
-        return QImage(frameFileStr(floor(framePos)));
+        return QImage(frameFileStr(floor(framePos), frameSize));
     }
 }
 
-QImage Project_sV::requestFlow(int leftFrame, FlowDirection direction, bool forceRebuild) const
+QImage Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const
 {
-    Q_ASSERT(leftFrame < m_videoInfo.framesCount-1);
-    const QString outFile = flowFileStr(leftFrame, direction);
+    Q_ASSERT(leftFrame < m_videoInfo->framesCount-1);
+    const QString outFile = flowFileStr(leftFrame, direction, frameSize);
     if (!QFile(outFile).exists() || forceRebuild) {
-        qDebug() << "Building flow for left frame " << leftFrame << " in direction " << direction;
-        const QString left(thumbFileStr(leftFrame));
-        const QString right(thumbFileStr(leftFrame+1));
+        qDebug() << "Building flow for left frame " << leftFrame << " in direction " << direction << "; Size: " << frameSize;
+        const QString left = frameFileStr(leftFrame, frameSize);
+        const QString right = frameFileStr(leftFrame+1, frameSize);
         m_flow->buildFlowImage(left, right,
                                outFile, direction);
     } else {
-        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " in direction " << direction;
+        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " in direction " << direction << ": " << outFile;
     }
     return QImage(outFile);
 }
@@ -312,30 +269,52 @@ inline
 float Project_sV::timeToFrame(float time) const
 {
     Q_ASSERT(time >= 0);
-    return time * m_videoInfo.frameRateNum / m_videoInfo.frameRateDen;
+    return time * m_videoInfo->frameRateNum / m_videoInfo->frameRateDen;
 }
 
-const QString Project_sV::frameFileStr(int number) const
+
+const QString Project_sV::framesDirStr(FrameSize frameSize) const
+{
+    return m_projDir.absolutePath() + "/frames" + enumStr(frameSize);
+}
+const QString Project_sV::flowDirStr(FrameSize frameSize) const
+{
+    return m_projDir.absolutePath() + "/oFlow" + enumStr(frameSize);
+}
+const QString Project_sV::renderDirStr(FrameSize frameSize) const
+{
+    return m_projDir.absolutePath() + "/rendered" + enumStr(frameSize);
+}
+
+void Project_sV::createDirectories(FrameSize frameSize) const
+{
+    QList<QDir> dirList;
+    dirList << QDir(framesDirStr(frameSize)) << QDir(flowDirStr(frameSize)) << QDir(renderDirStr(frameSize));
+    for (int i = 0; i < dirList.size(); i++) {
+        if (!dirList.at(i).exists()) {
+            dirList.at(i).mkpath(".");
+            qDebug() << "Created directory: " << dirList.at(i).absolutePath();
+        }
+    }
+}
+
+const QString Project_sV::frameFileStr(int number, FrameSize size) const
 {
     // ffmpeg numbering starts with 1, therefore add 1 to the frame number
-    return QString(m_framesDir.absoluteFilePath("frame%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
+    return QString("%1/frame%2.jpg").arg(framesDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
 }
-const QString Project_sV::thumbFileStr(int number) const
-{
-    return QString(m_thumbFramesDir.absoluteFilePath("frame%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
-}
-const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction) const
+const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const
 {
     switch (direction) {
     case FlowDirection_Forward:
-        return QString(m_flowDir.absoluteFilePath("forward%1.png").arg(leftFrame+1, 5, 10, QChar::fromAscii('0')));
+        return QString("%1/forward%2.png").arg(flowDirStr(size)).arg(leftFrame+1, 5, 10, QChar::fromAscii('0'));
     case FlowDirection_Backward:
-        return QString(m_flowDir.absoluteFilePath("backward%1.png").arg(leftFrame+2, 5, 10, QChar::fromAscii('0')));
+        return QString("%1/backward%2.png").arg(flowDirStr(size)).arg(leftFrame+2, 5, 10, QChar::fromAscii('0'));
     }
 }
-const QString Project_sV::renderedFileStr(int number) const
+const QString Project_sV::renderedFileStr(int number, FrameSize size) const
 {
-    return QString(m_renderDir.absoluteFilePath("rendered%1.jpg").arg(number+1, 5, 10, QChar::fromAscii('0')));
+    return QString("%1/rendered%2.jpg").arg(renderDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
 }
 
 void Project_sV::slotExtractingFinished(int fs)
@@ -366,13 +345,13 @@ void Project_sV::slotProgressUpdate()
     if (m_ffmpegOrig != NULL) {
         s = QString(m_ffmpegOrig->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            emit signalProgressUpdated(FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+            emit signalProgressUpdated(FrameSize_Orig, (100*regex.cap(1).toInt())/m_videoInfo->framesCount);
         }
     }
     if (m_ffmpegSmall != NULL) {
         s = QString(m_ffmpegSmall->readAllStandardError());
         if (regex.indexIn(s) >= 0) {
-            emit signalProgressUpdated(FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo.framesCount);
+            emit signalProgressUpdated(FrameSize_Small, (100*regex.cap(1).toInt())/m_videoInfo->framesCount);
         }
     }
 }
@@ -386,4 +365,9 @@ void Project_sV::slotSetFps(float fps)
 {
     Q_ASSERT(fps > 0);
     m_fps = fps;
+}
+void Project_sV::slotSetRenderFrameSize(const FrameSize size)
+{
+    qDebug() << "Render frame size is now " << size;
+    m_renderFrameSize = size;
 }

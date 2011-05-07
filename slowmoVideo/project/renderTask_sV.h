@@ -13,6 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QObject>
 
+#include "../lib/defs_sV.h"
+
 class Project_sV;
 class RenderTask_sV : public QObject
 {
@@ -23,6 +25,7 @@ public:
 public slots:
     void slotAbortRendering();
     void slotContinueRendering(qreal time = -1);
+//    void slotUpdateRenderFrameSize(const FrameSize frameSize);
 
 signals:
     void signalFrameRendered(qreal time, int frameNumber);
@@ -32,6 +35,7 @@ signals:
 private:
     const Project_sV *m_project;
 
+//    FrameSize m_frameSize;
     bool m_stopRendering;
     qreal m_nextFrameTime;
 

@@ -37,6 +37,7 @@ QColor Canvas::backgroundCol(30, 30, 40);
 Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
+    m_project(project),
     m_lastMousePos(0,0),
     m_mouseStart(0,0),
     m_mouseWithinWidget(false),
@@ -70,6 +71,7 @@ Canvas::~Canvas()
 void Canvas::load(const Project_sV *project)
 {
     m_project = project;
+    qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
     m_tmax.setY(project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen);
     qDebug() << "tMaxY set to " << m_tmax.y();

@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     m_project = new Project_sV(QDir::tempPath() + "/noexist", QDir::tempPath());
+    qDebug() << "Project location: " << &m_project;
 
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
@@ -151,6 +152,9 @@ void MainWindow::newProject()
                 delete m_project;
             }
             m_project = newProject;
+            m_wCanvas->load(m_project);
+            qDebug() << "Project location: " << &m_project;
+
             ProgressDialogExtractFrames progress;
             bool b = true;
             b &= connect(
@@ -203,7 +207,6 @@ void MainWindow::newProject()
             flowUI.exec();
             */
 
-            m_wCanvas->load(m_project);
 
         } else {
             qDebug() << "Project directories not writable.";
@@ -274,12 +277,12 @@ void MainWindow::shortcutUsed(QString which)
 
 void MainWindow::showRenderDialog()
 {
-    RenderDialog renderDialog;
-
-    m_project->renderTask();
+    RenderDialog renderDialog(m_project);
 
     bool b = true;
     b &= connect(&renderDialog, SIGNAL(signalChangeFps(float)), m_project, SLOT(slotSetFps(float)));
+    b &= connect(&renderDialog, SIGNAL(signalChangeRenderFrameSize(FrameSize)), m_project, SLOT(slotSetRenderFrameSize(FrameSize)));
+//    b &= connect(&renderDialog, SIGNAL(signalChangeRenderFrameSize(FrameSize)), m_project->renderTask(), SLOT(slotUpdateRenderFrameSize(FrameSize)));
     b &= connect(&renderDialog, SIGNAL(signalAbortRendering()), m_project->renderTask(), SLOT(slotAbortRendering()));
     b &= connect(&renderDialog, SIGNAL(signalContinueRendering()), m_project->renderTask(), SLOT(slotContinueRendering()));
     b &= connect(m_project->renderTask(), SIGNAL(signalFrameRendered(qreal,int)), &renderDialog, SLOT(slotFrameRendered(qreal,int)));

@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_project(project),
+//    m_frameSize(project->renderFrameSize()),
     m_stopRendering(false)
 {
     m_nextFrameTime = m_project->nodes()->startTime();
@@ -52,8 +53,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
             qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
-            QImage rendered = m_project->interpolateFrameAt(srcTime);
-            rendered.save(m_project->renderedFileStr(frameNumber));
+            QImage rendered = m_project->interpolateFrameAt(srcTime, m_project->renderFrameSize());
+            rendered.save(m_project->renderedFileStr(frameNumber, m_project->renderFrameSize()));
             m_nextFrameTime = time + 1/m_project->fpsOut();
             emit signalFrameRendered(time, frameNumber);
         }
@@ -65,3 +66,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
     }
 }
+
+//void RenderTask_sV::slotUpdateRenderFrameSize(const FrameSize frameSize)
+//{
+//    m_frameSize = frameSize;
+//}

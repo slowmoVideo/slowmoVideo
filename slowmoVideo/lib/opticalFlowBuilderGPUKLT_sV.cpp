@@ -3,15 +3,6 @@
 #include <QProcess>
 #include <QDebug>
 
-OpticalFlowBuilderGPUKLT_sV::OpticalFlowBuilderGPUKLT_sV()
-{
-}
-
-OpticalFlowBuilderGPUKLT_sV::~OpticalFlowBuilderGPUKLT_sV()
-{
-
-}
-
 void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const
 {
     QString program("/data/cworkspace/slowmoGPU/V3D/build/Apps/GL/tvl1_flow");
