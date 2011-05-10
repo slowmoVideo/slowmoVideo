@@ -29,6 +29,7 @@ set(CMAKE_MODULE_PATH
 
 include(cmake/macros.cmake)
 
+SET(QT_USE_QTXML TRUE)
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
@@ -42,7 +43,7 @@ add_subdirectory(lib)
 add_subdirectory(project)
 add_subdirectory(slowmoCLI)
 add_subdirectory(slowmoUI)
-#add_subdirectory(test)
+add_subdirectory(test)
 
 
 

@@ -56,7 +56,8 @@ public:
         Tool_Select,
         Tool_Move,
         Help,
-        Open
+        Open,
+        Save
     };
 
     static void displayHelp(QPainter &davinci);

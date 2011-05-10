@@ -4,6 +4,6 @@ set(SRCS
 )
 
 add_executable(Test ${SRCS} ${MOC_OUT})
-target_link_libraries(Test sV sVinfo sVproj ${QT_LIBRARIES})
+target_link_libraries(Test sVproj ${QT_LIBRARIES})
 
 install(TARGETS Test DESTINATION bin)

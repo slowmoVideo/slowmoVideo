@@ -18,12 +18,14 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../project/flow_sV.h"
 #include "../project/renderTask_sV.h"
+#include "../project/xmlProjectRW_sV.h"
 
 #include <QtCore>
 #include <QObject>
 #include <QDebug>
 
 #include <QDir>
+#include <QFileDialog>
 
 #include <QShortcut>
 #include <QSignalMapper>
@@ -42,6 +44,7 @@ void MainWindow::fillCommandList()
     m_commands << "h:\tHelp";
     m_commands << "q-q:\tQuit";
     m_commands << "o:\tOpen";
+    m_commands << "s:\tSave";
     m_commands << "x:\tAbort current action";
     m_commands << "x-s:\tAbort selection";
     m_commands << "d-n:\tDelete selected nodes";
@@ -68,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
     m_keyList.insert(MainWindow::Open, "o");
+    m_keyList.insert(MainWindow::Save, "s");
     m_keyList.insert(MainWindow::Abort, "x");
     m_keyList.insert(MainWindow::Abort_Selection, "s");
     m_keyList.insert(MainWindow::Delete, "d");
@@ -229,6 +233,8 @@ void MainWindow::shortcutUsed(QString which)
 //            .arg(ts.start.second())
 //            .arg(ts.start.msec());
 
+    bool handled = false;
+
     // Use a timeout. Otherwise pressing a key may lead to unpredictable results
     // since it may depend on the key you pressed several minutes ago.
     if (m_lastShortcut.start.elapsed() < 600) {
@@ -243,33 +249,54 @@ void MainWindow::shortcutUsed(QString which)
         else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Abort]) {
             if (which == m_keyList[MainWindow::Abort_Selection]) {
                 emit abort(Canvas::Abort_Selection);
+                handled = true;
             }
         }
         else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
             if (which == m_keyList[MainWindow::Delete_Node]) {
                 emit deleteNodes();
+                handled = true;
             }
         }
         else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Tool]) {
             if (which == m_keyList[MainWindow::Tool_Add]) {
                 emit setMode(Canvas::ToolMode_Add);
+                handled = true;
             } else if (which == m_keyList[MainWindow::Tool_Select]) {
                 emit setMode(Canvas::ToolMode_Select);
+                handled = true;
             } else if (which == m_keyList[MainWindow::Tool_Move]) {
                 emit setMode(Canvas::ToolMode_Move);
+                handled = true;
             }
         }
     } else {
         if (which == m_keyList[MainWindow::Abort]) {
             emit abort(Canvas::Abort_General);
+            handled = true;
         } else {
             qDebug() << "(Shortcut timed out.)";
         }
     }
-    if (which == m_keyList[MainWindow::Help]) {
-        m_wCanvas->toggleHelp();
-    } else if (which == m_keyList[MainWindow::Open]) {
-        newProject();
+    if (!handled) {
+        if (which == m_keyList[MainWindow::Help]) {
+            m_wCanvas->toggleHelp();
+            handled = true;
+        } else if (which == m_keyList[MainWindow::Open]) {
+            newProject();
+            handled = true;
+        } else if (which == m_keyList[MainWindow::Save]) {
+            QFileDialog dialog(this, "Save project");
+            dialog.setAcceptMode(QFileDialog::AcceptSave);
+            dialog.setDefaultSuffix(".sVproj");
+            dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
+            dialog.setFileMode(QFileDialog::AnyFile);
+            if (dialog.exec() == QDialog::Accepted) {
+                XmlProjectRW_sV writer;
+                writer.saveProject(m_project, dialog.selectedFiles().at(0));
+            }
+            handled = true;
+        }
     }
 
     m_lastShortcut = ts;

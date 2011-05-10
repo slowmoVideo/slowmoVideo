@@ -40,10 +40,15 @@ public:
     Project_sV(QString filename, QString projectDir);
     ~Project_sV();
 
+
+    int save(const QString &filename) const;
+
+
     const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     RenderTask_sV *renderTask() { return m_renderTask; }
+    const FrameSize renderFrameSize() const { return m_renderFrameSize; }
     float fpsOut() const { return m_fps; }
     float fpsIn() const {
         if (m_videoInfo->streamsCount > 0) {
@@ -52,7 +57,6 @@ public:
             return 24;
         }
     }
-    const FrameSize renderFrameSize() const { return m_renderFrameSize; }
 
 
     void render(qreal fps);
@@ -87,6 +91,7 @@ public:
     QImage requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
 
 
+    const QString inFileStr() const { return m_inFile.fileName(); }
     const QString frameFileStr(int number, FrameSize size) const;
     const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
     const QString renderedFileStr(int number, FrameSize size) const;

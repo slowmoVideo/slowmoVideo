@@ -24,6 +24,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
 
+#include "xmlProjectRW_sV.h"
 #include "renderTask_sV.h"
 #include "nodelist_sV.h"
 #include "flow_sV.h"
@@ -85,6 +86,13 @@ Project_sV::~Project_sV()
     delete m_videoInfo;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
+}
+
+int Project_sV::save(const QString &filename) const
+{
+//    AbstractProjectRW_sV *rw = new XmlProjectRW_sV();
+    XmlProjectRW_sV *rw = new XmlProjectRW_sV();
+    return rw->saveProject(this, filename);
 }
 
 bool Project_sV::validDirectories() const
