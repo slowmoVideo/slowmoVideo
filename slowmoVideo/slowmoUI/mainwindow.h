@@ -56,6 +56,7 @@ public:
         Tool_Select,
         Tool_Move,
         Help,
+        New,
         Open,
         Save
     };

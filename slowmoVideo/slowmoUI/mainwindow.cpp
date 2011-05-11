@@ -43,6 +43,7 @@ void MainWindow::fillCommandList()
     m_commands.clear();
     m_commands << "h:\tHelp";
     m_commands << "q-q:\tQuit";
+    m_commands << "n:\tNew";
     m_commands << "o:\tOpen";
     m_commands << "s:\tSave";
     m_commands << "x:\tAbort current action";
@@ -70,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Help, "h");
     m_keyList.insert(MainWindow::Quit, "q");
     m_keyList.insert(MainWindow::Quit_Quit, "q");
+    m_keyList.insert(MainWindow::New, "n");
     m_keyList.insert(MainWindow::Open, "o");
     m_keyList.insert(MainWindow::Save, "s");
     m_keyList.insert(MainWindow::Abort, "x");
@@ -282,8 +284,19 @@ void MainWindow::shortcutUsed(QString which)
         if (which == m_keyList[MainWindow::Help]) {
             m_wCanvas->toggleHelp();
             handled = true;
-        } else if (which == m_keyList[MainWindow::Open]) {
+        } else if (which == m_keyList[MainWindow::New]) {
             newProject();
+            handled = true;
+        } else if (which == m_keyList[MainWindow::Open]) {
+            QFileDialog dialog(this, "Load project");
+            dialog.setAcceptMode(QFileDialog::AcceptOpen);
+            dialog.setDefaultSuffix("sVproj");
+            dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
+            dialog.setFileMode(QFileDialog::ExistingFile);
+            if (dialog.exec() == QDialog::Accepted) {
+                XmlProjectRW_sV reader;
+                reader.loadProject(dialog.selectedFiles().at(0));
+            }
             handled = true;
         } else if (which == m_keyList[MainWindow::Save]) {
             QFileDialog dialog(this, "Save project");

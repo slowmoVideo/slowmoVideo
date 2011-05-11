@@ -33,28 +33,28 @@ the Free Software Foundation, either version 3 of the License, or
 
 QRegExp Project_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
-Project_sV::Project_sV(QString filename, QString projectDir) :
-    QObject(),
-    m_canWriteFrames(false),
-    m_flowComplete(false),
-    m_inFile(filename),
-    m_projDir(projectDir),
-    m_videoInfo(NULL),
-    m_ffmpegOrig(NULL),
-    m_ffmpegSmall(NULL),
-    m_fps(24),
-    m_renderFrameSize(FrameSize_Small)
+Project_sV::Project_sV()
 {
-    m_videoInfo = new VideoInfoSV();
+    init();
+}
+
+Project_sV::Project_sV(QString filename, QString projectDir)
+{
+    init();
+    loadFile(filename, projectDir);
+}
+
+void Project_sV::loadFile(QString filename, QString projectDir)
+{
+    m_inFile.setFileName(filename);
+    m_projDir = projectDir;
+
     *m_videoInfo = getInfo(filename.toStdString().c_str());
     if (m_videoInfo->streamsCount <= 0) {
         qDebug() << "Video info is invalid.";
     } else {
         m_fps = m_videoInfo->frameRateNum/(float)m_videoInfo->frameRateDen;
     }
-    m_flow = new Flow_sV();
-    m_nodes = new NodeList_sV();
-    m_renderTask = new RenderTask_sV(this);
 
     // Create directories if necessary
     qDebug() << "Project directory: " << m_projDir.absolutePath();
@@ -65,7 +65,22 @@ Project_sV::Project_sV(QString filename, QString projectDir) :
     createDirectories(FrameSize_Orig);
     createDirectories(FrameSize_Small);
     m_canWriteFrames = validDirectories();
+}
 
+void Project_sV::init()
+{
+    m_canWriteFrames = false;
+    m_flowComplete = false;
+    m_videoInfo = NULL;
+    m_ffmpegOrig = NULL;
+    m_ffmpegSmall = NULL;
+    m_fps = 24;
+    m_renderFrameSize = FrameSize_Small;
+
+    m_videoInfo = new VideoInfoSV();
+    m_flow = new Flow_sV();
+    m_nodes = new NodeList_sV();
+    m_renderTask = new RenderTask_sV(this);
 
     m_timer = new QTimer(this);
     m_signalMapper = new QSignalMapper(this);

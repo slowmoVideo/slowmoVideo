@@ -37,10 +37,12 @@ class Project_sV : public QObject
     Q_OBJECT
 
 public:
+    Project_sV();
     Project_sV(QString filename, QString projectDir);
     ~Project_sV();
 
 
+    void loadFile(QString filename, QString projectDir);
     int save(const QString &filename) const;
 
 
@@ -146,6 +148,7 @@ private:
 
     float timeToFrame(float time) const;
 
+    void init();
     void createDirectories(FrameSize frameSize) const;
     const QString framesDirStr(FrameSize frameSize) const;
     const QString flowDirStr(FrameSize frameSize) const;

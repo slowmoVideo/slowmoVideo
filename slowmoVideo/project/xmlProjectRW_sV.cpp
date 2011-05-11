@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QTextStream>
+#include <QXmlQuery>
 
 #include "project_sV.h"
 #include "nodelist_sV.h"
@@ -56,11 +57,13 @@ int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) co
 
     QFile outFile(filename);
     if (!outFile.open(QIODevice::WriteOnly)) {
+        qDebug() << "Cannot write file " << filename;
         Q_ASSERT(false);
     }
     QTextStream output(&outFile);
     doc.save(output, 4);
     output.flush();
+    outFile.close();
 
     return 0;
 }
@@ -82,5 +85,44 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
 
 Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
 {
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Cannot read file " << filename;
+        Q_ASSERT(false);
+    } else {
+        QXmlStreamReader xml;
+        xml.setDevice(&file);
+        if (xml.readNextStartElement()) {
+            if (xml.name() == "sVproject") {
+
+                Project_sV *project = new Project_sV();
+
+                while (xml.readNextStartElement()) {
+                    if (xml.name() == "info") {
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "appName") {
+                                qDebug() << "App name: " << xml.readElementText();
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    } else if (xml.name() == "resources") {
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "inputFile") {
+                                qDebug() << "Input file: " << xml.readElementText();
+                                project->loadFile(xml.readElementText(), QFileInfo(filename).absolutePath());
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    } else {
+                        xml.skipCurrentElement();
+                    }
+                }
+
+            }
+        }
+        file.close();
+    }
     return NULL;
 }
