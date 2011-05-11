@@ -24,7 +24,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
 
-#include "xmlProjectRW_sV.h"
 #include "renderTask_sV.h"
 #include "nodelist_sV.h"
 #include "flow_sV.h"
@@ -51,7 +50,7 @@ void Project_sV::loadFile(QString filename, QString projectDir)
 
     *m_videoInfo = getInfo(filename.toStdString().c_str());
     if (m_videoInfo->streamsCount <= 0) {
-        qDebug() << "Video info is invalid.";
+        qDebug() << "Video info is invalid: " << filename;
     } else {
         m_fps = m_videoInfo->frameRateNum/(float)m_videoInfo->frameRateDen;
     }
@@ -101,13 +100,6 @@ Project_sV::~Project_sV()
     delete m_videoInfo;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
-}
-
-int Project_sV::save(const QString &filename) const
-{
-//    AbstractProjectRW_sV *rw = new XmlProjectRW_sV();
-    XmlProjectRW_sV *rw = new XmlProjectRW_sV();
-    return rw->saveProject(this, filename);
 }
 
 bool Project_sV::validDirectories() const

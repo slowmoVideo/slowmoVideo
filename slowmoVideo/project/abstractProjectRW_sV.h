@@ -7,7 +7,6 @@ class Project_sV;
 class AbstractProjectRW_sV
 {
 public:
-    AbstractProjectRW_sV() {}
     virtual Project_sV* loadProject(QString filename) const;
     virtual int saveProject(const Project_sV *project, QString filename) const;
 };

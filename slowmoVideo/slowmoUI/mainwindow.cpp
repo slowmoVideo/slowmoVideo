@@ -135,6 +135,17 @@ MainWindow::~MainWindow()
     }
 }
 
+void MainWindow::loadProject(Project_sV *project)
+{
+    if (m_project != NULL) {
+        delete m_project;
+    }
+    if (project != NULL) {
+        m_project = project;
+        m_wCanvas->load(m_project);
+    }
+}
+
 
 void MainWindow::displayHelp(QPainter &davinci)
 {
@@ -154,12 +165,8 @@ void MainWindow::newProject()
     if (npd.exec() == QDialog::Accepted) {
         Project_sV *newProject = new Project_sV(npd.m_inputFile, npd.m_projectDir);
         if (newProject->validDirectories()) {
-            if (m_project != NULL) {
-                delete m_project;
-            }
-            m_project = newProject;
-            m_wCanvas->load(m_project);
-            qDebug() << "Project location: " << &m_project;
+
+            loadProject(newProject);
 
             ProgressDialogExtractFrames progress;
             bool b = true;
@@ -295,7 +302,8 @@ void MainWindow::shortcutUsed(QString which)
             dialog.setFileMode(QFileDialog::ExistingFile);
             if (dialog.exec() == QDialog::Accepted) {
                 XmlProjectRW_sV reader;
-                reader.loadProject(dialog.selectedFiles().at(0));
+                Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0));
+                loadProject(project);
             }
             handled = true;
         } else if (which == m_keyList[MainWindow::Save]) {

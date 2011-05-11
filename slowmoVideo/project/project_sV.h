@@ -37,13 +37,19 @@ class Project_sV : public QObject
     Q_OBJECT
 
 public:
+    /** Creates an empty project. A video file can be loaded with loadFile(QString, QString). */
     Project_sV();
+    /**
+      Creates a new project.
+      @param filename Input video file
+      @param projectDir Project directory; All cached files will be put in there.
+      */
     Project_sV(QString filename, QString projectDir);
     ~Project_sV();
 
 
+    /** Load filename and set the project directory to projectDir */
     void loadFile(QString filename, QString projectDir);
-    int save(const QString &filename) const;
 
 
     const VideoInfoSV& videoInfo() const { return *m_videoInfo; }

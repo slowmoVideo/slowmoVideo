@@ -32,7 +32,7 @@ public:
       @return true if the node has been added. The node is NOT added
       if it is too close to another node.
       */
-    bool add(const Node_sV &node);
+    bool add(const Node_sV node);
     uint deleteSelected();
 
     void unselectAll();

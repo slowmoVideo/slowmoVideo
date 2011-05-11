@@ -1,3 +1,13 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "xmlProjectRW_sV.h"
 
 #include <QDebug>
@@ -8,9 +18,6 @@
 #include "nodelist_sV.h"
 #include "../lib/defs_sV.h"
 
-XmlProjectRW_sV::XmlProjectRW_sV()
-{
-}
 
 int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) const
 {
@@ -90,10 +97,16 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
         qDebug() << "Cannot read file " << filename;
         Q_ASSERT(false);
     } else {
+
         QXmlStreamReader xml;
         xml.setDevice(&file);
-        if (xml.readNextStartElement()) {
-            if (xml.name() == "sVproject") {
+        if (!xml.readNextStartElement()) {
+            qDebug() << "Could not read " << filename;
+
+        } else {
+            if (xml.name() != "sVproject") {
+                qDebug() << "Invalid project file (incorrect root element): " << filename;
+            } else {
 
                 Project_sV *project = new Project_sV();
 
@@ -109,8 +122,29 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                     } else if (xml.name() == "resources") {
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "inputFile") {
-                                qDebug() << "Input file: " << xml.readElementText();
-                                project->loadFile(xml.readElementText(), QFileInfo(filename).absolutePath());
+                                QString filename = xml.readElementText();
+                                qDebug() << "Input file: " << filename;
+                                project->loadFile(filename, QFileInfo(filename).absolutePath());
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    } else if (xml.name() == "nodes") {
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "node") {
+                                Node_sV node;
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "x") {
+                                        node.setX(QVariant(xml.readElementText()).toFloat());
+                                    } else if (xml.name() == "y") {
+                                        node.setY(QVariant(xml.readElementText()).toFloat());
+                                    } else if (xml.name() == "selected") {
+                                        node.select(QVariant(xml.readElementText()).toBool());
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+                                project->nodes()->add(node);
                             } else {
                                 xml.skipCurrentElement();
                             }
@@ -119,6 +153,8 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                         xml.skipCurrentElement();
                     }
                 }
+
+                return project;
 
             }
         }

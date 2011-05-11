@@ -74,7 +74,7 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
     return srcTime;
 }
 
-bool NodeList_sV::add(const Node_sV &node)
+bool NodeList_sV::add(const Node_sV node)
 {
     bool add = true;
 

@@ -82,6 +82,7 @@ private:
     static void fillCommandList();
 
     void newProject();
+    void loadProject(Project_sV *project);
 
 private slots:
     /**

@@ -1,3 +1,13 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef XMLPROJECTRW_SV_H
 #define XMLPROJECTRW_SV_H
 
@@ -9,8 +19,14 @@ class Node_sV;
 class XmlProjectRW_sV// : public AbstractProjectRW_sV
 {
 public:
-    explicit XmlProjectRW_sV();
+    /**
+      Reads an XML project file.
+      @return NULL if an error ocurred.
+      */
     Project_sV* loadProject(QString filename) const;
+    /**
+      Saves a project to an XML project file.
+      */
     int saveProject(const Project_sV *project, QString filename) const;
 
 private:
