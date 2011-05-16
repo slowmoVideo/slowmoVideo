@@ -122,9 +122,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                     } else if (xml.name() == "resources") {
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "inputFile") {
-                                QString filename = xml.readElementText();
-                                qDebug() << "Input file: " << filename;
-                                project->loadFile(filename, QFileInfo(filename).absolutePath());
+                                QString inFilename = xml.readElementText();
+                                qDebug() << "Input file: " << inFilename;
+                                project->loadFile(inFilename, QFileInfo(filename).absolutePath());
                             } else {
                                 xml.skipCurrentElement();
                             }

@@ -53,6 +53,9 @@ public slots:
     void slotDeleteNodes();
     void slotSetToolMode(Canvas::ToolMode mode);
 
+signals:
+    void signalMouseInputTimeChanged(qreal frame);
+
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);

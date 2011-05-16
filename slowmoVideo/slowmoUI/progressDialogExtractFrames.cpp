@@ -36,6 +36,7 @@ void ProgressDialogExtractFrames::slotExtractionFinished(FrameSize frameSize)
     if (ui->progOrig->value() == 100 && ui->progThumbs->value() == 100) {
         ui->bOk->setEnabled(true);
     }
+    accept();
 }
 
 void ProgressDialogExtractFrames::slotProgressUpdated(FrameSize frameSize, int value)

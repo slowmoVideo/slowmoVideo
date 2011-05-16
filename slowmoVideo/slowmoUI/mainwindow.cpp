@@ -22,6 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore>
 #include <QObject>
+#include <QDockWidget>
 #include <QDebug>
 
 #include <QDir>
@@ -65,6 +66,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
+
+    m_wInputMonitor = new InputMonitor(this);
+    m_wInputMonitorDock = new QDockWidget("Input monitor", this);
+    m_wInputMonitorDock->setWidget(m_wInputMonitor);
+    addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
 
 
     // Set up shortcut bindings
@@ -114,6 +120,9 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
 
+    b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
+                 this, SLOT(slotForwardInputPosition(qreal)));
+
     b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(showRenderDialog()));
 
 
@@ -124,6 +133,8 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_wInputMonitor;
+    delete m_wInputMonitorDock;
 
     if (m_project != NULL) {
         delete m_project;
@@ -144,6 +155,20 @@ void MainWindow::loadProject(Project_sV *project)
         m_project = project;
         m_wCanvas->load(m_project);
     }
+
+    ProgressDialogExtractFrames progress;
+    bool b = true;
+    b &= connect(
+                m_project, SIGNAL(signalFramesExtracted(FrameSize)),
+                &progress, SLOT(slotExtractionFinished(FrameSize))
+            );
+    b &= connect(
+                m_project, SIGNAL(signalProgressUpdated(FrameSize,int)),
+                &progress, SLOT(slotProgressUpdated(FrameSize,int))
+            );
+    Q_ASSERT(b);
+    m_project->extractFrames();
+    progress.exec();
 }
 
 
@@ -167,20 +192,6 @@ void MainWindow::newProject()
         if (newProject->validDirectories()) {
 
             loadProject(newProject);
-
-            ProgressDialogExtractFrames progress;
-            bool b = true;
-            b &= connect(
-                        m_project, SIGNAL(signalFramesExtracted(FrameSize)),
-                        &progress, SLOT(slotExtractionFinished(FrameSize))
-                    );
-            b &= connect(
-                        m_project, SIGNAL(signalProgressUpdated(FrameSize,int)),
-                        &progress, SLOT(slotProgressUpdated(FrameSize,int))
-                    );
-            Q_ASSERT(b);
-            m_project->extractFrames();
-            progress.exec();
 
 
             /*
@@ -309,7 +320,7 @@ void MainWindow::shortcutUsed(QString which)
         } else if (which == m_keyList[MainWindow::Save]) {
             QFileDialog dialog(this, "Save project");
             dialog.setAcceptMode(QFileDialog::AcceptSave);
-            dialog.setDefaultSuffix(".sVproj");
+            dialog.setDefaultSuffix("sVproj");
             dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
             dialog.setFileMode(QFileDialog::AnyFile);
             if (dialog.exec() == QDialog::Accepted) {
@@ -321,6 +332,14 @@ void MainWindow::shortcutUsed(QString which)
     }
 
     m_lastShortcut = ts;
+}
+
+void MainWindow::slotForwardInputPosition(qreal frame)
+{
+    if (0 <= frame && frame < m_project->videoInfo().framesCount) {
+        qDebug() << "Signal: Load image at " << frame;
+        m_wInputMonitor->slotLoadImage(m_project->frameFileStr(qFloor(frame), FrameSize_Small));
+    }
 }
 
 void MainWindow::showRenderDialog()

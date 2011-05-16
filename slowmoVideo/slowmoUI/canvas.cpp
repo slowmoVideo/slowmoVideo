@@ -275,6 +275,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
         }
     }
 
+    emit signalMouseInputTimeChanged(convertCanvasToTime(m_lastMousePos).y() * float(m_project->videoInfo().frameRateNum) / m_project->videoInfo().frameRateDen);
+
     repaint();
 }
 

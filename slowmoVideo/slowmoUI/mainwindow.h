@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QMainWindow>
 #include "canvas.h"
+#include "inputMonitor.h"
 #include "../project/project_sV.h"
 
 namespace Ui {
@@ -75,6 +76,8 @@ private:
     QMap<int, QString> m_keyList;
 
     Canvas *m_wCanvas;
+    InputMonitor *m_wInputMonitor;
+    QDockWidget *m_wInputMonitorDock;
 
     Project_sV *m_project;
 
@@ -92,6 +95,7 @@ private slots:
      */
     void shortcutUsed(QString);
     void showRenderDialog();
+    void slotForwardInputPosition(qreal frame);
 
 
 signals:
