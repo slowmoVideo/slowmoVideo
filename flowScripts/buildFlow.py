@@ -12,6 +12,7 @@ parser.add_option("-o", "--output", dest="outDir", help="Output Directory", meta
 parser.add_option("--flow", dest="flowExecutable", help="Executable for optical flow")
 parser.add_option("--forward-only", action="store_true", dest="forwardOnly",  help="Calculate forward flow only")
 parser.add_option("--backward-only", action="store_true", dest="backwardOnly",  help="Calculate backward flow only")
+parser.add_option("--force-rebuild", action="store_true", dest="forceRebuild", help="Force rebuild of existing flow images")
 
 (options, args) = parser.parse_args()
 
@@ -59,20 +60,22 @@ for s in files :
             rightFile = options.inDir + os.sep + s
             
             if not options.backwardOnly :
-                outFile = nameForwardFlow(prev, s)
-                cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, leftFile, rightFile, options.outDir + os.sep + outFile)
-                ret = os.system(cmd)
-                print("%s: Returned %s" % (outFile, ret))
-                if ret == 2 :
-                    print("SIGINT received, terminating.")
-                    exit(2)
+                outFile = options.outDir + os.sep + nameForwardFlow(prev, s)
+                if not os.path.exists(outFile) or options.forceRebuild :
+                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, leftFile, rightFile, outFile)
+                    ret = os.system(cmd)
+                    print("%s: Returned %s" % (outFile, ret))
+                    if ret == 2 :
+                        print("SIGINT received, terminating.")
+                        exit(2)
             
             if not options.forwardOnly :
-                outFile = nameBackwardFlow(prev, s)
-                cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, options.outDir + os.sep + outFile)
-                ret = os.system(cmd)
-                print("%s: Returned %s" % (outFile, ret))
-                if ret == 2 :
-                    print("SIGINT received, terminating.")
-                    exit(2)
+                outFile = options.outDir + os.sep + nameBackwardFlow(prev, s)
+                if (not os.path.exists(outFile)) or options.forceRebuild :
+                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, options.outDir + os.sep + outFile)
+                    ret = os.system(cmd)
+                    print("%s: Returned %s" % (outFile, ret))
+                    if ret == 2 :
+                        print("SIGINT received, terminating.")
+                        exit(2)
         prev = s
