@@ -19,6 +19,13 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QList>
 
 
+
+#define NODE_RADIUS 4
+#define NODE_SEL_DIST 2
+#define MOVE_THRESHOLD 3
+
+
+
 class QColor;
 class QPoint;
 
@@ -35,7 +42,7 @@ public:
     explicit Canvas(const Project_sV *project, QWidget *parent = 0);
     ~Canvas();
 
-    enum ToolMode {ToolMode_Add, ToolMode_Select, ToolMode_Move };
+    enum ToolMode { ToolMode_Select, ToolMode_Move };
     enum Abort { Abort_General, Abort_Selection };
 
     static QColor lineCol;
@@ -67,8 +74,6 @@ protected:
 private:
     Ui::Canvas *ui;
     const Project_sV *m_project;
-    QPoint m_lastMousePos;
-    QPoint m_mouseStart;
     bool m_mouseWithinWidget;
     int m_distLeft;
     int m_distBottom;
@@ -79,12 +84,31 @@ private:
     int m_secResX;
     int m_secResY;
 
-    bool m_moveAborted;
     bool m_showHelp;
 
-    ToolMode m_mode;
-
     NodeList_sV *m_nodes;
+
+    ToolMode m_mode;
+    struct {
+        bool nodesMoved;
+        bool selectAttempted;
+        bool moveAborted;
+        QPoint prevMousePos;
+        QPoint initialMousePos;
+        Qt::KeyboardModifiers initialModifiers;
+
+        void reset() {
+            moveAborted = false;
+            nodesMoved = false;
+            selectAttempted = false;
+            travelledDistance = 0;
+        }
+        void travel(int length) { travelledDistance += length; }
+        bool countsAsMove() { return travelledDistance >= MOVE_THRESHOLD; }
+
+    private:
+        int travelledDistance;
+    } m_states;
 
     const Node_sV convertCanvasToTime(const QPoint &p) const;
     const QPoint convertTimeToCanvas(const Node_sV &p) const;

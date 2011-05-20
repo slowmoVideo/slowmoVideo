@@ -279,10 +279,7 @@ void MainWindow::shortcutUsed(QString which)
             }
         }
         else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Tool]) {
-            if (which == m_keyList[MainWindow::Tool_Add]) {
-                emit setMode(Canvas::ToolMode_Add);
-                handled = true;
-            } else if (which == m_keyList[MainWindow::Tool_Select]) {
+            if (which == m_keyList[MainWindow::Tool_Select]) {
                 emit setMode(Canvas::ToolMode_Select);
                 handled = true;
             } else if (which == m_keyList[MainWindow::Tool_Move]) {

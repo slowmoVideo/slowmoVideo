@@ -25,9 +25,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QPoint>
 #include <QPointF>
 
-#define NODE_RADIUS 4
-#define NODE_SEL_DIST 2
-
 QColor Canvas::selectedCol(255, 196, 0);
 QColor Canvas::lineCol(220, 220, 220);
 QColor Canvas::nodeCol(240, 240, 240);
@@ -38,8 +35,6 @@ Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
     m_project(project),
-    m_lastMousePos(0,0),
-    m_mouseStart(0,0),
     m_mouseWithinWidget(false),
     m_distLeft(90),
     m_distBottom(50),
@@ -49,15 +44,16 @@ Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     m_tmax(10,10),
     m_secResX(100),
     m_secResY(100),
-    m_moveAborted(false),
     m_showHelp(false),
-    m_mode(ToolMode_Add),
-    m_nodes(project->nodes())
+    m_nodes(project->nodes()),
+    m_mode(ToolMode_Select)
 {
     ui->setupUi(this);
 
     // Enable mouse tracking (not only when a mouse button is pressed)
     this->setMouseTracking(true);
+
+    m_states.prevMousePos = QPoint(0,0);
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
@@ -91,9 +87,10 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
     qDebug() << "Nearest node index: " << ti;
     if (ti != -1 && m_nodes->size() > ti) {
         QPoint p = convertTimeToCanvas(m_nodes->at(ti));
+        qDebug() << "Mouse pos: " << pos << ", node pos: " << p;
         if (
-                abs(p.x() - pos.x()) <= NODE_RADIUS+2 &&
-                abs(p.y() - pos.y()) <= NODE_RADIUS+2
+                abs(p.x() - pos.x()) <= NODE_RADIUS+NODE_SEL_DIST+4 &&
+                abs(p.y() - pos.y()) <= NODE_RADIUS+NODE_SEL_DIST+4
             ) {
             qDebug() << "Selected: " << pos.x() << "/" << pos.y();
 
@@ -161,12 +158,12 @@ void Canvas::paintEvent(QPaintEvent *)
 
     // Frames/seconds
     davinci.setPen(lineCol);
-    if (m_mouseWithinWidget && insideCanvas(m_lastMousePos)) {
-        davinci.drawLine(m_lastMousePos.x(), m_distTop, m_lastMousePos.x(), height()-1 - m_distBottom);
-        Node_sV time = convertCanvasToTime(m_lastMousePos);
-        davinci.drawText(m_lastMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
-        davinci.drawLine(m_distLeft, m_lastMousePos.y(), m_lastMousePos.x(), m_lastMousePos.y());
-        davinci.drawText(8, m_lastMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
+    if (m_mouseWithinWidget && insideCanvas(m_states.prevMousePos)) {
+        davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
+        Node_sV time = convertCanvasToTime(m_states.prevMousePos);
+        davinci.drawText(m_states.prevMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
+        davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
+        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -209,9 +206,6 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
     int dR = 0;
 
     dR += w;
-    davinci.setOpacity(.5 + ((m_mode == ToolMode_Add) ? .5 : 0));
-    davinci.drawImage(r - dR, t, QImage("res/iconAdd.png").scaled(16, 16));
-    dR += d+w;
 
     davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
     davinci.drawImage(r - dR, t, QImage("res/iconSel.png").scaled(16, 16));
@@ -225,69 +219,120 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
-    m_moveAborted = false;
-    if (e->pos().x() >= m_distLeft && e->pos().y() < this->height()-m_distBottom) {
-        // Try to select a node below the mouse. If there is none, add a point.
-        bool selected = selectAt(e->pos(), e->modifiers() && Qt::ControlModifier);
-        if (!selected) {
-            if (m_mode == ToolMode_Add) {
-                Node_sV p = convertCanvasToTime(e->pos());
-                m_nodes->add(p);
-            } else {
-                qDebug() << "Not adding node. Mode is " << m_mode;
-            }
-        } else {
-            qDebug() << "Node selected.";
-        }
-        repaint();
+    m_states.reset();
+    m_states.prevMousePos = e->pos();
+    m_states.initialMousePos = e->pos();
+    m_states.initialModifiers = e->modifiers();
 
-        qDebug() << "Node list: " << m_nodes;
-    } else {
-        qDebug() << "Not inside bounds.";
-    }
-    m_mouseStart = e->pos();
+
+
+    // OLD
+
+//    m_moveAborted = false;
+//    if (e->pos().x() >= m_distLeft && e->pos().y() < this->height()-m_distBottom) {
+//        // Try to select a node below the mouse. If there is none, add a point.
+//        bool selected = selectAt(e->pos(), e->modifiers() && Qt::ControlModifier);
+//        if (!selected) {
+//            if (m_mode == ToolMode_Select) {
+//                Node_sV p = convertCanvasToTime(e->pos());
+//                m_nodes->add(p);
+//            } else {
+//                qDebug() << "Not adding node. Mode is " << m_mode;
+//            }
+//        } else {
+//            qDebug() << "Node selected.";
+//        }
+//        repaint();
+
+//        qDebug() << "Node list: " << m_nodes;
+//    } else {
+//        qDebug() << "Not inside bounds.";
+//    }
+//    m_mouseStart = e->pos();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *e)
 {
-    m_lastMousePos = e->pos();
     m_mouseWithinWidget = true;
+
+    m_states.travel((m_states.prevMousePos - e->pos()).manhattanLength());
+    m_states.prevMousePos = e->pos();
 
     if (e->buttons().testFlag(Qt::LeftButton)) {
 
-        qDebug() << m_mouseStart << "to" << e->pos();
-        Node_sV diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_mouseStart);
+        qDebug() << m_states.initialMousePos << "to" << e->pos();
+        Node_sV diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_states.initialMousePos);
         qDebug() << "Diff: " << diff;
 
         if (m_mode == ToolMode_Select) {
-            if (!m_moveAborted) {
-                if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                    if (qAbs(diff.x()) < qAbs(diff.y())) {
-                        diff.setX(0);
-                    } else {
-                        diff.setY(0);
+            if (!m_states.moveAborted) {
+                if (m_states.countsAsMove()) {
+                    if (!m_states.selectAttempted) {
+                        m_states.selectAttempted = true;
+                        selectAt(m_states.initialMousePos, e->modifiers().testFlag(Qt::ControlModifier));
                     }
+                    if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                        if (qAbs(diff.x()) < qAbs(diff.y())) {
+                            diff.setX(0);
+                        } else {
+                            diff.setY(0);
+                        }
+                    }
+                    m_nodes->moveSelected(diff);
                 }
-                m_nodes->moveSelected(diff);
             }
+            m_states.nodesMoved = true;
         } else if (m_mode == ToolMode_Move) {
-            if (!m_moveAborted) {
-                m_nodes->shift(convertCanvasToTime(m_mouseStart).x(), diff.x());
+            if (!m_states.moveAborted) {
+                m_nodes->shift(convertCanvasToTime(m_states.initialMousePos).x(), diff.x());
             }
+            m_states.nodesMoved = true;
         }
     }
 
-    emit signalMouseInputTimeChanged(convertCanvasToTime(m_lastMousePos).y() * float(m_project->videoInfo().frameRateNum) / m_project->videoInfo().frameRateDen);
+    emit signalMouseInputTimeChanged(
+                  convertCanvasToTime(m_states.prevMousePos).y()
+                * float(m_project->videoInfo().frameRateNum)
+                / m_project->videoInfo().frameRateDen
+                                     );
 
     repaint();
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *)
 {
-    if (!m_moveAborted) {
-        if (m_mode == ToolMode_Select || m_mode == ToolMode_Move) {
+    if (!m_states.moveAborted) {
+        switch (m_mode) {
+        case ToolMode_Select:
+            if (m_states.countsAsMove()) {
+                m_nodes->confirmMove();
+                qDebug() << "Move confirmed.";
+            } else {
+                if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom) {
+                    // Try to select a node below the mouse. If there is none, add a point.
+                    bool selected = selectAt(m_states.initialMousePos, m_states.initialModifiers.testFlag(Qt::ControlModifier));
+                    if (!selected) {
+                        if (m_mode == ToolMode_Select) {
+                            Node_sV p = convertCanvasToTime(m_states.initialMousePos);
+                            m_nodes->add(p);
+                        } else {
+                            qDebug() << "Not adding node. Mode is " << m_mode;
+                        }
+                    } else {
+                        qDebug() << "Node selected.";
+                    }
+                    repaint();
+
+                    qDebug() << "Node list: " << m_nodes;
+                } else {
+                    qDebug() << "Not inside bounds.";
+                }
+            }
+            break;
+        case ToolMode_Move:
             m_nodes->confirmMove();
             qDebug() << "Move confirmed.";
+            break;
         }
     }
 }
@@ -368,7 +413,7 @@ void Canvas::slotAbort(Canvas::Abort abort)
     qDebug() << "Signal: " << abort;
     switch (abort) {
     case Abort_General:
-        m_moveAborted = true;
+        m_states.moveAborted = true;
         m_nodes->abortMove();
         repaint();
         break;
@@ -400,9 +445,6 @@ void Canvas::slotSetToolMode(ToolMode mode)
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)
 {
     switch(mode) {
-    case Canvas::ToolMode_Add:
-        qd << "Add tool";
-        break;
     case Canvas::ToolMode_Select:
         qd << "Select tool";
         break;

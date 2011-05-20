@@ -123,13 +123,14 @@ bool NodeList_sV::validate() const
     bool valid = true;
     qreal last = -m_minDist;
     for (int i = 0; i < m_list.size() && valid; i++) {
-        valid = m_list.at(i).x() >= 0
-                && m_list.at(i).x() - last >= m_minDist
-                && m_list.at(i).y() >= 0;
-        last = m_list.at(i).x();
+        valid =    m_list.at(i).x() >= 0
+                && m_list.at(i).y() >= 0
+                && m_list.at(i).x() - last >= m_minDist;
         if (!valid) {
-            qDebug() << "Invalid node position for node " << i << "; Distance is " << m_list.at(i).x() - last;
+            qDebug() << "Invalid node position for node " << i << " (" << m_list.size() << " total); Distance is " << m_list.at(i).x() - last;
+            qDebug() << "Positions: " << last << "/" << m_list.at(i).x();;
         }
+        last = m_list.at(i).x();
         Q_ASSERT(valid);
     }
     return valid;
