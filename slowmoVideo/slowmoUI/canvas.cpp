@@ -261,10 +261,12 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
         if (m_mode == ToolMode_Select) {
             if (!m_moveAborted) {
-                if (qAbs(diff.x()) < qAbs(diff.y())) {
-                    diff.setX(0);
-                } else {
-                    diff.setY(0);
+                if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                    if (qAbs(diff.x()) < qAbs(diff.y())) {
+                        diff.setX(0);
+                    } else {
+                        diff.setY(0);
+                    }
                 }
                 m_nodes->moveSelected(diff);
             }
