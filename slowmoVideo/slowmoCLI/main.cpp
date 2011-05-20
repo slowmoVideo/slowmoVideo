@@ -39,8 +39,8 @@ enum FlowMode {
 
 void printUsage() {
     std::cout << "Usage: " << std::endl;
-    std::cout << "\t" << myName << " twoway <left image> <right image> <flow image> <reverse image> [<output pattern> [numberOffset] ]" << std::endl;
-    std::cout << "\t" << myName << " forward <left image> <flow image> [<output pattern> [numberOffset] ]" << std::endl;
+    std::cout << "\t" << myName << " twoway <left image> <right image> <flow image> <reverse image> [<output pattern> [numberOffset [fps]] ]" << std::endl;
+    std::cout << "\t" << myName << " forward <left image> <flow image> [<output pattern> [numberOffset [fps]] ]" << std::endl;
 }
 
 
@@ -124,6 +124,11 @@ int main(int argc, char *argv[])
         std::cout << "Error converting argument to number." << std::endl;
         return RET_WRONG_PARAM;
     }
+    const unsigned int fps = QString(nextOptArg(argc, argi, argv, "24")).toInt(&ok);
+    if (!ok) {
+        std::cout << "Error converting argument to number." << std::endl;
+        return RET_WRONG_PARAM;
+    }
 
     switch (mode) {
     case FlowMode_Twoway:
@@ -167,7 +172,6 @@ int main(int argc, char *argv[])
 
 
 
-    const unsigned int steps = 25;
     //const int stepLog = ceil(log10(numberOffset + steps));
     const int stepLog = 8;
     float pos;
@@ -175,8 +179,8 @@ int main(int argc, char *argv[])
     qDebug() << stepLog << ": max length";
     QString filename;
 
-    for (unsigned int step = 0; step < steps+1; step++) {
-	pos = step/float(steps);
+    for (unsigned int step = 0; step < fps+1; step++) {
+        pos = step/float(fps);
         if (mode == FlowMode_Twoway) {
             Interpolate_sV::twowayFlow(left, right, flow, flowBack, pos, output);
         } else if (mode == FlowMode_Forward) {

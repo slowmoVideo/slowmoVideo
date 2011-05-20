@@ -249,13 +249,16 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
     if (framePos-floor(framePos) > MIN_FRAME_DIST) {
 
         QImage left(frameFileStr(floor(framePos), frameSize));
-//        QImage right(frameFileStr(floor(framePos)+1));
-        QImage flow(requestFlow(floor(framePos), FlowDirection_Forward, frameSize));
+        QImage right(frameFileStr(floor(framePos)+1, frameSize));
+        QImage forwardFlow(requestFlow(floor(framePos), FlowDirection_Forward, frameSize));
+        QImage backwardFlow(requestFlow(floor(framePos), FlowDirection_Backward, frameSize));
         QImage out(left.size(), QImage::Format_RGB888);
 
-        Q_ASSERT(!flow.isNull());
+        Q_ASSERT(!forwardFlow.isNull());
+        Q_ASSERT(!backwardFlow.isNull());
 
-        Interpolate_sV::forwardFlow(left, flow, framePos-floor(framePos), out);
+//        Interpolate_sV::forwardFlow(left, forwardFlow, framePos-floor(framePos), out);
+        Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, framePos-floor(framePos), out);
 
         return out;
     } else {

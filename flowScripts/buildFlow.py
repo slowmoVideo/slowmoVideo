@@ -13,6 +13,7 @@ parser.add_option("--flow", dest="flowExecutable", help="Executable for optical 
 parser.add_option("--forward-only", action="store_true", dest="forwardOnly",  help="Calculate forward flow only")
 parser.add_option("--backward-only", action="store_true", dest="backwardOnly",  help="Calculate backward flow only")
 parser.add_option("--force-rebuild", action="store_true", dest="forceRebuild", help="Force rebuild of existing flow images")
+parser.add_option("--offset", dest="offset", type="int", default=0, help="Frame offset")
 
 (options, args) = parser.parse_args()
 
@@ -54,7 +55,7 @@ if not os.path.exists(options.outDir) :
 
 prev = None
 for s in files :
-    if frameID(s) != None :
+    if frameID(s) != None and int(frameID(s)) >= options.offset :
         if prev != None :
             leftFile = options.inDir + os.sep + prev
             rightFile = options.inDir + os.sep + s
@@ -68,14 +69,20 @@ for s in files :
                     if ret == 2 :
                         print("SIGINT received, terminating.")
                         exit(2)
+                    elif ret == 65024 :
+                        print("Environment variable not set, terminating")
+                        exit(65024)
             
             if not options.forwardOnly :
                 outFile = options.outDir + os.sep + nameBackwardFlow(prev, s)
                 if (not os.path.exists(outFile)) or options.forceRebuild :
-                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, options.outDir + os.sep + outFile)
+                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, outFile)
                     ret = os.system(cmd)
                     print("%s: Returned %s" % (outFile, ret))
                     if ret == 2 :
                         print("SIGINT received, terminating.")
                         exit(2)
+                    elif ret == 65024 :
+                        print("Environment variable not set, terminating")
+                        exit(65024)
         prev = s
