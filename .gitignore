@@ -1,7 +1,7 @@
 bin
 res
 
-./*.png
+/*.png
 flowScripts/*.avi
 flowScripts/*.pyc
 
