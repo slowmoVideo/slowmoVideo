@@ -63,7 +63,7 @@ for s in files :
             if not options.backwardOnly :
                 outFile = options.outDir + os.sep + nameForwardFlow(prev, s)
                 if not os.path.exists(outFile) or options.forceRebuild :
-                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, leftFile, rightFile, outFile)
+                    cmd = "%s %s %s 50 100 %s x" % (options.flowExecutable, leftFile, rightFile, outFile)
                     ret = os.system(cmd)
                     print("%s: Returned %s" % (outFile, ret))
                     if ret == 2 :
@@ -76,7 +76,7 @@ for s in files :
             if not options.forwardOnly :
                 outFile = options.outDir + os.sep + nameBackwardFlow(prev, s)
                 if (not os.path.exists(outFile)) or options.forceRebuild :
-                    cmd = "%s %s %s 10 100 %s x" % (options.flowExecutable, rightFile, leftFile, outFile)
+                    cmd = "%s %s %s 50 100 %s x" % (options.flowExecutable, rightFile, leftFile, outFile)
                     ret = os.system(cmd)
                     print("%s: Returned %s" % (outFile, ret))
                     if ret == 2 :

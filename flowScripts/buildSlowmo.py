@@ -5,7 +5,7 @@ from optparse import OptionParser
 
 from naming import *
 
-framerate = 10
+framerate = 30
 
 parser = OptionParser()
 parser.add_option("-i", "--input", dest="inDir", help="Input Directory containing the video's frames", metavar="DIR")
@@ -22,6 +22,8 @@ def handler(signum, frame) :
     exit(signum)
 signal.signal(signal.SIGINT, handler)
 
+if not os.path.exists(options.outDir) :
+    os.makedirs(options.outDir)
 
 frames = os.listdir(options.inDir)
 frames.sort()
