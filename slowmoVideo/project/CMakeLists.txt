@@ -1,6 +1,7 @@
 set(SRCS_PROJ
   flow_sV.cpp
   project_sV.cpp
+  tag_sV.cpp
   node_sV.cpp
   nodelist_sV.cpp
   renderTask_sV.cpp

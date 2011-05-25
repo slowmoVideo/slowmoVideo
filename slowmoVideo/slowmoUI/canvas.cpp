@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "ui_canvas.h"
 
 #include "mainwindow.h"
+#include "tagAddDialog.h"
 
 #include <cmath>
 
@@ -46,6 +47,7 @@ Canvas::Canvas(const Project_sV *project, QWidget *parent) :
     m_secResY(100),
     m_showHelp(false),
     m_nodes(project->nodes()),
+    m_tags(project->tags()),
     m_mode(ToolMode_Select)
 {
     ui->setupUi(this);
@@ -69,8 +71,10 @@ void Canvas::load(const Project_sV *project)
     m_project = project;
     qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
+    m_tags = project->tags();
     m_tmax.setY(project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen);
     qDebug() << "tMaxY set to " << m_tmax.y();
+    repaint();
 }
 
 void Canvas::toggleHelp()
@@ -169,6 +173,16 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
 
+    // Tags
+    for (int i = 0; i < m_tags->size(); i++) {
+        Tag_sV tag = m_tags->at(i);
+        QPoint p = convertTimeToCanvas(Node_sV(m_t0.x(), tag.time()));
+        if (insideCanvas(p)) {
+            davinci.drawLine(m_distLeft, p.y(), width()-m_distRight, p.y());
+            davinci.drawText(m_distLeft, p.y(), tag.description());
+        }
+    }
+
     // Nodes
     const Node_sV *prev = NULL;
     const Node_sV *curr = NULL;
@@ -223,32 +237,6 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
     m_states.initialModifiers = e->modifiers();
-
-
-
-    // OLD
-
-//    m_moveAborted = false;
-//    if (e->pos().x() >= m_distLeft && e->pos().y() < this->height()-m_distBottom) {
-//        // Try to select a node below the mouse. If there is none, add a point.
-//        bool selected = selectAt(e->pos(), e->modifiers() && Qt::ControlModifier);
-//        if (!selected) {
-//            if (m_mode == ToolMode_Select) {
-//                Node_sV p = convertCanvasToTime(e->pos());
-//                m_nodes->add(p);
-//            } else {
-//                qDebug() << "Not adding node. Mode is " << m_mode;
-//            }
-//        } else {
-//            qDebug() << "Node selected.";
-//        }
-//        repaint();
-
-//        qDebug() << "Node list: " << m_nodes;
-//    } else {
-//        qDebug() << "Not inside bounds.";
-//    }
-//    m_mouseStart = e->pos();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *e)
@@ -423,6 +411,22 @@ void Canvas::slotAbort(Canvas::Abort abort)
         break;
     }
 
+}
+
+void Canvas::slotAddTag()
+{
+    if (m_mouseWithinWidget) {
+        TagAddDialog dialog;
+        if (dialog.exec() == QDialog::Accepted) {
+            m_tags->push_back(Tag_sV(convertCanvasToTime(m_states.prevMousePos).y(), dialog.m_text));
+            qDebug() << "Tag added. Number is now: " << m_tags->size();
+            repaint();
+        } else {
+            qDebug() << "Tag dialog not accepted.";
+        }
+    } else {
+        qDebug() << "Mouse outside widget.";
+    }
 }
 
 void Canvas::slotDeleteNodes()

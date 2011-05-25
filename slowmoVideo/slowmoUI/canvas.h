@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../project/node_sV.h"
 #include "../project/nodelist_sV.h"
 #include "../project/project_sV.h"
+#include "../project/tag_sV.h"
 
 #include <QWidget>
 #include <QList>
@@ -57,6 +58,7 @@ public:
 
 public slots:
     void slotAbort(Canvas::Abort abort);
+    void slotAddTag();
     void slotDeleteNodes();
     void slotSetToolMode(Canvas::ToolMode mode);
 
@@ -87,6 +89,7 @@ private:
     bool m_showHelp;
 
     NodeList_sV *m_nodes;
+    QList<Tag_sV> *m_tags;
 
     ToolMode m_mode;
     struct {

@@ -26,6 +26,8 @@ extern "C" {
 #include "../lib/videoInfo_sV.h"
 }
 
+#include "tag_sV.h"
+
 class RenderTask_sV;
 class NodeList_sV;
 class QSignalMapper;
@@ -55,6 +57,7 @@ public:
     const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
+    QList<Tag_sV> *tags() const { return m_tags; }
     RenderTask_sV *renderTask() { return m_renderTask; }
     const FrameSize renderFrameSize() const { return m_renderFrameSize; }
     float fpsOut() const { return m_fps; }
@@ -142,6 +145,7 @@ private:
     VideoInfoSV *m_videoInfo;
     Flow_sV *m_flow;
     NodeList_sV *m_nodes;
+    QList<Tag_sV> *m_tags;
     RenderTask_sV *m_renderTask;
 
     QSignalMapper *m_signalMapper;

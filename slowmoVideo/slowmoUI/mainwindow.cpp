@@ -51,8 +51,8 @@ void MainWindow::fillCommandList()
     m_commands << "x-s:\tAbort selection";
     m_commands << "d-n:\tDelete selected nodes";
     m_commands << "t-s:\tSelect tool";
-    m_commands << "t-a:\tAdd tool";
     m_commands << "t-m:\tMove tool";
+    m_commands << "t-t:\tTag";
 }
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -85,9 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_keyList.insert(MainWindow::Delete, "d");
     m_keyList.insert(MainWindow::Delete_Node, "n");
     m_keyList.insert(MainWindow::Tool, "t");
-    m_keyList.insert(MainWindow::Tool_Add, "a");
     m_keyList.insert(MainWindow::Tool_Select, "s");
     m_keyList.insert(MainWindow::Tool_Move, "m");
+    m_keyList.insert(MainWindow::Tool_Tag, "t");
     fillCommandList();
 
     QList<QString> uniqueKeys;
@@ -119,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
+    b &= connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
 
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
@@ -194,44 +195,6 @@ void MainWindow::newProject()
             loadProject(newProject);
 
 
-            /*
-            ProgressDialogBuildFlow flowUI;
-            flowUI.setProgressRange(m_project->videoInfo().framesCount-1);
-            Flow_sV *flowO = m_project->flow();
-            b = true;
-            b &= connect(
-                        flowO, SIGNAL(signalFlowProgressUpdated(int)),
-                        &flowUI, SLOT(slotProgressUpdated(int))
-                    );
-            b &= connect(
-                        flowO, SIGNAL(signalFlowFinished()),
-                        &flowUI, SLOT(slotFlowFinished())
-                        );
-            b &= connect( // Notify the project if the flow images have been built
-                        flowO, SIGNAL(signalFlowFinished()),
-                        m_project, SLOT(slotFlowCompleted())
-                        );
-            b &= connect(
-                        flowO, SIGNAL(signalFlowFrame(QString)),
-                        &flowUI, SLOT(slotCurrentFile(QString))
-                        );
-            b &= connect(
-                        flowO, SIGNAL(signalFlowAborted()),
-                        &flowUI, SLOT(slotFlowAborted())
-                        );
-            b &= connect(
-                        &flowUI, SIGNAL(signalAbortPressed()),
-                        flowO, SLOT(slotAbort())
-                        );
-            Q_ASSERT(b);
-
-            QtConcurrent::run(flowO, &Flow_sV::buildFlow,
-                              m_project, &Project_sV::thumbFileStr, &Project_sV::flowFileStr,
-                              FlowDirection_Forward);
-            flowUI.exec();
-            */
-
-
         } else {
             qDebug() << "Project directories not writable.";
             delete newProject;
@@ -284,6 +247,9 @@ void MainWindow::shortcutUsed(QString which)
                 handled = true;
             } else if (which == m_keyList[MainWindow::Tool_Move]) {
                 emit setMode(Canvas::ToolMode_Move);
+                handled = true;
+            } else if (which == m_keyList[MainWindow::Tool_Tag]) {
+                emit addTag();
                 handled = true;
             }
         }

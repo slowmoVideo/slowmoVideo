@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define XMLPROJECTRW_SV_H
 
 #include "abstractProjectRW_sV.h"
+#include "tag_sV.h"
 
 #include <QtXml>
 
@@ -31,6 +32,7 @@ public:
 
 private:
     static const QDomElement nodeToDom(QDomDocument *doc, const Node_sV *node);
+    static const QDomElement tagToDom(QDomDocument *doc, const Tag_sV &tag);
 };
 
 #endif // XMLPROJECTRW_SV_H

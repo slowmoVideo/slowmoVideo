@@ -53,9 +53,9 @@ public:
         Delete,
         Delete_Node,
         Tool,
-        Tool_Add,
         Tool_Select,
         Tool_Move,
+        Tool_Tag,
         Help,
         New,
         Open,
@@ -102,6 +102,7 @@ signals:
     void deleteNodes();
     void setMode(const Canvas::ToolMode mode);
     void abort(const Canvas::Abort abort);
+    void addTag();
 
 };
 

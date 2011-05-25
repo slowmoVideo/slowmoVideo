@@ -78,6 +78,7 @@ void Project_sV::init()
 
     m_videoInfo = new VideoInfoSV();
     m_flow = new Flow_sV();
+    m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
     m_renderTask = new RenderTask_sV(this);
 
@@ -88,6 +89,8 @@ void Project_sV::init()
     b &= connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
     b &= connect(m_signalMapper, SIGNAL(mapped(int)), this, SLOT(slotExtractingFinished(int)));
     Q_ASSERT(b);
+
+    qDebug() << "Tag list address: " << m_tags;
 }
 
 Project_sV::~Project_sV()
@@ -95,6 +98,7 @@ Project_sV::~Project_sV()
     delete m_signalMapper;
     delete m_timer;
     delete m_flow;
+    delete m_tags;
     delete m_nodes;
     delete m_renderTask;
     delete m_videoInfo;

@@ -60,6 +60,13 @@ int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) co
         nodes.appendChild(nodeToDom(&doc, &nodeList->at(i)));
     }
 
+    // Tags
+    QDomElement tags = doc.createElement("tags");
+    root.appendChild(tags);
+    for (int i = 0; i < project->tags()->size(); i++) {
+        tags.appendChild(tagToDom(&doc, project->tags()->at(i)));
+    }
+
     qDebug() << doc.toString(2);
 
     QFile outFile(filename);
@@ -87,6 +94,18 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     x.appendChild(doc->createTextNode(QString("%1").arg(node->xUnmoved())));
     y.appendChild(doc->createTextNode(QString("%1").arg(node->yUnmoved())));
     selected.appendChild(doc->createTextNode(QString("%1").arg(node->selected())));
+    return el;
+}
+
+const QDomElement XmlProjectRW_sV::tagToDom(QDomDocument *doc, const Tag_sV &tag)
+{
+    QDomElement el = doc->createElement("tag");
+    QDomElement t = doc->createElement("time");
+    QDomElement desc = doc->createElement("description");
+    el.appendChild(t);
+    el.appendChild(desc);
+    t.appendChild(doc->createTextNode(QString("%1").arg(tag.time())));
+    desc.appendChild(doc->createTextNode(tag.description()));
     return el;
 }
 
@@ -145,6 +164,24 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                                     }
                                 }
                                 project->nodes()->add(node);
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    } else if (xml.name() == "tags") {
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "tag") {
+                                Tag_sV tag;
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "time") {
+                                        tag.setTime(QVariant(xml.readElementText()).toFloat());
+                                    } else if (xml.name() == "description") {
+                                        tag.setDescription(xml.readElementText());
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+                                project->tags()->push_back(tag);
                             } else {
                                 xml.skipCurrentElement();
                             }
