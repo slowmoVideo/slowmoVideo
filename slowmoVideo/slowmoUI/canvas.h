@@ -50,6 +50,7 @@ public:
     static QColor nodeCol;
     static QColor gridCol;
     static QColor selectedCol;
+    static QColor labelCol;
     static QColor backgroundCol;
 
     void load(const Project_sV *project);

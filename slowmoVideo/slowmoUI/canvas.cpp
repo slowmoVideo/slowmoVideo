@@ -30,6 +30,7 @@ QColor Canvas::selectedCol(255, 196, 0);
 QColor Canvas::lineCol(220, 220, 220);
 QColor Canvas::nodeCol(240, 240, 240);
 QColor Canvas::gridCol(100, 100, 100);
+QColor Canvas::labelCol(0, 77, 255);
 QColor Canvas::backgroundCol(30, 30, 40);
 
 Canvas::Canvas(const Project_sV *project, QWidget *parent) :
@@ -174,16 +175,18 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
 
     // Tags
+    davinci.setPen(labelCol);
     for (int i = 0; i < m_tags->size(); i++) {
         Tag_sV tag = m_tags->at(i);
         QPoint p = convertTimeToCanvas(Node_sV(m_t0.x(), tag.time()));
         if (insideCanvas(p)) {
             davinci.drawLine(m_distLeft, p.y(), width()-m_distRight, p.y());
-            davinci.drawText(m_distLeft, p.y(), tag.description());
+            davinci.drawText(m_distLeft+10, p.y()-1, tag.description());
         }
     }
 
     // Nodes
+    davinci.setPen(lineCol);
     const Node_sV *prev = NULL;
     const Node_sV *curr = NULL;
     for (int i = 0; i < m_nodes->size(); i++) {
@@ -336,9 +339,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
     // Mouse wheel movement in degrees
     int deg = e->delta()/8;
 
-    qDebug() << "Modifiers: " << e->modifiers();
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
-        qDebug() << "Ctrl";
         Node_sV n0 = convertCanvasToTime(e->pos());
 
         // Update the line resolution
@@ -354,7 +355,6 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_t0.y() < 0) { m_t0.setY(0); }
     } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
         //Vertical scrolling
-        qDebug() << "Shift";
         m_t0 += Node_sV(0, (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x());
         if (m_t0.y() < 0) { m_t0.setY(0); }
         if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }

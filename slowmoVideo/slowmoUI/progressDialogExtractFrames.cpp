@@ -36,7 +36,11 @@ void ProgressDialogExtractFrames::slotExtractionFinished(FrameSize frameSize)
     if (ui->progOrig->value() == 100 && ui->progThumbs->value() == 100) {
         ui->bOk->setEnabled(true);
     }
+    qDebug() << "Accepting ...";
     accept();
+    reject();
+    qDebug() << "Accepted.";
+    done(QDialog::Accepted);
 }
 
 void ProgressDialogExtractFrames::slotProgressUpdated(FrameSize frameSize, int value)
