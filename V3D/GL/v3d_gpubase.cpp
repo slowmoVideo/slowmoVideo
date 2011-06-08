@@ -815,7 +815,6 @@ namespace V3D_GPU
          sprintf_s(completeName2, "./%s", fileName);
 #else
          snprintf(completeName2, 1024, "./%s", fileName);
-         system("pwd");
 #endif
          is.open(completeName2);
       }

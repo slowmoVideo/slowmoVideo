@@ -1,0 +1,174 @@
+#if 0
+
+float evalObjective(float tau, float3 T1, float3 T2, float2 uv, float2 g, float lambda, float2 eps_primal)
+{
+   float res = 0.5f * tau * tau * dot(g, g);
+
+   float3 Ju = T2;
+   Ju.x += dot(T1.xy, uv);
+   Ju.y += dot(T1.yz, uv);
+   Ju.z += dot(T2.xy, uv);
+
+   float const uJu = max(0.0f, dot(float3(uv, 1), Ju));
+
+   float const res2 = (uJu <= eps_primal.x) ? (uJu * eps_primal.y / 2) : sqrt(uJu);
+
+   res += lambda * res2;
+   return res;
+}
+
+void main(uniform sampler2D uv_src     : TEXUNIT0, // u
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D tensor1_tex : TEXUNIT2, // (a11, a12, a22)
+          uniform sampler2D tensor2_tex : TEXUNIT3, // (a13, a23, a33)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float lambda_theta,
+          uniform float theta,
+          uniform float2 eps_primal, // (eps^2, 1/eps)
+              out float4 uv_out : COLOR0)
+{
+   float3 T1 = tex2D(tensor1_tex, st0).xyz;
+   float3 T2 = tex2D(tensor2_tex, st0).xyz;
+   T1 /= 255; T2 /= 255; // Normalize here to allow lower precision for the warped buffer
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float2 uv = tex2D(uv_src, st0).xy;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   float3 Ju = T2;
+   Ju.x += dot(T1.xy, uv);
+   Ju.y += dot(T1.yz, uv);
+   Ju.z += dot(T2.xy, uv);
+
+   float const uJu = max(0.0f, dot(float3(uv, 1), Ju));
+
+   float const denom = (uJu <= eps_primal.x) ? eps_primal.y : rsqrt(uJu);
+   //float const denom = rsqrt(uJu + eps_primal.x);
+
+   float2 const g = lambda_theta * Ju.xy * denom;
+
+# if 0
+   float4 const steps = float4(1.0f, 0.25f, 0.0625f, 0.015625f);
+   //float4 const steps = float4(1.0f, 0.5f, 0.25f, 0.0625f);
+
+   float2 UV = uv - steps.x * g;
+   float obj = evalObjective(steps.x, T1, T2, UV, g, lambda_theta, eps_primal);
+
+   float2 UV2 = uv - steps.y * g;
+   float obj2 = evalObjective(steps.y, T1, T2, UV2, g, lambda_theta, eps_primal);
+   UV = (obj2 < obj) ? UV2 : UV;
+   obj = min(obj, obj2);
+
+   UV2 = uv - steps.z * g;
+   obj2 = evalObjective(steps.z, T1, T2, UV2, g, lambda_theta, eps_primal);
+   UV = (obj2 < obj) ? UV2 : UV;
+   obj = min(obj, obj2);
+
+   UV2 = uv - steps.w * g;
+   obj2 = evalObjective(steps.w, T1, T2, UV2, g, lambda_theta, eps_primal);
+   UV = (obj2 < obj) ? UV2 : UV;
+# elif 0
+   float const L = lambda_theta * eps_primal.y * (dot(T1, T1) + T1.y*T1.y) + 1;
+   float const step = 0.99f / L;
+   float2 UV = uv - step * g;
+# else
+   float const L = lambda_theta * eps_primal.y * (dot(T1, T1) + T1.y*T1.y) + 1;
+   float2 const steps = float2(1.0f / L, 0.25f / L);
+
+   float2 UV = uv - steps.x * g;
+   float obj = evalObjective(steps.x, T1, T2, UV, g, lambda_theta, eps_primal);
+
+   float2 UV2 = uv - steps.y * g;
+   float obj2 = evalObjective(steps.y, T1, T2, UV2, g, lambda_theta, eps_primal);
+   UV = (obj2 < obj) ? UV2 : UV;
+# endif
+
+   uv_out.xy = UV - theta * div_p;
+   uv_out.z  = 0;
+}
+
+#else
+
+void main(uniform sampler2D uv_src     : TEXUNIT0, // u
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D tensor1_tex : TEXUNIT2, // (a11, a12, a22)
+          uniform sampler2D tensor2_tex : TEXUNIT3, // (a13, a23, a33)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float lambda_theta,
+          uniform float theta,
+          uniform float2 eps_primal, // (eps^2, 1/eps)
+              out float4 uv_out : COLOR0)
+{
+   float3 T1 = tex2D(tensor1_tex, st0).xyz;
+   float3 T2 = tex2D(tensor2_tex, st0).xyz;
+   T1 /= 255; T2 /= 255; // Normalize here to allow lower precision for the warped buffer
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float2 uv = tex2D(uv_src, st0).xy;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   // First try (I + lambda*theta/eps*A) U = u - lambda*theta/eps*b, i.e. assuming U^T J U < eps^2
+   float3 A = lambda_theta * eps_primal.y * T1;
+   A.xz += 1.0f;
+   float const detA = A.x*A.z - A.y*A.y;
+   float2 const rhs = uv - lambda_theta * eps_primal.y * T2.xy;
+   float2 UV = float2(A.z*rhs.x - A.y*rhs.y, -A.y*rhs.x + A.x*rhs.y) / detA;
+
+   float3 Ju = T2;
+   Ju.x += dot(T1.xy, UV);
+   Ju.y += dot(T1.yz, UV);
+   Ju.z += dot(T2.xy, UV);
+   float const uJu = max(0.0f, dot(float3(UV, 1), Ju));
+
+   // Alternatively, do a gradient descent step
+   float const denom = rsqrt(uJu + 1e-10f);
+   float2 const g = lambda_theta * Ju.xy * denom;
+   float const L = lambda_theta * eps_primal.y * (dot(T1, T1) + T1.y*T1.y) + 1;
+   float const step = 1.0f / L;
+   float2 UV2 = uv - step * g;
+
+   UV = (uJu <= eps_primal.x) ? UV : UV2;
+
+   uv_out.xy = UV - theta * div_p;
+   uv_out.z  = 0;
+}
+
+#endif

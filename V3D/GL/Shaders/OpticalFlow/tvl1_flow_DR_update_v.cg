@@ -1,0 +1,29 @@
+float thresholdingStep(float a2, float b, float lambda)
+{
+   float lam_a2 = lambda * a2;
+   return (b + lam_a2 < 0) ? lambda : ((b - lam_a2 > 0) ? -lambda : (-b/a2));
+}
+
+void main(uniform sampler2D u_src   : TEXUNIT0, // (u^x, u^y)
+          uniform sampler2D v_src   : TEXUNIT1,
+          uniform sampler2D warped_tex : TEXUNIT3, // (c, Ix, Iy)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float  lambda_theta,
+              out float2 v_out : COLOR0)
+{
+   float2 u = tex2D(u_src, st0).xy;
+   float2 v = tex2D(v_src, st0).xy;
+
+   float2 vv = 2*u - v;
+
+   float3 warped = tex2D(warped_tex, st0).xyz;
+   warped /= 255; // Normalize here to allow lower precision for the warped buffer
+   float r2 = dot(warped.yz, warped.yz);
+
+   // Compute new v^x, v^y
+   float c = dot(warped, float3(1, vv));
+   float step = thresholdingStep(r2, c, lambda_theta);
+   v_out.xy = v + vv + step*warped.yz - u;
+}

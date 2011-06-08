@@ -1,0 +1,38 @@
+float2 tv(float4 uv_grad)
+{
+   return float2(length(uv_grad.xz), length(uv_grad.yw));
+}
+
+void main(uniform sampler2D u_src    : TEXUNIT0, // (w^x, w^y)
+          uniform sampler2D p_uv_src : TEXUNIT2, // (p1_u, p1_v, p2_u, p2_v)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float timestep_over_theta,
+              out float4 p_uv_out : COLOR0)
+{
+   float2 u    = tex2D(u_src, st0).xy;
+   float4 u_ES = float4(0);
+
+   float2 stE = stEW.xy;
+   float2 stS = stSN.xy;
+
+   u_ES.xy = tex2D(u_src, stE).xy;
+   u_ES.zw = tex2D(u_src, stS).xy;
+
+   float4 p_uv = tex2D(p_uv_src, st0);
+
+   // The right clamping mode should handle the boundary conditions.
+   float4 u_grad = u_ES - u.xyxy;
+
+#if 1
+   float2 denom = 1 + timestep_over_theta * tv(u_grad);
+   p_uv = (p_uv - timestep_over_theta * u_grad) / denom.xyxy;
+#else
+   p_uv -= timestep_over_theta * u_grad;
+   float2 denom = max(float2(1.0f), tv(p_uv));
+   p_uv /= denom.xyxy;
+#endif
+
+   p_uv_out = p_uv;
+}

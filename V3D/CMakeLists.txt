@@ -53,35 +53,33 @@ set (CMAKE_BUILD_TYPE Debug)
 
 set (GL_SRC
     GL/v3d_gpubase.cpp
-    GL/v3d_gpupyramid.cpp
-    GL/v3d_gpuklt.cpp
-    GL/v3d_gpuundistort.cpp
     GL/v3d_gpuflow.cpp
+    GL/v3d_gpucolorflow.cpp
+    GL/v3d_gpupyramid.cpp
 )
 
 set (ALL_SRC
-  Base/v3d_image.cpp
-  ${GL_SRC}
+    ${GL_SRC}
+    Base/v3d_image.cpp
+    Base/v3d_imageprocessing.h
+    Base/v3d_exception.h
+    Base/v3d_timer.h
+    Base/v3d_serialization.h
+    Base/v3d_utilities.h
 )
 
 
 set (SHADERS
-    ./GL/Shaders/klt_detector_nonmax.cg
-    ./GL/Shaders/klt_detector_traverse_histpyr.cg
     ./GL/Shaders/pyramid_with_derivative_pass2.cg
-    ./GL/Shaders/klt_detector_pass1.cg
-    ./GL/Shaders/klt_detector_pass2.cg
-    ./GL/Shaders/klt_tracker_with_gain.cg
-    ./GL/Shaders/klt_detector_discriminator.cg
-    ./GL/Shaders/klt_detector_build_histpyr.cg
-    ./GL/Shaders/klt_tracker.cg
     ./GL/Shaders/pyramid_pass2.cg
-    ./GL/Shaders/undistort_parametric.cg
     ./GL/Shaders/pyramid_with_derivative_pass1v.cg
     ./GL/Shaders/pyramid_with_derivative_pass1h.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_p.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_compute_UV.cg
+    ./GL/Shaders/OpticalFlow/tvl1_color_flow_QR_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_new_update_p.cg
+    ./GL/Shaders/Shaders/OpticalFlow/tvl1_color_flow_QR_update_uv.cg
     ./GL/Shaders/pyramid_pass1v.cg
     ./GL/Shaders/pyramid_pass1h.cg
     ./GL/Shaders/flow_warp_image.cg

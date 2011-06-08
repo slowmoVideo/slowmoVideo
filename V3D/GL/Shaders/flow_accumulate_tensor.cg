@@ -1,0 +1,107 @@
+// T1 holds the elements 11..22, T3 holds the last column
+void createTensor(float3 v, out float3 T1, out float3 T2)
+{
+   // Note: v = (It, Ix, Iy) originally
+   // Partially normalize here, since the elements are products
+   v = v.yzx;
+   T1 = float3(v.x*v.x, v.x*v.y, v.y*v.y);
+   T2 = v.z * v;
+
+   T1 /= 255.0f; T2 /= 255.0f;
+}
+
+void accumTensor(float w, float3 v, inout float3 T1, inout float3 T2)
+{
+   v = v.yzx;
+   T1 += w * float3(v.x*v.x, v.x*v.y, v.y*v.y) / 255.0f;
+   T2 += w * v.z * v / 255.0f;
+}
+
+void main(uniform sampler2D warped_tex : TEXUNIT0, // (It, Ix, Iy)
+          float2 st0  : TEXCOORD0,
+          float4 stEW : TEXCOORD1,
+          float4 stSN : TEXCOORD2,
+          out float3 tensor1_out : COLOR0,
+          out float3 tensor2_out : COLOR1)
+{
+   float3 res1 = float3(0.0f);
+   float3 res2 = float3(0.0f);
+
+#if 0
+   accumTensor(4, tex2D(warped_tex, st0),     res1, res2);
+   accumTensor(2, tex2D(warped_tex, stEW.xy), res1, res2);
+   accumTensor(2, tex2D(warped_tex, stEW.zw), res1, res2);
+   accumTensor(2, tex2D(warped_tex, stSN.xy), res1, res2);
+   accumTensor(2, tex2D(warped_tex, stSN.zw), res1, res2);
+
+   accumTensor(1, tex2D(warped_tex, float2(stEW.x, stSN.y)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.x, stSN.w)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.z, stSN.y)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.z, stSN.w)), res1, res2);
+
+   res1 /= 16.0f;
+   res2 /= 16.0f;
+#elif 0
+   accumTensor(1, tex2D(warped_tex, st0),     res1, res2);
+   accumTensor(1, tex2D(warped_tex, stEW.xy), res1, res2);
+   accumTensor(1, tex2D(warped_tex, stEW.zw), res1, res2);
+   accumTensor(1, tex2D(warped_tex, stSN.xy), res1, res2);
+   accumTensor(1, tex2D(warped_tex, stSN.zw), res1, res2);
+
+   accumTensor(1, tex2D(warped_tex, float2(stEW.x, stSN.y)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.x, stSN.w)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.z, stSN.y)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(stEW.z, stSN.w)), res1, res2);
+
+   res1 /= 9.0f;
+   res2 /= 9.0f;
+#elif 0
+   float const ds = stEW.x - st0.x;
+   float const dt = stSN.y - st0.y;
+
+   accumTensor(36, tex2D(warped_tex, st0),     res1, res2);
+   accumTensor(24, tex2D(warped_tex, stEW.xy), res1, res2);
+   accumTensor(24, tex2D(warped_tex, stEW.zw), res1, res2);
+   accumTensor(24, tex2D(warped_tex, stSN.xy), res1, res2);
+   accumTensor(24, tex2D(warped_tex, stSN.zw), res1, res2);
+
+   accumTensor(16, tex2D(warped_tex, float2(stEW.x, stSN.y)), res1, res2);
+   accumTensor(16, tex2D(warped_tex, float2(stEW.x, stSN.w)), res1, res2);
+   accumTensor(16, tex2D(warped_tex, float2(stEW.z, stSN.y)), res1, res2);
+   accumTensor(16, tex2D(warped_tex, float2(stEW.z, stSN.w)), res1, res2);
+
+   accumTensor(6, tex2D(warped_tex, float2(st0.x + 2*ds, st0.y)), res1, res2);
+   accumTensor(6, tex2D(warped_tex, float2(st0.x - 2*ds, st0.y)), res1, res2);
+   accumTensor(6, tex2D(warped_tex, float2(st0.x, st0.y + 2*dt)), res1, res2);
+   accumTensor(6, tex2D(warped_tex, float2(st0.x, st0.y - 2*dt)), res1, res2);
+
+   accumTensor(4, tex2D(warped_tex, float2(st0.x - ds, st0.y - 2*dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x + ds, st0.y - 2*dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x - ds, st0.y + 2*dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x + ds, st0.y + 2*dt)), res1, res2);
+
+   accumTensor(4, tex2D(warped_tex, float2(st0.x - 2*ds, st0.y - dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x + 2*ds, st0.y - dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x - 2*ds, st0.y + dt)), res1, res2);
+   accumTensor(4, tex2D(warped_tex, float2(st0.x + 2*ds, st0.y + dt)), res1, res2);
+
+   accumTensor(1, tex2D(warped_tex, float2(st0.x - ds, st0.y - dt)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(st0.x + ds, st0.y - dt)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(st0.x - ds, st0.y + dt)), res1, res2);
+   accumTensor(1, tex2D(warped_tex, float2(st0.x + ds, st0.y + dt)), res1, res2);
+
+   res1 /= 256.0f;
+   res2 /= 256.0f;
+#else
+   createTensor(tex2D(warped_tex, st0), res1, res2);
+#endif
+
+#if 0
+   float const eps = 0.0001f;
+   res1.xz += eps; // Make the tensor pos. def.
+   res2.z  += eps;
+#endif
+
+   tensor1_out = res1;
+   tensor2_out = res2;
+}

@@ -1,0 +1,65 @@
+//#define ENABLE_Q_SCALING 1
+
+void main(uniform sampler2D uv_src       : TEXUNIT0, // (u, v)
+          uniform sampler2D p_uv_src     : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D q_src        : TEXUNIT2,
+          uniform sampler2D warped_R_tex : TEXUNIT3, // (c, Ix, Iy)
+          uniform sampler2D warped_G_tex : TEXUNIT4, // (c, Ix, Iy)
+          uniform sampler2D warped_B_tex : TEXUNIT5, // (c, Ix, Iy)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float timestep,
+              out float2 uv_out : COLOR0)
+{
+   //float const normalizer = 0.01;
+   float const normalizer = 0.25;
+   //float const normalizer = 1;
+
+#if defined(ENABLE_Q_SCALING)
+   float3 warped_R = tex2D(warped_R_tex, st0).yzw;
+   float3 warped_G = tex2D(warped_G_tex, st0).yzw;
+   float3 warped_B = tex2D(warped_B_tex, st0).yzw;
+#else
+   float2 warped_R = tex2D(warped_R_tex, st0).yz;
+   float2 warped_G = tex2D(warped_G_tex, st0).yz;
+   float2 warped_B = tex2D(warped_B_tex, st0).yz;
+
+   // Normalize here to allow lower precision for the warped buffer
+   warped_R /= 255;
+   warped_G /= 255;
+   warped_B /= 255;
+   warped_R /= normalizer;
+   warped_G /= normalizer;
+   warped_B /= normalizer;
+#endif
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float2 uv = tex2D(uv_src, st0).xy;
+   float3 q  = tex2D(q_src, st0).xyz;
+
+   float4 p_uv    = tex2D(p_uv_src, st0);
+   float2 p1_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p2_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p1_W_uv = isLeftBorder   ? float2(0) : p1_W_uv;
+   p2_N_uv = isTopBorder    ? float2(0) : p2_N_uv;
+   p_uv.xy = isRightBorder  ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p1_W_uv + p_uv.zw - p2_N_uv;
+
+#if defined(ENABLE_Q_SCALING)
+   q *= float3(warped_R.z, warped_G.z, warped_B.z);
+#endif
+
+   // new u and v
+   uv_out = uv + timestep * (warped_R.xy*q.x + warped_G.xy*q.y + warped_B.xy*q.z - div_p);
+}

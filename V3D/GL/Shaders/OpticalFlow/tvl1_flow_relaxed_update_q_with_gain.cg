@@ -1,0 +1,35 @@
+void main(uniform sampler2D uv_src : TEXUNIT0, // (u, v, gain)
+          uniform sampler2D q_src  : TEXUNIT1, // (q1, q2)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float timestep_over_theta_delta,
+              out float3 q_out : COLOR0)
+{
+   float alpha = tex2D(uv_src, st0).z;
+
+#if 0
+   float2 alpha_ES = float2(0);
+
+   float2 stE = stEW.xy;
+   float2 stS = stSN.xy;
+
+   alpha_ES.x = tex2D(uv_src, stE).z;
+   alpha_ES.y = tex2D(uv_src, stS).z;
+
+   // The right clamping mode should handle the boundary conditions.
+   float2 alpha_grad = alpha_ES - alpha.xx;
+
+   float2 q = tex2D(q_src, st0).xy;
+   q += timestep_over_theta_delta * alpha_grad;
+
+   float denom = max(1.0, length(q));
+   q_out.xy = q / denom;
+   q_out.z  = 0;
+#else
+   float q = tex2D(q_src, st0).x;
+   q -= timestep_over_theta_delta * alpha;
+   q_out.x = clamp(q, -1.0, 1.0);
+   q_out.yz = 0;
+#endif
+}

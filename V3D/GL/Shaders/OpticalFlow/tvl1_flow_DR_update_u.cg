@@ -1,0 +1,31 @@
+void main(uniform sampler2D v_src    : TEXUNIT1, // (v^x, v^y)
+          uniform sampler2D p_uv_src : TEXUNIT2, // (p1_u, p1_v, p2_u, p2_v)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float  theta,
+              out float2 u_out : COLOR0)
+{
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float2 v = tex2D(v_src, st0).xy;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   u_out.xy = v - theta*div_p;
+}

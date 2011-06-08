@@ -1,0 +1,23 @@
+void main(uniform sampler2D u_tex   : TEXUNIT0, // (u^x, u^y, div_(b - p) + v - d)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+              out float4 u_out : COLOR0)
+{
+   float4 u_WN = float4(0);
+   u_WN.xy = tex2D(u_tex, stEW.zw).xy;
+   u_WN.zw = tex2D(u_tex, stSN.zw).xy;
+
+   float4 u_ES = float4(0);
+   u_ES.xy = tex2D(u_tex, stEW.xy).xy;
+   u_ES.zw = tex2D(u_tex, stSN.xy).xy;
+
+   float4 const u = tex2D(u_tex, st0);
+   float2 div_p = u.zw;
+
+   float2 num   = u_WN.xy + u_WN.zw + u_ES.xy + u_ES.zw;
+   float2 u_new = (num + div_p) / 5.0f;
+
+   u_out.xy = u_new;
+   u_out.zw = div_p;
+}

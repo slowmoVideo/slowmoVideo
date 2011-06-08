@@ -1,0 +1,62 @@
+//#define ENABLE_Q_SCALING 1
+
+void main(uniform sampler2D uv_src       : TEXUNIT0, // (u, v)
+          uniform sampler2D q_src        : TEXUNIT2,
+          uniform sampler2D warped_R_tex : TEXUNIT3, // (c, Ix, Iy)
+          uniform sampler2D warped_G_tex : TEXUNIT4, // (c, Ix, Iy)
+          uniform sampler2D warped_B_tex : TEXUNIT4, // (c, Ix, Iy)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float timestep,
+          uniform float lambda_q,
+              out float3 q_out : COLOR0)
+{
+   //float const normalizer = 0.01;
+   float const normalizer = 0.25;
+   //float const normalizer = 1;
+
+#if defined(ENABLE_Q_SCALING)
+   float4 warped_R = tex2D(warped_R_tex, st0).xyzw;
+   float4 warped_G = tex2D(warped_G_tex, st0).xyzw;
+   float4 warped_B = tex2D(warped_B_tex, st0).xyzw;
+#else
+   float3 warped_R = tex2D(warped_R_tex, st0).xyz;
+   float3 warped_G = tex2D(warped_G_tex, st0).xyz;
+   float3 warped_B = tex2D(warped_B_tex, st0).xyz;
+
+   // Normalize here to allow lower precision for the warped buffer
+   warped_R /= 255;
+   warped_G /= 255;
+   warped_B /= 255;
+   warped_R /= normalizer;
+   warped_G /= normalizer;
+   warped_B /= normalizer;
+#endif
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   float2 uv = tex2D(uv_src, st0).xy;
+   float3 q = tex2D(q_src, st0).xyz;
+
+   float3 b = float3(0);
+   b.x = -(warped_R.x + dot(warped_R.yz, uv));
+   b.y = -(warped_G.x + dot(warped_G.yz, uv));
+   b.z = -(warped_B.x + dot(warped_B.yz, uv));
+
+   q += timestep * b;
+
+#if defined(ENABLE_Q_SCALING)
+   q /= float3(warped_R.w, warped_G.w, warped_B.w);
+   float const denom = max(1.0f, length(q) / (lambda_q*normalizer));
+   q_out = q / denom;
+#else
+# if 1
+   float const denom = max(1.0f, length(q) / (lambda_q*normalizer));
+   q_out = q / denom;
+# else
+   q_out = clamp(q, -lambda_q*normalizer, lambda_q*normalizer);
+# endif
+#endif
+}

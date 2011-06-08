@@ -1,0 +1,47 @@
+void main(uniform sampler2D uv_src     : TEXUNIT0, // u
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D q_src      : TEXUNIT2,
+          uniform sampler2D tensor1_tex : TEXUNIT3, // (a11, a12, a22)
+          //uniform sampler2D tensor2_tex : TEXUNIT4, // (a13, a23, a33) -- not needed
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float lambda,
+          uniform float tau_primal,
+          //uniform float2 eps_primal, // (eps^2, 1/eps)
+              out float4 uv_out : COLOR0)
+{
+   float3 T1 = tex2D(tensor1_tex, st0).xyz;
+   //float3 T2 = tex2D(tensor2_tex, st0).xyz;
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float4 uv = tex2D(uv_src, st0);
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   float3 q = tex2D(q_src, st0);
+
+   float2 duv = div_p;
+
+   duv.x += lambda * T1.x * q.x;
+   duv.y += lambda * dot(T1.yz, q.xy);
+
+   uv_out.zw = uv.zw - tau_primal*duv;
+   uv_out.xy = 2*uv_out.zw - uv.zw;
+}

@@ -1,0 +1,44 @@
+void main(uniform sampler2D u_tex   : TEXUNIT0, // (u^x, u^y)
+          uniform sampler2D vd_tex  : TEXUNIT1, // (v^x, v^y, d^x, d^y)
+          uniform sampler2D p_tex : TEXUNIT2,
+          uniform sampler2D b_tex : TEXUNIT3,
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+              out float4 u_out : COLOR0)
+{
+   float4 const vd = tex2D(vd_tex, st0);
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float4 u_WN = float4(0);
+   u_WN.xy = tex2D(u_tex, stEW.zw).xy;
+   u_WN.zw = tex2D(u_tex, stSN.zw).xy;
+
+   float4 u_ES = float4(0);
+   u_ES.xy = tex2D(u_tex, stEW.xy).xy;
+   u_ES.zw = tex2D(u_tex, stSN.xy).xy;
+
+   float4 p   = -tex2D(p_tex, st0)    + tex2D(b_tex, st0);
+   float2 p_W = -tex2D(p_tex, stW).xy + tex2D(b_tex, stW).xy;
+   float2 p_N = -tex2D(p_tex, stN).zw + tex2D(b_tex, stN).zw;
+
+   p_W = isLeftBorder ? float2(0) : p_W;
+   p_N = isTopBorder ? float2(0) : p_N;
+   p.xy = isRightBorder ? float2(0) : p.xy;
+   p.zw = isBottomBorder ? float2(0) : p.zw;
+
+   float2 div_p = p.xy - p_W + p.zw - p_N;
+
+   float2 num = u_WN.xy + u_WN.zw + u_ES.xy + u_ES.zw;
+   float2 u_new = (num + div_p + vd.xy - vd.zw) / 5.0f;
+
+   u_out.xy = u_new;
+   u_out.zw = div_p + vd.xy - vd.zw;
+}

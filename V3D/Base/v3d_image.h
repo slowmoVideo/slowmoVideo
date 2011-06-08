@@ -2,13 +2,18 @@
 #ifndef V3D_IMAGE_H
 #define V3D_IMAGE_H
 
-#include <Base/v3d_exception.h>
-
+#include <assert.h>
 #include <math.h>
 #include <algorithm>
 #include <string>
+#include <Base/v3d_exception.h>
 #include <fstream>
 #include <vector>
+#include <stack>
+#include <Math/v3d_linear.h>
+#ifdef V3DLIB_ENABLE_IMDEBUG
+#  include <imdebug.h>
+#endif
 
 namespace V3D
 {
@@ -254,6 +259,16 @@ namespace V3D
 
       saveImageChannel(im, channel, minVal, maxVal, name);
    } // end saveImageChannel()
+
+   template <typename Elem>
+   inline void
+   copyImageChannel(Image<Elem> const& im, int channel, Image<Elem> &out)
+   {
+       out.resize(im.width(),im.height(),1);
+       for(int y=0; y<im.height(); y++)
+           for(int x=0; x<im.width(); x++)
+               out(x,y) = im(x,y,channel);
+   }
 
 } // end namespace V3D
 

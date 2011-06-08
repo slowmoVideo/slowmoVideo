@@ -120,7 +120,7 @@ namespace
    int scrwidth = 0, scrheight = 0;
 
    Image<unsigned char> leftImage, rightImage;
-   const char *outImage;
+   const char *outputFile;
 
    int const nTimingIterations = 1;
    float lambda = 1.0f;
@@ -227,19 +227,7 @@ namespace
       displayResidual(flowEstimator->getWarpedBuffer(startLevel)->textureID(), 1.0f/32);
 
       glViewport(scrwidth/2, 0, scrwidth/2, scrheight);
-      // scale = 0.4 for Ettlinger tor
-      //float const scale = 0.4f;
-      //float const scale = 0.25f;
-      //float const scale = 0.15f;
-      //float const scale = 0.21414f; // Dimetrodon
-      //float const scale = 0.1f; // Walking
-      //float const scale = 0.2f; // Pentagon
-      //displayMotionAsColor(flowEstimator->getFlowFieldTextureID(), scale * (1 << startLevel), false);
       displayMotionAsColorLight2(flowEstimator->getFlowFieldTextureID(), true);
-
-      //displayTexture(flowEstimator->getFlowFieldTextureID(), 0.01f);
-      //displayTexture(flowEstimator->getWarpedBuffer(0)->textureID(), 0.25f);
-      //displayResidual(flowEstimator->getWarpedBuffer(startLevel)->textureID(), 8.0f);
 
       {
           int left = scrwidth/2;
@@ -253,7 +241,7 @@ namespace
 
          flipImageUpsideDown(flowIm);
 
-         saveImageFile(flowIm, outImage);
+         saveImageFile(flowIm, outputFile);
 
          if (exitOnFileWritten) {
              cout << "File written, terminating." << endl;
@@ -298,12 +286,12 @@ main( int argc, char** argv)
     lambda = atof(argv[3]);
 
     if (argc >= 6) {
-        outImage = argv[5];
+        outputFile = argv[5];
         if (argc >= 7) {
             exitOnFileWritten = true;
         }
     } else {
-        outImage = "flow_tvl1_GL.png";
+        outputFile = "flow_tvl1_GL.png";
     }
 
    unsigned int win;

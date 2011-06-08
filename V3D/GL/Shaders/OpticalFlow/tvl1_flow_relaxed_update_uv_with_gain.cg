@@ -1,0 +1,78 @@
+float3 thresholdingStep(float3 a, float3 c, float b)
+{
+   float const d = dot(a*a, c);
+   //float const d = dot(a, a*c);
+   float const a2 = dot(a, a);
+
+   return (b + d < 0) ? (a*c) : ((b - d > 0) ? (-a*c) : (-b*a/a2));
+}
+
+void main(uniform sampler2D uv_src     : TEXUNIT0, // (u, v, alpha)
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D q_src      : TEXUNIT2, // (q1, q2)
+          uniform sampler2D warped_tex : TEXUNIT3, // (It, Ix, Iy)
+          uniform sampler2D norm_grad_tex : TEXUNIT4, // (-I0, |grad I0|, |grad I1|)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float lambda,
+          uniform float2 theta, // (theta, 1/theta)
+          uniform float gamma,
+          uniform float theta_delta,
+              out float3 uv_out : COLOR0)
+{
+   float4 warped;
+   warped.xyz = tex2D(warped_tex, st0).xyz;
+   float3 warped2 = tex2D(norm_grad_tex, st0);
+   warped /= 255; // Normalize here to allow lower precision for the warped buffer
+   warped2 /= 255;
+   warped.w = warped2.x;
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float3 uv = tex2D(uv_src, st0).xyz;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p_W_uv = isLeftBorder ? float2(0) : p_W_uv;
+   p_N_uv = isTopBorder ? float2(0) : p_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p_W_uv + p_uv.zw - p_N_uv;
+
+   float2 q   = tex2D(q_src, st0).xy;
+#if 0
+   float  q_W = tex2D(q_src, stW).x;
+   float  q_N = tex2D(q_src, stN).y;
+
+   q_W = isLeftBorder ? 0 : q_W;
+   q_N = isTopBorder ? 0 : q_N;
+   q.x = isRightBorder ? 0 : q.x;
+   q.y = isBottomBorder ? 0 : q.y;
+
+   float const div_q = q.x - q_W + q.y - q_N;
+#else
+   float const div_q = q.x;
+#endif
+
+   float const c_gain = 1.0f / (theta.y + gamma*warped2.y);
+   float const gain_est = (theta.y*uv.z + gamma*(warped2.z - warped2.y)) * c_gain;
+   uv.z = gain_est;
+
+   // new u and v
+   float  const b = dot(warped, float4(1, uv));
+   float3 const step = thresholdingStep(lambda*warped.yzw, float3(theta.xx, c_gain), lambda*b);
+
+   float3 UV = uv + step;
+   uv_out.xy = UV.xy + theta.x * div_p;
+   uv_out.z  = UV.z  + theta_delta * div_q;
+}

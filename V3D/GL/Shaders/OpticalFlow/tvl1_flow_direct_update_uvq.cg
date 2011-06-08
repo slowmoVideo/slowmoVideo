@@ -1,0 +1,57 @@
+void main(uniform sampler2D uvq_src    : TEXUNIT0, // (u, v)
+          uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+          uniform sampler2D warped_tex : TEXUNIT2, // (c, Ix, Iy)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float2 timesteps,
+          uniform float lambda_q,
+          uniform float beta,
+              out float3 uvq_out : COLOR0)
+{
+   //float const normalizer = 0.01;
+   float const normalizer = 0.25;
+
+   float3 warped = tex2D(warped_tex, st0).xyz;
+   warped /= 255; // Normalize here to allow lower precision for the warped buffer
+   warped /= normalizer;
+
+   float2 stW = stEW.zw;
+   float2 stN = stSN.zw;
+
+   bool const isLeftBorder   = (stW.x < 0);
+   bool const isRightBorder  = (stEW.x > 1);
+   bool const isTopBorder    = (stN.y < 0);
+   bool const isBottomBorder = (stSN.y > 1);
+
+   float3 uvq = tex2D(uvq_src, st0).xyz;
+
+   float4 p_uv   = tex2D(p_uv_src, st0);
+   float2 p1_W_uv = tex2D(p_uv_src, stW).xy;
+   float2 p2_N_uv = tex2D(p_uv_src, stN).zw;
+
+   p1_W_uv = isLeftBorder ? float2(0) : p1_W_uv;
+   p2_N_uv = isTopBorder ? float2(0) : p2_N_uv;
+   p_uv.xy = isRightBorder ? float2(0) : p_uv.xy;
+   p_uv.zw = isBottomBorder ? float2(0) : p_uv.zw;
+
+   float2 div_p = p_uv.xy - p1_W_uv + p_uv.zw - p2_N_uv;
+
+   // new u and v
+   uvq.xy += timesteps.x * (warped.yz*uvq.z - div_p);
+
+   // new q (eta in the paper)
+   //float b = -dot(warped, float3(1, uvq.xy));
+   float b = -(warped.x + dot(warped.yz, uvq.xy));
+#if 1
+   float const eta = uvq.z;
+   //uvq.z = eta + timestep.y * b + beta * dot(warped.yz, div_p.xy - warped.yz*eta)/length(warped.yz);
+   uvq.z = eta + timesteps.y * b;
+   uvq.z = clamp(uvq.z, -lambda_q*normalizer, lambda_q*normalizer);
+#else
+   float denom = 1 + abs(timesteps.y * b);
+   uvq.z = (uvq.z + timesteps.y * b) / denom;
+#endif
+
+   uvq_out = uvq;
+}

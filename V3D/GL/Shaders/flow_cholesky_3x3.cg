@@ -1,0 +1,25 @@
+float const eps = 1e-10f;
+
+float square_root(float x)
+{
+   return sqrt(max(eps, x));
+}
+
+void main(uniform sampler2D tensor1_tex : TEXUNIT0, // (a11, a12, a22)
+          uniform sampler2D tensor2_tex : TEXUNIT1, // (a13, a23, a33)
+          float2 st0  : TEXCOORD0,
+          out float3 R1_out : COLOR0, // (r11, r12, r22)
+          out float3 R2_out : COLOR1) // (r13, r23, r33)
+{
+   float3 t1 = tex2D(tensor1_tex, st0);
+   float3 t2 = tex2D(tensor2_tex, st0);
+
+   t1 /= 255.0f; t2 /= 255.0f;
+
+   R1_out.x = square_root(t1.x);                      // r11 = sqrt(a11)
+   R1_out.y = t1.y / R1_out.x;                        // r12 = a12 / r11
+   R1_out.z = square_root(t1.z - R1_out.y*R1_out.y);  // r22 = sqrt(a22 - r12^2)
+   R2_out.x = t2.x / R1_out.x;                        // r13 = a13 / r11
+   R2_out.y = (t2.y - R1_out.y*R2_out.x) / R1_out.z;  // r23 = (a23 - r12*r13)/r22
+   R2_out.z = square_root(t2.z - dot(R2_out.xy, R2_out.xy)); // r33 = sqrt(a33 - r13^2 - r23^2)
+}

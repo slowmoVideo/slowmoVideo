@@ -1,0 +1,19 @@
+void main(uniform sampler2D u_src   : TEXUNIT0, // (u, v)
+          uniform sampler2D p_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float  rcpMu,
+              out float4 delta_b_out : COLOR0) // (b1_u, b1_v, b2_u, b2_v)
+{
+   float2 u    = tex2D(u_src, st0).xy;
+   float4 u_ES = float4(0);
+   u_ES.xy = tex2D(u_src, stEW.xy).xy;
+   u_ES.zw = tex2D(u_src, stSN.xy).xy;
+   // The right clamping mode should handle the boundary conditions.
+   float4 u_grad = u_ES - u.xyxy;
+
+   float4 p = tex2D(p_src, st0);
+
+   delta_b_out = u_grad - p;
+}

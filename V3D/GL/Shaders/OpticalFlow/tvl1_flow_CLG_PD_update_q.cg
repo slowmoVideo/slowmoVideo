@@ -1,0 +1,29 @@
+void main(uniform sampler2D uv_src      : TEXUNIT0, // u
+          uniform sampler2D q_src       : TEXUNIT2,
+          uniform sampler2D tensor1_tex : TEXUNIT3, // (a11, a12, a22)
+          uniform sampler2D tensor2_tex : TEXUNIT4, // (a13, a23, a33)
+                  float2 st0  : TEXCOORD0,
+                  float4 stEW : TEXCOORD1,
+                  float4 stSN : TEXCOORD2,
+          uniform float tau_dual,
+          uniform float eps_data,
+          uniform float2 lambda, // (lambda, 1/lambda)
+              out float3 q_out : COLOR0)
+{
+   float3 T1 = tex2D(tensor1_tex, st0).xyz;
+   float3 T2 = tex2D(tensor2_tex, st0).xyz;
+
+   float2 uv = tex2D(uv_src, st0).xy;
+
+   float3 q = tex2D(q_src, st0);
+
+   float3 dq;
+   dq.x = dot(uv, T1.xy) + T2.x;
+   dq.y = T1.z*uv.y + T2.y;
+   dq.z = T2.z;
+
+   q = q + tau_dual * (lambda.x * dq - eps_data * q);
+
+   float const denom = max(1.0f, lambda.y * length(q));
+   q_out = q / denom;
+}
