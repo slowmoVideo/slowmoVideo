@@ -23,6 +23,8 @@ with GPU-KLT+FLOW. If not, see <http://www.gnu.org/licenses/>.
 #include "GL/v3d_gpuflow.h"
 #include "GL/v3d_gpupyramid.h"
 
+#include "flowRW.h"
+
 #include <iostream>
 
 #include <GL/glew.h>
@@ -200,6 +202,16 @@ namespace
       warpImageWithFlowField(flowEstimator->getFlowFieldTextureID(),
                              leftPyr.textureID(), rightPyr.textureID(), startLevel,
                              *flowEstimator->getWarpedBuffer(startLevel));
+
+      {
+          float *data = new float[3*leftImage.width()*leftImage.height()];
+          glActiveTexture(GL_TEXTURE0);
+          glBindTexture(GL_TEXTURE_2D, flowEstimator->getFlowFieldTextureID());
+
+          glReadPixels(0, 0, leftImage.width(), leftImage.height(), GL_RGB, GL_FLOAT, data);
+          FlowRW_sV::save("/tmp/flowData.dat", leftImage.width(), leftImage.height(), data);
+          cout << "Flow data written" << endl;
+      }
 
       FrameBufferObject::disableFBORendering();
       glViewport(0, 0, scrwidth/2, scrheight);

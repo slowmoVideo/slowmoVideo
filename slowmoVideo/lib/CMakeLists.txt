@@ -18,6 +18,14 @@ set(LIB_SRC_VI
   videoInfo_sV.c
 )
 
+set(LIB_SRC_ARGS
+  trivialArgsReader_sV.cpp
+)
+
+set(LIB_SRC_FLOWRW
+  flowRW_sV.cpp
+)
+
 
 
 add_library(sV STATIC ${LIB_SRC})
@@ -25,3 +33,5 @@ target_link_libraries(sV ${QT_LIBRARIES})
 
 add_library(sVinfo STATIC ${LIB_SRC_VI})
 target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})
+
+add_library(sVflowRW STATIC ${LIB_SRC_FLOWRW})

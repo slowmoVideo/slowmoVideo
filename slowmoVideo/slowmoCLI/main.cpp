@@ -33,7 +33,7 @@ char *myName;
 enum FlowMode {
     FlowMode_Forward,
     FlowMode_Twoway,
-    FlowMode_Undef,
+    FlowMode_Undef
 };
 
 

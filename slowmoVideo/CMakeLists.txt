@@ -43,6 +43,7 @@ add_subdirectory(lib)
 add_subdirectory(project)
 add_subdirectory(slowmoCLI)
 add_subdirectory(slowmoUI)
+add_subdirectory(visualizeFlow)
 add_subdirectory(test)
 
 
