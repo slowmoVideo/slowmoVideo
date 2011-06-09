@@ -10,7 +10,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 class QImage;
+class FlowField_sV;
 
+/**
+  Provides interpolation methods between frames
+  */
 class Interpolate_sV {
 
  public:
@@ -18,9 +22,8 @@ class Interpolate_sV {
     struct Movement {
 	float moveX;
 	float moveY;
-	float mult;
     };
 
-    static void forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output);
-    static void twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage& output);
+    static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
+    static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
 };

@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "interpolate_sV.h"
+#include "flowField_sV.h"
 
 #include <cmath>
 
@@ -77,7 +78,7 @@ QColor interpolate(const QImage& in, float x, float y)
 #endif
 
 
-void Interpolate_sV::twowayFlow(const QImage& left, const QImage& right, const QImage& flowForward, const QImage& flowBackward, float pos, QImage& output)
+void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage &output)
 {
 #ifdef INTERPOLATE
     const int Wmax = left.width()-1;
@@ -85,21 +86,17 @@ void Interpolate_sV::twowayFlow(const QImage& left, const QImage& right, const Q
     float posX, posY;
 #endif
 
-    QColor colFlow, colOut, colLeft, colRight;
+    QColor colOut, colLeft, colRight;
     float r,g,b;
     Interpolate_sV::Movement forward, backward;
 
-    for (int x = 0; x < left.width(); x++) {
-	for (int y = 0; y < left.height(); y++) {
-	    colFlow = QColor(flowForward.pixel(x,y));
-	    forward.mult = colFlow.blue();
-	    forward.moveX = 2 * forward.mult * (colFlow.redF() - .5);
-	    forward.moveY = 2 * forward.mult * (colFlow.greenF() - .5);
+    for (int y = 0; y < left.height(); y++) {
+        for (int x = 0; x < left.width(); x++) {
+            forward.moveX = flowForward->x(x, y);
+            forward.moveY = flowForward->y(x, y);
 
-	    colFlow = QColor(flowBackward.pixel(x,y));
-	    backward.mult = colFlow.blue();
-	    backward.moveX = 2 * backward.mult * (colFlow.redF() - .5);
-	    backward.moveY = 2 * backward.mult * (colFlow.greenF() - .5);
+            backward.moveX = flowBackward->x(x, y);
+            backward.moveY = flowBackward->y(x, y);
 
 #ifdef INTERPOLATE
 	    posX = x - pos*forward.moveX;
@@ -130,7 +127,7 @@ void Interpolate_sV::twowayFlow(const QImage& left, const QImage& right, const Q
     }
 }
 
-void Interpolate_sV::forwardFlow(const QImage& left, const QImage& flow, float pos, QImage& output)
+void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, float pos, QImage &output)
 {
     qDebug() << "Interpolating flow at offset " << pos;
 #ifdef INTERPOLATE
@@ -139,19 +136,17 @@ void Interpolate_sV::forwardFlow(const QImage& left, const QImage& flow, float p
     const int Hmax = left.height()-1;
 #endif
 
-    QColor colFlow, colOut;
+    QColor colOut;
     Interpolate_sV::Movement forward;    
 
-    for (int x = 0; x < left.width(); x++) {
-	for (int y = 0; y < left.height(); y++) {
-	    colFlow = QColor(flow.pixel(x,y));
-	    forward.mult = colFlow.blue();
-	    forward.moveX = 2 * forward.mult * (colFlow.redF() - .5);
-	    forward.moveY = 2 * forward.mult * (colFlow.greenF() - .5);
+    for (int y = 0; y < left.height(); y++) {
+        for (int x = 0; x < left.width(); x++) {
+            forward.moveX = flow->x(x, y);
+            forward.moveY = flow->y(x, y);
 
 #ifdef INTERPOLATE
-	    posX = x - pos*forward.moveX;
-	    posY = y - pos*forward.moveY;
+            posX = x - pos*forward.moveX;
+            posY = y - pos*forward.moveY;
 	    posX = CLAMP(posX, 0, Wmax);
 	    posY = CLAMP(posY, 0, Hmax);
 	    colOut = interpolate(left, posX, posY);

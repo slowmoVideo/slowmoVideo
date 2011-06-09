@@ -9,6 +9,11 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "project_sV.h"
+#include "../lib/opticalFlowBuilder_sV.h"
+#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
+#include "../lib/interpolate_sV.h"
+#include "../lib/flowRW_sV.h"
+#include "../lib/flowField_sV.h"
 
 #include <cmath>
 
@@ -20,9 +25,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 #include <QFileInfo>
 #include <QSignalMapper>
-#include "../lib/opticalFlowBuilder_sV.h"
-#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
-#include "../lib/interpolate_sV.h"
 
 #include "renderTask_sV.h"
 #include "nodelist_sV.h"
@@ -254,14 +256,14 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
 
         QImage left(frameFileStr(floor(framePos), frameSize));
         QImage right(frameFileStr(floor(framePos)+1, frameSize));
-        QImage forwardFlow(requestFlow(floor(framePos), FlowDirection_Forward, frameSize));
-        QImage backwardFlow(requestFlow(floor(framePos), FlowDirection_Backward, frameSize));
         QImage out(left.size(), QImage::Format_RGB888);
 
-        Q_ASSERT(!forwardFlow.isNull());
-        Q_ASSERT(!backwardFlow.isNull());
+        FlowField_sV *forwardFlow = requestFlow(floor(framePos), FlowDirection_Forward, frameSize);
+        FlowField_sV *backwardFlow = requestFlow(floor(framePos), FlowDirection_Backward, frameSize);
 
-//        Interpolate_sV::forwardFlow(left, forwardFlow, framePos-floor(framePos), out);
+        Q_ASSERT(forwardFlow != NULL);
+        Q_ASSERT(backwardFlow != NULL);
+
         Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, framePos-floor(framePos), out);
 
         return out;
@@ -271,7 +273,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
     }
 }
 
-QImage Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const
+FlowField_sV* Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const
 {
     Q_ASSERT(leftFrame < m_videoInfo->framesCount-1);
     const QString outFile = flowFileStr(leftFrame, direction, frameSize);
@@ -284,7 +286,7 @@ QImage Project_sV::requestFlow(int leftFrame, FlowDirection direction, const Fra
     } else {
         qDebug() << "Re-using existing flow image for left frame " << leftFrame << " in direction " << direction << ": " << outFile;
     }
-    return QImage(outFile);
+    return FlowRW_sV::load(outFile.toStdString());
 }
 
 inline
@@ -329,9 +331,10 @@ const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, Fr
 {
     switch (direction) {
     case FlowDirection_Forward:
-        return QString("%1/forward%2.png").arg(flowDirStr(size)).arg(leftFrame+1, 5, 10, QChar::fromAscii('0'));
+        return QString("%1/forward%2.sVflow").arg(flowDirStr(size)).arg(leftFrame+1, 5, 10, QChar::fromAscii('0'));
     case FlowDirection_Backward:
-        return QString("%1/backward%2.png").arg(flowDirStr(size)).arg(leftFrame+2, 5, 10, QChar::fromAscii('0'));
+    default:
+        return QString("%1/backward%2.sVflow").arg(flowDirStr(size)).arg(leftFrame+2, 5, 10, QChar::fromAscii('0'));
     }
 }
 const QString Project_sV::renderedFileStr(int number, FrameSize size) const

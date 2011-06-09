@@ -8,6 +8,9 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
+#include "../lib/interpolate_sV.h"
+#include "../lib/flowField_sV.h"
+#include "../lib/flowRW_sV.h"
 
 #include <iostream>
 #include <cmath>
@@ -20,12 +23,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 
-#include "../lib/interpolate_sV.h"
 
 
 const int RET_MISSING_PARAM = -1;
 const int RET_WRONG_PARAM = -2;
 const int RET_MISSING_FILE = -3;
+const int RET_SIZE_DIFFERS = -4;
 
 
 char *myName;
@@ -94,20 +97,21 @@ int main(int argc, char *argv[])
     }
 
 
-    QImage left, right, flow, flowBack, output;
+    QImage left, right, output;
+    FlowField_sV *ffForward, *ffBackward;
+
     switch (mode) {
     case FlowMode_Twoway:
         std::cout << "Running two-way flow." << std::endl;
         left = QImage(nextArg(argc, argi, argv));
         right = QImage(nextArg(argc, argi, argv));
-        flow = QImage(nextArg(argc, argi, argv));
-        flowBack = QImage(nextArg(argc, argi, argv));
+        ffForward = FlowRW_sV::load(nextArg(argc, argi, argv));
+        ffBackward = FlowRW_sV::load(nextArg(argc, argi, argv));
         break;
     case FlowMode_Forward:
         std::cout << "Running forward flow." << std::endl;
         left = QImage(nextArg(argc, argi, argv));
-        //right = QImage(nextArg(argc, argi, argv));
-        flow = QImage(nextArg(argc, argi, argv));
+        ffForward = FlowRW_sV::load(nextArg(argc, argi, argv));
         break;
     case FlowMode_Undef:
         Q_ASSERT(false);
@@ -130,19 +134,22 @@ int main(int argc, char *argv[])
         return RET_WRONG_PARAM;
     }
 
+
+
     switch (mode) {
     case FlowMode_Twoway:
-        if (flowBack.isNull()) {
-            std::cout << "Backward flow image does not exist." << std::endl;
+        if (ffBackward == NULL) {
+            std::cout << "Backward flow is not valid." << std::endl;
             exit(RET_MISSING_FILE);
-        }
-        if (flowBack.size() != left.size()) {
-            qDebug() << "Re-scaling backward flow image from " << flow.width() << "x" << flow.height() << " to " << left.width() << "x" << left.height();
-            flowBack = flowBack.scaled(left.size());
         }
         if (right.isNull()) {
             std::cout << "Right image does not exist." << std::endl;
             exit(RET_MISSING_FILE);
+        }
+        if (ffBackward->width() != left.width() || ffBackward->height() != left.height()) {
+            qDebug() << "Invalid backward flow field size. Image is " << left.width()
+                     << ", flow is " << ffBackward->width() << "x" << ffBackward->height() << ".";
+            exit(RET_SIZE_DIFFERS);
         }
         // Fall through
     case FlowMode_Forward:
@@ -150,13 +157,17 @@ int main(int argc, char *argv[])
             std::cout << "Left image does not exist." << std::endl;
             exit(RET_MISSING_FILE);
         }
-        if (flow.isNull()) {
-            std::cout << "Flow image does not exist." << std::endl;
+        if (ffForward == NULL) {
+            std::cout << "Forward flow is not valid." << std::endl;
             exit(RET_MISSING_FILE);
         }
-        if (flow.size() != left.size()) {
-            qDebug() << "Re-scaling forward flow image from " << flow.width() << "x" << flow.height() << " to " << left.width() << "x" << left.height();
-            flow = flow.scaled(left.size());
+        if (left.size() != right.size()) {
+            qDebug() << "Left image size differs from right image size: " << left.size() << " vs. " << right.size() << ".";
+        }
+        if (ffForward->width() != left.width() || ffForward->height() != left.height()) {
+            qDebug() << "Invalid forward flow field size. Image is " << left.width()
+                     << ", flow is " << ffForward->width() << "x" << ffForward->height() << ".";
+            exit(RET_SIZE_DIFFERS);
         }
         break;
     case FlowMode_Undef:
@@ -182,12 +193,17 @@ int main(int argc, char *argv[])
     for (unsigned int step = 0; step < fps+1; step++) {
         pos = step/float(fps);
         if (mode == FlowMode_Twoway) {
-            Interpolate_sV::twowayFlow(left, right, flow, flowBack, pos, output);
+            Interpolate_sV::twowayFlow(left, right, ffForward, ffBackward, pos, output);
         } else if (mode == FlowMode_Forward) {
-            Interpolate_sV::forwardFlow(left, flow, pos, output);
+            Interpolate_sV::forwardFlow(left, ffForward, pos, output);
         }
         filename = pattern.arg(QString::number(numberOffset + step), stepLog, fillChar);
         qDebug() << "Saving position " << pos << " to image " << filename;
         output.save(filename);
+    }
+
+    delete ffForward;
+    if (mode == FlowMode_Twoway) {
+        delete ffBackward;
     }
 }

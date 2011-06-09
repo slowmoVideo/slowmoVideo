@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const
 {
-    QString program("/data/cworkspace/slowmoGPU/V3D/build/Apps/GL/tvl1_flow");
+    QString program("/data/cworkspace/slowmoGPU/V3D/build/Apps/GL/flowBuilder");
     QStringList args;
     switch (direction) {
     case FlowDirection_Forward:
@@ -25,8 +25,8 @@ void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &righ
         args << right.fileName() << left.fileName();
         break;
     }
-    args << "10" << "100" << output.fileName() << "exit";
-
+    args << output.fileName();
+    args << "10" << "100";
 
     qDebug() << "Images: " << left.fileName() << ", " << right.fileName();
 

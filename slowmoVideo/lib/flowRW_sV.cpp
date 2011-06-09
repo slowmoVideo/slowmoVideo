@@ -1,4 +1,15 @@
+/*
+slowmoVideo creates slow-motion videos from normal-speed videos.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "flowRW_sV.h"
+#include "flowField_sV.h"
 
 #include <iostream>
 #include <fstream>
@@ -27,7 +38,7 @@ void FlowRW_sV::save(std::string filename, const int width, const int height, co
     file.close();
 }
 
-float* FlowRW_sV::load(std::string filename, int &out_width, int &out_height)
+FlowField_sV* FlowRW_sV::load(std::string filename)
 {
     std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
@@ -38,21 +49,24 @@ float* FlowRW_sV::load(std::string filename, int &out_width, int &out_height)
 
     std::cout << "Magic number: " << magic << ", version: " << (int)version << std::endl;
 
-    file.read((char*) &out_width, sizeof(int));
-    file.read((char*) &out_height, sizeof(int));
+    int width, height;
+    file.read((char*) &width, sizeof(int));
+    file.read((char*) &height, sizeof(int));
     if (file.rdstate() != std::ios::goodbit) {
         std::cerr << "Failed to read width/height from " << filename << "." << std::endl;
+        return NULL;
     }
 
-    const int dataSize = 2*out_width*out_height;
-    float *data = new float[dataSize];
+    FlowField_sV *field = new FlowField_sV(width, height);
 
-    file.read((char*) data, sizeof(float)*dataSize);
+    file.read((char*) field->data(), sizeof(float)*field->dataSize());
     if (file.rdstate() != std::ios::goodbit) {
         std::cerr << "Failed to read data from " << filename << "." << std::endl;
+        delete field;
+        return NULL;
     }
 
     file.close();
 
-    return data;
+    return field;
 }

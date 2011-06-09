@@ -22,8 +22,9 @@ set(LIB_SRC_ARGS
   trivialArgsReader_sV.cpp
 )
 
-set(LIB_SRC_FLOWRW
+set(LIB_SRC_FLOW
   flowRW_sV.cpp
+  flowField_sV.cpp
 )
 
 
@@ -34,4 +35,4 @@ target_link_libraries(sV ${QT_LIBRARIES})
 add_library(sVinfo STATIC ${LIB_SRC_VI})
 target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})
 
-add_library(sVflowRW STATIC ${LIB_SRC_FLOWRW})
+add_library(sVflow STATIC ${LIB_SRC_FLOW})

@@ -30,6 +30,7 @@ extern "C" {
 
 class RenderTask_sV;
 class NodeList_sV;
+class FlowField_sV;
 class QSignalMapper;
 class QProcess;
 class QRegExp;
@@ -99,7 +100,7 @@ public:
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize) const;
 
-    QImage requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
+    FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
 
 
     const QString inFileStr() const { return m_inFile.fileName(); }

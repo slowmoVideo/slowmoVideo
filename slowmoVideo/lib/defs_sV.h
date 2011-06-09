@@ -13,6 +13,9 @@ inline QString enumStr(const FrameSize &size) {
         return QString("Orig");
     case FrameSize_Small:
         return QString("Small");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown size");
     }
 }
 inline QString enumStr(const FlowDirection &dir) {
@@ -21,6 +24,9 @@ inline QString enumStr(const FlowDirection &dir) {
         return QString("Forward");
     case FlowDirection_Backward:
         return QString("Backward");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown direction");
     }
 }
 
@@ -31,6 +37,10 @@ inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
         break;
     case FlowDirection_Backward:
         qd << "Backward";
+        break;
+    default:
+        qd << "Unknown direction";
+        Q_ASSERT(false);
         break;
     }
     return qd;
@@ -44,6 +54,10 @@ inline QDebug operator<<(QDebug qd, const FrameSize &frameSize)
         break;
     case FrameSize_Small:
         qd << "Small frame size";
+        break;
+    default:
+        qd << "Unknown frame size";
+        Q_ASSERT(false);
         break;
     }
     return qd;

@@ -19,6 +19,9 @@ class Project_sV;
 #include <QtCore>
 #include <QObject>
 
+/**
+  \brief Handles building of optical flow data
+  */
 class Flow_sV : public QObject
 {
     Q_OBJECT
