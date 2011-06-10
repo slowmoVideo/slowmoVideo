@@ -19,6 +19,9 @@ const char FlowRW_sV::m_version = 1;
 
 void FlowRW_sV::save(std::string filename, const int width, const int height, const float *data, Format format)
 {
+    std::cout << "Writing flow file: " << width << "×" << height
+              << ", version " << (int)m_version << ", magic number " << m_magicNumber << std::endl;
+
     std::ofstream file(filename.c_str(), std::ios_base::out | std::ios_base::binary);
     file.write((char*) m_magicNumber.c_str(), m_magicNumber.length()*sizeof(char));
     file.write((char*) &m_version, sizeof(char));
@@ -35,6 +38,23 @@ void FlowRW_sV::save(std::string filename, const int width, const int height, co
             pos++;
         }
     }
+    file.close();
+}
+void FlowRW_sV::save(std::string filename, FlowField_sV *flowField)
+{
+    int width = flowField->width();
+    int height = flowField->height();
+    std::cout << "Writing flow file: " << width << "×" << height
+              << ", version " << (int)m_version << ", magic number " << m_magicNumber << std::endl;
+
+    float *data = flowField->data();
+    std::ofstream file(filename.c_str(), std::ios_base::out | std::ios_base::binary);
+    file.write((char*) m_magicNumber.c_str(), m_magicNumber.length()*sizeof(char));
+    file.write((char*) &m_version, sizeof(char));
+    file.write((char*) &width, sizeof(int));
+    file.write((char*) &height, sizeof(int));
+
+    file.write((char*) data, sizeof(float)*flowField->dataSize());
     file.close();
 }
 
@@ -65,8 +85,9 @@ FlowField_sV* FlowRW_sV::load(std::string filename)
         delete field;
         return NULL;
     }
-
     file.close();
 
+    std::cout << "Read flow file of size " << field->width()
+              << "×" << field->height() << "." << std::endl;
     return field;
 }

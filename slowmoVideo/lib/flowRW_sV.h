@@ -25,6 +25,7 @@ public:
     enum Format { Format_RGB };
 
     static void save(std::string filename, const int width, const int height, const float *data, Format format = Format_RGB);
+    static void save(std::string filename, FlowField_sV *flowField);
     /**
       \return \tt NULL, if the file could not be loaded, and the flow field otherwise.
       */

@@ -23,6 +23,10 @@ public:
     int height() const { return m_height; }
     float x(int x, int y) const;
     float y(int x, int y) const;
+    void setX(int x, int y, float value);
+    void setY(int x, int y, float value);
+
+    bool operator==(const FlowField_sV& other) const;
 
 private:
     int m_width;
