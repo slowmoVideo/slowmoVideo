@@ -31,6 +31,7 @@ signals:
 
 private:
     Ui::RenderDialog *ui;
+    const Project_sV *m_project;
 
 private slots:
     void slotStartClicked();

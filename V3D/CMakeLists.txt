@@ -11,6 +11,11 @@ cmake_minimum_required(VERSION 2.8)
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
 
+# Should be changed later if required.
+set(CMAKE_INSTALL_PREFIX
+  ../..
+)
+
 # Include OpenGL
 find_package (OpenGL REQUIRED)
 include_directories (${OPENGL_INCLUDE_DIR})

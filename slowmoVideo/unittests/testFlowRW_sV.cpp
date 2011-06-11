@@ -44,7 +44,7 @@ void TestFlowRW_sV::testWriteAndReadFail()
 
 
 
-    field->setX(width-1, height-1, -1.0f);
+    field->setX(width-1, height-1, -3.1415927);
     FlowField_sV *loadedField = FlowRW_sV::load(filename);
 
     qDebug() << "Equal? " << (field->x(width-1, height-1) == loadedField->x(width-1, height-1));
@@ -55,4 +55,3 @@ void TestFlowRW_sV::testWriteAndReadFail()
     delete loadedField;
 }
 
-QTEST_MAIN(TestFlowRW_sV)

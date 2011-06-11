@@ -22,6 +22,7 @@ void FlowRW_sV::save(std::string filename, const int width, const int height, co
             file.write((char*) &data[pos++], sizeof(float));
             file.write((char*) &data[pos++], sizeof(float));
             pos++;
+//            if (data[pos] != 0) { std::cout << "Value " << i << " is != 0: " << data[pos] << " (reason unknown!)" << std::endl; }
         }
     }
     file.close();

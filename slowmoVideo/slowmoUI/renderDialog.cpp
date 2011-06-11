@@ -7,7 +7,8 @@
 
 RenderDialog::RenderDialog(const Project_sV *project, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::RenderDialog)
+    ui(new Ui::RenderDialog),
+    m_project(project)
 {
     ui->setupUi(this);
 
@@ -22,6 +23,7 @@ RenderDialog::RenderDialog(const Project_sV *project, QWidget *parent) :
     ui->comboOutputSize->insertItem(0, enumStr(FrameSize_Orig), QVariant(FrameSize_Orig));
     ui->comboOutputSize->insertItem(0, enumStr(FrameSize_Small), QVariant(FrameSize_Small));
 
+
     bool b = true;
     b &= connect(ui->bStart, SIGNAL(clicked()), this, SLOT(slotStartClicked()));
     b &= connect(ui->bStop, SIGNAL(clicked()), this, SLOT(slotStopClicked()));
@@ -30,6 +32,8 @@ RenderDialog::RenderDialog(const Project_sV *project, QWidget *parent) :
     b &= connect(ui->comboOutputSize, SIGNAL(currentIndexChanged(int)), this, SLOT(slotRenderFrameSizeChanged()));
     Q_ASSERT(b);
 
+    slotFpsChanged();
+    slotRenderFrameSizeChanged();
 }
 
 RenderDialog::~RenderDialog()
@@ -52,6 +56,7 @@ void RenderDialog::slotRenderingFinished()
 void RenderDialog::slotFrameRendered(qreal time, int frameNumber)
 {
     ui->lblFrame->setText(QString("%1 (%2 s)").arg(frameNumber).arg(time));
+    ui->progressBar->setValue(frameNumber);
 }
 
 
@@ -71,8 +76,10 @@ void RenderDialog::slotStopClicked()
 }
 void RenderDialog::slotFpsChanged()
 {
-    qDebug() << "Signal: fps changed to " << ui->comboFps->currentText();
-    emit signalChangeFps(ui->comboFps->currentText().toFloat());
+    float fps = ui->comboFps->currentText().toFloat();
+    qDebug() << "Signal: fps changed to " << fps;
+    ui->progressBar->setMaximum((int) m_project->length()*fps);
+    emit signalChangeFps(fps);
 //    m_project->slotSetFps(ui->comboFps->currentText().toFloat());
 }
 void RenderDialog::slotRenderFrameSizeChanged()

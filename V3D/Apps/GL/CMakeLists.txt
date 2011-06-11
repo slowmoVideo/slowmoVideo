@@ -9,3 +9,5 @@ endif (V3DLIB_ENABLE_GPGPU AND V3DLIB_GPGPU_ENABLE_CG)
 if (V3DLIB_ENABLE_GPGPU AND V3DLIB_GPGPU_ENABLE_CG)
   add_v3d_executable (flowBuilder flowBuilder.cpp flowRW.cpp)
 endif (V3DLIB_ENABLE_GPGPU AND V3DLIB_GPGPU_ENABLE_CG)
+
+install(TARGETS flowBuilder tvl1_flow DESTINATION bin)

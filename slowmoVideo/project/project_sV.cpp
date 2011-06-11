@@ -45,29 +45,6 @@ Project_sV::Project_sV(QString filename, QString projectDir)
     loadFile(filename, projectDir);
 }
 
-void Project_sV::loadFile(QString filename, QString projectDir)
-{
-    m_inFile.setFileName(filename);
-    m_projDir = projectDir;
-
-    *m_videoInfo = getInfo(filename.toStdString().c_str());
-    if (m_videoInfo->streamsCount <= 0) {
-        qDebug() << "Video info is invalid: " << filename;
-    } else {
-        m_fps = m_videoInfo->frameRateNum/(float)m_videoInfo->frameRateDen;
-    }
-
-    // Create directories if necessary
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
-    if (!m_projDir.exists()) {
-        m_projDir.mkpath(".");
-    }
-
-    createDirectories(FrameSize_Orig);
-    createDirectories(FrameSize_Small);
-    m_canWriteFrames = validDirectories();
-}
-
 void Project_sV::init()
 {
     m_canWriteFrames = false;
@@ -106,6 +83,38 @@ Project_sV::~Project_sV()
     delete m_videoInfo;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
+}
+
+float Project_sV::length() const
+{
+    if (m_nodes->size() > 0) {
+        return m_nodes->at(m_nodes->size()-1).xUnmoved();
+    } else {
+        return 0;
+    }
+}
+
+void Project_sV::loadFile(QString filename, QString projectDir)
+{
+    m_inFile.setFileName(filename);
+    m_projDir = projectDir;
+
+    *m_videoInfo = getInfo(filename.toStdString().c_str());
+    if (m_videoInfo->streamsCount <= 0) {
+        qDebug() << "Video info is invalid: " << filename;
+    } else {
+        m_fps = m_videoInfo->frameRateNum/(float)m_videoInfo->frameRateDen;
+    }
+
+    // Create directories if necessary
+    qDebug() << "Project directory: " << m_projDir.absolutePath();
+    if (!m_projDir.exists()) {
+        m_projDir.mkpath(".");
+    }
+
+    createDirectories(FrameSize_Orig);
+    createDirectories(FrameSize_Small);
+    m_canWriteFrames = validDirectories();
 }
 
 bool Project_sV::validDirectories() const
@@ -190,7 +199,7 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
                 }
                 qDebug() << "Thumbnail frame size: " << w << "x" << h;
                 args << "-s" << QString("%1x%2").arg(w).arg(h);
-                args << QString("%1/frame%5d.jpg").arg(framesDirStr(frameSize));
+                args << QString("%1/frame%5d.png").arg(framesDirStr(frameSize));
                 if (m_ffmpegSmall != NULL && m_ffmpegSmall->state() != QProcess::NotRunning) {
                     qDebug() << "Shutting down old ffmpeg process";
                     m_ffmpegSmall->waitForFinished(2000);
@@ -264,6 +273,11 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
         Q_ASSERT(forwardFlow != NULL);
         Q_ASSERT(backwardFlow != NULL);
 
+        if (forwardFlow == NULL || backwardFlow == NULL) {
+            qDebug() << "No flow received!";
+            Q_ASSERT(false);
+        }
+
         Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, framePos-floor(framePos), out);
 
         return out;
@@ -325,7 +339,7 @@ void Project_sV::createDirectories(FrameSize frameSize) const
 const QString Project_sV::frameFileStr(int number, FrameSize size) const
 {
     // ffmpeg numbering starts with 1, therefore add 1 to the frame number
-    return QString("%1/frame%2.jpg").arg(framesDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
+    return QString("%1/frame%2.png").arg(framesDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
 }
 const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const
 {

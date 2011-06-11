@@ -69,6 +69,7 @@ public:
             return 24;
         }
     }
+    float length() const;
 
 
     void render(qreal fps);

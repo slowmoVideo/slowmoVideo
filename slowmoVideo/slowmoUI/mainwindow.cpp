@@ -13,7 +13,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "newprojectdialog.h"
 #include "progressDialogExtractFrames.h"
-#include "progressDialogBuildFlow.h"
 #include "renderDialog.h"
 
 #include "../project/flow_sV.h"

@@ -11,10 +11,21 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef FLOWFIELD_SV_H
 #define FLOWFIELD_SV_H
 
+/**
+  Represents a dense optical flow field.
+  */
 class FlowField_sV
 {
 public:
+    /** OpenGL format */
+    enum GLFormat { GLFormat_RGB };
+
+    /** Constructor for uninitialized data */
     FlowField_sV(int width, int height);
+
+    /** Constructor for data read from OpenGL in the given \param format. */
+    FlowField_sV(int width, int height, float *data, GLFormat format);
+
     ~FlowField_sV();
 
     float* data();

@@ -152,9 +152,9 @@ void drawscene()
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, flowEstimator->getFlowFieldTextureID());
-      glEnable(GL_TEXTURE_2D);
-      glReadPixels(0, 0, leftImage.width(), leftImage.height(), GL_RGB, GL_FLOAT, data);
-      glDisable(GL_TEXTURE_2D);
+//      glEnable(GL_TEXTURE_2D); // Not required for reading
+//      glReadPixels(0, 0, leftImage.width(), leftImage.height(), GL_RGB, GL_FLOAT, data); // Wrong, reads frame buffer
+      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
 
       FlowRW_sV::save(outputFile, leftImage.width(), leftImage.height(), data);
       cout << "Flow data written to " << outputFile << "." << endl;
