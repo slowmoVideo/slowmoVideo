@@ -39,7 +39,7 @@ set(SRCS_MOC
 )
 
 set(RES
-  res/iconAdd.png
+  #res/iconAdd.png
   res/iconSel.png
   res/iconMov.png
 )

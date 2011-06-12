@@ -27,6 +27,11 @@ set(LIB_SRC_FLOW
   flowField_sV.cpp
 )
 
+set(HEADERS
+  flowRW_sV.h
+  flowField_sV.h
+)
+
 
 
 add_library(sV STATIC ${LIB_SRC})
@@ -36,3 +41,5 @@ add_library(sVinfo STATIC ${LIB_SRC_VI})
 target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})
 
 add_library(sVflow STATIC ${LIB_SRC_FLOW})
+install(TARGETS sVflow DESTINATION "lib")
+install(FILES ${HEADERS} DESTINATION "include")

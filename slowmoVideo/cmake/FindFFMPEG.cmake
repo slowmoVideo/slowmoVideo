@@ -69,13 +69,13 @@ SET( INC_SUCCESS 0 )
 SET( TMP_ TMP-NOTFOUND )
 SET( FFMPEG_INCLUDE_DIR ${FFMPEG_INCLUDE_PATHS} )
 FOREACH( INC_ ${FFMPEG_HEADERS} )
-   message( "checking: " ${INC_} )
+   message(STATUS "checking: ${INC_}" )
 
    FIND_PATH( TMP_ ${INC_}
               PATHS ${FFMPEG_INCLUDE_PATHS}
               PATH_SUFFIXES ${FFMPEG_PATH_SUFFIXES} )
    IF ( TMP_ )
-      message( "found: " ${TMP_} )
+      message(STATUS "          ${TMP_}" )
       MATH( EXPR INC_SUCCESS ${INC_SUCCESS}+1 )
       SET( FFMPEG_INCLUDE_DIR ${FFMPEG_INCLUDE_DIR} ${TMP_} )
    ENDIF ( TMP_ )

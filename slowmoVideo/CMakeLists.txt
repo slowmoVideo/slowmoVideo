@@ -17,11 +17,10 @@ set(CMAKE_CXX_FLAGS
 
 ## Builder options ##
 
-set(CMAKE_INSTALL_PREFIX
-  ../..
-)
+get_filename_component(CMAKE_INSTALL_PREFIX "${slowmoVideo_SOURCE_DIR}/../install" ABSOLUTE)
+message("Installing to ${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_MODULE_PATH
-  ${PROJECT_SOURCE_DIR}/cmake
+  ${slowmoVideo_SOURCE_DIR}/cmake
 )
 
 
@@ -51,7 +50,4 @@ add_subdirectory(unittests)
 
 
 
-copy_files(
-  fetch.sh
-)
 install(FILES fetch.sh DESTINATION bin PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

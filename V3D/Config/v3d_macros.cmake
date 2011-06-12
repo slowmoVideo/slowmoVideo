@@ -31,7 +31,7 @@ macro (enable_feature_libraries feature)
 endmacro (enable_feature_libraries)
 
 macro (add_v3d_executable target)
-  message(-- " ARGN variable contains: ${ARGN}")
+  message(STATUS "ARGN variable contains: ${ARGN}")
   add_executable(${target} ${ARGN})
   add_dependencies(${target} V3d2)
 endmacro (add_v3d_executable)

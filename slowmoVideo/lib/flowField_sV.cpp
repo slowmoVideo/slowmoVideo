@@ -9,8 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "flowField_sV.h"
-
-#include <QDebug>
+#include <iostream>
 
 FlowField_sV::FlowField_sV(int width, int height) :
     m_width(width),
@@ -70,24 +69,24 @@ bool FlowField_sV::operator ==(const FlowField_sV& other) const
 {
 
     if (m_width != other.m_width) {
-        qDebug() << "Width differs: " << m_width << " vs. " << other.m_width << ".";
+        std::cout << "Width differs: " << m_width << " vs. " << other.m_width << "." << std::endl;
         return false;
     }
     if (m_height != other.m_height) {
-        qDebug() << "Height differs. " << m_height << " vs. " << other.m_height << "";
+        std::cout << "Height differs. " << m_height << " vs. " << other.m_height << "" << std::endl;
         return false;
     }
 
     for (int y = 0; y < m_height; y++) {
         for (int x = 0; x < m_width; x++) {
             if (this->x(x,y) != other.x(x,y)) {
-                qDebug() << "x Value differs at " << x << "," << y << ": "
-                         << this->x(x,y) << "/" << other.x(x,y);
+                std::cout << "x Value differs at " << x << "," << y << ": "
+                         << this->x(x,y) << "/" << other.x(x,y) << std::endl;
                 return false;
             }
             if (this->y(x,y) != other.y(x,y)) {
-                qDebug() << "y Value differs at " << x << "," << y << ": "
-                         << this->y(x,y) << "/" << other.y(x,y);
+                std::cout << "y Value differs at " << x << "," << y << ": "
+                         << this->y(x,y) << "/" << other.y(x,y) << std::endl;
                 return false;
             }
         }

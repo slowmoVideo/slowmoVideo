@@ -9,7 +9,8 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 
-#include "flowRW.h"
+#include "flowRW_sV.h"
+#include "flowField_sV.h"
 
 using namespace std;
 using namespace V3D;
@@ -156,10 +157,12 @@ void drawscene()
 //      glReadPixels(0, 0, leftImage.width(), leftImage.height(), GL_RGB, GL_FLOAT, data); // Wrong, reads frame buffer
       glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
 
-      FlowRW_sV::save(outputFile, leftImage.width(), leftImage.height(), data);
+      FlowField_sV field(leftImage.width(), leftImage.height(), data, FlowField_sV::GLFormat_RGB);
+      FlowRW_sV::save(outputFile, &field);
       cout << "Flow data written to " << outputFile << "." << endl;
 
-      delete data;
+      delete[] data;
+
       exit(0);
    }
 

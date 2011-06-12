@@ -1,5 +1,4 @@
-bin
-res
+install
 
 /*.png
 flowScripts/*.avi
@@ -11,3 +10,4 @@ clips
 slowmoVideo/doxy
 
 img/*.sVflow
+qtcreator*

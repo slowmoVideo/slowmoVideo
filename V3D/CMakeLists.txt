@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+
 project(V3D)
 
 # export V3D_SHADER_DIR=/data/cworkspace/slowmoGPU/GL/Shaders/
@@ -7,14 +9,12 @@ set(CMAKE_CXX_FLAGS
     -Wall
 )
 
-cmake_minimum_required(VERSION 2.8)
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
 
 # Should be changed later if required.
-set(CMAKE_INSTALL_PREFIX
-  ../..
-)
+get_filename_component(CMAKE_INSTALL_PREFIX "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
+message("Install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Include OpenGL
 find_package (OpenGL REQUIRED)
@@ -75,32 +75,49 @@ set (ALL_SRC
 
 
 set (SHADERS
+    ./GL/Shaders/flow_cholesky_3x3.cg
+    ./GL/Shaders/flow_warp_image_with_gain.cg
     ./GL/Shaders/pyramid_with_derivative_pass2.cg
     ./GL/Shaders/pyramid_pass2.cg
     ./GL/Shaders/pyramid_with_derivative_pass1v.cg
     ./GL/Shaders/pyramid_with_derivative_pass1h.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_p.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_update_u.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_v.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_direct_update_uvq.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_u.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_direct_update_p.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_vd.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_u_iter1.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_pb.cg
+    ./GL/Shaders/OpticalFlow/tvl1_color_flow_direct_update_q.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_q_with_gain.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_b.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_PD_update_u.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_color_flow_new_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_u_iterN.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_p.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_compute_UV.cg
     ./GL/Shaders/OpticalFlow/tvl1_color_flow_QR_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv_with_gain.cg
+    ./GL/Shaders/OpticalFlow/tvl1_color_flow_direct_update_uv.cg
     ./GL/Shaders/OpticalFlow/tvl1_flow_new_update_p.cg
-    ./GL/Shaders/Shaders/OpticalFlow/tvl1_color_flow_QR_update_uv.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_p.cg
+    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_PD_update_q.cg
+    ./GL/Shaders/OpticalFlow/tvl1_color_flow_new_update_q.cg
+    ./GL/Shaders/flow_accumulate_tensor.cg
     ./GL/Shaders/pyramid_pass1v.cg
     ./GL/Shaders/pyramid_pass1h.cg
     ./GL/Shaders/flow_warp_image.cg
 )
 
-message("-- Copying files")
-macro(copy_files FILELIST)
-  foreach (FILENAME ${FILELIST})
+foreach (FILENAME "${SHADERS}")
     set(FILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
     set(FILE_DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-    message("   Copying " ${FILENAME} " to " ${FILE_DST})
-
     configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)
-  endforeach(FILENAME)
-endmacro(copy_files)
-#copy_files("${SHADERS}")
+endforeach(FILENAME)
+message(STATUS "Shader files copied")
 
 
 
@@ -109,5 +126,3 @@ add_subdirectory(Apps)
 target_link_libraries(V3D ${OpenCV_LIBS})
 
 
-message(-- "Found? ${OpenCV_LIBS}.")
-message(-- " OpenCV Dirs: ${OpenCV_INCLUDE_DIRS}")
