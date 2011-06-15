@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../project/flow_sV.h"
 #include "../project/renderTask_sV.h"
 #include "../project/xmlProjectRW_sV.h"
+#include "../project/abstractFrameSource_sV.h"
 
 #include <QtCore>
 #include <QObject>
@@ -167,7 +168,8 @@ void MainWindow::loadProject(Project_sV *project)
                 &progress, SLOT(slotProgressUpdated(FrameSize,int))
             );
     Q_ASSERT(b);
-    m_project->extractFrames();
+    // TODO do in project itself
+//    m_project->extractFrames();
     progress.exec();
 }
 
@@ -298,7 +300,7 @@ void MainWindow::shortcutUsed(QString which)
 
 void MainWindow::slotForwardInputPosition(qreal frame)
 {
-    if (0 <= frame && frame < m_project->videoInfo().framesCount) {
+    if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
         qDebug() << "Signal: Load image at " << frame;
         m_wInputMonitor->slotLoadImage(m_project->frameFileStr(qFloor(frame), FrameSize_Small));
     }

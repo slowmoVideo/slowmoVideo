@@ -14,6 +14,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "tagAddDialog.h"
 
+#include "../project/abstractFrameSource_sV.h"
+
 #include <cmath>
 
 #include <QDebug>
@@ -73,7 +75,7 @@ void Canvas::load(const Project_sV *project)
     qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
     m_tags = project->tags();
-    m_tmax.setY(project->videoInfo().framesCount / float(project->videoInfo().frameRateNum) * project->videoInfo().frameRateDen);
+    m_tmax.setY(project->frameSource()->framesCount() / project->frameSource()->fps());
     qDebug() << "tMaxY set to " << m_tmax.y();
     repaint();
 }
@@ -168,7 +170,8 @@ void Canvas::paintEvent(QPaintEvent *)
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
         davinci.drawText(m_states.prevMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
-        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
+        // TODO fps in
+//        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -283,8 +286,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
     emit signalMouseInputTimeChanged(
                   convertCanvasToTime(m_states.prevMousePos).y()
-                * float(m_project->videoInfo().frameRateNum)
-                / m_project->videoInfo().frameRateDen
+                * m_project->frameSource()->fps()
                                      );
 
     repaint();

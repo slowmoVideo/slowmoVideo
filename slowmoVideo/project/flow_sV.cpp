@@ -8,12 +8,13 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
+#include "abstractFrameSource_sV.h"
 #include "flow_sV.h"
+#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 
 #include <QFile>
 #include <QDebug>
 
-#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object)->*(ptrToMember))
 
@@ -31,7 +32,7 @@ void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, Proje
 {
     m_abort = false;
     m_aborted = false;
-    int framesCount = project->frameSource()->videoInfo().framesCount;
+    int framesCount = project->frameSource()->framesCount();
 
     for (int i = 2; i < framesCount; i++) {
         if (m_abort) {

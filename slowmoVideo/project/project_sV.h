@@ -20,8 +20,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 
 class Flow_sV;
+class AbstractFrameSource_sV;
 #include "../lib/defs_sV.hpp"
-#include "abstractFrameSource_sV.h"
 
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -105,6 +105,7 @@ public:
 
     FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
 
+    const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
     const QString inFileStr() const { return m_inFile.fileName(); }
     const QString frameFileStr(int number, FrameSize size) const;
@@ -154,8 +155,8 @@ private:
     RenderTask_sV *m_renderTask;
 
     QSignalMapper *m_signalMapper;
-    QProcess *m_ffmpegOrig;
-    QProcess *m_ffmpegSmall;
+//    QProcess *m_ffmpegOrig;
+//    QProcess *m_ffmpegSmall;
     QTimer *m_timer;
 
     float m_fps;
@@ -165,7 +166,7 @@ private:
 
     void init();
     void createDirectories(FrameSize frameSize) const;
-    const QString framesDirStr(FrameSize frameSize) const;
+    const QString framesDirStr(FrameSize frameSize) const; // TODO remove?
     const QString flowDirStr(FrameSize frameSize) const;
     const QString renderDirStr(FrameSize frameSize) const;
 

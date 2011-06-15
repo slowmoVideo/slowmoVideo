@@ -1,35 +1,40 @@
 #ifndef ABSTRACTFRAMESOURCE_SV_H
 #define ABSTRACTFRAMESOURCE_SV_H
 
-#include "../lib/defs_sV.h"
 #include "../lib/defs_sV.hpp"
 
 #include <QImage>
 #include <QtCore/QDir>
+#include <inttypes.h>
+class Project_sV;
+
+class Div0Exception
+{
+
+};
 
 /** Represents a source for input frames, like a video or an image sequence */
 class AbstractFrameSource_sV
 {
 public:
-    AbstractFrameSource_sV(const QDir &projectDir);
+    AbstractFrameSource_sV(const Project_sV *project);
     virtual ~AbstractFrameSource_sV();
 
-    virtual void init();
-
-    const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
+    virtual int64_t framesCount() const = 0;
+    virtual int frameRateNum() const = 0;
+    virtual int frameRateDen() const = 0;
+    float fps() const throw(Div0Exception);
 
     /**
       @return The frame at the given position, as image. Fails
       if the frames have not been extracted yet.
       */
-    virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
-
-    virtual QImage interpolateFrameAt(float time, const FrameSize frameSize) const;
+    virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
 protected:
-    /** Needs to be initialized! */
-    VideoInfoSV *m_videoInfo;
-    QDir m_projectDir;
+    const Project_sV *m_project;
+
 };
+
 
 #endif // ABSTRACTFRAMESOURCE_SV_H
