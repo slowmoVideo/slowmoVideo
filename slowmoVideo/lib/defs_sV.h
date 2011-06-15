@@ -1,66 +1,15 @@
 #ifndef DEFS_SV_H
 #define DEFS_SV_H
 
-#include <QDebug>
-#include <QString>
+#include <inttypes.h>
 
-enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
-enum FrameSize { FrameSize_Orig, FrameSize_Small };
-
-inline QString enumStr(const FrameSize &size) {
-    switch (size) {
-    case FrameSize_Orig:
-        return QString("Orig");
-    case FrameSize_Small:
-        return QString("Small");
-    default:
-        Q_ASSERT(false);
-        return QString("Unknown size");
-    }
-}
-inline QString enumStr(const FlowDirection &dir) {
-    switch (dir) {
-    case FlowDirection_Forward:
-        return QString("Forward");
-    case FlowDirection_Backward:
-        return QString("Backward");
-    default:
-        Q_ASSERT(false);
-        return QString("Unknown direction");
-    }
-}
-
-inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
-    switch (direction) {
-    case FlowDirection_Forward:
-        qd << "Forward";
-        break;
-    case FlowDirection_Backward:
-        qd << "Backward";
-        break;
-    default:
-        qd << "Unknown direction";
-        Q_ASSERT(false);
-        break;
-    }
-    return qd;
-}
-
-inline QDebug operator<<(QDebug qd, const FrameSize &frameSize)
-{
-    switch(frameSize) {
-    case FrameSize_Orig:
-        qd << "Original frame size";
-        break;
-    case FrameSize_Small:
-        qd << "Small frame size";
-        break;
-    default:
-        qd << "Unknown frame size";
-        Q_ASSERT(false);
-        break;
-    }
-    return qd;
-}
+typedef struct VideoInfoSV {
+    int frameRateNum;
+    int frameRateDen;
+    int width;
+    int height;
+    int64_t framesCount;
+    int streamsCount;
+} VideoInfoSV;
 
 #endif // DEFS_SV_H

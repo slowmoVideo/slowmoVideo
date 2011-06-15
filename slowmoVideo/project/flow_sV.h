@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class Project_sV;
 #include "project_sV.h"
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
 #include "../lib/opticalFlowBuilder_sV.h"
 
 #include <QtCore>

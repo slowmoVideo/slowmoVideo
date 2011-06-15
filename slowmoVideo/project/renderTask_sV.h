@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QObject>
 
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
 
 class Project_sV;
 class RenderTask_sV : public QObject

@@ -49,13 +49,13 @@ void Project_sV::init()
 {
     m_canWriteFrames = false;
     m_flowComplete = false;
-    m_videoInfo = NULL;
+//    m_videoInfo = NULL;
     m_ffmpegOrig = NULL;
     m_ffmpegSmall = NULL;
     m_fps = 24;
     m_renderFrameSize = FrameSize_Small;
 
-    m_videoInfo = new VideoInfoSV();
+//    m_videoInfo = new VideoInfoSV();
     m_flow = new Flow_sV();
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
@@ -80,7 +80,7 @@ Project_sV::~Project_sV()
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
-    delete m_videoInfo;
+//    delete m_videoInfo;
     if (m_ffmpegOrig != NULL) { delete m_ffmpegOrig; }
     if (m_ffmpegSmall != NULL) { delete m_ffmpegSmall; }
 }
@@ -135,7 +135,7 @@ bool Project_sV::validDirectories() const
         }
     }
     return valid;
-}
+}/*
 
 void Project_sV::extractFrames(bool force)
 {
@@ -229,7 +229,7 @@ bool Project_sV::extractFramesFor(const FrameSize frameSize)
 
     }
     return success;
-}
+}*/
 
 bool Project_sV::rebuildRequired(const FrameSize frameSize) const
 {

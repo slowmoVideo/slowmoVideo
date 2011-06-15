@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QFile>
 
-#include "defs_sV.h"
+#include "defs_sV.hpp"
 
 class OpticalFlowBuilder_sV {
 

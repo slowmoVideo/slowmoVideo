@@ -7,6 +7,9 @@ set(SRCS_PROJ
   renderTask_sV.cpp
   abstractProjectRW_sV.h
   xmlProjectRW_sV.cpp
+  abstractFrameSource_sV.cpp
+  videoFrameSource_sV.cpp
+  abstractRenderTarget_sV.cpp
 )
 
 set(SRCS_MOC

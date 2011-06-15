@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include "../project/project_sV.h"
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
 
 namespace Ui {
     class ProgressDialogExtractFrames;

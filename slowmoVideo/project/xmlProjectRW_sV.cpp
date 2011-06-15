@@ -16,7 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "project_sV.h"
 #include "nodelist_sV.h"
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
 
 
 int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) const

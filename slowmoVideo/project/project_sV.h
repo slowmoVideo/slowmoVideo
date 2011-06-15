@@ -20,7 +20,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 
 class Flow_sV;
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
+#include "abstractFrameSource_sV.h"
 
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -55,20 +56,21 @@ public:
     void loadFile(QString filename, QString projectDir);
 
 
-    const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
+//    const VideoInfoSV& videoInfo() const { return *m_videoInfo; }
+    const AbstractFrameSource_sV* frameSource() const { return m_frameSource; }
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
     RenderTask_sV *renderTask() { return m_renderTask; }
     const FrameSize renderFrameSize() const { return m_renderFrameSize; }
     float fpsOut() const { return m_fps; }
-    float fpsIn() const {
-        if (m_videoInfo->streamsCount > 0) {
-            return (float)m_videoInfo->frameRateNum/m_videoInfo->frameRateDen;
-        } else {
-            return 24;
-        }
-    }
+//    float fpsIn() const {
+//        if (m_videoInfo->streamsCount > 0) {
+//            return (float)m_videoInfo->frameRateNum/m_videoInfo->frameRateDen;
+//        } else {
+//            return 24;
+//        }
+//    }
     float length() const;
 
 
@@ -79,25 +81,25 @@ public:
       @return true, iff all required directories exist
       */
     bool validDirectories() const;
-    /**
-      Extracts frames for all sizes.
-      @param force Also generate frames if they already exist.
-      */
-    void extractFrames(bool force = false);
-    /**
-      Extracts the frames from the video file into single images
-      */
-    bool extractFramesFor(const FrameSize frameSize);
-    /**
-      Checks the availability of the frames and decides
-      whether they need to be extracted with extractFrames()
-      */
-    bool rebuildRequired(const FrameSize frameSize) const;
-    /**
-      @return The frame at the given position, as image. Fails
-      if the frames have not been extracted yet.
-      */
-    QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
+//    /**
+//      Extracts frames for all sizes.
+//      @param force Also generate frames if they already exist.
+//      */
+//    void extractFrames(bool force = false);
+//    /**
+//      Extracts the frames from the video file into single images
+//      */
+//    bool extractFramesFor(const FrameSize frameSize);
+//    /**
+//      Checks the availability of the frames and decides
+//      whether they need to be extracted with extractFrames()
+//      */
+//    bool rebuildRequired(const FrameSize frameSize) const;
+//    /**
+//      @return The frame at the given position, as image. Fails
+//      if the frames have not been extracted yet.
+//      */
+//    QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize) const;
 
@@ -144,7 +146,8 @@ private:
 
     QFile m_inFile;
     QDir m_projDir;
-    VideoInfoSV *m_videoInfo;
+    AbstractFrameSource_sV *m_frameSource;
+//    VideoInfoSV *m_videoInfo;
     Flow_sV *m_flow;
     NodeList_sV *m_nodes;
     QList<Tag_sV> *m_tags;

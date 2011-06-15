@@ -31,7 +31,7 @@ void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, Proje
 {
     m_abort = false;
     m_aborted = false;
-    int framesCount = project->videoInfo().framesCount;
+    int framesCount = project->frameSource()->videoInfo().framesCount;
 
     for (int i = 2; i < framesCount; i++) {
         if (m_abort) {

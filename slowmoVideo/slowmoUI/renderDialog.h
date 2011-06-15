@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "../lib/defs_sV.h"
+#include "../lib/defs_sV.hpp"
 
 namespace Ui {
     class RenderDialog;
