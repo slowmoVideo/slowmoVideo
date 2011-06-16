@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project_sV.h"
 #include "abstractFrameSource_sV.h"
 #include "videoFrameSource_sV.h"
+#include "emptyFrameSource_sV.h"
 #include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
@@ -45,7 +46,8 @@ void Project_sV::init()
     m_fps = 24;
     m_renderFrameSize = FrameSize_Small;
 
-    m_frameSource = new VideoFrameSource_sV(this, "/tmp/noexist.avi");
+//    m_frameSource = new VideoFrameSource_sV(this, "/tmp/noexist.avi");
+    m_frameSource = new EmptyFrameSource_sV(this);
 
     m_flow = new Flow_sV();
     m_tags = new QList<Tag_sV>();

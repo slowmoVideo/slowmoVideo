@@ -186,6 +186,7 @@ void VideoFrameSource_sV::slotProgressUpdate()
         s = QString(m_ffmpeg->readAllStandardError());
         if (regex.lastIndexIn(s) >= 0) {
             emit signalTaskProgress(regex.cap(1).toInt());
+            emit signalTaskItemDescription(QString("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
         }
     }
 }

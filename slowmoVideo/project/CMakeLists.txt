@@ -9,6 +9,7 @@ set(SRCS_PROJ
   xmlProjectRW_sV.cpp
   abstractFrameSource_sV.cpp
   videoFrameSource_sV.cpp
+  emptyFrameSource_sV.cpp
   abstractRenderTarget_sV.cpp
 )
 
@@ -18,6 +19,7 @@ set(SRCS_MOC
   renderTask_sV.h
   abstractFrameSource_sV.h
   videoFrameSource_sV.h
+  emptyFrameSource_sV.h
 )
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})

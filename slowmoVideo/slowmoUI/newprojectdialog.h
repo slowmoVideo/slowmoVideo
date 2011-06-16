@@ -14,6 +14,8 @@ namespace Ui {
 }
 
 class QColor;
+class QButtonGroup;
+
 class NewProjectDialog : public QDialog
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ private:
 
 
     Ui::NewProjectDialog *ui;
+    QButtonGroup *m_buttonGroup;
 
     VideoInfoSV m_videoInfo;
 
@@ -41,7 +44,8 @@ private slots:
 
     void slotUpdateVideoInfo();
 
-    void updateButtonStates();
+    void slotUpdateButtonStates();
+    void slotUpdateFrameSourceType();
 };
 
 #endif // NEWPROJECTDIALOG_H

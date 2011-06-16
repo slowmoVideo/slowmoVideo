@@ -4,9 +4,11 @@
 
 #include <QDebug>
 
-#include <QFile>
-#include <QDir>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
 #include <QFileDialog>
+#include <QButtonGroup>
 
 QColor NewProjectDialog::colOk(158, 245, 94);
 QColor NewProjectDialog::colBad(247, 122, 48);
@@ -17,24 +19,33 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_buttonGroup = new QButtonGroup(this);
+    m_buttonGroup->addButton(ui->radioVideo);
+    m_buttonGroup->addButton(ui->radioImages);
+    ui->radioVideo->setChecked(true);
+
     m_videoInfo.streamsCount = 0;
 
     bool b = true;
     b &= connect(ui->browseInputVideo, SIGNAL(clicked()), this, SLOT(slotSelectVideoFile()));
     b &= connect(ui->browseProjectDir, SIGNAL(clicked()), this, SLOT(slotSelectProjectDir()));
     b &= connect(ui->inputVideo, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateVideoInfo()));
-    b &= connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(updateButtonStates()));
+    b &= connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
 
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+
+    b &= connect(m_buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFrameSourceType()));
     Q_ASSERT(b);
 
-    updateButtonStates();
+    slotUpdateButtonStates();
+    slotUpdateFrameSourceType();
 }
 
 NewProjectDialog::~NewProjectDialog()
 {
     delete ui;
+    delete m_buttonGroup;
 }
 
 void NewProjectDialog::slotSelectVideoFile()
@@ -57,7 +68,7 @@ void NewProjectDialog::slotSelectProjectDir()
     dialog.setFileMode(QFileDialog::Directory);
     if (dialog.exec() == QDialog::Accepted) {
         ui->projectDir->setText(dialog.selectedFiles().at(0));
-        updateButtonStates();
+        slotUpdateButtonStates();
     }
 }
 
@@ -75,10 +86,10 @@ void NewProjectDialog::slotUpdateVideoInfo()
         m_videoInfo.streamsCount = 0;
         ui->txtVideoInfo->setPlainText("No video stream detected.");
     }
-    updateButtonStates();
+    slotUpdateButtonStates();
 }
 
-void NewProjectDialog::updateButtonStates()
+void NewProjectDialog::slotUpdateButtonStates()
 {
     bool ok = true;
 
@@ -100,4 +111,13 @@ void NewProjectDialog::updateButtonStates()
     }
 
     ui->bOk->setEnabled(ok);
+}
+
+void NewProjectDialog::slotUpdateFrameSourceType()
+{
+    ui->groupImages->setEnabled(ui->radioImages->isChecked());
+    ui->groupImages->setVisible(ui->radioImages->isChecked());
+    ui->groupVideo->setEnabled(ui->radioVideo->isChecked());
+    ui->groupVideo->setVisible(ui->radioVideo->isChecked());
+    adjustSize();
 }
