@@ -45,10 +45,11 @@ int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) co
 
 
     // Project Resources
+    // TODO update
     QDomElement resources = doc.createElement("resources");
     root.appendChild(resources);
     QDomElement inputFile = doc.createElement("inputFile");
-    inputFile.appendChild(doc.createTextNode(project->inFileStr()));
+//    inputFile.appendChild(doc.createTextNode(project->inFileStr()));
     resources.appendChild(inputFile);
 
 

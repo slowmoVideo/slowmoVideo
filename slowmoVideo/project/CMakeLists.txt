@@ -16,6 +16,8 @@ set(SRCS_MOC
   flow_sV.h
   project_sV.h
   renderTask_sV.h
+  abstractFrameSource_sV.h
+  videoFrameSource_sV.h
 )
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
