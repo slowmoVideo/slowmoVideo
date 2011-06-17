@@ -20,7 +20,6 @@ QRegExp VideoFrameSource_sV::regexFrameNumber("frame=\\s*(\\d+)");
 VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException) :
     AbstractFrameSource_sV(project),
     m_inFile(filename),
-    m_ffmpeg(NULL),
     m_ffmpegSemaphore(1),
     m_initialized(false)
 {
@@ -35,6 +34,7 @@ VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QStrin
     m_dirFramesSmall = project->getDirectory("framesSmall");
     m_dirFramesOrig = project->getDirectory("framesOrig");
 
+    m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
 
     bool b = true;
@@ -43,14 +43,14 @@ VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QStrin
 }
 VideoFrameSource_sV::~VideoFrameSource_sV()
 {
-    if (m_ffmpeg != NULL) { delete m_ffmpeg; }
+    delete m_ffmpeg;
     delete m_timer;
     delete m_videoInfo;
 }
 
 void VideoFrameSource_sV::initialize()
 {
-    if (!initialized() && m_ffmpeg == NULL) {
+    if (!initialized()) {
         // Start the frame extraction process
         slotExtractSmallFrames();
     }
@@ -75,6 +75,10 @@ int VideoFrameSource_sV::frameRateDen() const
 QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {
     return QImage(frameFileStr(frame, frameSize));
+}
+const QString VideoFrameSource_sV::videoFile() const
+{
+    return m_inFile.fileName();
 }
 
 const QString VideoFrameSource_sV::frameFileStr(int number, FrameSize size) const
@@ -139,20 +143,21 @@ void VideoFrameSource_sV::slotExtractSmallFrames()
     emit signalNextTask("Extracting thumbnail-sized frames from the video file", m_videoInfo->framesCount);
     m_timer->start(100);
     if (rebuildRequired(FrameSize_Small)) {
-        m_ffmpegSemaphore.acquire();
-        if (m_ffmpeg != NULL) {
-            qDebug() << "ffmpeg process is not NULL; terminating ...";
-            m_ffmpeg->waitForFinished(2000);
-            delete m_ffmpeg;
-        }
-        m_ffmpeg = new QProcess();
-        m_ffmpegSemaphore.release();
 
+        m_ffmpegSemaphore.acquire();
+
+        m_ffmpeg->waitForFinished(2000);
+        m_ffmpeg->terminate();
+
+        disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
         bool b = true;
         b &= connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotExtractOrigFrames()));
         Q_ASSERT(b);
 
         extractFramesFor(FrameSize_Small, m_ffmpeg);
+
+        m_ffmpegSemaphore.release();
+
     } else {
         slotExtractOrigFrames();
     }
@@ -163,20 +168,21 @@ void VideoFrameSource_sV::slotExtractOrigFrames()
     emit signalNextTask("Extracting original-sized frames from the video file", m_videoInfo->framesCount);
     m_timer->start(100);
     if (rebuildRequired(FrameSize_Orig)) {
-        m_ffmpegSemaphore.acquire();
-        if (m_ffmpeg != NULL) {
-            qDebug() << "ffmpeg process is not NULL; terminating ...";
-            m_ffmpeg->waitForFinished(2000);
-            delete m_ffmpeg;
-        }
-        m_ffmpeg = new QProcess();
-        m_ffmpegSemaphore.release();
 
+        m_ffmpegSemaphore.acquire();
+
+        m_ffmpeg->waitForFinished(2000);
+        m_ffmpeg->terminate();
+
+        disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
         bool b = true;
         b &= connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotInitializationFinished()));
         Q_ASSERT(b);
 
         extractFramesFor(FrameSize_Orig, m_ffmpeg);
+
+        m_ffmpegSemaphore.release();
+
     } else {
         slotInitializationFinished();
     }
@@ -188,10 +194,8 @@ void VideoFrameSource_sV::slotInitializationFinished()
     emit signalAllTasksFinished();
 
     m_ffmpegSemaphore.acquire();
-    if (m_ffmpeg != NULL) {
-        delete m_ffmpeg;
-        m_ffmpeg = NULL;
-    }
+    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->terminate();
     m_ffmpegSemaphore.release();
 
     if (!rebuildRequired(FrameSize_Small) && !rebuildRequired(FrameSize_Orig)) {
@@ -214,12 +218,10 @@ void VideoFrameSource_sV::slotProgressUpdate()
     QRegExp regex(regexFrameNumber);
     QString s;
     m_ffmpegSemaphore.acquire();
-    if (m_ffmpeg != NULL) {
-        s = QString(m_ffmpeg->readAllStandardError());
-        if (regex.lastIndexIn(s) >= 0) {
-            emit signalTaskProgress(regex.cap(1).toInt());
-            emit signalTaskItemDescription(QString("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
-        }
+    s = QString(m_ffmpeg->readAllStandardError());
+    if (regex.lastIndexIn(s) >= 0) {
+        emit signalTaskProgress(regex.cap(1).toInt());
+        emit signalTaskItemDescription(QString("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
     }
     m_ffmpegSemaphore.release();
 }

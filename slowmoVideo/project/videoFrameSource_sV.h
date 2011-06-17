@@ -42,6 +42,9 @@ public:
     int frameRateDen() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
 
+    /** \return The absolute path of the input video file. */
+    const QString videoFile() const;
+
 public slots:
     void slotAbortInitialization();
 

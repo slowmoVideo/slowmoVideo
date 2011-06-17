@@ -10,19 +10,24 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "xmlProjectRW_sV.h"
 
+#include "project_sV.h"
+#include "nodelist_sV.h"
+#include "videoFrameSource_sV.h"
+#include "emptyFrameSource_sV.h"
+#include "../lib/defs_sV.hpp"
+
 #include <QDebug>
 #include <QTextStream>
 #include <QXmlQuery>
 
-#include "project_sV.h"
-#include "nodelist_sV.h"
-#include "../lib/defs_sV.hpp"
 
+/// \todo project directory
 
-int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) const
+int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
+    root.setAttribute("version", "2");
     doc.appendChild(root);
 
     // File info
@@ -45,12 +50,12 @@ int XmlProjectRW_sV::saveProject(const Project_sV *project, QString filename) co
 
 
     // Project Resources
-    // TODO update
     QDomElement resources = doc.createElement("resources");
     root.appendChild(resources);
-    QDomElement inputFile = doc.createElement("inputFile");
-//    inputFile.appendChild(doc.createTextNode(project->inFileStr()));
-    resources.appendChild(inputFile);
+    resources.appendChild(frameSource(&doc, project->frameSource()));
+    QDomElement projectDir = doc.createElement("projectDir");
+    projectDir.appendChild(doc.createTextNode(project->getDirectory(".", false).absolutePath()));
+    resources.appendChild(projectDir);
 
 
     // Nodes
@@ -110,6 +115,51 @@ const QDomElement XmlProjectRW_sV::tagToDom(QDomDocument *doc, const Tag_sV &tag
     return el;
 }
 
+const QDomElement XmlProjectRW_sV::frameSource(QDomDocument *doc, const AbstractFrameSource_sV *frameSource)
+{
+    QDomElement source = doc->createElement("frameSource");
+    if (dynamic_cast<const VideoFrameSource_sV *>(frameSource) != NULL) {
+        qDebug() << "Frame source is a video.";
+
+        const VideoFrameSource_sV *vfs = dynamic_cast<const VideoFrameSource_sV *>(frameSource);
+        source.setAttribute("type", "videoFile");
+        QDomElement file = doc->createElement("inputFile");
+        file.appendChild(doc->createTextNode(vfs->videoFile()));
+        source.appendChild(file);
+
+    } else if (dynamic_cast<const EmptyFrameSource_sV *>(frameSource) != NULL) {
+        qDebug() << "Frame source is empty.";
+        source.setAttribute("type", "empty");
+    } else {
+        qDebug() << "Unknown frame source type; cannot save!";
+        source.setAttribute("type", "unknown");
+        Q_ASSERT(false);
+    }
+    return source;
+}
+
+void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *project)
+{
+    QStringRef frameSourceType = reader->attributes().value("type");
+    if (frameSourceType.compare("videoFile") == 0) {
+        while (reader->readNextStartElement()) {
+            if (reader->name() == "inputFile") {
+                VideoFrameSource_sV *frameSource = new VideoFrameSource_sV(project, reader->readElementText());
+                project->loadFrameSource(frameSource);
+            } else {
+                qDebug() << "Unknown element in video frame source section: " << reader->name();
+            }
+        }
+    } else if (frameSourceType.compare("empty")) {
+        EmptyFrameSource_sV *frameSource = new EmptyFrameSource_sV(project);
+        project->loadFrameSource(frameSource);
+    } else {
+        qDebug() << "Unknown frame source: " << frameSourceType << "; Cannot load!";
+        // \todo throw exception
+        Q_ASSERT(false);
+    }
+}
+
 Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
 {
     QFile file(filename);
@@ -128,6 +178,13 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                 qDebug() << "Invalid project file (incorrect root element): " << filename;
             } else {
 
+                int version = 0;
+                QStringRef sVersion = xml.attributes().value("version");
+                if (!sVersion.isEmpty()) {
+                    version = sVersion.toString().toInt();
+                }
+                qDebug() << "Reading project file: version " << version;
+
                 Project_sV *project = new Project_sV();
 
                 while (xml.readNextStartElement()) {
@@ -141,10 +198,15 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
                         }
                     } else if (xml.name() == "resources") {
                         while (xml.readNextStartElement()) {
-                            if (xml.name() == "inputFile") {
+                            if (version < 2 && xml.name() == "inputFile") {
                                 QString inFilename = xml.readElementText();
                                 qDebug() << "Input file: " << inFilename;
-                                project->loadFile(inFilename, QFileInfo(filename).absolutePath());
+                                project->setProjectDir(QFileInfo(filename).absolutePath());
+                                project->loadFrameSource(new VideoFrameSource_sV(project, inFilename));
+                            } else if (xml.name() == "frameSource") {
+                                loadFrameSource(&xml, project);
+                            } else if (xml.name() == "projectDir") {
+                                project->setProjectDir(xml.readElementText());
                             } else {
                                 xml.skipCurrentElement();
                             }

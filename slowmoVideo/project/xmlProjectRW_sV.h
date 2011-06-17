@@ -17,6 +17,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtXml>
 
 class Node_sV;
+class AbstractFrameSource_sV;
+
 class XmlProjectRW_sV// : public AbstractProjectRW_sV
 {
 public:
@@ -28,11 +30,14 @@ public:
     /**
       Saves a project to an XML project file.
       */
-    int saveProject(const Project_sV *project, QString filename) const;
+    int saveProject(Project_sV *project, QString filename) const;
 
 private:
     static const QDomElement nodeToDom(QDomDocument *doc, const Node_sV *node);
     static const QDomElement tagToDom(QDomDocument *doc, const Tag_sV &tag);
+
+    static const QDomElement frameSource(QDomDocument *doc, const AbstractFrameSource_sV *frameSource);
+    static void loadFrameSource(QXmlStreamReader *reader, Project_sV *project);
 };
 
 #endif // XMLPROJECTRW_SV_H

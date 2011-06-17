@@ -28,6 +28,7 @@ public:
     QString m_projectDir;
 
     Project_sV* buildProject();
+    const QString projectFilename() const;
 
 private:
     static QColor colOk;

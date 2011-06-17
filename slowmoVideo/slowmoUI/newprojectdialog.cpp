@@ -63,6 +63,10 @@ Project_sV* NewProjectDialog::buildProject()
     project->loadFrameSource(frameSource);
     return project;
 }
+const QString NewProjectDialog::projectFilename() const
+{
+    return QString(ui->projectDir->text() + "/" + ui->projectFilename->text() + ".sVproj");
+}
 
 void NewProjectDialog::slotSelectVideoFile()
 {
@@ -118,7 +122,7 @@ void NewProjectDialog::slotUpdateButtonStates()
         ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
         ok = false;
     }
-    QFile projectFile(ui->projectDir->text() + "/" + ui->projectFilename->text() + ".sVproj");
+    QFile projectFile(projectFilename());
     if (ui->projectFilename->text().length() > 0 && !projectFile.exists()) {
         ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
     } else {

@@ -51,12 +51,13 @@ public:
     Project_sV(QString projectDir);
     ~Project_sV();
 
+    void setProjectDir(QString projectDir);
 
     /** \param frameSource will be managed (deleted) by the project. If \c NULL, an empty frame source will be used. */
     void loadFrameSource(AbstractFrameSource_sV *frameSource);
 
-    /** Load filename and set the project directory to projectDir */
-    void loadFile(QString filename, QString projectDir);
+//    /** Load filename and set the project directory to projectDir */
+//    void loadFile(QString filename, QString projectDir);
 
 
     AbstractFrameSource_sV* frameSource() { return m_frameSource; }

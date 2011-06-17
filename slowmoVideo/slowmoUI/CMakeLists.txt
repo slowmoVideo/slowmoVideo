@@ -10,7 +10,6 @@ set(SRCS
   canvas.cpp
   inputMonitor.cpp
   newprojectdialog.cpp
-  progressDialogExtractFrames.cpp
   progressDialogBuildFlow.cpp
   progressDialog.cpp
   renderDialog.cpp
@@ -22,7 +21,6 @@ set(SRCS_UI
   canvas.ui
   inputMonitor.ui
   newprojectdialog.ui
-  progressDialogExtractFrames.ui
   progressDialogBuildFlow.ui
   progressDialog.ui
   renderDialog.ui
@@ -34,7 +32,6 @@ set(SRCS_MOC
   canvas.h
   inputMonitor.h
   newprojectdialog.h
-  progressDialogExtractFrames.h
   progressDialogBuildFlow.h
   progressDialog.h
   renderDialog.h

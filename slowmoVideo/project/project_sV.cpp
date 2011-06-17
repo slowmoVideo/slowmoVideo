@@ -33,6 +33,7 @@ the Free Software Foundation, either version 3 of the License, or
 Project_sV::Project_sV()
 {
     init();
+    m_projDir = QDir::temp();
 }
 
 Project_sV::Project_sV(QString projectDir)
@@ -72,6 +73,16 @@ Project_sV::~Project_sV()
     delete m_renderTask;
 }
 
+void Project_sV::setProjectDir(QString projectDir)
+{
+    m_projDir = projectDir;
+    // Create directory if necessary
+    qDebug() << "Project directory: " << m_projDir.absolutePath();
+    if (!m_projDir.exists()) {
+        m_projDir.mkpath(".");
+    }
+}
+
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
 {
     if (m_frameSource != NULL) {
@@ -90,19 +101,6 @@ float Project_sV::length() const
         return m_nodes->at(m_nodes->size()-1).xUnmoved();
     } else {
         return 0;
-    }
-}
-
-void Project_sV::loadFile(QString filename, QString projectDir)
-{
-    // TODO
-    // Set fps number
-    m_projDir = projectDir;
-
-    // Create directory if necessary
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
-    if (!m_projDir.exists()) {
-        m_projDir.mkpath(".");
     }
 }
 

@@ -13,7 +13,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "newprojectdialog.h"
 #include "progressDialog.h"
-#include "progressDialogExtractFrames.h"
 #include "renderDialog.h"
 
 #include "../project/flow_sV.h"
@@ -193,8 +192,13 @@ void MainWindow::newProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {
-        loadProject(npd.buildProject());
-        // TODO save
+        Project_sV *project = npd.buildProject();
+
+        // Save project
+        XmlProjectRW_sV writer;
+        writer.saveProject(m_project, npd.projectFilename());
+
+        loadProject(project);
     }
 }
 

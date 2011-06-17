@@ -12,6 +12,9 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));
     Q_ASSERT(b);
+
+    ui->bOk->setVisible(false);
+    ui->bOk->setEnabled(false);
 }
 
 ProgressDialog::~ProgressDialog()
@@ -39,7 +42,6 @@ void ProgressDialog::slotAbortPressed()
 }
 void ProgressDialog::slotAborted(const QString &message)
 {
-    // \todo abort
     if (message.length() > 0) {
         // Show message
         QMessageBox box(QMessageBox::Warning, "Aborted", message, QMessageBox::Ok);
@@ -50,5 +52,9 @@ void ProgressDialog::slotAborted(const QString &message)
 
 void ProgressDialog::slotAllTasksFinished()
 {
-    accept();
+    ui->progress->setValue(ui->progress->maximum());
+    ui->bOk->setVisible(true);
+    ui->bOk->setEnabled(true);
+    ui->bAbort->setVisible(false);
+    ui->bAbort->setEnabled(false);
 }
