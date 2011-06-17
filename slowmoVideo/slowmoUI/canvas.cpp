@@ -35,7 +35,7 @@ QColor Canvas::gridCol(100, 100, 100);
 QColor Canvas::labelCol(0, 77, 255);
 QColor Canvas::backgroundCol(30, 30, 40);
 
-Canvas::Canvas(const Project_sV *project, QWidget *parent) :
+Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
     m_project(project),
@@ -69,12 +69,13 @@ Canvas::~Canvas()
     delete ui;
 }
 
-void Canvas::load(const Project_sV *project)
+void Canvas::load(Project_sV *project)
 {
     m_project = project;
     qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
     m_tags = project->tags();
+    qDebug() << "Frame source: " << project->frameSource();
     m_tmax.setY(project->frameSource()->framesCount() / project->frameSource()->fps());
     qDebug() << "tMaxY set to " << m_tmax.y();
     repaint();

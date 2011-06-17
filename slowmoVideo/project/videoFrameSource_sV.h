@@ -33,10 +33,12 @@ public:
     VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException);
     ~VideoFrameSource_sV();
 
+    virtual void initialize();
+
     int64_t framesCount() const;
     int frameRateNum() const;
     int frameRateDen() const;
-    QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const;
+    QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
 
 private:
     static QRegExp regexFrameNumber;
@@ -61,7 +63,7 @@ private:
       Checks the availability of the frames and decides
       whether they need to be extracted with extractFrames()
       */
-    bool rebuildRequired(const FrameSize frameSize) const;
+    bool rebuildRequired(const FrameSize frameSize);
 
     const QString frameFileStr(int number, FrameSize size) const;
 

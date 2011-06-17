@@ -27,6 +27,8 @@ public:
     QString m_inputFile;
     QString m_projectDir;
 
+    Project_sV* buildProject();
+
 private:
     static QColor colOk;
     static QColor colBad;

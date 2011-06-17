@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>698</width>
-    <height>611</height>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item row="13" column="0" colspan="7">
+   <item row="14" column="0" colspan="7">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -77,7 +77,7 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0" rowspan="2" colspan="7">
+   <item row="9" column="0" rowspan="2" colspan="7">
     <widget class="QGroupBox" name="groupVideo">
      <property name="title">
       <string>Video source</string>
@@ -94,7 +94,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="lblVideoInfo">
+       <widget class="QLabel" name="lblcVideoInfo">
         <property name="text">
          <string>Video information:</string>
         </property>
@@ -111,7 +111,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="lblInputVideo">
+       <widget class="QLabel" name="lblcInputVideo">
         <property name="font">
          <font>
           <weight>75</weight>
@@ -126,14 +126,14 @@
      </layout>
     </widget>
    </item>
-   <item row="10" column="0" colspan="7">
+   <item row="11" column="0" colspan="7">
     <widget class="QGroupBox" name="groupImages">
      <property name="title">
       <string>Image source</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QLabel" name="lblInputImages">
+       <widget class="QLabel" name="lblcInputImages">
         <property name="font">
          <font>
           <weight>75</weight>
@@ -156,7 +156,7 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="lblImageInfo">
+       <widget class="QLabel" name="lblcImageInfo">
         <property name="text">
          <string>Image information:</string>
         </property>
@@ -168,7 +168,7 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0" colspan="7">
+   <item row="6" column="0" colspan="7">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QRadioButton" name="radioVideo">
@@ -186,7 +186,7 @@
      </item>
     </layout>
    </item>
-   <item row="12" column="0" colspan="7">
+   <item row="13" column="0" colspan="7">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -200,7 +200,7 @@
     </spacer>
    </item>
    <item row="0" column="0">
-    <widget class="QLabel" name="lblProjectDir">
+    <widget class="QLabel" name="lblcProjectDir">
      <property name="font">
       <font>
        <weight>75</weight>
@@ -209,6 +209,29 @@
      </property>
      <property name="text">
       <string>Project Directory</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lblcProjectFilename">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Project Filename</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLineEdit" name="projectFilename"/>
+   </item>
+   <item row="4" column="1" colspan="5">
+    <widget class="QLabel" name="lblcFilenameExtension">
+     <property name="text">
+      <string>.sVproj</string>
      </property>
     </widget>
    </item>

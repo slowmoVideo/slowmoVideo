@@ -38,15 +38,21 @@ VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QStrin
     bool b = true;
     b &= connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
     Q_ASSERT(b);
-
-    // Start the frame extraction process
-    slotExtractOrigFrames();
 }
 VideoFrameSource_sV::~VideoFrameSource_sV()
 {
     if (m_ffmpeg != NULL) { delete m_ffmpeg; }
     delete m_timer;
     delete m_videoInfo;
+}
+
+void VideoFrameSource_sV::initialize()
+{
+    if (!initialized()) {
+        AbstractFrameSource_sV::initialize();
+        // Start the frame extraction process
+        slotExtractOrigFrames();
+    }
 }
 
 int64_t VideoFrameSource_sV::framesCount() const
@@ -61,8 +67,9 @@ int VideoFrameSource_sV::frameRateDen() const
 {
     return m_videoInfo->frameRateDen;
 }
-QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize) const
+QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {
+    initialize();   // Automatically initialize the frame source if not happened yet
     return QImage(frameFileStr(frame, frameSize));
 }
 
@@ -115,7 +122,7 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     qDebug() << process->readAllStandardError();
 }
 
-bool VideoFrameSource_sV::rebuildRequired(const FrameSize frameSize) const
+bool VideoFrameSource_sV::rebuildRequired(const FrameSize frameSize)
 {
     bool needsRebuild = false;
 

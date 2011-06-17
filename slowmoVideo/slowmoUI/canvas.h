@@ -40,7 +40,7 @@ class Canvas : public QWidget
     Q_OBJECT
 
 public:
-    explicit Canvas(const Project_sV *project, QWidget *parent = 0);
+    explicit Canvas(Project_sV *project, QWidget *parent = 0);
     ~Canvas();
 
     enum ToolMode { ToolMode_Select, ToolMode_Move };
@@ -53,7 +53,7 @@ public:
     static QColor labelCol;
     static QColor backgroundCol;
 
-    void load(const Project_sV *project);
+    void load(Project_sV *project);
 
     void toggleHelp();
 
@@ -76,7 +76,7 @@ protected:
 
 private:
     Ui::Canvas *ui;
-    const Project_sV *m_project;
+    Project_sV *m_project;
     bool m_mouseWithinWidget;
     int m_distLeft;
     int m_distBottom;

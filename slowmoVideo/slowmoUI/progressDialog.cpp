@@ -39,6 +39,7 @@ void ProgressDialog::slotAbortPressed()
 }
 void ProgressDialog::slotAborted(const QString &message)
 {
+    // \todo abort
     if (message.length() > 0) {
         // Show message
         QMessageBox box(QMessageBox::Warning, "Aborted", message, QMessageBox::Ok);

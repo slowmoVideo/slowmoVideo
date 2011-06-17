@@ -25,6 +25,7 @@ namespace Ui {
 #include <QTime>
 
 class Canvas;
+class ProgressDialog;
 class QShortcut;
 class QSignalMapper;
 
@@ -68,6 +69,14 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    Project_sV *m_project;
+
+    Canvas *m_wCanvas;
+    InputMonitor *m_wInputMonitor;
+    QDockWidget *m_wInputMonitorDock;
+
+    ProgressDialog *m_progressDialog;
+
 
     TimedShortcut m_lastShortcut;
 
@@ -75,17 +84,12 @@ private:
     QList<QShortcut *> m_shortcutList;
     QMap<int, QString> m_keyList;
 
-    Canvas *m_wCanvas;
-    InputMonitor *m_wInputMonitor;
-    QDockWidget *m_wInputMonitorDock;
-
-    Project_sV *m_project;
-
 
     static void fillCommandList();
 
     void newProject();
     void loadProject(Project_sV *project);
+    void resetDialogs();
 
 private slots:
     /**
@@ -96,6 +100,10 @@ private slots:
     void shortcutUsed(QString);
     void showRenderDialog();
     void slotForwardInputPosition(qreal frame);
+
+    void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
+    void slotFrameSourceTasksFinished();
+    void slotCloseFrameSourceProgress();
 
 
 signals:

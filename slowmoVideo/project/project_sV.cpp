@@ -35,10 +35,17 @@ Project_sV::Project_sV()
     init();
 }
 
-Project_sV::Project_sV(QString filename, QString projectDir)
+Project_sV::Project_sV(QString projectDir)
 {
     init();
-    loadFile(filename, projectDir);
+
+    m_projDir = projectDir;
+
+    // Create directory if necessary
+    qDebug() << "Project directory: " << m_projDir.absolutePath();
+    if (!m_projDir.exists()) {
+        m_projDir.mkpath(".");
+    }
 }
 
 void Project_sV::init()
@@ -46,7 +53,6 @@ void Project_sV::init()
     m_fps = 24;
     m_renderFrameSize = FrameSize_Small;
 
-//    m_frameSource = new VideoFrameSource_sV(this, "/tmp/noexist.avi");
     m_frameSource = new EmptyFrameSource_sV(this);
 
     m_flow = new Flow_sV();
@@ -64,6 +70,18 @@ Project_sV::~Project_sV()
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
+}
+
+void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
+{
+    if (m_frameSource != NULL) {
+        delete m_frameSource;
+    }
+    if (frameSource == NULL) {
+        m_frameSource = new EmptyFrameSource_sV(this);
+    } else {
+        m_frameSource = frameSource;
+    }
 }
 
 float Project_sV::length() const

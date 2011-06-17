@@ -1,6 +1,8 @@
 #include "newprojectdialog.h"
 #include "ui_newprojectdialog.h"
 
+#include "../project/videoFrameSource_sV.h"
+
 
 #include <QDebug>
 
@@ -31,6 +33,7 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
     b &= connect(ui->browseProjectDir, SIGNAL(clicked()), this, SLOT(slotSelectProjectDir()));
     b &= connect(ui->inputVideo, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateVideoInfo()));
     b &= connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
+    b &= connect(ui->projectFilename, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
 
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
@@ -46,6 +49,19 @@ NewProjectDialog::~NewProjectDialog()
 {
     delete ui;
     delete m_buttonGroup;
+}
+
+Project_sV* NewProjectDialog::buildProject()
+{
+    Project_sV *project = new Project_sV(ui->projectDir->text());
+    AbstractFrameSource_sV *frameSource = NULL;
+    if (ui->radioVideo->isChecked()) {
+        frameSource = new VideoFrameSource_sV(project, ui->inputVideo->text());
+    } else {
+        Q_ASSERT(false);
+    }
+    project->loadFrameSource(frameSource);
+    return project;
 }
 
 void NewProjectDialog::slotSelectVideoFile()
@@ -93,13 +109,6 @@ void NewProjectDialog::slotUpdateButtonStates()
 {
     bool ok = true;
 
-    if (m_videoInfo.streamsCount > 0) {
-        ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
-        m_inputFile = ui->inputVideo->text();
-    } else {
-        ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
-        ok = false;
-    }
     if (ui->projectDir->text().length() > 0) {
         QDir dir(ui->projectDir->text());
         ui->cbDirectoryCreated->setChecked(!dir.exists());
@@ -107,6 +116,27 @@ void NewProjectDialog::slotUpdateButtonStates()
         m_projectDir = ui->projectDir->text();
     } else {
         ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+        ok = false;
+    }
+    QFile projectFile(ui->projectDir->text() + "/" + ui->projectFilename->text() + ".sVproj");
+    if (ui->projectFilename->text().length() > 0 && !projectFile.exists()) {
+        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
+    } else {
+        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+        ok = false;
+    }
+
+    if (ui->radioVideo->isChecked()) {
+        // Validate the video file
+        if (m_videoInfo.streamsCount > 0) {
+            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
+            m_inputFile = ui->inputVideo->text();
+        } else {
+            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+            ok = false;
+        }
+    } else if (ui->radioImages->isChecked()) {
+        // \todo Validate the images
         ok = false;
     }
 
@@ -119,5 +149,6 @@ void NewProjectDialog::slotUpdateFrameSourceType()
     ui->groupImages->setVisible(ui->radioImages->isChecked());
     ui->groupVideo->setEnabled(ui->radioVideo->isChecked());
     ui->groupVideo->setVisible(ui->radioVideo->isChecked());
+    slotUpdateButtonStates();
     adjustSize();
 }

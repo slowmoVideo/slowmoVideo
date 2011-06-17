@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "ui_mainwindow.h"
 
 #include "newprojectdialog.h"
+#include "progressDialog.h"
 #include "progressDialogExtractFrames.h"
 #include "renderDialog.h"
 
@@ -57,12 +58,12 @@ void MainWindow::fillCommandList()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_progressDialog(NULL)
 {
     ui->setupUi(this);
 
-    m_project = new Project_sV(QDir::tempPath() + "/noexist", QDir::tempPath());
-    qDebug() << "Project location: " << &m_project;
+    m_project = new Project_sV();
 
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
@@ -149,28 +150,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadProject(Project_sV *project)
 {
+    Q_ASSERT(project != NULL);
+    resetDialogs();
     if (m_project != NULL) {
         delete m_project;
+        m_project = NULL;
     }
-    if (project != NULL) {
-        m_project = project;
-        m_wCanvas->load(m_project);
-    }
+    m_project = project;
+    m_wCanvas->load(m_project);
 
-    ProgressDialogExtractFrames progress;
     bool b = true;
-    b &= connect(
-                m_project, SIGNAL(signalFramesExtracted(FrameSize)),
-                &progress, SLOT(slotExtractionFinished(FrameSize))
-            );
-    b &= connect(
-                m_project, SIGNAL(signalProgressUpdated(FrameSize,int)),
-                &progress, SLOT(slotProgressUpdated(FrameSize,int))
-            );
+    b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
+    b &= connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
     Q_ASSERT(b);
-    // TODO do in project itself
-//    m_project->extractFrames();
-    progress.exec();
+
+    m_project->frameSource()->initialize();
 }
 
 
@@ -186,20 +180,21 @@ void MainWindow::displayHelp(QPainter &davinci)
     davinci.drawText(text, helpText);
 }
 
+void MainWindow::resetDialogs()
+{
+    if (m_progressDialog != NULL) {
+        m_progressDialog->close();
+        delete m_progressDialog;
+        m_progressDialog = NULL;
+    }
+}
+
 void MainWindow::newProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {
-        Project_sV *newProject = new Project_sV(npd.m_inputFile, npd.m_projectDir);
-        if (newProject->validDirectories()) {
-
-            loadProject(newProject);
-
-
-        } else {
-            qDebug() << "Project directories not writable.";
-            delete newProject;
-        }
+        loadProject(npd.buildProject());
+        // TODO save
     }
 }
 
@@ -323,4 +318,30 @@ void MainWindow::showRenderDialog()
 
     renderDialog.exec();
 }
+
+void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskSize)
+{
+    if (m_progressDialog == NULL) {
+        m_progressDialog = new ProgressDialog(this);
+        bool b = true;
+        b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
+        b &= connect(m_project->frameSource(), SIGNAL(signalTaskProgress(int)), m_progressDialog, SLOT(slotTaskProgress(int)));
+        b &= connect(m_project->frameSource(), SIGNAL(signalTaskItemDescription(QString)), m_progressDialog, SLOT(slotTaskItemDescription(QString)));
+        b &= connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), m_progressDialog, SLOT(slotAllTasksFinished()));
+        Q_ASSERT(b);
+    }
+    m_progressDialog->show();
+    m_progressDialog->slotNextTask(taskDescription, taskSize);
+}
+void MainWindow::slotFrameSourceTasksFinished()
+{
+    QTimer::singleShot(2000, this, SLOT(slotCloseFrameSourceProgress()));
+}
+void MainWindow::slotCloseFrameSourceProgress()
+{
+    if (m_progressDialog != NULL) {
+        m_progressDialog->close();
+    }
+}
+
 

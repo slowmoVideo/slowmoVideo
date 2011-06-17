@@ -28,6 +28,20 @@ public:
     AbstractFrameSource_sV(const Project_sV *project);
     virtual ~AbstractFrameSource_sV();
 
+    /**
+      \fn initialize()
+      Initializes the frame source (like extracting frames from a video).
+      When re-implementing this method, the parent function must be called in order for
+      initialized() to work.
+      \see signalNextTask() and the other signals
+      */
+    /**
+      \fn initialized()
+      \return \c true, if the frame source has been initialized.
+      */
+    virtual void initialize();
+    virtual bool initialized();
+
     virtual int64_t framesCount() const = 0;
     virtual int frameRateNum() const = 0;
     virtual int frameRateDen() const = 0;
@@ -37,7 +51,7 @@ public:
       @return The frame at the given position, as image. Fails
       if the frames have not been extracted yet.
       */
-    virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
+    virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) = 0;
 
 signals:
     /**
@@ -65,6 +79,9 @@ signals:
 
 protected:
     const Project_sV *m_project;
+
+private:
+    bool m_initialized;
 
 };
 

@@ -48,15 +48,18 @@ public:
       @param filename Input video file
       @param projectDir Project directory; All cached files will be put in there.
       */
-    Project_sV(QString filename, QString projectDir);
+    Project_sV(QString projectDir);
     ~Project_sV();
 
+
+    /** \param frameSource will be managed (deleted) by the project. If \c NULL, an empty frame source will be used. */
+    void loadFrameSource(AbstractFrameSource_sV *frameSource);
 
     /** Load filename and set the project directory to projectDir */
     void loadFile(QString filename, QString projectDir);
 
 
-    const AbstractFrameSource_sV* frameSource() const { return m_frameSource; }
+    AbstractFrameSource_sV* frameSource() { return m_frameSource; }
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
