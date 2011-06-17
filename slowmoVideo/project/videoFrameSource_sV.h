@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
+#include <QtCore/QSemaphore>
 
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -33,12 +34,16 @@ public:
     VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException);
     ~VideoFrameSource_sV();
 
-    virtual void initialize();
+    void initialize();
+    bool initialized() const;
 
     int64_t framesCount() const;
     int frameRateNum() const;
     int frameRateDen() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
+
+public slots:
+    void slotAbortInitialization();
 
 private:
     static QRegExp regexFrameNumber;
@@ -52,6 +57,8 @@ private:
 
     QTimer *m_timer;
     QProcess *m_ffmpeg;
+    QSemaphore m_ffmpegSemaphore;
+    bool m_initialized;
 
 
     const QString framesDirStr(FrameSize frameSize) const;

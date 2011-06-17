@@ -35,7 +35,7 @@ void ProgressDialog::slotTaskItemDescription(const QString desc)
 }
 void ProgressDialog::slotAbortPressed()
 {
-    emit abort();
+    emit signalAbortTask();
 }
 void ProgressDialog::slotAborted(const QString &message)
 {

@@ -23,7 +23,7 @@ public slots:
     void slotAborted(const QString& message = "");
 
 signals:
-    void signalAbort();
+    void signalAbortTask();
 
 private:
     Ui::ProgressDialog *ui;

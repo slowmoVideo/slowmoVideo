@@ -39,8 +39,8 @@ public:
       \fn initialized()
       \return \c true, if the frame source has been initialized.
       */
-    virtual void initialize();
-    virtual bool initialized();
+    virtual void initialize() = 0;
+    virtual bool initialized() const = 0;
 
     virtual int64_t framesCount() const = 0;
     virtual int frameRateNum() const = 0;
@@ -77,11 +77,11 @@ signals:
     void signalTaskItemDescription(const QString desc);
     void signalAllTasksFinished();
 
+public slots:
+    virtual void slotAbortInitialization() = 0;
+
 protected:
     const Project_sV *m_project;
-
-private:
-    bool m_initialized;
 
 };
 

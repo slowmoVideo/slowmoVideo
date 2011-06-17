@@ -11,8 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "abstractFrameSource_sV.h"
 
 AbstractFrameSource_sV::AbstractFrameSource_sV(const Project_sV *project) :
-    m_project(project),
-    m_initialized(false)
+    m_project(project)
 {
 }
 
@@ -20,16 +19,6 @@ AbstractFrameSource_sV::~AbstractFrameSource_sV()
 {
 
 }
-
-void AbstractFrameSource_sV::initialize()
-{
-    m_initialized = true;
-}
-bool AbstractFrameSource_sV::initialized()
-{
-    return m_initialized;
-}
-
 
 float AbstractFrameSource_sV::fps() const throw(Div0Exception)
 {
