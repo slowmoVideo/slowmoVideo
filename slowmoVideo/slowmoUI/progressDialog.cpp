@@ -11,6 +11,7 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
 
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));
+    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
     Q_ASSERT(b);
 
     ui->bOk->setVisible(false);
@@ -22,11 +23,20 @@ ProgressDialog::~ProgressDialog()
     delete ui;
 }
 
+void ProgressDialog::setWorking(bool working)
+{
+    ui->bOk->setVisible(!working);
+    ui->bOk->setEnabled(!working);
+    ui->bAbort->setVisible(working);
+    ui->bAbort->setEnabled(working);
+}
+
 void ProgressDialog::slotNextTask(const QString taskDescription, int taskSize)
 {
     ui->lblTaskDesc->setText(taskDescription);
     ui->progress->setMaximum(taskSize);
     ui->progress->setValue(0);
+    setWorking(true);
 }
 void ProgressDialog::slotTaskProgress(int progress)
 {
@@ -53,8 +63,5 @@ void ProgressDialog::slotAborted(const QString &message)
 void ProgressDialog::slotAllTasksFinished()
 {
     ui->progress->setValue(ui->progress->maximum());
-    ui->bOk->setVisible(true);
-    ui->bOk->setEnabled(true);
-    ui->bAbort->setVisible(false);
-    ui->bAbort->setEnabled(false);
+    setWorking(false);
 }

@@ -56,7 +56,7 @@ void Project_sV::init()
     m_flow = new Flow_sV();
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
-    m_renderTask = new RenderTask_sV(this);
+    m_renderTask = NULL;
 }
 
 Project_sV::~Project_sV()
@@ -88,6 +88,16 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
     } else {
         m_frameSource = frameSource;
     }
+}
+
+void Project_sV::replaceRenderTask(RenderTask_sV *task)
+{
+    if (m_renderTask != NULL) {
+        m_renderTask->slotStopRendering();
+        m_renderTask->deleteLater();
+        m_renderTask = NULL;
+    }
+    m_renderTask = task;
 }
 
 const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists) const
@@ -122,7 +132,7 @@ bool Project_sV::validDirectories() const
 /**
   @todo frame size
   */
-QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const
+QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError)
 {
     float framePos = timeToFrame(time);
     if (framePos > m_frameSource->framesCount()) {
@@ -157,7 +167,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
     }
 }
 
-FlowField_sV* Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const
+FlowField_sV* Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const throw(FlowBuildingError)
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount()-1);
     const QString outFile = flowFileStr(leftFrame, direction, frameSize);

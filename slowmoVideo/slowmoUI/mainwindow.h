@@ -76,6 +76,7 @@ private:
     QDockWidget *m_wInputMonitorDock;
 
     ProgressDialog *m_progressDialog;
+    ProgressDialog *m_renderProgressDialog;
 
 
     TimedShortcut m_lastShortcut;
@@ -104,6 +105,8 @@ private slots:
     void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
     void slotFrameSourceTasksFinished();
     void slotCloseFrameSourceProgress();
+
+    void slotRenderingAborted(QString message);
 
 
 signals:

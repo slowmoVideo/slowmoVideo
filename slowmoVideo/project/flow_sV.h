@@ -35,8 +35,8 @@ public:
     typedef const QString (Project_sV::*ProjectFlowMemFn)(int nr, FlowDirection direction) const;
 
     void buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, ProjectFlowMemFn outName,
-                          FlowDirection direction);
-    void buildFlowImage(const QString& leftFrame, const QString& rightFrame, const QString& outFrame, FlowDirection direction);
+                   FlowDirection direction) throw(FlowBuildingError);
+    void buildFlowImage(const QString& leftFrame, const QString& rightFrame, const QString& outFrame, FlowDirection direction) throw(FlowBuildingError);
 
 signals:
     void signalFlowProgressUpdated(int progress);

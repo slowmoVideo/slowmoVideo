@@ -12,9 +12,6 @@
 #include <QFileDialog>
 #include <QButtonGroup>
 
-QColor NewProjectDialog::colOk(158, 245, 94);
-QColor NewProjectDialog::colBad(247, 122, 48);
-
 NewProjectDialog::NewProjectDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::NewProjectDialog)
@@ -116,27 +113,27 @@ void NewProjectDialog::slotUpdateButtonStates()
     if (ui->projectDir->text().length() > 0) {
         QDir dir(ui->projectDir->text());
         ui->cbDirectoryCreated->setChecked(!dir.exists());
-        ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
+        ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
         m_projectDir = ui->projectDir->text();
     } else {
-        ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+        ui->projectDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
         ok = false;
     }
     QFile projectFile(projectFilename());
     if (ui->projectFilename->text().length() > 0 && !projectFile.exists()) {
-        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
+        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
     } else {
-        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+        ui->projectFilename->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
         ok = false;
     }
 
     if (ui->radioVideo->isChecked()) {
         // Validate the video file
         if (m_videoInfo.streamsCount > 0) {
-            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colOk.name()));
+            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
             m_inputFile = ui->inputVideo->text();
         } else {
-            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(colBad.name()));
+            ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
             ok = false;
         }
     } else if (ui->radioImages->isChecked()) {

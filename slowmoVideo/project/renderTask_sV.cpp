@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QMetaObject>
 #include "project_sV.h"
 #include "nodelist_sV.h"
+#include "../lib/defs_sV.hpp"
 
 RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_project(project),
@@ -103,13 +104,18 @@ void RenderTask_sV::slotRenderFrom(qreal time)
 
             qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s").arg(frameNumber).arg(time).arg(srcTime));
-            QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize);
+            try {
+                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize);
 
-            m_renderTarget->slotConsumeFrame(rendered, frameNumber);
-            m_nextFrameTime = time + 1/m_fps;
+                m_renderTarget->slotConsumeFrame(rendered, frameNumber);
+                m_nextFrameTime = time + 1/m_fps;
 
-            emit signalTaskProgress(frameNumber);
-            emit signalFrameRendered(time, frameNumber);
+                emit signalTaskProgress(frameNumber);
+                emit signalFrameRendered(time, frameNumber);
+            } catch (FlowBuildingError &err) {
+                m_stopRendering = true;
+                emit signalRenderingAborted(err.message());
+            }
         }
 
     } else {

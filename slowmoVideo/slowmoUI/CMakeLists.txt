@@ -12,7 +12,7 @@ set(SRCS
   newprojectdialog.cpp
   progressDialogBuildFlow.cpp
   progressDialog.cpp
-  renderDialog.cpp
+  renderingDialog.cpp
   tagAddDialog.cpp
 )
 
@@ -23,7 +23,7 @@ set(SRCS_UI
   newprojectdialog.ui
   progressDialogBuildFlow.ui
   progressDialog.ui
-  renderDialog.ui
+  renderingDialog.ui
   tagAddDialog.ui
 )
 
@@ -34,7 +34,7 @@ set(SRCS_MOC
   newprojectdialog.h
   progressDialogBuildFlow.h
   progressDialog.h
-  renderDialog.h
+  renderingDialog.h
   tagAddDialog.h
 )
 

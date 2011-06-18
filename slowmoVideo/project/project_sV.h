@@ -60,13 +60,11 @@ public:
     Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
+
     RenderTask_sV *renderTask() { return m_renderTask; }
-//    const FrameSize renderFrameSize() const { return m_renderFrameSize; }
-//    float fpsOut() const { return m_fps; }
+    void replaceRenderTask(RenderTask_sV *task);
+
     float length() const;
-
-
-    void render(qreal fps);
 
 
     /**
@@ -74,9 +72,9 @@ public:
       */
     bool validDirectories() const;
 
-    QImage interpolateFrameAt(float time, const FrameSize frameSize) const;
+    QImage interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError);
 
-    FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const;
+    FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const throw(FlowBuildingError);
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 

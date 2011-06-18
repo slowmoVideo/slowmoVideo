@@ -108,6 +108,9 @@
           <height>0</height>
          </size>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
        </widget>
       </item>
       <item row="0" column="0">
@@ -163,7 +166,11 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QPlainTextEdit" name="txtImageInfo"/>
+       <widget class="QPlainTextEdit" name="txtImageInfo">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -237,6 +244,22 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>projectDir</tabstop>
+  <tabstop>browseProjectDir</tabstop>
+  <tabstop>cbDirectoryCreated</tabstop>
+  <tabstop>projectFilename</tabstop>
+  <tabstop>radioVideo</tabstop>
+  <tabstop>radioImages</tabstop>
+  <tabstop>inputVideo</tabstop>
+  <tabstop>browseInputVideo</tabstop>
+  <tabstop>inputImages</tabstop>
+  <tabstop>browseInputImages</tabstop>
+  <tabstop>bAbort</tabstop>
+  <tabstop>bOk</tabstop>
+  <tabstop>txtImageInfo</tabstop>
+  <tabstop>txtVideoInfo</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

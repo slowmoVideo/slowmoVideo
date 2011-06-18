@@ -13,7 +13,6 @@ namespace Ui {
     class NewProjectDialog;
 }
 
-class QColor;
 class QButtonGroup;
 
 class NewProjectDialog : public QDialog
@@ -31,8 +30,6 @@ public:
     const QString projectFilename() const;
 
 private:
-    static QColor colOk;
-    static QColor colBad;
 
 
     Ui::NewProjectDialog *ui;

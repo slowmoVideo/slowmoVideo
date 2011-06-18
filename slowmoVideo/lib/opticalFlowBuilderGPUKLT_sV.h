@@ -16,7 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 class OpticalFlowBuilderGPUKLT_sV : public OpticalFlowBuilder_sV
 {
 public:
-    virtual void buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const;
+    virtual void buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const throw(FlowBuildingError);
 };
 
 #endif // OPTICALFLOWBUILDERGPUKLT_SV_H

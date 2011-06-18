@@ -25,7 +25,7 @@ void ImagesRenderTarget_sV::setTargetDir(const QDir dir)
 
 bool ImagesRenderTarget_sV::setFilenamePattern(const QString pattern)
 {
-    if (pattern.contains("\\%1")) {
+    if (pattern.contains("%1")) {
         m_filenamePattern = pattern;
         return true;
     }
@@ -34,6 +34,9 @@ bool ImagesRenderTarget_sV::setFilenamePattern(const QString pattern)
 
 void ImagesRenderTarget_sV::slotConsumeFrame(const QImage &image, const int frameNumber)
 {
+    if (!m_targetDir.exists()) {
+        m_targetDir.mkpath(".");
+    }
     QString path = m_targetDir.absoluteFilePath(m_filenamePattern.arg(frameNumber+1, 5, 10, QChar::fromAscii('0')));
 
     bool ok;

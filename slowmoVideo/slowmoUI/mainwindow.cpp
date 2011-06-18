@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "newprojectdialog.h"
 #include "progressDialog.h"
-#include "renderDialog.h"
+#include "renderingDialog.h"
 
 #include "../project/flow_sV.h"
 #include "../project/renderTask_sV.h"
@@ -24,6 +24,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QObject>
 #include <QDockWidget>
 #include <QDebug>
+#include <QMessageBox>
 
 #include <QDir>
 #include <QFileDialog>
@@ -58,7 +59,8 @@ void MainWindow::fillCommandList()
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_progressDialog(NULL)
+    m_progressDialog(NULL),
+    m_renderProgressDialog(NULL)
 {
     ui->setupUi(this);
 
@@ -186,6 +188,11 @@ void MainWindow::resetDialogs()
         delete m_progressDialog;
         m_progressDialog = NULL;
     }
+    if (m_renderProgressDialog != NULL) {
+        m_renderProgressDialog->close();
+        delete m_renderProgressDialog;
+        m_renderProgressDialog = NULL;
+    }
 }
 
 void MainWindow::newProject()
@@ -307,20 +314,38 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 
 void MainWindow::showRenderDialog()
 {
-    RenderDialog renderDialog(m_project);
+    RenderingDialog renderingDialog(m_project, this);
+    if (renderingDialog.exec() == QDialog::Accepted) {
+        RenderTask_sV *task = renderingDialog.buildTask();
+        m_project->replaceRenderTask(task);
 
-    bool b = true;
-    b &= connect(&renderDialog, SIGNAL(signalChangeFps(float)), m_project, SLOT(slotSetFps(float)));
-    b &= connect(&renderDialog, SIGNAL(signalChangeRenderFrameSize(FrameSize)), m_project, SLOT(slotSetRenderFrameSize(FrameSize)));
-//    b &= connect(&renderDialog, SIGNAL(signalChangeRenderFrameSize(FrameSize)), m_project->renderTask(), SLOT(slotUpdateRenderFrameSize(FrameSize)));
-    b &= connect(&renderDialog, SIGNAL(signalAbortRendering()), m_project->renderTask(), SLOT(slotAbortRendering()));
-    b &= connect(&renderDialog, SIGNAL(signalContinueRendering()), m_project->renderTask(), SLOT(slotContinueRendering()));
-    b &= connect(m_project->renderTask(), SIGNAL(signalFrameRendered(qreal,int)), &renderDialog, SLOT(slotFrameRendered(qreal,int)));
-    b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted()), &renderDialog, SLOT(slotRenderingAborted()));
-    b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished()), &renderDialog, SLOT(slotRenderingFinished()));
-    Q_ASSERT(b);
+        if (m_renderProgressDialog == NULL) {
+            m_renderProgressDialog = new ProgressDialog(this);
+        } else {
+            m_renderProgressDialog->disconnect();
+        }
 
-    renderDialog.exec();
+        bool b = true;
+        b &= connect(task, SIGNAL(signalNewTask(QString,int)), m_renderProgressDialog, SLOT(slotNextTask(QString,int)));
+        b &= connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
+        b &= connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
+        b &= connect(task, SIGNAL(signalRenderingFinished()), m_renderProgressDialog, SLOT(slotAllTasksFinished()));
+        b &= connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
+        b &= connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
+        b &= connect(task, SIGNAL(signalRenderingStopped()), m_renderProgressDialog, SLOT(slotAborted()));
+        b &= connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
+        // TODO continue/abort
+        Q_ASSERT(b);
+
+        m_renderProgressDialog->show();
+
+        task->slotContinueRendering();
+
+    }
+}
+void MainWindow::slotRenderingAborted(QString message)
+{
+    QMessageBox(QMessageBox::Warning, "Error", message, QMessageBox::Ok).exec();
 }
 
 void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskSize)

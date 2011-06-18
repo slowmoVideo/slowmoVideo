@@ -13,9 +13,14 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QProcess>
 #include <QDebug>
 
-void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const
+/// \todo No hardcoding for the flow builder location (QSettings)
+void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &right, const QFile &output, FlowDirection direction) const throw(FlowBuildingError)
 {
-    QString program("/data/cworkspace/slowmoGPU/V3D/build/Apps/GL/flowBuilder");
+    QString programLocation("/data/cworkspace/slowmoGPU/install/bin/flowBuilder");
+    if (!QFile(programLocation).exists()) {
+        throw FlowBuildingError("Program\n" + programLocation + "\ndoes not exist, cannot build flow!");
+    }
+    QString program(programLocation);
     QStringList args;
     switch (direction) {
     case FlowDirection_Forward:
@@ -35,6 +40,7 @@ void OpticalFlowBuilderGPUKLT_sV::buildFlow(const QFile &left, const QFile &righ
     proc->waitForFinished();
     if (proc->exitCode() != 0) {
         qDebug() << "Failed: " << proc->readAllStandardError() << proc->readAllStandardOutput();
+        throw FlowBuildingError(QString("Flow builder exited with exit code %1; For details see debugging output").arg(proc->exitCode()));
     } else {
         qDebug() << "Optical flow built for " << output.fileName();
         qDebug() << proc->readAllStandardError() << proc->readAllStandardOutput();

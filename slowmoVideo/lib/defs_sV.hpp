@@ -3,9 +3,23 @@
 
 #include <QDebug>
 #include <QString>
+#include <QColor>
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
+
+namespace Colours_sV {
+    static QColor colOk(158, 245, 94);
+    static QColor colBad(247, 122, 48);
+}
+
+class FlowBuildingError {
+public:
+    FlowBuildingError(QString msg);
+    QString message() const;
+private:
+    QString m_message;
+};
 
 inline QString enumStr(const FrameSize &size) {
     switch (size) {

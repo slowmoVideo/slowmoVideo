@@ -28,6 +28,8 @@ signals:
 private:
     Ui::ProgressDialog *ui;
 
+    void setWorking(bool working);
+
 private slots:
     void slotAbortPressed();
 };

@@ -28,7 +28,7 @@ Flow_sV::~Flow_sV()
     delete m_flowBuilder;
 }
 
-void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, ProjectFlowMemFn outName, FlowDirection direction)
+void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, ProjectFlowMemFn outName, FlowDirection direction) throw(FlowBuildingError)
 {
     m_abort = false;
     m_aborted = false;
@@ -61,7 +61,7 @@ void Flow_sV::buildFlow(Project_sV *project, ProjectFrameMemFn frameNames, Proje
     }
 }
 
-void Flow_sV::buildFlowImage(const QString &leftFrame, const QString &rightFrame, const QString &outFrame, FlowDirection direction)
+void Flow_sV::buildFlowImage(const QString &leftFrame, const QString &rightFrame, const QString &outFrame, FlowDirection direction) throw(FlowBuildingError)
 {
     m_flowBuilder->buildFlow(leftFrame, rightFrame, outFrame, direction);
 }
