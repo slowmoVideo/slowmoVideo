@@ -5,7 +5,7 @@
 #include <QString>
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
-enum FrameSize { FrameSize_Orig, FrameSize_Small };
+enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 
 inline QString enumStr(const FrameSize &size) {
     switch (size) {

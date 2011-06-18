@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "renderTask_sV.h"
+#include "abstractRenderTarget_sV.h"
 
 #include <QImage>
 #include <QMetaObject>
@@ -17,57 +18,105 @@ the Free Software Foundation, either version 3 of the License, or
 
 RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_project(project),
-//    m_frameSize(project->renderFrameSize()),
+    m_renderTarget(NULL),
     m_stopRendering(false)
 {
+    m_timeStart = m_project->nodes()->startTime();
+    m_timeEnd = m_project->nodes()->endTime();
+    m_fps = 24;
+    m_frameSize = FrameSize_Small;
+
     m_nextFrameTime = m_project->nodes()->startTime();
 }
 
-void RenderTask_sV::slotAbortRendering()
+RenderTask_sV::~RenderTask_sV()
+{
+    if (m_renderTarget != NULL) { delete m_renderTarget; }
+}
+
+void RenderTask_sV::setRenderTarget(AbstractRenderTarget_sV *renderTarget)
+{
+    Q_ASSERT(renderTarget != NULL);
+
+    if (m_renderTarget != NULL && m_renderTarget != renderTarget) {
+        delete m_renderTarget;
+    }
+    m_renderTarget = renderTarget;
+}
+
+void RenderTask_sV::setTimeRange(float start, float end)
+{
+    Q_ASSERT(start <= end);
+    Q_ASSERT(start >= m_project->nodes()->startTime());
+    Q_ASSERT(end <= m_project->nodes()->endTime());
+
+    m_timeStart = start;
+    m_timeEnd = end;
+}
+
+void RenderTask_sV::setFPS(float fps)
+{
+    Q_ASSERT(fps > 0);
+    m_fps = fps;
+}
+
+void RenderTask_sV::setSize(FrameSize size)
+{
+    m_frameSize = size;
+}
+
+void RenderTask_sV::slotStopRendering()
 {
     m_stopRendering = true;
 }
 
-void RenderTask_sV::slotContinueRendering(qreal time)
+void RenderTask_sV::slotContinueRendering()
 {
     m_stopRendering = false;
-    if (time >= 0) {
-        m_nextFrameTime = time;
-    }
-    if (time < m_project->nodes()->startTime()) {
-        m_nextFrameTime = m_project->nodes()->startTime();
+    if (m_nextFrameTime < m_timeStart) {
+        m_nextFrameTime = m_timeStart;
     }
     qDebug() << "Continuing rendering at " << m_nextFrameTime;
+
+    emit signalRenderingContinued();
+    emit signalNewTask("Rendering slowmo ...", int(m_fps * (m_timeEnd-m_timeStart)));
     QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
 }
 
 void RenderTask_sV::slotRenderFrom(qreal time)
 {
-    int frameNumber = (time - m_project->nodes()->startTime()) * m_project->fpsOut();
+    if (m_renderTarget == NULL) {
+        m_stopRendering = true;
+        emit signalRenderingAborted("No rendering target given! Aborting rendering.");
+        return;
+    }
+
+    int frameNumber = (time - m_project->nodes()->startTime()) * m_fps;
     if (!m_stopRendering) {
 
-        if (time > m_project->nodes()->endTime()) {
+        if (time > m_timeEnd) {
             m_stopRendering = true;
             emit signalRenderingFinished();
 
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
+
             qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
-            QImage rendered = m_project->interpolateFrameAt(srcTime, m_project->renderFrameSize());
-            rendered.save(m_project->renderedFileStr(frameNumber, m_project->renderFrameSize()));
-            m_nextFrameTime = time + 1/m_project->fpsOut();
+            emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s").arg(frameNumber).arg(time).arg(srcTime));
+            QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize);
+
+            m_renderTarget->slotConsumeFrame(rendered, frameNumber);
+            m_nextFrameTime = time + 1/m_fps;
+
+            emit signalTaskProgress(frameNumber);
             emit signalFrameRendered(time, frameNumber);
         }
 
     } else {
-        emit signalRenderingAborted();
+        emit signalRenderingStopped();
     }
     if (!m_stopRendering) {
         QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
     }
 }
 
-//void RenderTask_sV::slotUpdateRenderFrameSize(const FrameSize frameSize)
-//{
-//    m_frameSize = frameSize;
-//}

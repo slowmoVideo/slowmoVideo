@@ -41,12 +41,13 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     // Project Preferences
     QDomElement preferences = doc.createElement("preferences");
     root.appendChild(preferences);
-    QDomElement renderFPS = doc.createElement("renderFPS");
-    renderFPS.appendChild(doc.createTextNode(QString("%1").arg(project->fpsOut())));
-    preferences.appendChild(renderFPS);
-    QDomElement renderSize = doc.createElement("renderSize");
-    renderSize.appendChild(doc.createTextNode(enumStr(project->renderFrameSize())));
-    preferences.appendChild(renderSize);
+    /// \todo rendering settings
+//    QDomElement renderFPS = doc.createElement("renderFPS");
+//    renderFPS.appendChild(doc.createTextNode(QString("%1").arg(project->fpsOut())));
+//    preferences.appendChild(renderFPS);
+//    QDomElement renderSize = doc.createElement("renderSize");
+//    renderSize.appendChild(doc.createTextNode(enumStr(project->renderFrameSize())));
+//    preferences.appendChild(renderSize);
 
 
     // Project Resources

@@ -11,6 +11,7 @@ set(SRCS_PROJ
   videoFrameSource_sV.cpp
   emptyFrameSource_sV.cpp
   abstractRenderTarget_sV.cpp
+  imagesRenderTarget_sV.cpp
 )
 
 set(SRCS_MOC

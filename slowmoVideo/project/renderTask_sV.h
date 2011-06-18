@@ -16,26 +16,51 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/defs_sV.hpp"
 
 class Project_sV;
+class AbstractRenderTarget_sV;
+
+/**
+  \brief Renders a project when started.
+  \todo Changes in the project affect the rendering as well. Copy the project?
+  */
 class RenderTask_sV : public QObject
 {
     Q_OBJECT
 public:
     RenderTask_sV(const Project_sV *project);
+    ~RenderTask_sV();
+
+    /** Manages the \c renderTarget pointer (includes destruction). */
+    void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
+    void setTimeRange(float start, float end);
+    void setFPS(float fps);
+    void setSize(FrameSize size);
 
 public slots:
-    void slotAbortRendering();
-    void slotContinueRendering(qreal time = -1);
-//    void slotUpdateRenderFrameSize(const FrameSize frameSize);
+    void slotContinueRendering();
+    void slotStopRendering();
+    // reset?
 
 signals:
-    void signalFrameRendered(qreal time, int frameNumber);
+    void signalNewTask(QString desc, int taskSize);
+    void signalItemDesc(QString desc);
+    void signalTaskProgress(int value);
+    void signalRenderingContinued();
+    void signalRenderingStopped();
     void signalRenderingFinished();
-    void signalRenderingAborted();
+    void signalRenderingAborted(QString reason);
+
+    void signalFrameRendered(qreal time, int frameNumber);
 
 private:
     const Project_sV *m_project;
+    AbstractRenderTarget_sV *m_renderTarget;
 
-//    FrameSize m_frameSize;
+    float m_timeStart;
+    float m_timeEnd;
+
+    float m_fps;
+    FrameSize m_frameSize;
+
     bool m_stopRendering;
     qreal m_nextFrameTime;
 

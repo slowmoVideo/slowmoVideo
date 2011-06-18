@@ -51,17 +51,12 @@ Project_sV::Project_sV(QString projectDir)
 
 void Project_sV::init()
 {
-    m_fps = 24;
-    m_renderFrameSize = FrameSize_Small;
-
     m_frameSource = new EmptyFrameSource_sV(this);
 
     m_flow = new Flow_sV();
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
     m_renderTask = new RenderTask_sV(this);
-
-    qDebug() << "Tag list address: " << m_tags;
 }
 
 Project_sV::~Project_sV()
@@ -92,15 +87,6 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
         m_frameSource = new EmptyFrameSource_sV(this);
     } else {
         m_frameSource = frameSource;
-    }
-}
-
-float Project_sV::length() const
-{
-    if (m_nodes->size() > 0) {
-        return m_nodes->at(m_nodes->size()-1).xUnmoved();
-    } else {
-        return 0;
     }
 }
 
@@ -234,19 +220,4 @@ const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, Fr
     default:
         return QString("%1/backward%2.sVflow").arg(flowDirStr(size)).arg(leftFrame+2, 5, 10, QChar::fromAscii('0'));
     }
-}
-const QString Project_sV::renderedFileStr(int number, FrameSize size) const
-{
-    return QString("%1/rendered%2.jpg").arg(renderDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
-}
-
-void Project_sV::slotSetFps(float fps)
-{
-    Q_ASSERT(fps > 0);
-    m_fps = fps;
-}
-void Project_sV::slotSetRenderFrameSize(const FrameSize size)
-{
-    qDebug() << "Render frame size is now " << size;
-    m_renderFrameSize = size;
 }

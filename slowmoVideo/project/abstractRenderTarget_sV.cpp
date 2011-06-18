@@ -13,3 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 AbstractRenderTarget_sV::AbstractRenderTarget_sV()
 {
 }
+
+AbstractRenderTarget_sV::~AbstractRenderTarget_sV()
+{
+}

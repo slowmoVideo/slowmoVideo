@@ -14,10 +14,11 @@ RenderDialog::RenderDialog(const Project_sV *project, QWidget *parent) :
 
     ui->comboFps->insertItems(0, QStringList() << "30" << "29.97" << "25" << "24");
     for (int i = 0; i < ui->comboFps->count(); i++) {
-        if (qAbs(ui->comboFps->itemText(i).toFloat() - project->fpsOut()) < .01) {
-            ui->comboFps->setCurrentIndex(i);
-            break;
-        }
+        // TODO
+//        if (qAbs(ui->comboFps->itemText(i).toFloat() - project->fpsOut()) < .01) {
+//            ui->comboFps->setCurrentIndex(i);
+//            break;
+//        }
     }
 
     ui->comboOutputSize->insertItem(0, enumStr(FrameSize_Orig), QVariant(FrameSize_Orig));
@@ -78,7 +79,7 @@ void RenderDialog::slotFpsChanged()
 {
     float fps = ui->comboFps->currentText().toFloat();
     qDebug() << "Signal: fps changed to " << fps;
-    ui->progressBar->setMaximum((int) m_project->length()*fps);
+//    ui->progressBar->setMaximum((int) m_project->length()*fps);
     emit signalChangeFps(fps);
 //    m_project->slotSetFps(ui->comboFps->currentText().toFloat());
 }
