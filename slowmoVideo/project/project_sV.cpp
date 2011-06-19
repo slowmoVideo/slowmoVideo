@@ -76,6 +76,7 @@ void Project_sV::setProjectDir(QString projectDir)
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
+    m_frameSource->slotUpdateProjectDir();
 }
 
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
@@ -117,8 +118,7 @@ bool Project_sV::validDirectories() const
         valid = false;
     }
     QList<QDir> dirList;
-    dirList << QDir(framesDirStr(FrameSize_Orig)) << QDir(flowDirStr(FrameSize_Orig)) << QDir(renderDirStr(FrameSize_Orig))
-               << QDir(framesDirStr(FrameSize_Small)) << QDir(flowDirStr(FrameSize_Small)) << QDir(renderDirStr(FrameSize_Small));
+    dirList << QDir(flowDirStr(FrameSize_Orig)) << QDir(flowDirStr(FrameSize_Small));
     for (int i = 0; i < dirList.size(); i++) {
         if (!dirList.at(i).exists()) {
             valid = false;
@@ -129,9 +129,6 @@ bool Project_sV::validDirectories() const
     return valid;
 }
 
-/**
-  @todo frame size
-  */
 QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError)
 {
     float framePos = timeToFrame(time);
@@ -143,8 +140,8 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
     }
     if (framePos-floor(framePos) > MIN_FRAME_DIST) {
 
-        QImage left(frameFileStr(floor(framePos), frameSize));
-        QImage right(frameFileStr(floor(framePos)+1, frameSize));
+        QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
+        QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
         QImage out(left.size(), QImage::Format_RGB888);
 
         FlowField_sV *forwardFlow = requestFlow(floor(framePos), FlowDirection_Forward, frameSize);
@@ -163,7 +160,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
-        return QImage(frameFileStr(floor(framePos), frameSize));
+        return m_frameSource->frameAt(floor(framePos), frameSize);
     }
 }
 
@@ -173,8 +170,8 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, FlowDirection direction, co
     const QString outFile = flowFileStr(leftFrame, direction, frameSize);
     if (!QFile(outFile).exists() || forceRebuild) {
         qDebug() << "Building flow for left frame " << leftFrame << " in direction " << direction << "; Size: " << frameSize;
-        const QString left = frameFileStr(leftFrame, frameSize);
-        const QString right = frameFileStr(leftFrame+1, frameSize);
+        const QString left = m_frameSource->framePath(leftFrame, frameSize);
+        const QString right = m_frameSource->framePath(leftFrame+1, frameSize);
         m_flow->buildFlowImage(left, right,
                                outFile, direction);
     } else {
@@ -191,23 +188,15 @@ float Project_sV::timeToFrame(float time) const
 }
 
 
-const QString Project_sV::framesDirStr(FrameSize frameSize) const
-{
-    return m_projDir.absolutePath() + "/frames" + enumStr(frameSize);
-}
 const QString Project_sV::flowDirStr(FrameSize frameSize) const
 {
-    return m_projDir.absolutePath() + "/oFlow" + enumStr(frameSize);
-}
-const QString Project_sV::renderDirStr(FrameSize frameSize) const
-{
-    return m_projDir.absolutePath() + "/rendered" + enumStr(frameSize);
+    return m_projDir.absolutePath() + "/oFlow" + toString(frameSize);
 }
 
 void Project_sV::createDirectories(FrameSize frameSize) const
 {
     QList<QDir> dirList;
-    dirList << QDir(framesDirStr(frameSize)) << QDir(flowDirStr(frameSize)) << QDir(renderDirStr(frameSize));
+    dirList << QDir(flowDirStr(frameSize));
     for (int i = 0; i < dirList.size(); i++) {
         if (!dirList.at(i).exists()) {
             dirList.at(i).mkpath(".");
@@ -216,11 +205,6 @@ void Project_sV::createDirectories(FrameSize frameSize) const
     }
 }
 
-const QString Project_sV::frameFileStr(int number, FrameSize size) const
-{
-    // ffmpeg numbering starts with 1, therefore add 1 to the frame number
-    return QString("%1/frame%2.png").arg(framesDirStr(size)).arg(number+1, 5, 10, QChar::fromAscii('0'));
-}
 const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const
 {
     switch (direction) {

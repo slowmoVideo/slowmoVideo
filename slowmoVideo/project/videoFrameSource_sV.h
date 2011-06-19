@@ -41,12 +41,14 @@ public:
     int frameRateNum() const;
     int frameRateDen() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
+    const QString framePath(const uint frame, const FrameSize frameSize) const;
 
     /** \return The absolute path of the input video file. */
     const QString videoFile() const;
 
 public slots:
     void slotAbortInitialization();
+    void slotUpdateProjectDir();
 
 private:
     static QRegExp regexFrameNumber;
@@ -74,8 +76,6 @@ private:
       whether they need to be extracted with extractFrames()
       */
     bool rebuildRequired(const FrameSize frameSize);
-
-    const QString frameFileStr(int number, FrameSize size) const;
 
 signals:
     void signalExtractOrigFramesFinished();

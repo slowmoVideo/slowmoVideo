@@ -48,6 +48,16 @@ VideoFrameSource_sV::~VideoFrameSource_sV()
     delete m_videoInfo;
 }
 
+void VideoFrameSource_sV::slotUpdateProjectDir()
+{
+    // Delete old directories if they are empty
+    m_dirFramesSmall.rmdir(".");
+    m_dirFramesOrig.rmdir(".");
+
+    m_dirFramesSmall = project()->getDirectory("framesSmall");
+    m_dirFramesOrig = project()->getDirectory("framesOrig");
+}
+
 void VideoFrameSource_sV::initialize()
 {
     if (!initialized()) {
@@ -74,17 +84,17 @@ int VideoFrameSource_sV::frameRateDen() const
 }
 QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {
-    return QImage(frameFileStr(frame, frameSize));
+    return QImage(framePath(frame, frameSize));
 }
 const QString VideoFrameSource_sV::videoFile() const
 {
     return m_inFile.fileName();
 }
 
-const QString VideoFrameSource_sV::frameFileStr(int number, FrameSize size) const
+const QString VideoFrameSource_sV::framePath(const uint frame, const FrameSize frameSize) const
 {
     QString dir;
-    switch (size) {
+    switch (frameSize) {
     case FrameSize_Orig:
         dir = m_dirFramesOrig.absolutePath();
         break;
@@ -95,7 +105,7 @@ const QString VideoFrameSource_sV::frameFileStr(int number, FrameSize size) cons
     }
 
     // ffmpeg numbering starts with 1, therefore add 1 to the frame number
-    return QString("%1/frame%2.png").arg(dir).arg(number+1, 5, 10, QChar::fromAscii('0'));
+    return QString("%1/frame%2.png").arg(dir).arg(frame+1, 5, 10, QChar::fromAscii('0'));
 }
 
 void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *process)

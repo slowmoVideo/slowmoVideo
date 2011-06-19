@@ -307,8 +307,7 @@ void MainWindow::shortcutUsed(QString which)
 void MainWindow::slotForwardInputPosition(qreal frame)
 {
     if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
-        qDebug() << "Signal: Load image at " << frame;
-        m_wInputMonitor->slotLoadImage(m_project->frameFileStr(qFloor(frame), FrameSize_Small));
+        m_wInputMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
     }
 }
 

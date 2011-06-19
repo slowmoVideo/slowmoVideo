@@ -28,9 +28,11 @@ public:
     int frameRateNum() const { return 24; }
     int frameRateDen() const { return 1; }
     QImage frameAt(const uint, const FrameSize = FrameSize_Orig) { return QImage(); }
+    const QString framePath(const uint, const FrameSize) const { return QString(); }
 
 public slots:
     void slotAbortInitialization() {}
+    void slotUpdateProjectDir() {}
 };
 
 #endif // EMPTYFRAMESOURCE_H

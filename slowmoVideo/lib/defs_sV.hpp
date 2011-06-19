@@ -2,7 +2,8 @@
 #define DEFS_SV_HPP
 
 #include <QDebug>
-#include <QString>
+#include <QtCore/QString>
+#include <QtCore/QSize>
 #include <QColor>
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
@@ -13,25 +14,34 @@ namespace Colours_sV {
     static QColor colBad(247, 122, 48);
 }
 
-class FlowBuildingError {
+class Error_sV {
 public:
-    FlowBuildingError(QString msg);
+    Error_sV(QString msg);
     QString message() const;
 private:
     QString m_message;
 };
+class FlowBuildingError : public Error_sV {
+public: FlowBuildingError(QString msg);
+};
+class FrameSourceError : public Error_sV {
+public: FrameSourceError(QString msg);
+};
 
-inline QString enumStr(const FrameSize &size) {
-    switch (size) {
-    case FrameSize_Orig:
-        return QString("Orig");
-    case FrameSize_Small:
-        return QString("Small");
-    default:
-        Q_ASSERT(false);
-        return QString("Unknown size");
-    }
-}
+QString toString(const QSize& size);
+QString toString(const FrameSize &size);
+
+//inline QString enumStr(const FrameSize &size) {
+//    switch (size) {
+//    case FrameSize_Orig:
+//        return QString("Orig");
+//    case FrameSize_Small:
+//        return QString("Small");
+//    default:
+//        Q_ASSERT(false);
+//        return QString("Unknown size");
+//    }
+//}
 inline QString enumStr(const FlowDirection &dir) {
     switch (dir) {
     case FlowDirection_Forward:

@@ -8,6 +8,7 @@ set(SRCS_PROJ
   abstractProjectRW_sV.h
   xmlProjectRW_sV.cpp
   abstractFrameSource_sV.cpp
+  imagesFrameSource_sV.cpp
   videoFrameSource_sV.cpp
   emptyFrameSource_sV.cpp
   abstractRenderTarget_sV.cpp
@@ -19,6 +20,7 @@ set(SRCS_MOC
   project_sV.h
   renderTask_sV.h
   abstractFrameSource_sV.h
+  imagesFrameSource_sV.h
   videoFrameSource_sV.h
   emptyFrameSource_sV.h
 )

@@ -71,15 +71,14 @@ public:
       @return true, iff all required directories exist
       */
     bool validDirectories() const;
+    const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError);
 
+    const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
     FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const throw(FlowBuildingError);
 
-    const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
-    const QString frameFileStr(int number, FrameSize size) const;
-    const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
 
 
 private:
@@ -94,9 +93,7 @@ private:
 
     void init();
     void createDirectories(FrameSize frameSize) const;
-    const QString framesDirStr(FrameSize frameSize) const; // TODO remove?
     const QString flowDirStr(FrameSize frameSize) const;
-    const QString renderDirStr(FrameSize frameSize) const;
 
 };
 

@@ -2,6 +2,7 @@
 #define NEWPROJECTDIALOG_H
 
 #include <QDialog>
+#include <QtCore/QStringList>
 
 #include "../project/project_sV.h"
 
@@ -30,19 +31,21 @@ public:
     const QString projectFilename() const;
 
 private:
-
-
     Ui::NewProjectDialog *ui;
     QButtonGroup *m_buttonGroup;
 
     VideoInfoSV m_videoInfo;
+    QStringList m_images;
+    QString m_imagesMsg;
 
 
 private slots:
-    void slotSelectVideoFile();
     void slotSelectProjectDir();
+    void slotSelectVideoFile();
+    void slotSelectImages();
 
     void slotUpdateVideoInfo();
+    void slotUpdateImagesInfo();
 
     void slotUpdateButtonStates();
     void slotUpdateFrameSourceType();

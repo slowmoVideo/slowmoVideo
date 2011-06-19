@@ -27,7 +27,6 @@ void InputMonitor::slotLoadImage(const QString &filename)
     m_semaphore.acquire();
     if (m_queue[0] == NULL) {
         m_queue[0] = new QString(filename);
-        qDebug() << "Using image: " << filename;
     } else {
         if (m_queue[1] != NULL) {
             delete m_queue[1];
@@ -40,7 +39,7 @@ void InputMonitor::slotLoadImage(const QString &filename)
     repaint();
 }
 
-void InputMonitor::paintEvent(QPaintEvent *event)
+void InputMonitor::paintEvent(QPaintEvent *)
 {
 //    QWidget::paintEvent(event);
 

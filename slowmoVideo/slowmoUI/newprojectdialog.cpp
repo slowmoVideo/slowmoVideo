@@ -2,6 +2,7 @@
 #include "ui_newprojectdialog.h"
 
 #include "../project/videoFrameSource_sV.h"
+#include "../project/imagesFrameSource_sV.h"
 
 
 #include <QDebug>
@@ -27,6 +28,7 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
 
     bool b = true;
     b &= connect(ui->browseInputVideo, SIGNAL(clicked()), this, SLOT(slotSelectVideoFile()));
+    b &= connect(ui->browseInputImages, SIGNAL(clicked()), this, SLOT(slotSelectImages()));
     b &= connect(ui->browseProjectDir, SIGNAL(clicked()), this, SLOT(slotSelectProjectDir()));
     b &= connect(ui->inputVideo, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateVideoInfo()));
     b &= connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
@@ -55,7 +57,7 @@ Project_sV* NewProjectDialog::buildProject()
     if (ui->radioVideo->isChecked()) {
         frameSource = new VideoFrameSource_sV(project, ui->inputVideo->text());
     } else {
-        Q_ASSERT(false);
+        frameSource = new ImagesFrameSource_sV(project, m_images);
     }
     project->loadFrameSource(frameSource);
     return project;
@@ -75,6 +77,24 @@ void NewProjectDialog::slotSelectVideoFile()
         ui->txtVideoInfo->clear();
 
         slotUpdateVideoInfo();
+    }
+}
+
+void NewProjectDialog::slotSelectImages()
+{
+    QFileDialog dialog(this, "Select input images");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    if (dialog.exec() == QDialog::Accepted) {
+
+        m_images = dialog.selectedFiles();
+
+        ui->inputImages->clear();
+        for (int i = 0; i < m_images.size(); i++) {
+            new QListWidgetItem(m_images.at(i), ui->inputImages);
+        }
+
+        slotUpdateImagesInfo();
     }
 }
 
@@ -103,6 +123,12 @@ void NewProjectDialog::slotUpdateVideoInfo()
         m_videoInfo.streamsCount = 0;
         ui->txtVideoInfo->setPlainText("No video stream detected.");
     }
+    slotUpdateButtonStates();
+}
+
+void NewProjectDialog::slotUpdateImagesInfo()
+{
+    m_imagesMsg = ImagesFrameSource_sV::validateImages(m_images);
     slotUpdateButtonStates();
 }
 
@@ -137,8 +163,15 @@ void NewProjectDialog::slotUpdateButtonStates()
             ok = false;
         }
     } else if (ui->radioImages->isChecked()) {
-        // \todo Validate the images
-        ok = false;
+        // Validate the images
+        if (m_imagesMsg.length() == 0) {
+            ui->inputImages->setStyleSheet(QString("QListWidget { background-color: %1; }").arg(Colours_sV::colOk.name()));
+            ui->txtImageInfo->setText("Image size: " + toString(QImage(m_images.at(0)).size()));
+        } else {
+            ui->inputImages->setStyleSheet(QString("QListWidget { background-color: %1; }").arg(Colours_sV::colBad.name()));
+            ui->txtImageInfo->setText(m_imagesMsg);
+            ok = false;
+        }
     }
 
     ui->bOk->setEnabled(ok);
@@ -150,6 +183,12 @@ void NewProjectDialog::slotUpdateFrameSourceType()
     ui->groupImages->setVisible(ui->radioImages->isChecked());
     ui->groupVideo->setEnabled(ui->radioVideo->isChecked());
     ui->groupVideo->setVisible(ui->radioVideo->isChecked());
+    if (ui->radioImages->isChecked()) {
+        slotUpdateImagesInfo();
+    }
+    if (ui->radioVideo->isChecked()) {
+        slotUpdateVideoInfo();
+    }
     slotUpdateButtonStates();
     adjustSize();
 }

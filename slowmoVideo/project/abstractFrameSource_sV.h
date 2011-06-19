@@ -28,6 +28,8 @@ public:
     AbstractFrameSource_sV(const Project_sV *project);
     virtual ~AbstractFrameSource_sV();
 
+    const Project_sV* project() { return m_project; }
+
     /**
       \fn initialize()
       Initializes the frame source (like extracting frames from a video).
@@ -52,6 +54,7 @@ public:
       if the frames have not been extracted yet.
       */
     virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) = 0;
+    virtual const QString framePath(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
 signals:
     /**
@@ -79,6 +82,7 @@ signals:
 
 public slots:
     virtual void slotAbortInitialization() = 0;
+    virtual void slotUpdateProjectDir() = 0;
 
 protected:
     const Project_sV *m_project;
