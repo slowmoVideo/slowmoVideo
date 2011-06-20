@@ -147,7 +147,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Input images directory</string>
+         <string>Input images</string>
         </property>
        </widget>
       </item>

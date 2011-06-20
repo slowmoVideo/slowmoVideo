@@ -14,7 +14,7 @@ FrameSourceError::FrameSourceError(QString msg) :
 
 QString toString(const QSize &size)
 {
-    return QString("%1×%2").arg(size.width()).arg(size.height());
+    return QString::fromUtf8("%1×%2").arg(size.width()).arg(size.height());
 }
 
 QString toString(const FrameSize &size) {

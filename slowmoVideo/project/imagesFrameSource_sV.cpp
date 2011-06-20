@@ -25,6 +25,7 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
     }
 
     m_imagesList.append(images);
+    m_imagesList.sort();
 
     m_sizeSmall = QImage(m_imagesList.at(0)).size();
     while (m_sizeSmall.width() > 320) {
@@ -114,6 +115,6 @@ const QString ImagesFrameSource_sV::framePath(const uint frame, const FrameSize 
         return QString(m_imagesList.at(frame));
     case FrameSize_Small:
     default:
-        return QString(m_dirImagesSmall.absoluteFilePath(QFileInfo(m_imagesList.at(frame)).fileName()));
+        return QString(m_dirImagesSmall.absoluteFilePath(QFileInfo(m_imagesList.at(frame)).completeBaseName() + ".png"));
     }
 }

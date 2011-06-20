@@ -40,6 +40,8 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
     b &= connect(m_buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFrameSourceType()));
     Q_ASSERT(b);
 
+    slotUpdateImagesInfo();
+    slotUpdateVideoInfo();
     slotUpdateButtonStates();
     slotUpdateFrameSourceType();
 }
@@ -183,12 +185,6 @@ void NewProjectDialog::slotUpdateFrameSourceType()
     ui->groupImages->setVisible(ui->radioImages->isChecked());
     ui->groupVideo->setEnabled(ui->radioVideo->isChecked());
     ui->groupVideo->setVisible(ui->radioVideo->isChecked());
-    if (ui->radioImages->isChecked()) {
-        slotUpdateImagesInfo();
-    }
-    if (ui->radioVideo->isChecked()) {
-        slotUpdateVideoInfo();
-    }
     slotUpdateButtonStates();
     adjustSize();
 }
