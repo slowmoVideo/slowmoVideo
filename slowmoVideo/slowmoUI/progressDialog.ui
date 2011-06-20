@@ -41,6 +41,9 @@
        <property name="text">
         <string>Task Description</string>
        </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>

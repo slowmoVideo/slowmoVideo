@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef XMLPROJECTRW_SV_H
 #define XMLPROJECTRW_SV_H
 
+#include "../lib/defs_sV.hpp"
 #include "abstractProjectRW_sV.h"
 #include "tag_sV.h"
 
@@ -26,7 +27,7 @@ public:
       Reads an XML project file.
       @return NULL if an error ocurred.
       */
-    Project_sV* loadProject(QString filename) const;
+    Project_sV* loadProject(QString filename) const throw(FrameSourceError);
     /**
       Saves a project to an XML project file.
       */
@@ -37,7 +38,7 @@ private:
     static const QDomElement tagToDom(QDomDocument *doc, const Tag_sV &tag);
 
     static const QDomElement frameSource(QDomDocument *doc, const AbstractFrameSource_sV *frameSource);
-    static void loadFrameSource(QXmlStreamReader *reader, Project_sV *project);
+    static void loadFrameSource(QXmlStreamReader *reader, Project_sV *project) throw(FrameSourceError);
 };
 
 #endif // XMLPROJECTRW_SV_H

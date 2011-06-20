@@ -23,6 +23,19 @@ class FlowRW_sV
 {
 public:
 
+    struct FlowInfo_sV {
+        int width;
+        int height;
+        char version;
+        std::string magic;
+        bool valid;
+        FlowInfo_sV() {
+            magic = "flow_sV";
+            version = '1';
+            valid = false;
+        }
+    };
+
     /**
       \see FlowField_sV::FlowField_sV(int, int, float*, FlowField_sV::GLFormat)
       */
@@ -31,6 +44,8 @@ public:
       \return \tt NULL, if the file could not be loaded, and the flow field otherwise.
       */
     static FlowField_sV* load(std::string filename);
+
+    static FlowInfo_sV readInfo(std::string filename);
 
 private:
     static const std::string m_magicNumber;

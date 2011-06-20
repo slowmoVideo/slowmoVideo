@@ -35,6 +35,8 @@ public:
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
     const QString framePath(const uint frame, const FrameSize frameSize) const;
 
+    const QStringList inputFiles() const;
+
 
 public slots:
     void slotAbortInitialization();

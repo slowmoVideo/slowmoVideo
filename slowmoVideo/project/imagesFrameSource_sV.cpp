@@ -28,7 +28,7 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
     m_imagesList.sort();
 
     m_sizeSmall = QImage(m_imagesList.at(0)).size();
-    while (m_sizeSmall.width() > 320) {
+    while (m_sizeSmall.width() > 600) {
         m_sizeSmall = m_sizeSmall/2;
     }
 
@@ -47,6 +47,11 @@ QString ImagesFrameSource_sV::validateImages(const QStringList images)
         }
     }
     return QString();
+}
+
+const QStringList ImagesFrameSource_sV::inputFiles() const
+{
+    return m_imagesList;
 }
 
 void ImagesFrameSource_sV::slotUpdateProjectDir()
@@ -69,10 +74,17 @@ void ImagesFrameSource_sV::slotContinueInitialization()
 {
     emit signalNextTask("Creating preview images from the input images", m_imagesList.size());
     for (; m_nextFrame < m_imagesList.size(); m_nextFrame++) {
-        emit signalTaskItemDescription("Re-sizing image " + QFileInfo(m_imagesList.at(m_nextFrame)).fileName());
 
-        QImage small = QImage(m_imagesList.at(m_nextFrame)).scaled(m_sizeSmall, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        small.save(framePath(m_nextFrame, FrameSize_Small));
+        QString outputFile(framePath(m_nextFrame, FrameSize_Small));
+        if (QFile(outputFile).exists()) {
+            emit signalTaskItemDescription("Resized image already exists for " + QFileInfo(m_imagesList.at(m_nextFrame)).fileName());
+        } else {
+            emit signalTaskItemDescription(QString("Re-sizing image %1 to:\n%2")
+                                           .arg(QFileInfo(m_imagesList.at(m_nextFrame)).fileName())
+                                           .arg(outputFile));
+            QImage small = QImage(m_imagesList.at(m_nextFrame)).scaled(m_sizeSmall, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            small.save(outputFile);
+        }
 
         emit signalTaskProgress(m_nextFrame);
         if (m_stopInitialization) {

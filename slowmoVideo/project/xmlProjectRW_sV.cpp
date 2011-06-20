@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "nodelist_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
+#include "imagesFrameSource_sV.h"
 #include "../lib/defs_sV.hpp"
 
 #include <QDebug>
@@ -53,10 +54,10 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     // Project Resources
     QDomElement resources = doc.createElement("resources");
     root.appendChild(resources);
-    resources.appendChild(frameSource(&doc, project->frameSource()));
     QDomElement projectDir = doc.createElement("projectDir");
     projectDir.appendChild(doc.createTextNode(project->getDirectory(".", false).absolutePath()));
     resources.appendChild(projectDir);
+    resources.appendChild(frameSource(&doc, project->frameSource()));
 
 
     // Nodes
@@ -128,6 +129,20 @@ const QDomElement XmlProjectRW_sV::frameSource(QDomDocument *doc, const Abstract
         file.appendChild(doc->createTextNode(vfs->videoFile()));
         source.appendChild(file);
 
+    } else if (dynamic_cast<const ImagesFrameSource_sV *>(frameSource) != NULL) {
+        qDebug() << "Frame source are images.";
+
+        const ImagesFrameSource_sV *ifs = dynamic_cast<const ImagesFrameSource_sV *>(frameSource);
+        source.setAttribute("type", "images");
+        QDomElement files = doc->createElement("inputFiles");
+        QStringList images = ifs->inputFiles();
+        for (int i = 0; i < images.size(); i++) {
+            QDomElement file = doc->createElement("file");
+            file.appendChild(doc->createTextNode(images.at(i)));
+            files.appendChild(file);
+        }
+        source.appendChild(files);
+
     } else if (dynamic_cast<const EmptyFrameSource_sV *>(frameSource) != NULL) {
         qDebug() << "Frame source is empty.";
         source.setAttribute("type", "empty");
@@ -139,7 +154,7 @@ const QDomElement XmlProjectRW_sV::frameSource(QDomDocument *doc, const Abstract
     return source;
 }
 
-void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *project)
+void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *project) throw(FrameSourceError)
 {
     QStringRef frameSourceType = reader->attributes().value("type");
     if (frameSourceType.compare("videoFile") == 0) {
@@ -149,19 +164,36 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
                 project->loadFrameSource(frameSource);
             } else {
                 qDebug() << "Unknown element in video frame source section: " << reader->name();
+                reader->skipCurrentElement();
             }
         }
-    } else if (frameSourceType.compare("empty")) {
+
+    } else if (frameSourceType.compare("images") == 0) {
+        while (reader->readNextStartElement()) {
+            if (reader->name() == "inputFiles") {
+
+                QStringList images;
+                while (reader->readNextStartElement()) {
+                    if (reader->name() == "file") {
+                        images << reader->readElementText();
+                    } else {
+                        reader->skipCurrentElement();
+                    }
+                }
+                ImagesFrameSource_sV *frameSource = new ImagesFrameSource_sV(project, images);
+                project->loadFrameSource(frameSource);
+            }
+        }
+    } else if (frameSourceType.compare("empty") == 0) {
         EmptyFrameSource_sV *frameSource = new EmptyFrameSource_sV(project);
         project->loadFrameSource(frameSource);
     } else {
         qDebug() << "Unknown frame source: " << frameSourceType << "; Cannot load!";
-        // \todo throw exception
-        Q_ASSERT(false);
+        throw FrameSourceError(QString::fromUtf8("Unknown frame source “%1”. Cannot load the project.").arg(frameSourceType.toString()));
     }
 }
 
-Project_sV* XmlProjectRW_sV::loadProject(QString filename) const
+Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSourceError)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {

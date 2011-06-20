@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "progressDialog.h"
 #include "renderingDialog.h"
 
+#include "../lib/defs_sV.hpp"
 #include "../project/flow_sV.h"
 #include "../project/renderTask_sV.h"
 #include "../project/xmlProjectRW_sV.h"
@@ -203,7 +204,7 @@ void MainWindow::newProject()
 
         // Save project
         XmlProjectRW_sV writer;
-        writer.saveProject(m_project, npd.projectFilename());
+        writer.saveProject(project, npd.projectFilename());
 
         loadProject(project);
     }
@@ -283,8 +284,12 @@ void MainWindow::shortcutUsed(QString which)
             dialog.setFileMode(QFileDialog::ExistingFile);
             if (dialog.exec() == QDialog::Accepted) {
                 XmlProjectRW_sV reader;
-                Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0));
-                loadProject(project);
+                try {
+                    Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0));
+                    loadProject(project);
+                } catch (FrameSourceError &err) {
+                    QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+                }
             }
             handled = true;
         } else if (which == m_keyList[MainWindow::Save]) {

@@ -21,6 +21,7 @@ class AbstractRenderTarget_sV;
 /**
   \brief Renders a project when started.
   \todo Changes in the project affect the rendering as well. Copy the project?
+  \todo Segfault on emtpy project
   */
 class RenderTask_sV : public QObject
 {

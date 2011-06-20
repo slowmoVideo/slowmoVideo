@@ -21,6 +21,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class Flow_sV;
 class AbstractFrameSource_sV;
+class AbstractFlowSource_sV;
 #include "../lib/defs_sV.hpp"
 
 extern "C" {
@@ -57,7 +58,6 @@ public:
     void loadFrameSource(AbstractFrameSource_sV *frameSource);
 
     AbstractFrameSource_sV* frameSource() { return m_frameSource; }
-    Flow_sV *flow() const { return m_flow; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
 
@@ -67,16 +67,12 @@ public:
     float length() const;
 
 
-    /**
-      @return true, iff all required directories exist
-      */
-    bool validDirectories() const;
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError);
 
     const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
-    FlowField_sV* requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild = false) const throw(FlowBuildingError);
+    FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
 
 
@@ -84,7 +80,7 @@ public:
 private:
     QDir m_projDir;
     AbstractFrameSource_sV *m_frameSource;
-    Flow_sV *m_flow;
+    AbstractFlowSource_sV *m_flowSource;
     NodeList_sV *m_nodes;
     QList<Tag_sV> *m_tags;
     RenderTask_sV *m_renderTask;

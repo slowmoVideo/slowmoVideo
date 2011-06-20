@@ -9,9 +9,9 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "project_sV.h"
-#include "abstractFrameSource_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
+#include "v3dFlowSource_sV.h"
 #include "../lib/opticalFlowBuilder_sV.h"
 #include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
@@ -52,8 +52,8 @@ Project_sV::Project_sV(QString projectDir)
 void Project_sV::init()
 {
     m_frameSource = new EmptyFrameSource_sV(this);
+    m_flowSource = new V3dFlowSource_sV(this);
 
-    m_flow = new Flow_sV();
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
     m_renderTask = NULL;
@@ -62,7 +62,7 @@ void Project_sV::init()
 Project_sV::~Project_sV()
 {
     delete m_frameSource;
-    delete m_flow;
+    delete m_flowSource;
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
@@ -77,6 +77,7 @@ void Project_sV::setProjectDir(QString projectDir)
         m_projDir.mkpath(".");
     }
     m_frameSource->slotUpdateProjectDir();
+    m_flowSource->slotUpdateProjectDir();
 }
 
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
@@ -110,25 +111,6 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-bool Project_sV::validDirectories() const
-{
-    bool valid = true;
-    if (!m_projDir.exists()) {
-        qDebug() << "Project directory could not be created.";
-        valid = false;
-    }
-    QList<QDir> dirList;
-    dirList << QDir(flowDirStr(FrameSize_Orig)) << QDir(flowDirStr(FrameSize_Small));
-    for (int i = 0; i < dirList.size(); i++) {
-        if (!dirList.at(i).exists()) {
-            valid = false;
-            qDebug() << "Directory " << dirList.at(i).absolutePath() << " does not exist.";
-            break;
-        }
-    }
-    return valid;
-}
-
 QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError)
 {
     float framePos = timeToFrame(time);
@@ -144,8 +126,8 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
         QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
         QImage out(left.size(), QImage::Format_RGB888);
 
-        FlowField_sV *forwardFlow = requestFlow(floor(framePos), FlowDirection_Forward, frameSize);
-        FlowField_sV *backwardFlow = requestFlow(floor(framePos), FlowDirection_Backward, frameSize);
+        FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+        FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
 
         Q_ASSERT(forwardFlow != NULL);
         Q_ASSERT(backwardFlow != NULL);
@@ -157,6 +139,8 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
 
         Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, framePos-floor(framePos), out);
 
+        delete forwardFlow;
+        delete backwardFlow;
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
@@ -164,20 +148,11 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) con
     }
 }
 
-FlowField_sV* Project_sV::requestFlow(int leftFrame, FlowDirection direction, const FrameSize frameSize, bool forceRebuild) const throw(FlowBuildingError)
+FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError)
 {
-    Q_ASSERT(leftFrame < m_frameSource->framesCount()-1);
-    const QString outFile = flowFileStr(leftFrame, direction, frameSize);
-    if (!QFile(outFile).exists() || forceRebuild) {
-        qDebug() << "Building flow for left frame " << leftFrame << " in direction " << direction << "; Size: " << frameSize;
-        const QString left = m_frameSource->framePath(leftFrame, frameSize);
-        const QString right = m_frameSource->framePath(leftFrame+1, frameSize);
-        m_flow->buildFlowImage(left, right,
-                               outFile, direction);
-    } else {
-        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " in direction " << direction << ": " << outFile;
-    }
-    return FlowRW_sV::load(outFile.toStdString());
+    Q_ASSERT(leftFrame < m_frameSource->framesCount());
+    Q_ASSERT(rightFrame < m_frameSource->framesCount());
+    return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
 }
 
 inline

@@ -21,7 +21,7 @@ void FlowRW_sV::save(std::string filename, FlowField_sV *flowField)
 {
     int width = flowField->width();
     int height = flowField->height();
-    std::cout << "Writing flow file: " << width << "×" << height
+    std::cout << "Writing flow file: " << width << "x" << height
               << ", version " << (int)m_version << ", magic number " << m_magicNumber << std::endl;
 
     float *data = flowField->data();
@@ -35,6 +35,34 @@ void FlowRW_sV::save(std::string filename, FlowField_sV *flowField)
     file.close();
 }
 
+FlowRW_sV::FlowInfo_sV FlowRW_sV::readInfo(std::string filename)
+{
+    FlowInfo_sV info;
+
+    std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+
+    char *magic = new char[m_magicNumber.size()];
+    file.read(magic, sizeof(char)*m_magicNumber.size());
+    file.read(&info.version, sizeof(char));
+    info.magic = std::string(magic);
+    delete[] magic;
+
+    std::cout << "Magic number: " << info.magic << ", version: " << (int)info.version << std::endl;
+
+    file.read((char*) &info.width, sizeof(int));
+    file.read((char*) &info.height, sizeof(int));
+    if (file.rdstate() == std::ios::goodbit) {
+        if (info.magic.compare(m_magicNumber) == 0) {
+            info.valid = true;
+        }
+    } else {
+        std::cerr << "Failed to read width/height from " << filename << "." << std::endl;
+    }
+    file.close();
+
+    return info;
+}
+
 FlowField_sV* FlowRW_sV::load(std::string filename)
 {
     std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
@@ -45,6 +73,7 @@ FlowField_sV* FlowRW_sV::load(std::string filename)
     file.read((char*) &version, sizeof(char));
 
     std::cout << "Magic number: " << magic << ", version: " << (int)version << std::endl;
+    delete[] magic;
 
     int width, height;
     file.read((char*) &width, sizeof(int));

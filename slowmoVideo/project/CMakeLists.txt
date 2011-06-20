@@ -1,5 +1,4 @@
 set(SRCS_PROJ
-  flow_sV.cpp
   project_sV.cpp
   tag_sV.cpp
   node_sV.cpp
@@ -13,10 +12,11 @@ set(SRCS_PROJ
   emptyFrameSource_sV.cpp
   abstractRenderTarget_sV.cpp
   imagesRenderTarget_sV.cpp
+  abstractFlowSource_sV.cpp
+  v3dFlowSource_sV.cpp
 )
 
 set(SRCS_MOC
-  flow_sV.h
   project_sV.h
   renderTask_sV.h
   abstractFrameSource_sV.h

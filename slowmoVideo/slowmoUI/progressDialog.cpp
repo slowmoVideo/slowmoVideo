@@ -2,6 +2,7 @@
 #include "ui_progressDialog.h"
 
 #include <QMessageBox>
+#include <QtCore/QDebug>
 
 ProgressDialog::ProgressDialog(QWidget *parent) :
     QDialog(parent),
@@ -44,7 +45,9 @@ void ProgressDialog::slotTaskProgress(int progress)
 }
 void ProgressDialog::slotTaskItemDescription(const QString desc)
 {
+    qDebug() << "Description received: " << desc;
     ui->lblTaskItemDesc->setText(desc);
+    repaint();
 }
 void ProgressDialog::slotAbortPressed()
 {
