@@ -118,8 +118,7 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     if (frameSize == FrameSize_Small) {
         int w = m_videoInfo->width;
         int h = m_videoInfo->height;
-        // @todo adjust size
-        while (w > 320) {
+        while (w > 600) {
             w /= 2;
             h /= 2;
         }

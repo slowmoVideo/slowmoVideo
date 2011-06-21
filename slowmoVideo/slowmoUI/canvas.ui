@@ -75,7 +75,7 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>slowmoUI canvas</string>
   </property>
  </widget>
  <resources/>

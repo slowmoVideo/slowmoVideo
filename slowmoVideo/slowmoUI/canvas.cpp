@@ -35,6 +35,8 @@ QColor Canvas::gridCol(100, 100, 100);
 QColor Canvas::labelCol(0, 77, 255);
 QColor Canvas::backgroundCol(30, 30, 40);
 
+/// \todo zoom in/out, scrolling etc.: scaling
+
 Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Canvas),
@@ -171,8 +173,8 @@ void Canvas::paintEvent(QPaintEvent *)
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
         davinci.drawText(m_states.prevMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
-        // TODO fps in
-//        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight, QString("f %1").arg(time.y()*m_project->fpsIn(), 2, 'f', 2));
+        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight,
+                         QString("f %1").arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);

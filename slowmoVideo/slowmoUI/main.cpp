@@ -14,6 +14,12 @@ the Free Software Foundation, either version 3 of the License, or
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // Set up preferences for the QSettings file
+    QCoreApplication::setOrganizationName("Granjow");
+    QCoreApplication::setOrganizationDomain("granjow.net");
+    QCoreApplication::setApplicationName("slowmoUI");
+
     MainWindow w;
 
     w.show();

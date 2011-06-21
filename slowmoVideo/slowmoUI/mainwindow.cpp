@@ -14,9 +14,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "newprojectdialog.h"
 #include "progressDialog.h"
 #include "renderingDialog.h"
+#include "preferencesDialog.h"
 
 #include "../lib/defs_sV.hpp"
-#include "../project/flow_sV.h"
 #include "../project/renderTask_sV.h"
 #include "../project/xmlProjectRW_sV.h"
 #include "../project/abstractFrameSource_sV.h"
@@ -127,7 +127,8 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
 
-    b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(showRenderDialog()));
+    b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
+    b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
 
 
     Q_ASSERT(b);
@@ -316,7 +317,13 @@ void MainWindow::slotForwardInputPosition(qreal frame)
     }
 }
 
-void MainWindow::showRenderDialog()
+void MainWindow::slotShowPreferencesDialog()
+{
+    PreferencesDialog dialog;
+    dialog.exec();
+}
+
+void MainWindow::slotShowRenderDialog()
 {
     RenderingDialog renderingDialog(m_project, this);
     if (renderingDialog.exec() == QDialog::Accepted) {
@@ -325,6 +332,7 @@ void MainWindow::showRenderDialog()
 
         if (m_renderProgressDialog == NULL) {
             m_renderProgressDialog = new ProgressDialog(this);
+            m_renderProgressDialog->setWindowTitle("Rendering progress");
         } else {
             m_renderProgressDialog->disconnect();
         }
@@ -356,6 +364,7 @@ void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskS
 {
     if (m_progressDialog == NULL) {
         m_progressDialog = new ProgressDialog(this);
+        m_progressDialog->setWindowTitle("Frame extraction progress");
         bool b = true;
         b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
         b &= connect(m_project->frameSource(), SIGNAL(signalTaskProgress(int)), m_progressDialog, SLOT(slotTaskProgress(int)));

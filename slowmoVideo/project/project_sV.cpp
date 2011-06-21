@@ -26,21 +26,19 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "renderTask_sV.h"
 #include "nodelist_sV.h"
-#include "flow_sV.h"
 
 #define MIN_FRAME_DIST .001
 
-Project_sV::Project_sV()
+Project_sV::Project_sV() :
+    m_projDir(QDir::temp())
 {
     init();
-    m_projDir = QDir::temp();
 }
 
-Project_sV::Project_sV(QString projectDir)
+Project_sV::Project_sV(QString projectDir) :
+    m_projDir(projectDir)
 {
     init();
-
-    m_projDir = projectDir;
 
     // Create directory if necessary
     qDebug() << "Project directory: " << m_projDir.absolutePath();

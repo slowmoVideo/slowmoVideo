@@ -28,6 +28,8 @@
      <string>slowmoVideo UI</string>
     </property>
     <addaction name="actionRender"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
    </widget>
    <addaction name="menuSlowmoVideo_UI"/>
   </widget>
@@ -43,6 +45,11 @@
   <action name="actionRender">
    <property name="text">
     <string>Render</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

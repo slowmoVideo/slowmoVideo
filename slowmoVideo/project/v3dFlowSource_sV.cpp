@@ -13,7 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "abstractFrameSource_sV.h"
 #include "../lib/flowRW_sV.h"
 
-#include <QProcess>
+#include <QtCore/QProcess>
+#include <QtCore/QSettings>
 
 V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project) :
     AbstractFlowSource_sV(project)
@@ -39,7 +40,8 @@ void V3dFlowSource_sV::slotUpdateProjectDir()
 
 FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
-    QString programLocation("/data/cworkspace/slowmoGPU/install/bin/flowBuilder");
+    QSettings settings;
+    QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
     if (!QFile(programLocation).exists()) {
         throw FlowBuildingError("Program\n" + programLocation + "\ndoes not exist, cannot build flow!");
     }

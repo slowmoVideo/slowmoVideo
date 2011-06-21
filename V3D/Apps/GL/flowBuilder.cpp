@@ -12,9 +12,10 @@
 #include "flowRW_sV.h"
 #include "flowField_sV.h"
 
-using namespace std;
 using namespace V3D;
 using namespace V3D_GPU;
+
+#define VERSION "1.0"
 
 //#define USE_LAB_COLORSPACE 1
 #define USE_NEW_TVL1_FLOW 1
@@ -81,7 +82,7 @@ void drawscene()
       int const w = leftImage.width();
       int const h = leftImage.height();
 
-     cout << "Start initialization..." << endl;
+     std::cout << "Start initialization..." << std::endl;
      glewInit();
      Cg_ProgramBase::initializeCg();
 
@@ -100,7 +101,7 @@ void drawscene()
      rightPyrG.allocate(w, h, nLevels);
      leftPyrB.allocate(w, h, nLevels);
      rightPyrB.allocate(w, h, nLevels);
-     cout << "done." << endl;
+     std::cout << "done." << std::endl;
 
 #if !defined(USE_LAB_COLORSPACE)
       if (leftImage.numChannels() == 3) {
@@ -159,7 +160,7 @@ void drawscene()
 
       FlowField_sV field(leftImage.width(), leftImage.height(), data, FlowField_sV::GLFormat_RGB);
       FlowRW_sV::save(outputFile, &field);
-      cout << "Flow data written to " << outputFile << "." << endl;
+      std::cout << "Flow data written to " << outputFile << "." << std::endl;
 
       delete[] data;
 
@@ -169,13 +170,20 @@ void drawscene()
 int main( int argc, char** argv)
 {
 
+    if ((argc-1) == 1) {
+        if (strcmp(argv[1], "--identify") == 0) {
+            std::cout << "flowBuilder v" << VERSION << std::endl;
+            return 0;
+        }
+    }
+
    if ((argc-1) < 3) {
-       cout << "Usage: " << argv[0] << " <left image> <right image> <outFilename> "
-               "[ <lambda=" << lambda << "> [<nIterations=" << nIterations << ">] ]" << endl;
+       std::cout << "Usage: " << argv[0] << " <left image> <right image> <outFilename> "
+               "[ <lambda=" << lambda << "> [<nIterations=" << nIterations << ">] ]" << std::endl;
        return -1;
    }
    if (getenv("V3D_SHADER_DIR") == NULL) {
-       cout << "V3D_SHADER_DIR environment variable needs to be set!";
+       std::cout << "V3D_SHADER_DIR environment variable needs to be set!";
        return -2;
    }
 
@@ -190,8 +198,8 @@ int main( int argc, char** argv)
        }
    }
 
-   cout << "leftImage.numChannels() = " << leftImage.numChannels() << endl;
-   cout << "rightImage.numChannels() = " << rightImage.numChannels() << endl;
+   std::cout << "leftImage.numChannels() = " << leftImage.numChannels() << std::endl;
+   std::cout << "rightImage.numChannels() = " << rightImage.numChannels() << std::endl;
 
    glutInitWindowPosition(0, 0);
    glutInitWindowSize(100, 100);
@@ -199,11 +207,11 @@ int main( int argc, char** argv)
 
 #if !defined(USE_LAB_COLORSPACE)
    if (leftImage.numChannels() < 3 || rightImage.numChannels() < 3)
-      cerr << "Warning: grayscale images provided." << endl;
+      cerr << "Warning: grayscale images provided." << std::endl;
 #else
    if (leftImage.numChannels() < 3 || rightImage.numChannels() < 3)
    {
-      cerr << "Error: grayscale images provided." << endl;
+      cerr << "Error: grayscale images provided." << std::endl;
       return -2;
    }
 
@@ -217,25 +225,25 @@ int main( int argc, char** argv)
    minL = std::min(minL, *min_element(leftImageLab.begin(0), leftImageLab.end(0)));
    maxL = std::max(maxL, *max_element(rightImageLab.begin(0), rightImageLab.end(0)));
    minL = std::min(minL, *min_element(rightImageLab.begin(0), rightImageLab.end(0)));
-   cout << "minL = " << minL << " maxL = " << maxL << endl;
+   std::cout << "minL = " << minL << " maxL = " << maxL << std::endl;
 
    maxA = std::max(maxA, *max_element(leftImageLab.begin(1), leftImageLab.end(1)));
    minA = std::min(minA, *min_element(leftImageLab.begin(1), leftImageLab.end(1)));
    maxA = std::max(maxA, *max_element(rightImageLab.begin(1), rightImageLab.end(1)));
    minA = std::min(minA, *min_element(rightImageLab.begin(1), rightImageLab.end(1)));
-   cout << "minA = " << minA << " maxA = " << maxA << endl;
+   std::cout << "minA = " << minA << " maxA = " << maxA << std::endl;
 
    maxB = std::max(maxB, *max_element(leftImageLab.begin(2), leftImageLab.end(2)));
    minB = std::min(minB, *min_element(leftImageLab.begin(2), leftImageLab.end(2)));
    maxB = std::max(maxB, *max_element(rightImageLab.begin(2), rightImageLab.end(2)));
    minB = std::min(minB, *min_element(rightImageLab.begin(2), rightImageLab.end(2)));
-   cout << "minB = " << minB << " maxB = " << maxB << endl;
+   std::cout << "minB = " << minB << " maxB = " << maxB << std::endl;
 #endif
 
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
    if (!glutCreateWindow("GPU TV-L1 Optic Flow")) {
-      cerr << "Error, couldn't open window" << endl;
+      cerr << "Error, couldn't open window" << std::endl;
       return -1;
    }
 

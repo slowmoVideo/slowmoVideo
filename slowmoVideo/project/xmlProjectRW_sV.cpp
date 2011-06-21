@@ -22,8 +22,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QXmlQuery>
 
 
-/// \todo project directory
-
 int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
 {
     QDomDocument doc;
