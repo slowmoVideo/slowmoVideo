@@ -22,6 +22,7 @@ class AbstractRenderTarget_sV;
   \brief Renders a project when started.
   \todo Changes in the project affect the rendering as well. Copy the project?
   \todo Segfault on emtpy project
+  \todo Time range for rendering (markers?)
   */
 class RenderTask_sV : public QObject
 {
@@ -30,7 +31,22 @@ public:
     RenderTask_sV(const Project_sV *project);
     ~RenderTask_sV();
 
-    /** Manages the \c renderTarget pointer (includes destruction). */
+    /**
+      \fn setRenderTarget()
+      Manages the \c renderTarget pointer (includes destruction).
+      */
+    /**
+      \fn setTimeRange()
+      Sets the time range for rendering. By default, the whole project is rendered.
+      */
+    /**
+      \fn setFPS()
+      Sets the number of frames per second for rendering.
+      */
+    /**
+      \fn setSize()
+      Sets the size to use for rendering.
+      */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(float start, float end);
     void setFPS(float fps);

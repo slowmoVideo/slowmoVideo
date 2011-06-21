@@ -44,14 +44,38 @@ public:
     virtual void initialize() = 0;
     virtual bool initialized() const = 0;
 
+    /**
+      \fn framesCount()
+      \return Number of frames in this frame source
+      */
+    /**
+      \fn frameRateNum()
+      \return Frame rate numinator
+      */
+    /**
+      \fn frameRateDen()
+      \return Frame rate denominator
+      */
+    /**
+      \fn fps()
+      fps as float may be less acurate for video frame rates like 29.97 fps (3000/1001 fps), but
+      is a convenient shorthand (no manual division).
+      \return Frames per second as float value.
+      \throw Div0Exception
+      */
     virtual int64_t framesCount() const = 0;
     virtual int frameRateNum() const = 0;
     virtual int frameRateDen() const = 0;
     float fps() const throw(Div0Exception);
 
     /**
-      @return The frame at the given position, as image. Fails
+      \fn frameAt()
+      \return The frame at the given position, as image. Fails
       if the frames have not been extracted yet.
+      */
+    /**
+      \fn framePath()
+      \return The path to the frame at position \c frame
       */
     virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) = 0;
     virtual const QString framePath(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
@@ -81,6 +105,16 @@ signals:
     void signalAllTasksFinished();
 
 public slots:
+    /**
+      \fn slotAbortInitialization()
+      Should abort the initialization of the frame source since this might take a long time
+      (e.g. extracting large frames from a long video, or re-sizing lots of frames).
+      */
+    /**
+      \fn slotUpdateProjectDir()
+      Informs the frame source that the project directory has changed. If the frame source created sub-directories
+      in the old project directories, it can e.g. delete them and create them at the new place.
+      */
     virtual void slotAbortInitialization() = 0;
     virtual void slotUpdateProjectDir() = 0;
 

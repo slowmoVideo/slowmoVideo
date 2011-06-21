@@ -13,6 +13,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "defs_sV.h"
 
+/**
+  Reads video information (number of frames, fps, resolution, etc.) from a video file.
+  */
 VideoInfoSV getInfo(const char filename[]);
 
 #endif //VIDEOINFO_SV_H

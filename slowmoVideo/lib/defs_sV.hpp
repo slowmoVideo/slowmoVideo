@@ -30,29 +30,7 @@ public: FrameSourceError(QString msg);
 
 QString toString(const QSize& size);
 QString toString(const FrameSize &size);
-
-//inline QString enumStr(const FrameSize &size) {
-//    switch (size) {
-//    case FrameSize_Orig:
-//        return QString("Orig");
-//    case FrameSize_Small:
-//        return QString("Small");
-//    default:
-//        Q_ASSERT(false);
-//        return QString("Unknown size");
-//    }
-//}
-inline QString enumStr(const FlowDirection &dir) {
-    switch (dir) {
-    case FlowDirection_Forward:
-        return QString("Forward");
-    case FlowDirection_Backward:
-        return QString("Backward");
-    default:
-        Q_ASSERT(false);
-        return QString("Unknown direction");
-    }
-}
+QString toString(const FlowDirection &dir);
 
 inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
     switch (direction) {

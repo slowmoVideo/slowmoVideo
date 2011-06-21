@@ -21,10 +21,17 @@ class AbstractFlowSource_sV
 public:
     AbstractFlowSource_sV(Project_sV *project);
 
+    /** \return The flow field from \c leftFrame to \c rightFrame */
     virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError) = 0;
+    /** \return The path to the flow file for the given frames */
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
 public slots:
+    /**
+      \fn slotUpdateProjectDir()
+      Informs the flow source that the project directory has changed. If the flow source created sub-directories
+      in the old project directories, it can e.g. delete them and create them at the new place.
+      */
     virtual void slotUpdateProjectDir() = 0;
 
 protected:

@@ -13,17 +13,24 @@ class QImage;
 class FlowField_sV;
 
 /**
-  Provides interpolation methods between frames
+  \short Provides interpolation methods between frames
   */
 class Interpolate_sV {
 
  public:
-
-    struct Movement {
-	float moveX;
-	float moveY;
-    };
-
+    /** \fn forwardFlow()
+      Interpolates a frame using only the flow from the first to the second frame.
+      */
+    /** \fn twowayFlow()
+      Interpolates a frame using optical flow from the first to the second frame, as well as from the second to the first frame.
+      */
     static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
+
+private:
+    struct Movement {
+        float moveX;
+        float moveY;
+    };
+
 };

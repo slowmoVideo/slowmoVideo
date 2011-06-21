@@ -12,7 +12,15 @@ the Free Software Foundation, either version 3 of the License, or
 #define FLOWFIELD_SV_H
 
 /**
-  Represents a dense optical flow field.
+  \brief Represents a dense optical flow field.
+
+  Values are internally stored in row order:
+  \code
+  [ x0 y0  x1 y1  x2 y2 ...
+    xi yi  xj yj  xk yk ... ]
+  \endcode
+
+  \see FlowRW_sV for reading and writing flow fields.
   */
 class FlowField_sV
 {
@@ -28,6 +36,24 @@ public:
 
     ~FlowField_sV();
 
+    /** \fn data()
+      \return Pointer to the raw data. See the class description for the accurate format.
+      */
+    /** \fn dataSize()
+      \return Number of elements in the data array.
+      */
+    /** \fn width()
+      \return Width of the flow field
+      */
+    /** \fn height()
+      \return Height of the flow field
+      */
+    /** \fn x(int, int)
+      \return Flow in x direction at position \c (x|y)
+      */
+    /** \fn setX(int, int, float)
+      Sets the flow in x direction for the position <code>(x|y)</code>
+      */
     float* data();
     int dataSize() const { return 2*m_width*m_height; }
     int width() const { return m_width; }

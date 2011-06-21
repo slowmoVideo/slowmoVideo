@@ -17,7 +17,8 @@ QString toString(const QSize &size)
     return QString::fromUtf8("%1×%2").arg(size.width()).arg(size.height());
 }
 
-QString toString(const FrameSize &size) {
+QString toString(const FrameSize &size)
+{
     switch (size) {
     case FrameSize_Orig:
         return QString("Orig");
@@ -26,5 +27,18 @@ QString toString(const FrameSize &size) {
     default:
         Q_ASSERT(false);
         return QString("Unknown size");
+    }
+}
+
+QString toString(const FlowDirection &dir)
+{
+    switch (dir) {
+    case FlowDirection_Forward:
+        return QString("Forward");
+    case FlowDirection_Backward:
+        return QString("Backward");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown direction");
     }
 }

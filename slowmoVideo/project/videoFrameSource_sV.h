@@ -31,6 +31,7 @@ class VideoFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT
 public:
+    /** Builds a new video frame source from the given file. */
     VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException);
     ~VideoFrameSource_sV();
 
@@ -78,7 +79,9 @@ private:
     bool rebuildRequired(const FrameSize frameSize);
 
 signals:
+    /** Emitted when the task for extracting original-sized images has finished (or has been terminated) */
     void signalExtractOrigFramesFinished();
+    /** Emitted when the task for extracting thumbnail-sized images has finished (or has been terminated) */
     void signalExtractSmallFramesFinished();
 
 private slots:

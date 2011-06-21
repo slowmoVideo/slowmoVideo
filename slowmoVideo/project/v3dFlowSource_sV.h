@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 class V3dFlowSource_sV : public AbstractFlowSource_sV
 {
 public:
+    /** Creates a new flow source using V3D optical flow */
     V3dFlowSource_sV(Project_sV *project);
 
     FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);

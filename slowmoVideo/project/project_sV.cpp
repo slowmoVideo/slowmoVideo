@@ -160,31 +160,3 @@ float Project_sV::timeToFrame(float time) const
     return time * m_frameSource->fps();
 }
 
-
-const QString Project_sV::flowDirStr(FrameSize frameSize) const
-{
-    return m_projDir.absolutePath() + "/oFlow" + toString(frameSize);
-}
-
-void Project_sV::createDirectories(FrameSize frameSize) const
-{
-    QList<QDir> dirList;
-    dirList << QDir(flowDirStr(frameSize));
-    for (int i = 0; i < dirList.size(); i++) {
-        if (!dirList.at(i).exists()) {
-            dirList.at(i).mkpath(".");
-            qDebug() << "Created directory: " << dirList.at(i).absolutePath();
-        }
-    }
-}
-
-const QString Project_sV::flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const
-{
-    switch (direction) {
-    case FlowDirection_Forward:
-        return QString("%1/forward%2.sVflow").arg(flowDirStr(size)).arg(leftFrame+1, 5, 10, QChar::fromAscii('0'));
-    case FlowDirection_Backward:
-    default:
-        return QString("%1/backward%2.sVflow").arg(flowDirStr(size)).arg(leftFrame+2, 5, 10, QChar::fromAscii('0'));
-    }
-}

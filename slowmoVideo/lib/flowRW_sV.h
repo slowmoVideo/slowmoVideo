@@ -17,6 +17,7 @@ class FlowField_sV;
 
 /**
   \brief Reads and writes Optical Flow fields.
+  \see FlowField_sV
   \todo Cast exception if the file is not a valid flow file
   */
 class FlowRW_sV
@@ -36,13 +37,16 @@ public:
         }
     };
 
-    /**
-      \see FlowField_sV::FlowField_sV(int, int, float*, FlowField_sV::GLFormat)
-      */
-    static void save(std::string filename, FlowField_sV *flowField);
-    /**
+    /** \fn load(std::string)
       \return \tt NULL, if the file could not be loaded, and the flow field otherwise.
       */
+    /** \fn save(std::string, FlowField_sV*);
+      \see FlowField_sV::FlowField_sV(int, int, float*, FlowField_sV::GLFormat)
+      */
+    /** \fn readInfo(std::string)
+      \return Information about the flow file (like dimension); Does not read the whole file and is therefore faster than load(std::string).
+      */
+    static void save(std::string filename, FlowField_sV *flowField);
     static FlowField_sV* load(std::string filename);
 
     static FlowInfo_sV readInfo(std::string filename);

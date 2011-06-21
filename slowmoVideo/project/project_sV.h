@@ -71,7 +71,6 @@ public:
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError);
 
-    const QString flowFileStr(int leftFrame, FlowDirection direction, FrameSize size) const;
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
 
@@ -88,8 +87,6 @@ private:
     float timeToFrame(float time) const;
 
     void init();
-    void createDirectories(FrameSize frameSize) const;
-    const QString flowDirStr(FrameSize frameSize) const;
 
 };
 
