@@ -12,8 +12,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
-#include "../lib/opticalFlowBuilder_sV.h"
-#include "../lib/opticalFlowBuilderGPUKLT_sV.h"
 #include "../lib/interpolate_sV.h"
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
