@@ -62,7 +62,7 @@ NewProjectDialog::~NewProjectDialog()
     delete m_buttonGroup;
 }
 
-Project_sV* NewProjectDialog::buildProject()
+Project_sV* NewProjectDialog::buildProject() throw(FrameSourceError)
 {
     Project_sV *project = new Project_sV(ui->projectDir->text());
     AbstractFrameSource_sV *frameSource = NULL;

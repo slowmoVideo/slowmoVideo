@@ -201,13 +201,17 @@ void MainWindow::newProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {
-        Project_sV *project = npd.buildProject();
+        try {
+            Project_sV *project = npd.buildProject();
 
-        // Save project
-        XmlProjectRW_sV writer;
-        writer.saveProject(project, npd.projectFilename());
+            // Save project
+            XmlProjectRW_sV writer;
+            writer.saveProject(project, npd.projectFilename());
 
-        loadProject(project);
+            loadProject(project);
+        } catch (FrameSourceError &err) {
+            QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+        }
     }
 }
 
@@ -299,6 +303,8 @@ void MainWindow::shortcutUsed(QString which)
             dialog.setDefaultSuffix("sVproj");
             dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
             dialog.setFileMode(QFileDialog::AnyFile);
+            /// \todo project directory
+//            dialog.setDirectory(QFileInfo(m_project->blockSignals()));
             if (dialog.exec() == QDialog::Accepted) {
                 XmlProjectRW_sV writer;
                 writer.saveProject(m_project, dialog.selectedFiles().at(0));

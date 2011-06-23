@@ -21,6 +21,10 @@ class QButtonGroup;
 class RenderTask_sV;
 class Project_sV;
 
+/**
+  \brief Dialog for rendering option
+  \todo Remember size, fps, etc.
+  */
 class RenderingDialog : public QDialog
 {
     Q_OBJECT

@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define VIDEOFRAMESOURCE_SV_H
 
 #include "abstractFrameSource_sV.h"
+#include "../lib/defs_sV.hpp"
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
@@ -24,15 +25,15 @@ extern "C" {
 class QProcess;
 class Project_sV;
 
-class NoVideoStreamsException {};
-
 /** \brief Uses frames from a video file */
 class VideoFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT
 public:
     /** Builds a new video frame source from the given file. */
-    VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException);
+    VideoFrameSource_sV(const Project_sV *project, const QString &filename)
+    throw(FrameSourceError);
+
     ~VideoFrameSource_sV();
 
     void initialize();

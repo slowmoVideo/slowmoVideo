@@ -17,18 +17,33 @@ the Free Software Foundation, either version 3 of the License, or
 
 QRegExp VideoFrameSource_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
-VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename) throw(NoVideoStreamsException) :
+VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename)
+throw(FrameSourceError) :
     AbstractFrameSource_sV(project),
     m_inFile(filename),
     m_ffmpegSemaphore(1),
     m_initialized(false)
 {
+    if (!QFileInfo(filename).exists()) {
+        throw FrameSourceError(QString("Video file %1 does not exist!").arg(filename));
+    }
+
     m_videoInfo = new VideoInfoSV();
 
     *m_videoInfo = getInfo(filename.toStdString().c_str());
     if (m_videoInfo->streamsCount <= 0) {
         qDebug() << "Video info is invalid: " << filename;
-        throw NoVideoStreamsException();
+        throw FrameSourceError("Video is invalid, no streams found: " + filename);
+    }
+
+    QProcess ffmpeg(this);
+    QStringList args;
+    args << "-version";
+    ffmpeg.start("ffmpeg", args);
+    ffmpeg.waitForFinished(1000);
+    QByteArray output = ffmpeg.readAllStandardOutput();
+    if (output.size() == 0) {
+        throw FrameSourceError("ffmpeg executable not found! Cannot load " + filename);
     }
 
     m_dirFramesSmall = project->getDirectory("framesSmall");

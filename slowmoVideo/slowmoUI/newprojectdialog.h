@@ -37,7 +37,7 @@ public:
     QString m_inputFile;
     QString m_projectDir;
 
-    Project_sV* buildProject();
+    Project_sV* buildProject() throw(FrameSourceError);
     const QString projectFilename() const;
 
 private:

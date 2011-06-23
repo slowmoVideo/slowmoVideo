@@ -1,10 +1,10 @@
 #ifndef DEFS_SV_HPP
 #define DEFS_SV_HPP
 
-#include <QDebug>
+#include <QtCore/QDebug>
 #include <QtCore/QString>
 #include <QtCore/QSize>
-#include <QColor>
+#include <QtGui/QColor>
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
