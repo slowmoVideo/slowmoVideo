@@ -20,6 +20,9 @@ message("Install prefix: ${CMAKE_INSTALL_PREFIX}")
 find_package (OpenGL REQUIRED)
 include_directories (${OPENGL_INCLUDE_DIR})
 
+find_package(SDL REQUIRED)
+include_directories(${SDL_INCLUDE_DIR})
+
 #Include GLUT (libglut3-dev)
 find_package(GLUT REQUIRED)
 include_directories(${GLUT_INCLUDE_DIR})

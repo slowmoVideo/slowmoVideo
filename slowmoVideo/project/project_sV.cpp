@@ -76,6 +76,15 @@ void Project_sV::setProjectDir(QString projectDir)
     m_flowSource->slotUpdateProjectDir();
 }
 
+void Project_sV::readSettings(const QSettings &settings)
+{
+    if (dynamic_cast<V3dFlowSource_sV *>(m_flowSource) != NULL) {
+        V3dFlowSource_sV *flowSource = dynamic_cast<V3dFlowSource_sV *>(m_flowSource);
+        flowSource->setLambda(settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble());
+        qDebug() << "Lambda set to " << settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble();
+    }
+}
+
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
 {
     if (m_frameSource != NULL) {

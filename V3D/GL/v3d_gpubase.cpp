@@ -878,12 +878,14 @@ namespace V3D_GPU
          if (cgGLIsProfileSupported(CG_PROFILE_FP30))   fragmentProfile = CG_PROFILE_FP30;
          if (cgGLIsProfileSupported(CG_PROFILE_FP40))   fragmentProfile = CG_PROFILE_FP40;
          if (cgGLIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
+         if (cgIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
 
          if (cgGLIsProfileSupported(CG_PROFILE_ARBVP1)) vertexProfile = CG_PROFILE_ARBVP1;
          if (cgGLIsProfileSupported(CG_PROFILE_VP20))   vertexProfile = CG_PROFILE_VP20;
          if (cgGLIsProfileSupported(CG_PROFILE_VP30))   vertexProfile = CG_PROFILE_VP30;
          if (cgGLIsProfileSupported(CG_PROFILE_VP40))   vertexProfile = CG_PROFILE_VP40;
          if (cgGLIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
+         if (cgIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
 
          if (fragmentProfile == CG_PROFILE_UNKNOWN)
             cerr << "Warning: No useful fragment shader profile found." << endl;

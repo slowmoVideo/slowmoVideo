@@ -45,7 +45,6 @@ void ProgressDialog::slotTaskProgress(int progress)
 }
 void ProgressDialog::slotTaskItemDescription(const QString desc)
 {
-    qDebug() << "Description received: " << desc;
     ui->lblTaskItemDesc->setText(desc);
     repaint();
 }

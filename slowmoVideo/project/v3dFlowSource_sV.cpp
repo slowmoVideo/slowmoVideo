@@ -16,8 +16,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
 
-V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project) :
-    AbstractFlowSource_sV(project)
+V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project, float lambda) :
+    AbstractFlowSource_sV(project),
+    m_lambda(lambda)
 {
     m_dirFlowSmall = project->getDirectory("oFlowSmall");
     m_dirFlowOrig = project->getDirectory("oFlowOrig");
@@ -36,6 +37,11 @@ void V3dFlowSource_sV::slotUpdateProjectDir()
 
     m_dirFlowSmall.mkpath(".");
     m_dirFlowOrig.mkpath(".");
+}
+
+void V3dFlowSource_sV::setLambda(float lambda)
+{
+    m_lambda = lambda;
 }
 
 FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
@@ -57,7 +63,7 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
         args    << project()->frameSource()->framePath(leftFrame, frameSize)
                 << project()->frameSource()->framePath(rightFrame, frameSize)
                 << flowFileName
-                << "10" << "100";
+                << QVariant(m_lambda).toString() << "100";
 
         qDebug() << "Arguments: " << args;
 

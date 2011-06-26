@@ -11,6 +11,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
+    ui->lambda->setValue(m_settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble());
 
     bool b = true;
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
@@ -32,6 +33,7 @@ void PreferencesDialog::accept()
     if (slotValidateFlowBinary()) {
         m_settings.setValue("binaries/v3dFlowBuilder", ui->buildFlow->text());
     }
+    m_settings.setValue("settings/v3dFlowBuilder/lambda", ui->lambda->value());
     QDialog::accept();
 }
 

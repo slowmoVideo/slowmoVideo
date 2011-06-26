@@ -11,25 +11,21 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef PROJECT_SV_H
 #define PROJECT_SV_H
 
-#include <QFile>
-#include <QDir>
-#include <QString>
-#include <QImage>
-
-#include <QObject>
-#include <QFile>
-
-class Flow_sV;
-class AbstractFrameSource_sV;
-class AbstractFlowSource_sV;
+#include "tag_sV.h"
 #include "../lib/defs_sV.hpp"
-
 extern "C" {
 #include "../lib/videoInfo_sV.h"
 }
 
-#include "tag_sV.h"
+#include <QtCore/QObject>
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+#include <QtGui/QImage>
+#include <QSettings>
 
+class Flow_sV;
+class AbstractFrameSource_sV;
+class AbstractFlowSource_sV;
 class RenderTask_sV;
 class NodeList_sV;
 class FlowField_sV;
@@ -53,11 +49,13 @@ public:
     ~Project_sV();
 
     void setProjectDir(QString projectDir);
+    void readSettings(const QSettings &settings);
 
     /** \param frameSource will be managed (deleted) by the project. If \c NULL, an empty frame source will be used. */
     void loadFrameSource(AbstractFrameSource_sV *frameSource);
 
     AbstractFrameSource_sV* frameSource() { return m_frameSource; }
+    AbstractFlowSource_sV* flowSource() { return m_flowSource; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
 
