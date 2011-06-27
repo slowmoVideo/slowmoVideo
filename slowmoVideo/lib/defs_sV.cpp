@@ -42,3 +42,20 @@ QString toString(const FlowDirection &dir)
         return QString("Unknown direction");
     }
 }
+
+QString toString(const NodeContext &context)
+{
+    switch (context) {
+    case NodeContext_Node:
+        return QString("Node");
+    case NodeContext_Segment:
+        return QString("Segment");
+    case NodeContext_Handle:
+        return QString("Handle");
+    case NodeContext_None:
+        return QString("None");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown context");
+    }
+}

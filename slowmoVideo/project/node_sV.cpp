@@ -15,16 +15,23 @@ Node_sV::Node_sV() :
     m_x(0),
     m_y(0)
 {
+    init();
 }
 
 Node_sV::Node_sV(const qreal &x, const qreal &y) :
     m_x(x),
-    m_y(y),
-    m_moveX(0),
-    m_moveY(0),
-    m_selected(false)
+    m_y(y)
 {
+    init();
+}
 
+void Node_sV::init()
+{
+    m_moveX = 0;
+    m_moveY = 0;
+    m_selected = false;
+    m_leftCurveType = CurveType_Linear;
+    m_rightCurveType = CurveType_Linear;
 }
 
 qreal Node_sV::x() const { return m_x + m_moveX; }
@@ -35,11 +42,24 @@ qreal Node_sV::yUnmoved() const { return m_y; }
 qreal Node_sV::setX(qreal x) { qreal ret = m_x; m_x = x; return ret; }
 qreal Node_sV::setY(qreal y) { qreal ret = m_y; m_y = y; return ret; }
 
-void Node_sV::select(bool select)
-{
-    m_selected = select;
-}
+void Node_sV::select(bool select) { m_selected = select; }
 bool Node_sV::selected() const { return m_selected; }
+
+const Node_sV::NodeHandle_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
+const Node_sV::NodeHandle_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
+Node_sV::CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
+Node_sV::CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
+
+void Node_sV::setLeftCurveType(CurveType type) { m_leftCurveType = type; }
+void Node_sV::setRightCurveType(CurveType type) { m_rightCurveType = type; }
+void Node_sV::setLeftNodeHandle(qreal x, qreal y) {
+    Q_ASSERT(x <= 0); // Relative offset to current node; ensure that mapping is injective
+    m_leftHandle.x = x; m_leftHandle.y = y;
+}
+void Node_sV::setRightNodeHandle(qreal x, qreal y) {
+    Q_ASSERT(x >= 0);
+    m_rightHandle.x = x; m_rightHandle.y = y;
+}
 
 bool Node_sV::operator <(const Node_sV& other) const
 {

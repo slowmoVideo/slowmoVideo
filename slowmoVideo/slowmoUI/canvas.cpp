@@ -36,6 +36,7 @@ QColor Canvas::labelCol(0, 77, 255);
 QColor Canvas::backgroundCol(30, 30, 40);
 
 /// \todo zoom in/out, scrolling etc.: scaling
+/// \todo move with MMB
 
 Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),
@@ -213,6 +214,14 @@ void Canvas::paintEvent(QPaintEvent *)
             davinci.drawLine(convertTimeToCanvas(*prev), p);
         }
 
+        // Handles
+        if (curr->leftCurveType() != Node_sV::CurveType_Linear || true) {
+            QPoint h1 = convertTimeToCanvas(*curr + Node_sV(curr->leftNodeHandle().x, curr->leftNodeHandle().y));
+            QPoint h2 = convertTimeToCanvas(*curr + Node_sV(curr->rightNodeHandle().x, curr->rightNodeHandle().y));
+            davinci.drawEllipse(h1.x(), h1.y(), 5, 5);
+            davinci.drawEllipse(h2.x(), h2.y(), 5, 5);
+        }
+
         prev = &m_nodes->at(i);
     }
 
@@ -246,6 +255,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
     m_states.initialModifiers = e->modifiers();
+    m_states.initialButtons = e->buttons();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *e)
@@ -297,39 +307,45 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
 void Canvas::mouseReleaseEvent(QMouseEvent *)
 {
-    if (!m_states.moveAborted) {
-        switch (m_mode) {
-        case ToolMode_Select:
-            if (m_states.countsAsMove()) {
+    if (m_states.initialButtons.testFlag(Qt::LeftButton)) {
+        if (!m_states.moveAborted) {
+            switch (m_mode) {
+            case ToolMode_Select:
+                if (m_states.countsAsMove()) {
+                    m_nodes->confirmMove();
+                    qDebug() << "Move confirmed.";
+                } else {
+                    if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom) {
+                        // Try to select a node below the mouse. If there is none, add a point.
+                        bool selected = selectAt(m_states.initialMousePos, m_states.initialModifiers.testFlag(Qt::ControlModifier));
+                        if (!selected) {
+                            if (m_mode == ToolMode_Select) {
+                                Node_sV p = convertCanvasToTime(m_states.initialMousePos);
+                                m_nodes->add(p);
+                            } else {
+                                qDebug() << "Not adding node. Mode is " << m_mode;
+                            }
+                        } else {
+                            qDebug() << "Node selected.";
+                        }
+                        repaint();
+
+                        qDebug() << "Node list: " << m_nodes;
+                    } else {
+                        qDebug() << "Not inside bounds.";
+                    }
+                }
+                break;
+            case ToolMode_Move:
                 m_nodes->confirmMove();
                 qDebug() << "Move confirmed.";
-            } else {
-                if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom) {
-                    // Try to select a node below the mouse. If there is none, add a point.
-                    bool selected = selectAt(m_states.initialMousePos, m_states.initialModifiers.testFlag(Qt::ControlModifier));
-                    if (!selected) {
-                        if (m_mode == ToolMode_Select) {
-                            Node_sV p = convertCanvasToTime(m_states.initialMousePos);
-                            m_nodes->add(p);
-                        } else {
-                            qDebug() << "Not adding node. Mode is " << m_mode;
-                        }
-                    } else {
-                        qDebug() << "Node selected.";
-                    }
-                    repaint();
-
-                    qDebug() << "Node list: " << m_nodes;
-                } else {
-                    qDebug() << "Not inside bounds.";
-                }
+                break;
             }
-            break;
-        case ToolMode_Move:
-            m_nodes->confirmMove();
-            qDebug() << "Move confirmed.";
-            break;
         }
+    } else if (m_states.initialButtons.testFlag(Qt::RightButton)) {
+        Node_sV time = convertCanvasToTime(m_states.prevMousePos);
+        NodeContext context = m_nodes->context(time.x(), time.y(), convertCanvasToTime(QPoint(m_distLeft+5,0)).x());
+        qDebug() << "Context at " << time << " is: " << toString(context);
     }
 }
 
@@ -377,6 +393,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
     repaint();
 }
 
+/// \todo something without m_distLeft
 const Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
 {
     Q_ASSERT(m_secResX > 0);

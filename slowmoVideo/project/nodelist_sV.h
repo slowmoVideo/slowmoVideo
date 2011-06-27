@@ -11,15 +11,29 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef NODELIST_SV_H
 #define NODELIST_SV_H
 
+#include "node_sV.h"
+#include "../lib/defs_sV.hpp"
+
 #include <QList>
 #include <QtGlobal>
 
-#include "node_sV.h"
+/**
+  \brief Represents a curve defined by a Node_sV list.
 
+  This object can be queried for the source time given an output time.
+
+  The curve is (ensured to be) injective, i.e.
+  \f$ t_1 \neq t_2 \rightarrow f(t_1) \neq f(t_2) \f$
+  with \f$ t_1,t_2 \in \f$ target time, \f$ f(t_1),f(t_2) \in \f$ source time. This means that
+  there is alwas a non-ambiguous answer to the question:
+  <em>Which frame from the input video has to be displayed at output time \f$ t \f$?</em>
+  */
 class NodeList_sV
 {
 public:
     NodeList_sV(float minDist = 1/30.0f);
+
+
     void setMaxY(qreal time);
 
     qreal sourceTime(qreal targetTime) const;
@@ -53,12 +67,39 @@ public:
       */
     void abortMove();
 
+    void moveHandle(int nodeIndex, bool leftHandle, Node_sV &relPos);
+
+
+    NodeContext context(qreal tx, qreal ty, qreal tdelta) const;
+    void setCurveType(qreal segmentTime, Node_sV::CurveType type);
+
+
 
     /**
       @return The position of the node whose target time (x()) is <= time,
       or -1 if there is no such node.
       */
     int find(qreal time) const;
+
+    /**
+      @return The position of the first node in the list which is within a radius
+      of \c tdelta around the point <tt>(tx|ty)</tt>, or -1 if no such node exists.
+      @todo Replace other functions with this one
+      */
+    int find(qreal tx, qreal ty, qreal tdelta) const;
+    /**
+      \return The position of the first node belonging to the handle at <tt>(tx|ty)</tt>
+      if there is one within a radius uf \c tdelta, and if its mode is not set to linear.
+      \see find(qreal) for finding nodes directly.
+      */
+    int findByHandle(qreal tx, qreal ty, qreal tdelta) const;
+    /**
+      \brief Searches for a segment (or path) between two nodes at time \c tx.
+
+      If a left or right node does not exist (when \c tx is outside of the curve), the return
+      value for this index is -1.
+      */
+    void findBySegment(qreal tx, int& leftIndex_out, int& rightIndex_out) const;
 
     /**
       @return The index of the node whose time is equal or greater than

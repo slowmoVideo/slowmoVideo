@@ -231,6 +231,60 @@ void NodeList_sV::abortMove()
     }
 }
 
+void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV &relPos)
+{
+    Q_ASSERT(nodeIndex >= 0);
+    Q_ASSERT(nodeIndex < m_list.size());
+
+    Node_sV currentNode = m_list[nodeIndex];
+    Node_sV otherNode;
+    if (leftHandle && nodeIndex > 0) {
+        otherNode = m_list.at(nodeIndex-1);
+        relPos.setX(qMin(relPos.x(), currentNode.x() - otherNode.x() - otherNode.rightNodeHandle().x));
+        currentNode.setLeftNodeHandle(relPos.x(), relPos.y());
+    } else if (!leftHandle && nodeIndex+1 < m_list.size()) {
+        otherNode = m_list.at(nodeIndex+1);
+        relPos.setX(qMin(relPos.x(), otherNode.x() - currentNode.x() + otherNode.leftNodeHandle().x));
+        currentNode.setLeftNodeHandle(relPos.x(), relPos.y());
+    }
+}
+
+
+
+
+////////// Info
+
+NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
+{
+    if (find(tx, ty, tdelta) >= 0) {
+        return NodeContext_Node;
+    }
+    if (findByHandle(tx, ty, tdelta) >= 0) {
+        return NodeContext_Handle;
+    }
+    if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
+        return NodeContext_Segment;
+    }
+    return NodeContext_None;
+}
+
+
+
+
+////////// Curve
+
+void NodeList_sV::setCurveType(qreal segmentTime, Node_sV::CurveType type)
+{
+    int left, right;
+    findBySegment(segmentTime, left, right);
+    if (left != -1) {
+        m_list[left].setRightCurveType(type);
+    }
+    if (right != -1) {
+        m_list[right].setLeftCurveType(type);
+    }
+}
+
 
 
 
@@ -248,6 +302,50 @@ int NodeList_sV::find(qreal time) const
         pos = -1;
     }
     return pos;
+}
+int NodeList_sV::find(qreal tx, qreal ty, qreal tdelta) const
+{
+    for (int i = 0; i < m_list.size(); i++) {
+        if (std::pow(m_list.at(i).xUnmoved() - tx, 2) + std::pow(m_list.at(i).yUnmoved()-ty, 2)
+                < std::pow(tdelta, 2)) {
+            return i;
+        }
+    }
+    return -1;
+}
+int NodeList_sV::findByHandle(qreal tx, qreal ty, qreal tdelta) const
+{
+    for (int i = 0; i < m_list.size(); i++) {
+        Node_sV node = m_list[i];
+        if (node.leftCurveType() != Node_sV::CurveType_Linear) {
+            if (std::pow(node.xUnmoved() + node.leftNodeHandle().x - tx, 2) + std::pow(node.yUnmoved() + node.leftNodeHandle().y - ty, 2)
+                    < std::pow(tdelta, 2)) {
+                return i;
+            }
+        }
+        if (node.rightCurveType() != Node_sV::CurveType_Linear) {
+            if (std::pow(node.xUnmoved() + node.rightNodeHandle().x - tx, 2) + std::pow(node.yUnmoved() + node.rightNodeHandle().y - ty, 2)
+                    < std::pow(tdelta, 2)) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+void NodeList_sV::findBySegment(qreal tx, int &leftIndex_out, int &rightIndex_out) const
+{
+    for (int i = 0; i < m_list.size(); i++) {
+        leftIndex_out = i-1;
+        rightIndex_out = i;
+        if (m_list.at(i).xUnmoved() > tx) {
+            break;
+        }
+        if (i == m_list.size()-1) {
+            leftIndex_out = i;
+            rightIndex_out = -1;
+        }
+    }
 }
 
 int NodeList_sV::nodeAfter(qreal time) const
@@ -277,6 +375,12 @@ const Node_sV* NodeList_sV::near(qreal t) const
 const Node_sV& NodeList_sV::at(int i) const { return m_list.at(i); }
 Node_sV& NodeList_sV::operator[](int i) { return m_list[i]; }
 int NodeList_sV::size() const { return m_list.size(); }
+
+
+
+
+
+////////// Debug
 
 QDebug operator<<(QDebug dbg, const NodeList_sV &list)
 {

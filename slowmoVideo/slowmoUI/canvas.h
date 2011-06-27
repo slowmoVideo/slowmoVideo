@@ -100,6 +100,7 @@ private:
         QPoint prevMousePos;
         QPoint initialMousePos;
         Qt::KeyboardModifiers initialModifiers;
+        Qt::MouseButtons initialButtons;
 
         void reset() {
             moveAborted = false;

@@ -13,11 +13,27 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtGlobal>
 
+/**
+  \brief Node for defining the input/output curve
+
+  \todo Save handles
+  */
 class Node_sV
 {
 public:
     Node_sV();
     Node_sV(const qreal &x, const qreal &y);
+
+    enum CurveType { CurveType_Linear, CurveType_Bezier };
+
+    struct NodeHandle_sV {
+        qreal x;
+        qreal y;
+        NodeHandle_sV() :
+            x(0),
+            y(0)
+        { }
+    };
 
     bool operator<(const Node_sV &other) const;
     bool operator==(const Node_sV &other) const;
@@ -41,6 +57,16 @@ public:
     void abortMove();
     void confirmMove();
 
+    const NodeHandle_sV& leftNodeHandle() const;
+    const NodeHandle_sV& rightNodeHandle() const;
+    CurveType leftCurveType() const;
+    CurveType rightCurveType() const;
+
+    void setLeftNodeHandle(qreal x, qreal y);
+    void setRightNodeHandle(qreal x, qreal y);
+    void setLeftCurveType(CurveType type);
+    void setRightCurveType(CurveType type);
+
 
 private:
     qreal m_x;
@@ -50,6 +76,13 @@ private:
     qreal m_moveY;
 
     bool m_selected;
+
+    NodeHandle_sV m_leftHandle;
+    NodeHandle_sV m_rightHandle;
+    CurveType m_leftCurveType;
+    CurveType m_rightCurveType;
+
+    void init();
 };
 
 QDebug operator<<(QDebug qd, const Node_sV& n);

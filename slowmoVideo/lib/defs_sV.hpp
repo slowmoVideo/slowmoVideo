@@ -8,6 +8,7 @@
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
+enum NodeContext { NodeContext_Node, NodeContext_Segment, NodeContext_Handle, NodeContext_None };
 
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);
@@ -31,6 +32,7 @@ public: FrameSourceError(QString msg);
 QString toString(const QSize& size);
 QString toString(const FrameSize &size);
 QString toString(const FlowDirection &dir);
+QString toString(const NodeContext &context);
 
 inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
     switch (direction) {
