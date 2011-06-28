@@ -80,6 +80,12 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
+    m_handleMapper = new QSignalMapper(this);
+    m_aResetLeftHandle = new QAction("Reset left handle", this);
+    m_aResetRightHandle = new QAction("Reset right handle", this);
+    m_handleMapper->setMapping(m_aResetLeftHandle, "left");
+    m_handleMapper->setMapping(m_aResetRightHandle, "right");
+
 
     bool b = true;
     b &= connect(m_aDeleteNode, SIGNAL(triggered()), this, SLOT(slotDeleteNode()));
@@ -87,6 +93,9 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
+    b &= connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
+    b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
+    b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
     Q_ASSERT(b);
 }
 
@@ -228,8 +237,8 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (curr->selected()) {
             davinci.setPen(QPen(QBrush(selectedCol), 2.0));
-            davinci.drawRoundedRect(p.x()-NODE_RADIUS-SELECT_RADIUS, p.y()-NODE_RADIUS-SELECT_RADIUS,
-                                    2*(NODE_RADIUS+SELECT_RADIUS)+1, 2*(NODE_RADIUS+SELECT_RADIUS)+1,
+            davinci.drawRoundedRect(p.x()-NODE_SELECTED_RADIUS, p.y()-NODE_SELECTED_RADIUS,
+                                    2*NODE_SELECTED_RADIUS+1, 2*NODE_SELECTED_RADIUS+1,
                                     1, 1);
         }
         if (prev != NULL) {
@@ -413,14 +422,23 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
                 convertCanvasToTime(QPoint(m_distLeft+5,0)).x()
                 );
     switch(context) {
-    case NodeContext_Node:
+    case NodeContext_Node: {
+        int nodeIndex = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toSimplePointF_sV(), delta(SELECT_RADIUS));
+        menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
         menu.addAction(m_aSnapInNode);
-        break;
-    case NodeContext_Segment:
+        break; }
+    case NodeContext_Segment: {
+        int leftNode, rightNode;
+        m_nodes->findBySegment(convertCanvasToTime(m_states.prevMousePos).x(), leftNode, rightNode);
+
+        menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(rightNode))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
-        break;
+        menu.addSeparator()->setText("Handle actions");
+        menu.addAction(m_aResetLeftHandle);
+        menu.addAction(m_aResetRightHandle);
+        break; }
     default:
         qDebug() << "No context menu available for context " << toString(context);
         return;
@@ -592,6 +610,23 @@ void Canvas::slotChangeCurveType(int curveType)
 {
     qDebug() << "Changing curve type to " << toString((CurveType)curveType) << " at " << convertCanvasToTime(m_states.prevMousePos).x();
     m_nodes->setCurveType(convertCanvasToTime(m_states.prevMousePos).x(), (CurveType) curveType);
+}
+void Canvas::slotResetHandle(const QString &position)
+{
+    int leftNode, rightNode;
+    m_nodes->findBySegment(convertCanvasToTime(m_states.prevMousePos).x(), leftNode, rightNode);
+    if (position == "left") {
+        if (leftNode >= 0) {
+            m_nodes->moveHandle(leftNode, false, Node_sV());
+        }
+    } else if (position == "right") {
+        if (rightNode >= 0) {
+            m_nodes->moveHandle(rightNode, true, Node_sV());
+        }
+    } else {
+        qDebug() << "Unknown handle position: " << position;
+        Q_ASSERT(false);
+    }
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)

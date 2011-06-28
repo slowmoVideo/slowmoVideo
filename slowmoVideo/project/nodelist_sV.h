@@ -87,7 +87,7 @@ public:
       of \c tdelta around the point <tt>(tx|ty)</tt>, or -1 if no such node exists.
       @todo Replace other functions with this one
       */
-    int find(qreal tx, qreal ty, qreal tdelta) const;
+    int find(SimplePointF_sV pos, qreal tdelta) const;
     /**
       \return The position of the first node belonging to the handle at <tt>(tx|ty)</tt>
       if there is one within a radius uf \c tdelta, and if its mode is not set to linear.

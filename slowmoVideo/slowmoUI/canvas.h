@@ -22,6 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 #define NODE_RADIUS 4
+#define NODE_SELECTED_RADIUS 6
 #define SELECT_RADIUS 8
 #define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3
@@ -126,8 +127,11 @@ private:
     QAction *m_aSnapInNode;
 
     QSignalMapper *m_curveTypeMapper;
+    QSignalMapper *m_handleMapper;
     QAction *m_aLinear;
     QAction *m_aBezier;
+    QAction *m_aResetLeftHandle;
+    QAction *m_aResetRightHandle;
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
@@ -148,6 +152,7 @@ private slots:
     void slotDeleteNode();
     void slotSnapInNode();
     void slotChangeCurveType(int curveType);
+    void slotResetHandle(const QString &position);
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);

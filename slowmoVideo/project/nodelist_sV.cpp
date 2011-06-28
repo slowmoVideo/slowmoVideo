@@ -181,10 +181,16 @@ void NodeList_sV::moveSelected(const Node_sV &time)
         if (left != NULL) {
             if (left->selected() && !right->selected()) {
                 // Move-right distance
-                maxRMove = qMin(maxRMove, right->xUnmoved() - left->xUnmoved() - m_minDist);
+                maxRMove = qMin(maxRMove,
+                                right->xUnmoved()+right->leftNodeHandle().x -
+                                (left->xUnmoved()+left->rightNodeHandle().x) -
+                                m_minDist);
             } else if (!left->selected() && right->selected()) {
                 // Move-left distance
-                maxLMove = qMax(maxLMove, left->xUnmoved() - right->xUnmoved() + m_minDist);
+                maxLMove = qMax(maxLMove,
+                                left->xUnmoved()+left->rightNodeHandle().x -
+                                (right->xUnmoved()+right->leftNodeHandle().x) +
+                                m_minDist);
             }
         }
 
@@ -200,15 +206,14 @@ void NodeList_sV::moveSelected(const Node_sV &time)
         maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
     }
     qDebug() << "Max move: left " << maxLMove << ", right: " << maxRMove;
-    if (maxLMove <= time.x() && time.x() <= maxRMove
-            && maxDMove <= time.y() && time.y() <= maxUMove) {
-        for (int i = 0; i < m_list.size(); i++) {
-            if (m_list.at(i).selected()) {
-                m_list[i].move(time);
-            }
+    Node_sV newTime(
+                qMax(maxLMove, qMin(maxRMove, time.x())),
+                qMax(maxDMove, qMin(maxUMove, time.y()))
+                );
+    for (int i = 0; i < m_list.size(); i++) {
+        if (m_list.at(i).selected()) {
+            m_list[i].move(newTime);
         }
-    } else {
-        qDebug() << "Not within valid range:" << time;
     }
 }
 void NodeList_sV::shift(qreal after, qreal by)
@@ -216,8 +221,13 @@ void NodeList_sV::shift(qreal after, qreal by)
     int pos = nodeAfter(after);
     if (pos >= 0) {
         if (pos > 0) {
-            qDebug() << "Max of " << by << " and " << m_list.at(pos-1).xUnmoved() - m_list.at(pos).xUnmoved() + m_minDist;
-            by = qMax(by, m_list.at(pos-1).xUnmoved() - m_list.at(pos).xUnmoved() + m_minDist);
+            // []----o     o----[]---   <- nodes with handles
+            //        <--->             <- maximum distance
+            by = qMax(by,
+                      m_list.at(pos-1).xUnmoved()+m_list.at(pos-1).rightNodeHandle().x -
+                      (m_list.at(pos).xUnmoved()+m_list.at(pos).leftNodeHandle().x) +
+                      m_minDist
+                      );
         }
         if (pos == 0) {
             by = qMax(by, -m_list.at(pos).xUnmoved());
@@ -290,7 +300,7 @@ NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
     if (findByHandle(tx, ty, tdelta) >= 0) {
         return NodeContext_Handle;
     }
-    if (find(tx, ty, tdelta) >= 0) {
+    if (find(SimplePointF_sV(tx, ty), tdelta) >= 0) {
         return NodeContext_Node;
     }
     if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
@@ -334,10 +344,10 @@ int NodeList_sV::find(qreal time) const
     }
     return pos;
 }
-int NodeList_sV::find(qreal tx, qreal ty, qreal tdelta) const
+int NodeList_sV::find(SimplePointF_sV pos, qreal tdelta) const
 {
     for (int i = 0; i < m_list.size(); i++) {
-        if (std::pow(m_list.at(i).xUnmoved() - tx, 2) + std::pow(m_list.at(i).yUnmoved()-ty, 2)
+        if (std::pow(m_list.at(i).xUnmoved() - pos.x, 2) + std::pow(m_list.at(i).yUnmoved()-pos.y, 2)
                 < std::pow(tdelta, 2)) {
             return i;
         }
