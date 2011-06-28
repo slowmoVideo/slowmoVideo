@@ -256,6 +256,16 @@ void Canvas::paintEvent(QPaintEvent *)
             }
         }
 
+//        // Handles
+//        if (i > 0 && curr->leftCurveType() != CurveType_Linear && prev->rightCurveType() != CurveType_Linear) {
+//            // TODO improve
+//            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle());
+//            davinci.drawLine(convertTimeToCanvas(*curr), h);
+//            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
+//            h = convertTimeToCanvas(prev->toSimplePointF_sV() + prev->rightNodeHandle());
+//            davinci.drawLine(convertTimeToCanvas(*prev), h);
+//            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
+//        }
         // Handles
         if (curr->leftCurveType() != CurveType_Linear && i > 0) {
             QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle());

@@ -22,7 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 #define NODE_RADIUS 4
-#define NODE_SELECTED_RADIUS 6
+#define NODE_SELECTED_RADIUS 8
 #define SELECT_RADIUS 8
 #define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3

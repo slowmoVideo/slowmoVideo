@@ -94,12 +94,37 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     QDomElement x = doc->createElement("x");
     QDomElement y = doc->createElement("y");
     QDomElement selected = doc->createElement("selected");
+    QDomElement leftHandle = doc->createElement("leftHandle");
+    QDomElement rightHandle = doc->createElement("rightHandle");
+    QDomElement leftCurveType = doc->createElement("type");
+    QDomElement rightCurveType = doc->createElement("type");
+    QDomElement leftX = doc->createElement("x");
+    QDomElement leftY = doc->createElement("y");
+    QDomElement rightX = doc->createElement("x");
+    QDomElement rightY = doc->createElement("y");
     el.appendChild(x);
     el.appendChild(y);
     el.appendChild(selected);
+    el.appendChild(leftHandle);
+    el.appendChild(rightHandle);
     x.appendChild(doc->createTextNode(QString("%1").arg(node->xUnmoved())));
     y.appendChild(doc->createTextNode(QString("%1").arg(node->yUnmoved())));
     selected.appendChild(doc->createTextNode(QString("%1").arg(node->selected())));
+
+    leftHandle.appendChild(leftX);
+    leftHandle.appendChild(leftY);
+    leftHandle.appendChild(leftCurveType);
+    rightHandle.appendChild(rightX);
+    rightHandle.appendChild(rightY);
+    rightHandle.appendChild(rightCurveType);
+
+    leftX.appendChild(doc->createTextNode(QString("%1").arg(node->leftNodeHandle().x)));
+    leftY.appendChild(doc->createTextNode(QString("%1").arg(node->leftNodeHandle().y)));
+    leftCurveType.appendChild(doc->createTextNode(QVariant((int)node->leftCurveType()).toString()));
+    rightX.appendChild(doc->createTextNode(QString("%1").arg(node->rightNodeHandle().x)));
+    rightY.appendChild(doc->createTextNode(QString("%1").arg(node->rightNodeHandle().y)));
+    rightCurveType.appendChild(doc->createTextNode(QVariant((int)node->rightCurveType()).toString()));
+
     return el;
 }
 
@@ -253,6 +278,30 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                         node.setY(QVariant(xml.readElementText()).toFloat());
                                     } else if (xml.name() == "selected") {
                                         node.select(QVariant(xml.readElementText()).toBool());
+                                    } else if (xml.name() == "leftHandle") {
+                                        while (xml.readNextStartElement()) {
+                                            if (xml.name() == "type") {
+                                                node.setLeftCurveType((CurveType)xml.readElementText().toInt());
+                                            } else if (xml.name() == "x") {
+                                                node.setLeftNodeHandle(xml.readElementText().toFloat(), node.leftNodeHandle().y);
+                                            } else if (xml.name() == "y") {
+                                                node.setLeftNodeHandle(node.leftNodeHandle().x, xml.readElementText().toFloat());
+                                            } else {
+                                                xml.skipCurrentElement();
+                                            }
+                                        }
+                                    } else if (xml.name() == "rightHandle") {
+                                        while (xml.readNextStartElement()) {
+                                            if (xml.name() == "type") {
+                                                node.setRightCurveType((CurveType)xml.readElementText().toInt());
+                                            } else if (xml.name() == "x") {
+                                                node.setRightNodeHandle(xml.readElementText().toFloat(), node.rightNodeHandle().y);
+                                            } else if (xml.name() == "y") {
+                                                node.setRightNodeHandle(node.rightNodeHandle().x, xml.readElementText().toFloat());
+                                            } else {
+                                                xml.skipCurrentElement();
+                                            }
+                                        }
                                     } else {
                                         xml.skipCurrentElement();
                                     }

@@ -46,7 +46,7 @@ public:
       @return true if the node has been added. The node is NOT added
       if it is too close to another node.
       */
-    bool add(const Node_sV node);
+    bool add(const Node_sV nod);
     uint deleteSelected();
 
     void unselectAll();
@@ -127,6 +127,8 @@ private:
     qreal m_maxY;
     QList<Node_sV> m_list;
     const float m_minDist;
+
+    qreal bezierSourceTime(qreal targetTime, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3) const;
 };
 
 QDebug operator<<(QDebug qd, const NodeList_sV &list);

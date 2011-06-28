@@ -9,7 +9,7 @@
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 enum NodeContext { NodeContext_Node, NodeContext_Segment, NodeContext_Handle, NodeContext_None };
-enum CurveType { CurveType_Linear, CurveType_Bezier };
+enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
 
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);
@@ -42,6 +42,10 @@ struct SimplePointF_sV {
     SimplePointF_sV operator +(const SimplePointF_sV &other)
     {
         return SimplePointF_sV(x + other.x, y + other.y);
+    }
+    SimplePointF_sV operator *(const float &other)
+    {
+        return SimplePointF_sV(other*x, other*y);
     }
 };
 

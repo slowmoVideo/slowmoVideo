@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "nodelist_sV.h"
 #include "node_sV.h"
+#include "../lib/bezierTools_sV.h"
 
 #include <cmath>
 
@@ -57,9 +58,18 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
     qreal srcTime = -1;
     int index = find(targetTime);
     if (index >= 0) {
-        if (m_list.size() > index) {
-            float ratio = (targetTime-m_list[index].x())/(m_list[index+1].x()-m_list[index].x());
-            srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
+        if (m_list.size() > index+1) {
+            if (m_list.at(index).rightCurveType() == CurveType_Bezier
+                    && m_list.at(index+1).leftCurveType() == CurveType_Bezier) {
+                srcTime = BezierTools_sV::interpolateAtX(targetTime,
+                                                         m_list.at(index).toSimplePointF_sV(),
+                                                         m_list.at(index).toSimplePointF_sV()+m_list.at(index).rightNodeHandle(),
+                                                         m_list.at(index+1).toSimplePointF_sV()+m_list.at(index+1).leftNodeHandle(),
+                                                         m_list.at(index+1).toSimplePointF_sV()).y;
+            } else {
+                float ratio = (targetTime-m_list[index].x())/(m_list[index+1].x()-m_list[index].x());
+                srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
+            }
         } else {
             Q_ASSERT(false);
             srcTime = m_list[index].y();
@@ -91,6 +101,15 @@ bool NodeList_sV::add(const Node_sV node)
     if (add) {
         m_list.append(node);
         qSort(m_list);
+
+        // Reset curve type of neighbours if this is a linear node
+        int index = m_list.indexOf(node);
+        if (index > 0 && node.leftCurveType() == CurveType_Linear) {
+            m_list[index-1].setRightCurveType(CurveType_Linear);
+        }
+        if (index < m_list.size()-1 && node.rightCurveType() == CurveType_Linear) {
+            m_list[index+1].setLeftCurveType(CurveType_Linear);
+        }
     }
 
     return add;

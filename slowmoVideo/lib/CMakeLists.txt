@@ -11,6 +11,7 @@ set(LIB_SRC
   defs_sV.cpp
   defs_sV.hpp
   interpolate_sV.cpp
+  bezierTools_sV.cpp
 )
 
 set(LIB_SRC_VI
