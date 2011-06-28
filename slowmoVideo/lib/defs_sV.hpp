@@ -9,6 +9,7 @@
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 enum NodeContext { NodeContext_Node, NodeContext_Segment, NodeContext_Handle, NodeContext_None };
+enum CurveType { CurveType_Linear, CurveType_Bezier };
 
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);
@@ -29,10 +30,27 @@ class FrameSourceError : public Error_sV {
 public: FrameSourceError(QString msg);
 };
 
+struct SimplePointF_sV {
+    float x;
+    float y;
+    SimplePointF_sV() :
+        x(0), y(0)
+    {}
+    SimplePointF_sV(float x, float y) :
+        x(x), y(y)
+    {}
+    SimplePointF_sV operator +(const SimplePointF_sV &other)
+    {
+        return SimplePointF_sV(x + other.x, y + other.y);
+    }
+};
+
 QString toString(const QSize& size);
 QString toString(const FrameSize &size);
 QString toString(const FlowDirection &dir);
 QString toString(const NodeContext &context);
+QString toString(const CurveType &curveType);
+QString toString(const SimplePointF_sV &p);
 
 inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
     switch (direction) {

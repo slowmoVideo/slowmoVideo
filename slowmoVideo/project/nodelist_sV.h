@@ -67,11 +67,12 @@ public:
       */
     void abortMove();
 
-    void moveHandle(int nodeIndex, bool leftHandle, Node_sV &relPos);
+    void moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos);
 
 
     NodeContext context(qreal tx, qreal ty, qreal tdelta) const;
-    void setCurveType(qreal segmentTime, Node_sV::CurveType type);
+    NodeContext context(SimplePointF_sV point, qreal delta) const;
+    void setCurveType(qreal segmentTime, CurveType type);
 
 
 

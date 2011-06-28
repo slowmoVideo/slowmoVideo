@@ -22,7 +22,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 #define NODE_RADIUS 4
-#define NODE_SEL_DIST 2
+#define SELECT_RADIUS 8
+#define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3
 
 
@@ -73,6 +74,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
     void leaveEvent(QEvent *);
+    void contextMenuEvent(QContextMenuEvent *);
 
 private:
     Ui::Canvas *ui;
@@ -97,6 +99,9 @@ private:
         bool nodesMoved;
         bool selectAttempted;
         bool moveAborted;
+        bool leftHandle;
+        NodeContext context;
+        int nodeOfHandle;
         QPoint prevMousePos;
         QPoint initialMousePos;
         Qt::KeyboardModifiers initialModifiers;
@@ -106,6 +111,8 @@ private:
             moveAborted = false;
             nodesMoved = false;
             selectAttempted = false;
+            context = NodeContext_None;
+            nodeOfHandle = -1;
             travelledDistance = 0;
         }
         void travel(int length) { travelledDistance += length; }
@@ -115,14 +122,32 @@ private:
         int travelledDistance;
     } m_states;
 
-    const Node_sV convertCanvasToTime(const QPoint &p) const;
-    const QPoint convertTimeToCanvas(const Node_sV &p) const;
+    QAction *m_aDeleteNode;
+    QAction *m_aSnapInNode;
+
+    QSignalMapper *m_curveTypeMapper;
+    QAction *m_aLinear;
+    QAction *m_aBezier;
+
+    Node_sV convertCanvasToTime(const QPoint &p) const;
+    QPoint convertTimeToCanvas(const Node_sV &p) const;
+    QPoint convertTimeToCanvas(const SimplePointF_sV &p) const;
+    SimplePointF_sV convertDistanceToTime(const QPoint &p) const;
+    QPoint convertTimeToDistance(const SimplePointF_sV &time) const;
+
+    /** \return The distance in px converted to time */
+    float delta(int px) const;
 
     bool insideCanvas(const QPoint& pos);
 
     bool selectAt(const QPoint& pos, bool addToSelection = false);
 
     void drawModes(QPainter &davinci, int top, int right);
+
+private slots:
+    void slotDeleteNode();
+    void slotSnapInNode();
+    void slotChangeCurveType(int curveType);
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);

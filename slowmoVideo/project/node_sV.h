@@ -11,7 +11,9 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef NODE_SV_H
 #define NODE_SV_H
 
+#include "../lib/defs_sV.hpp"
 #include <QtGlobal>
+#include <QtCore/QPointF>
 
 /**
   \brief Node for defining the input/output curve
@@ -23,17 +25,6 @@ class Node_sV
 public:
     Node_sV();
     Node_sV(const qreal &x, const qreal &y);
-
-    enum CurveType { CurveType_Linear, CurveType_Bezier };
-
-    struct NodeHandle_sV {
-        qreal x;
-        qreal y;
-        NodeHandle_sV() :
-            x(0),
-            y(0)
-        { }
-    };
 
     bool operator<(const Node_sV &other) const;
     bool operator==(const Node_sV &other) const;
@@ -57,8 +48,8 @@ public:
     void abortMove();
     void confirmMove();
 
-    const NodeHandle_sV& leftNodeHandle() const;
-    const NodeHandle_sV& rightNodeHandle() const;
+    const SimplePointF_sV& leftNodeHandle() const;
+    const SimplePointF_sV& rightNodeHandle() const;
     CurveType leftCurveType() const;
     CurveType rightCurveType() const;
 
@@ -66,6 +57,9 @@ public:
     void setRightNodeHandle(qreal x, qreal y);
     void setLeftCurveType(CurveType type);
     void setRightCurveType(CurveType type);
+
+    SimplePointF_sV toSimplePointF_sV() const;
+    QPointF toQPointF() const;
 
 
 private:
@@ -77,8 +71,8 @@ private:
 
     bool m_selected;
 
-    NodeHandle_sV m_leftHandle;
-    NodeHandle_sV m_rightHandle;
+    SimplePointF_sV m_leftHandle;
+    SimplePointF_sV m_rightHandle;
     CurveType m_leftCurveType;
     CurveType m_rightCurveType;
 

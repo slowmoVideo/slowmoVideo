@@ -128,10 +128,26 @@ bool NodeList_sV::validate() const
                 && m_list.at(i).x() - last >= m_minDist;
         if (!valid) {
             qDebug() << "Invalid node position for node " << i << " (" << m_list.size() << " total); Distance is " << m_list.at(i).x() - last;
-            qDebug() << "Positions: " << last << "/" << m_list.at(i).x();;
+            qDebug() << "Positions: " << last << "/" << m_list.at(i).x();
+            Q_ASSERT(false);
+            break;
         }
         last = m_list.at(i).x();
-        Q_ASSERT(valid);
+    }
+    if (valid) {
+        for (int i = 1; i < m_list.size(); i++) {
+            float space = (m_list.at(i).x() + m_list.at(i).leftNodeHandle().x)
+                    - (m_list.at(i-1).x() + m_list.at(i-1).rightNodeHandle().x);
+            valid = space >= 0;
+            if (!valid) {
+                qDebug() << "Invalid handle position for nodes " << i-1 << " and " << i;
+                qDebug() << "Positions: " << m_list.at(i-1) << " with handle " << toString(m_list.at(i-1).rightNodeHandle())
+                         << ", " << m_list.at(i) << " with handle " << toString(m_list.at(i).leftNodeHandle())
+                         << ", space: " << space;
+                Q_ASSERT(false);
+                break;
+            }
+        }
     }
     return valid;
 }
@@ -231,22 +247,36 @@ void NodeList_sV::abortMove()
     }
 }
 
-void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV &relPos)
+void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos)
 {
     Q_ASSERT(nodeIndex >= 0);
     Q_ASSERT(nodeIndex < m_list.size());
 
-    Node_sV currentNode = m_list[nodeIndex];
+    Node_sV *currentNode = &m_list[nodeIndex];
     Node_sV otherNode;
-    if (leftHandle && nodeIndex > 0) {
-        otherNode = m_list.at(nodeIndex-1);
-        relPos.setX(qMin(relPos.x(), currentNode.x() - otherNode.x() - otherNode.rightNodeHandle().x));
-        currentNode.setLeftNodeHandle(relPos.x(), relPos.y());
-    } else if (!leftHandle && nodeIndex+1 < m_list.size()) {
-        otherNode = m_list.at(nodeIndex+1);
-        relPos.setX(qMin(relPos.x(), otherNode.x() - currentNode.x() + otherNode.leftNodeHandle().x));
-        currentNode.setLeftNodeHandle(relPos.x(), relPos.y());
+    if (leftHandle) {
+        //  o------[]
+        if (nodeIndex > 0) {
+            // Ensure that it does not overlap with the left node's handle (injectivity)
+            otherNode = m_list.at(nodeIndex-1);
+            relPos.setX(qMax(relPos.x(), -(currentNode->x() - otherNode.x() - otherNode.rightNodeHandle().x)));
+        }
+        // Additionally the handle has to stay on the left of its node
+        relPos.setX(qMin(relPos.x(), .0));
+
+        currentNode->setLeftNodeHandle(relPos.x(), relPos.y());
+
+    } else {
+        // []-------o
+        if (nodeIndex+1 < m_list.size()) {
+            otherNode = m_list.at(nodeIndex+1);
+            relPos.setX(qMin(relPos.x(), otherNode.x() - currentNode->x() + otherNode.leftNodeHandle().x));
+        }
+        relPos.setX(qMax(relPos.x(), .0));
+
+        currentNode->setRightNodeHandle(relPos.x(), relPos.y());
     }
+    validate();
 }
 
 
@@ -254,13 +284,14 @@ void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV &relPos)
 
 ////////// Info
 
+NodeContext NodeList_sV::context(SimplePointF_sV point, qreal delta) const { return context(point.x, point.y, delta); }
 NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
 {
-    if (find(tx, ty, tdelta) >= 0) {
-        return NodeContext_Node;
-    }
     if (findByHandle(tx, ty, tdelta) >= 0) {
         return NodeContext_Handle;
+    }
+    if (find(tx, ty, tdelta) >= 0) {
+        return NodeContext_Node;
     }
     if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
         return NodeContext_Segment;
@@ -273,7 +304,7 @@ NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
 
 ////////// Curve
 
-void NodeList_sV::setCurveType(qreal segmentTime, Node_sV::CurveType type)
+void NodeList_sV::setCurveType(qreal segmentTime, CurveType type)
 {
     int left, right;
     findBySegment(segmentTime, left, right);
@@ -317,13 +348,13 @@ int NodeList_sV::findByHandle(qreal tx, qreal ty, qreal tdelta) const
 {
     for (int i = 0; i < m_list.size(); i++) {
         Node_sV node = m_list[i];
-        if (node.leftCurveType() != Node_sV::CurveType_Linear) {
+        if (node.leftCurveType() != CurveType_Linear) {
             if (std::pow(node.xUnmoved() + node.leftNodeHandle().x - tx, 2) + std::pow(node.yUnmoved() + node.leftNodeHandle().y - ty, 2)
                     < std::pow(tdelta, 2)) {
                 return i;
             }
         }
-        if (node.rightCurveType() != Node_sV::CurveType_Linear) {
+        if (node.rightCurveType() != CurveType_Linear) {
             if (std::pow(node.xUnmoved() + node.rightNodeHandle().x - tx, 2) + std::pow(node.yUnmoved() + node.rightNodeHandle().y - ty, 2)
                     < std::pow(tdelta, 2)) {
                 return i;

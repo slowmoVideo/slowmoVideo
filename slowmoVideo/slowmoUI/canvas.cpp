@@ -18,15 +18,18 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <cmath>
 
-#include <QDebug>
+#include <QtCore/QDebug>
 
-#include <QColor>
-#include <QImage>
-#include <QMouseEvent>
-#include <QPainter>
+#include <QtCore/QPoint>
+#include <QtCore/QPointF>
+#include <QtCore/QSignalMapper>
 
-#include <QPoint>
-#include <QPointF>
+#include <QtGui/QColor>
+#include <QtGui/QImage>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPainterPath>
+#include <QtGui/QMenu>
 
 QColor Canvas::selectedCol(255, 196, 0);
 QColor Canvas::lineCol(220, 220, 220);
@@ -61,10 +64,30 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     // Enable mouse tracking (not only when a mouse button is pressed)
     this->setMouseTracking(true);
 
+    setContextMenuPolicy(Qt::DefaultContextMenu);
+
     m_states.prevMousePos = QPoint(0,0);
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
+
+    m_aDeleteNode = new QAction("Delete node", this);
+    m_aSnapInNode = new QAction("Snap in node", this);
+
+    m_curveTypeMapper = new QSignalMapper(this);
+    m_aLinear = new QAction("Linear curve", this);
+    m_aBezier = new QAction(QString::fromUtf8("Bézier curve"), this);
+    m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
+    m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
+
+
+    bool b = true;
+    b &= connect(m_aDeleteNode, SIGNAL(triggered()), this, SLOT(slotDeleteNode()));
+    b &= connect(m_aSnapInNode, SIGNAL(triggered()), this, SLOT(slotSnapInNode()));
+    b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
+    b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
+    b &= connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
+    Q_ASSERT(b);
 }
 
 Canvas::~Canvas()
@@ -100,8 +123,8 @@ bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
         QPoint p = convertTimeToCanvas(m_nodes->at(ti));
         qDebug() << "Mouse pos: " << pos << ", node pos: " << p;
         if (
-                abs(p.x() - pos.x()) <= NODE_RADIUS+NODE_SEL_DIST+4 &&
-                abs(p.y() - pos.y()) <= NODE_RADIUS+NODE_SEL_DIST+4
+                abs(p.x() - pos.x()) <= NODE_RADIUS+SELECT_RADIUS+4 &&
+                abs(p.y() - pos.y()) <= NODE_RADIUS+SELECT_RADIUS+4
             ) {
             qDebug() << "Selected: " << pos.x() << "/" << pos.y();
 
@@ -205,21 +228,33 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (curr->selected()) {
             davinci.setPen(QPen(QBrush(selectedCol), 2.0));
-            davinci.drawRoundedRect(p.x()-NODE_RADIUS-NODE_SEL_DIST, p.y()-NODE_RADIUS-NODE_SEL_DIST,
-                                    2*(NODE_RADIUS+NODE_SEL_DIST)+1, 2*(NODE_RADIUS+NODE_SEL_DIST)+1,
+            davinci.drawRoundedRect(p.x()-NODE_RADIUS-SELECT_RADIUS, p.y()-NODE_RADIUS-SELECT_RADIUS,
+                                    2*(NODE_RADIUS+SELECT_RADIUS)+1, 2*(NODE_RADIUS+SELECT_RADIUS)+1,
                                     1, 1);
         }
         if (prev != NULL) {
             davinci.setPen(lineCol);
-            davinci.drawLine(convertTimeToCanvas(*prev), p);
+            if (prev->rightCurveType() == CurveType_Bezier && curr->leftCurveType() == CurveType_Bezier) {
+                QPainterPath path;
+                path.moveTo(convertTimeToCanvas(*prev));
+                path.cubicTo(
+                            convertTimeToCanvas(prev->toSimplePointF_sV() + prev->rightNodeHandle()),
+                            convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle()),
+                            convertTimeToCanvas(*curr));
+                davinci.drawPath(path);
+            } else {
+                davinci.drawLine(convertTimeToCanvas(*prev), p);
+            }
         }
 
         // Handles
-        if (curr->leftCurveType() != Node_sV::CurveType_Linear || true) {
-            QPoint h1 = convertTimeToCanvas(*curr + Node_sV(curr->leftNodeHandle().x, curr->leftNodeHandle().y));
-            QPoint h2 = convertTimeToCanvas(*curr + Node_sV(curr->rightNodeHandle().x, curr->rightNodeHandle().y));
-            davinci.drawEllipse(h1.x(), h1.y(), 5, 5);
-            davinci.drawEllipse(h2.x(), h2.y(), 5, 5);
+        if (curr->leftCurveType() != CurveType_Linear && i > 0) {
+            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle());
+            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
+        }
+        if (curr->rightCurveType() != CurveType_Linear && i < m_nodes->size()-1) {
+            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->rightNodeHandle());
+            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
         }
 
         prev = &m_nodes->at(i);
@@ -251,11 +286,18 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
+    SimplePointF_sV time = convertCanvasToTime(e->pos()).toSimplePointF_sV();
     m_states.reset();
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
     m_states.initialModifiers = e->modifiers();
     m_states.initialButtons = e->buttons();
+    m_states.context = m_nodes->context(time, delta(SELECT_RADIUS));
+    if (m_states.context == NodeContext_Handle) {
+        m_states.nodeOfHandle = m_nodes->findByHandle(time.x, time.y, delta(SELECT_RADIUS));
+        m_states.leftHandle = e->pos().x() < convertTimeToCanvas(m_nodes->at(m_states.nodeOfHandle)).x();
+    }
+    qDebug() << "Mouse pressed. Context: " << toString(m_states.context);
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *e)
@@ -272,23 +314,36 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
         qDebug() << "Diff: " << diff;
 
         if (m_mode == ToolMode_Select) {
-            if (!m_states.moveAborted) {
-                if (m_states.countsAsMove()) {
-                    if (!m_states.selectAttempted) {
-                        m_states.selectAttempted = true;
-                        selectAt(m_states.initialMousePos, e->modifiers().testFlag(Qt::ControlModifier));
-                    }
-                    if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                        if (qAbs(diff.x()) < qAbs(diff.y())) {
-                            diff.setX(0);
-                        } else {
-                            diff.setY(0);
-                        }
-                    }
-                    m_nodes->moveSelected(diff);
+            if (m_states.context == NodeContext_Handle) {
+                qDebug() << "Moving handle" << m_states.nodeOfHandle << "; left? " << m_states.leftHandle;
+                if (m_states.nodeOfHandle >= 0) {
+                    m_nodes->moveHandle(
+                                m_states.nodeOfHandle,
+                                m_states.leftHandle,
+                                convertCanvasToTime(e->pos())-m_nodes->at(m_states.nodeOfHandle)
+                                );
                 }
+            } else {
+                qDebug() << "Moving node.";
+                if (!m_states.moveAborted) {
+                    if (m_states.countsAsMove()) {
+                        if (!m_states.selectAttempted) {
+                            m_states.selectAttempted = true;
+                            selectAt(m_states.initialMousePos, e->modifiers().testFlag(Qt::ControlModifier));
+                        }
+                        if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                            if (qAbs(diff.x()) < qAbs(diff.y())) {
+                                diff.setX(0);
+                            } else {
+                                diff.setY(0);
+                            }
+                        }
+                        m_nodes->moveSelected(diff);
+                    }
+                }
+                m_states.nodesMoved = true;
             }
-            m_states.nodesMoved = true;
+
         } else if (m_mode == ToolMode_Move) {
             if (!m_states.moveAborted) {
                 m_nodes->shift(convertCanvasToTime(m_states.initialMousePos).x(), diff.x());
@@ -349,6 +404,30 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
     }
 }
 
+void Canvas::contextMenuEvent(QContextMenuEvent *e)
+{
+    qDebug() << "Context menu requested";
+    QMenu menu;
+    NodeContext context = m_nodes->context(
+                convertCanvasToTime(e->pos()).toSimplePointF_sV(),
+                convertCanvasToTime(QPoint(m_distLeft+5,0)).x()
+                );
+    switch(context) {
+    case NodeContext_Node:
+        menu.addAction(m_aDeleteNode);
+        menu.addAction(m_aSnapInNode);
+        break;
+    case NodeContext_Segment:
+        menu.addAction(m_aLinear);
+        menu.addAction(m_aBezier);
+        break;
+    default:
+        qDebug() << "No context menu available for context " << toString(context);
+        return;
+    }
+    menu.exec(e->globalPos());
+}
+
 void Canvas::leaveEvent(QEvent *)
 {
     m_mouseWithinWidget = false;
@@ -393,30 +472,62 @@ void Canvas::wheelEvent(QWheelEvent *e)
     repaint();
 }
 
-/// \todo something without m_distLeft
-const Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
+
+
+////////// Conversion Time <--> Screen pixels
+
+Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
 {
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
-    int x = p.x()-m_distLeft;
-    int y = height()-1 - m_distBottom - p.y();
-    Node_sV out(
-                m_t0.x() + float(x) / m_secResX,
-                m_t0.y() + float(y) / m_secResY
+    SimplePointF_sV tDelta = convertDistanceToTime(QPoint(
+                                                       p.x()-m_distLeft,
+                                                       height()-1 - m_distBottom - p.y()
+                                                       ));
+    SimplePointF_sV tFinal = tDelta + m_t0.toSimplePointF_sV();
+    return Node_sV(tFinal.x, tFinal.y);
+}
+QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const
+{
+    return convertTimeToCanvas(p.toSimplePointF_sV());
+}
+QPoint Canvas::convertTimeToCanvas(const SimplePointF_sV &p) const
+{
+    QPoint tDelta = convertTimeToDistance(SimplePointF_sV(
+                                              p.x-m_t0.x(),
+                                              p.y-m_t0.y()
+                                              ));
+    QPoint out(
+                tDelta.x() + m_distLeft,
+                height()-1 - m_distBottom - tDelta.y()
+                );
+    return out;
+}
+SimplePointF_sV Canvas::convertDistanceToTime(const QPoint &p) const
+{
+    SimplePointF_sV out(
+                float(p.x()) / m_secResX,
+                float(p.y()) / m_secResY
             );
     return out;
 }
-
-const QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const
+QPoint Canvas::convertTimeToDistance(const SimplePointF_sV &time) const
 {
     QPoint out(
-                (p.x()-m_t0.x())*m_secResX + m_distLeft,
-                this->height()-1 - m_distBottom - (p.y()-m_t0.y())*m_secResY
+                time.x*m_secResX,
+                time.y*m_secResY
            );
     return out;
 }
+float Canvas::delta(int px) const
+{
+    return convertDistanceToTime(QPoint(px, 0)).x;
+}
 
+
+
+////////// Slots
 
 void Canvas::slotAbort(Canvas::Abort abort)
 {
@@ -466,6 +577,21 @@ void Canvas::slotSetToolMode(ToolMode mode)
     m_mode = mode;
     qDebug() << "Mode set to: " << mode;
     repaint();
+}
+
+void Canvas::slotDeleteNode()
+{
+    qDebug() << "Deleting node at " << m_states.prevMousePos;
+//    m_nodes->find()
+}
+void Canvas::slotSnapInNode()
+{
+    qDebug() << "Snapping in at " << m_states.prevMousePos;
+}
+void Canvas::slotChangeCurveType(int curveType)
+{
+    qDebug() << "Changing curve type to " << toString((CurveType)curveType) << " at " << convertCanvasToTime(m_states.prevMousePos).x();
+    m_nodes->setCurveType(convertCanvasToTime(m_states.prevMousePos).x(), (CurveType) curveType);
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)

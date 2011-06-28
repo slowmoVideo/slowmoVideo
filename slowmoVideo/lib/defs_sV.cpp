@@ -59,3 +59,21 @@ QString toString(const NodeContext &context)
         return QString("Unknown context");
     }
 }
+
+QString toString(const CurveType &curveType)
+{
+    switch (curveType) {
+    case CurveType_Linear:
+        return QString("Linear");
+    case CurveType_Bezier:
+        return QString::fromUtf8("Bézier");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown curve type");
+    }
+}
+
+QString toString(const SimplePointF_sV &p)
+{
+    return QString("(%1|%2)").arg(p.x).arg(p.y);
+}

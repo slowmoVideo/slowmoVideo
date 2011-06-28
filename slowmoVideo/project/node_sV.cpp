@@ -34,6 +34,10 @@ void Node_sV::init()
     m_rightCurveType = CurveType_Linear;
 }
 
+
+
+////////// Basic commands
+
 qreal Node_sV::x() const { return m_x + m_moveX; }
 qreal Node_sV::y() const { return m_y + m_moveY; }
 qreal Node_sV::xUnmoved() const { return m_x; }
@@ -45,10 +49,14 @@ qreal Node_sV::setY(qreal y) { qreal ret = m_y; m_y = y; return ret; }
 void Node_sV::select(bool select) { m_selected = select; }
 bool Node_sV::selected() const { return m_selected; }
 
-const Node_sV::NodeHandle_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
-const Node_sV::NodeHandle_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
-Node_sV::CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
-Node_sV::CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
+
+
+////////// Curve types, handles
+
+const SimplePointF_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
+const SimplePointF_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
+CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
+CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
 
 void Node_sV::setLeftCurveType(CurveType type) { m_leftCurveType = type; }
 void Node_sV::setRightCurveType(CurveType type) { m_rightCurveType = type; }
@@ -61,10 +69,9 @@ void Node_sV::setRightNodeHandle(qreal x, qreal y) {
     m_rightHandle.x = x; m_rightHandle.y = y;
 }
 
-bool Node_sV::operator <(const Node_sV& other) const
-{
-    return m_x < other.x();
-}
+
+
+////////// Movement
 
 void Node_sV::move(const Node_sV &dist)
 {
@@ -84,6 +91,16 @@ void Node_sV::confirmMove()
     m_moveY = 0;
 }
 
+
+
+
+////////// Operators
+
+
+bool Node_sV::operator <(const Node_sV& other) const
+{
+    return m_x < other.x();
+}
 bool Node_sV::operator ==(const Node_sV& other) const
 {
     return m_x == other.m_x && m_y == other.m_y
@@ -106,6 +123,19 @@ void Node_sV::operator -=(const Node_sV& other)
 {
     m_x -= other.m_x;
     m_y -= other.m_y;
+}
+
+
+
+////////// Conversion
+
+SimplePointF_sV Node_sV::toSimplePointF_sV() const
+{
+    return SimplePointF_sV(x(), y());
+}
+QPointF Node_sV::toQPointF() const
+{
+    return QPointF(x(), y());
 }
 
 QDebug operator<<(QDebug qd, const Node_sV& n)
