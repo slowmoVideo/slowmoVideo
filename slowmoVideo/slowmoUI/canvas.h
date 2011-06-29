@@ -135,9 +135,9 @@ private:
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
-    QPoint convertTimeToCanvas(const SimplePointF_sV &p) const;
-    SimplePointF_sV convertDistanceToTime(const QPoint &p) const;
-    QPoint convertTimeToDistance(const SimplePointF_sV &time) const;
+    QPoint convertTimeToCanvas(const QPointF &p) const;
+    QPointF convertDistanceToTime(const QPoint &p) const;
+    QPoint convertTimeToDistance(const QPointF &time) const;
 
     /** \return The distance in px converted to time */
     float delta(int px) const;

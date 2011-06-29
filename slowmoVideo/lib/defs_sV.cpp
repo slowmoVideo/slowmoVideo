@@ -73,7 +73,7 @@ QString toString(const CurveType &curveType)
     }
 }
 
-QString toString(const SimplePointF_sV &p)
+QString toString(const QPointF &p)
 {
-    return QString("(%1|%2)").arg(p.x).arg(p.y);
+    return QString("(%1|%2)").arg(p.x()).arg(p.y());
 }

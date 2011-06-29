@@ -19,26 +19,26 @@ void testSave()
 
 void testBezier()
 {
-    SimplePointF_sV p0(0,1);
-    SimplePointF_sV p1(2,3);
-    SimplePointF_sV p2(0,0);
-    SimplePointF_sV p3(3,1);
+    QPointF p0(0,1);
+    QPointF p1(2,3);
+    QPointF p2(0,0);
+    QPointF p3(3,1);
 
     QImage img(300, 200, QImage::Format_ARGB32);
     img.fill(qRgb(255,255,255));
     for (int i = 0; i < 300; i++) {
-        SimplePointF_sV p = BezierTools_sV::interpolate(float(i)/300, p0, p1, p2, p3);
-        img.setPixel(qRound(100*p.x), qRound(100*p.y), qRgb(200, 200, 40));
+        QPointF p = BezierTools_sV::interpolate(float(i)/300, p0, p1, p2, p3);
+        img.setPixel(qRound(100*p.x()), qRound(100*p.y()), qRgb(200, 200, 40));
     }
     img.save("/tmp/bezier.png");
 
     img.fill(qRgb(255,255,255));
     for (int i = 0; i < 300; i++) {
-        SimplePointF_sV p = BezierTools_sV::interpolateAtX(float(i)/100, p0, p1, p2, p3);
-        img.setPixel(qRound(100*p.x), qRound(100*p.y), qRgb(200, 200, 40));
+        QPointF p = BezierTools_sV::interpolateAtX(float(i)/100, p0, p1, p2, p3);
+        img.setPixel(qRound(100*p.x()), qRound(100*p.y()), qRgb(200, 200, 40));
         qDebug() << "Painting at " << toString(p*100);
-        if (qRound(100*p.x) != i) {
-            qDebug() << "this index is off!" << int(100*p.x) << " != i: " << i << ", qRound: " << qRound(100*p.x);
+        if (qRound(100*p.x()) != i) {
+            qDebug() << "this index is off!" << int(100*p.x()) << " != i: " << i << ", qRound: " << qRound(100*p.x());
         }
     }
     img.save("/tmp/bezier2.png");
@@ -47,13 +47,13 @@ void testBezier()
     QPainter davinci(&img);
     davinci.setRenderHint(QPainter::Antialiasing, true);
     int n = 30;
-    SimplePointF_sV prev = p0*100;
+    QPointF prev = p0*100;
     for (int i = 0; i < n; i++) {
-        SimplePointF_sV cur = BezierTools_sV::interpolateAtX(3*float(i)/n, p0, p1, p2, p3)*100;
-        davinci.drawLine(QPointF(prev.x, prev.y), QPointF(cur.x, cur.y));
+        QPointF cur = BezierTools_sV::interpolateAtX(3*float(i)/n, p0, p1, p2, p3)*100;
+        davinci.drawLine(QPointF(prev.x(), prev.y()), QPointF(cur.x(), cur.y()));
         prev = cur;
     }
-    davinci.drawLine(QPointF(prev.x, prev.y), QPointF(100*p3.x, 100*p3.y));
+    davinci.drawLine(QPointF(prev.x(), prev.y()), QPointF(100*p3.x(), 100*p3.y()));
     img.save("/tmp/bezier3.png");
 
 }

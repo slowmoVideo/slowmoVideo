@@ -16,8 +16,8 @@ the Free Software Foundation, either version 3 of the License, or
 class BezierTools_sV
 {
 public:
-    static SimplePointF_sV interpolateAtX(float x, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3);
-    static SimplePointF_sV interpolate(float t, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3);
+    static QPointF interpolateAtX(float x, QPointF p0, QPointF p1, QPointF p2, QPointF p3);
+    static QPointF interpolate(float t, QPointF p0, QPointF p1, QPointF p2, QPointF p3);
 };
 
 #endif // BEZIERTOOLS_SV_H

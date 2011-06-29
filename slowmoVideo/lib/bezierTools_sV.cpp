@@ -13,16 +13,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include <cmath>
 #include <iostream>
 
-SimplePointF_sV BezierTools_sV::interpolateAtX(float x, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3)
+QPointF BezierTools_sV::interpolateAtX(float x, QPointF p0, QPointF p1, QPointF p2, QPointF p3)
 {
     float delta = 1;
     float t = 0;
-    int iterations = 10*(p3.x-p0.x);
+    int iterations = 10*(p3.x()-p0.x());
 
     for (int i = 0; i < iterations; i++) {
-        float plus  = interpolate(t+delta, p0, p1, p2, p3).x;
-        float minus = interpolate(t-delta, p0, p1, p2, p3).x;
-        float norm  = interpolate(t      , p0, p1, p2, p3).x;
+        float plus  = interpolate(t+delta, p0, p1, p2, p3).x();
+        float minus = interpolate(t-delta, p0, p1, p2, p3).x();
+        float norm  = interpolate(t      , p0, p1, p2, p3).x();
         if ((t+delta) <= 1 && fabs(plus-x) < fabs(norm-x)) {
             t += delta;
         } else if ((t-delta) >= 0 && fabs(minus-x) < fabs(norm-x)) {
@@ -34,7 +34,7 @@ SimplePointF_sV BezierTools_sV::interpolateAtX(float x, SimplePointF_sV p0, Simp
     return interpolate(t, p0, p1, p2, p3);
 }
 
-SimplePointF_sV BezierTools_sV::interpolate(float t, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3)
+QPointF BezierTools_sV::interpolate(float t, QPointF p0, QPointF p1, QPointF p2, QPointF p3)
 {
     p0 = p0 * 1 * pow(t,0) * pow(1-t, 3);
     p1 = p1 * 3 * pow(t,1) * pow(1-t, 2);

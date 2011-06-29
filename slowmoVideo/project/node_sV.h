@@ -48,8 +48,8 @@ public:
     void abortMove();
     void confirmMove();
 
-    const SimplePointF_sV& leftNodeHandle() const;
-    const SimplePointF_sV& rightNodeHandle() const;
+    const QPointF& leftNodeHandle() const;
+    const QPointF& rightNodeHandle() const;
     CurveType leftCurveType() const;
     CurveType rightCurveType() const;
 
@@ -58,7 +58,6 @@ public:
     void setLeftCurveType(CurveType type);
     void setRightCurveType(CurveType type);
 
-    SimplePointF_sV toSimplePointF_sV() const;
     QPointF toQPointF() const;
 
 
@@ -71,8 +70,8 @@ private:
 
     bool m_selected;
 
-    SimplePointF_sV m_leftHandle;
-    SimplePointF_sV m_rightHandle;
+    QPointF m_leftHandle;
+    QPointF m_rightHandle;
     CurveType m_leftCurveType;
     CurveType m_rightCurveType;
 

@@ -247,8 +247,8 @@ void Canvas::paintEvent(QPaintEvent *)
                 QPainterPath path;
                 path.moveTo(convertTimeToCanvas(*prev));
                 path.cubicTo(
-                            convertTimeToCanvas(prev->toSimplePointF_sV() + prev->rightNodeHandle()),
-                            convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle()),
+                            convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle()),
+                            convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle()),
                             convertTimeToCanvas(*curr));
                 davinci.drawPath(path);
             } else {
@@ -259,20 +259,20 @@ void Canvas::paintEvent(QPaintEvent *)
 //        // Handles
 //        if (i > 0 && curr->leftCurveType() != CurveType_Linear && prev->rightCurveType() != CurveType_Linear) {
 //            // TODO improve
-//            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle());
+//            QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle());
 //            davinci.drawLine(convertTimeToCanvas(*curr), h);
 //            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
-//            h = convertTimeToCanvas(prev->toSimplePointF_sV() + prev->rightNodeHandle());
+//            h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
 //            davinci.drawLine(convertTimeToCanvas(*prev), h);
 //            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
 //        }
         // Handles
         if (curr->leftCurveType() != CurveType_Linear && i > 0) {
-            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->leftNodeHandle());
+            QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle());
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
         }
         if (curr->rightCurveType() != CurveType_Linear && i < m_nodes->size()-1) {
-            QPoint h = convertTimeToCanvas(curr->toSimplePointF_sV() + curr->rightNodeHandle());
+            QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->rightNodeHandle());
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
         }
 
@@ -305,7 +305,7 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
-    SimplePointF_sV time = convertCanvasToTime(e->pos()).toSimplePointF_sV();
+    QPointF time = convertCanvasToTime(e->pos()).toQPointF();
     m_states.reset();
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
@@ -313,7 +313,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.initialButtons = e->buttons();
     m_states.context = m_nodes->context(time, delta(SELECT_RADIUS));
     if (m_states.context == NodeContext_Handle) {
-        m_states.nodeOfHandle = m_nodes->findByHandle(time.x, time.y, delta(SELECT_RADIUS));
+        m_states.nodeOfHandle = m_nodes->findByHandle(time.x(), time.y(), delta(SELECT_RADIUS));
         m_states.leftHandle = e->pos().x() < convertTimeToCanvas(m_nodes->at(m_states.nodeOfHandle)).x();
     }
     qDebug() << "Mouse pressed. Context: " << toString(m_states.context);
@@ -428,12 +428,12 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     qDebug() << "Context menu requested";
     QMenu menu;
     NodeContext context = m_nodes->context(
-                convertCanvasToTime(e->pos()).toSimplePointF_sV(),
+                convertCanvasToTime(e->pos()).toQPointF(),
                 convertCanvasToTime(QPoint(m_distLeft+5,0)).x()
                 );
     switch(context) {
     case NodeContext_Node: {
-        int nodeIndex = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toSimplePointF_sV(), delta(SELECT_RADIUS));
+        int nodeIndex = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
         menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
         menu.addAction(m_aSnapInNode);
@@ -509,22 +509,22 @@ Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
-    SimplePointF_sV tDelta = convertDistanceToTime(QPoint(
+    QPointF tDelta = convertDistanceToTime(QPoint(
                                                        p.x()-m_distLeft,
                                                        height()-1 - m_distBottom - p.y()
                                                        ));
-    SimplePointF_sV tFinal = tDelta + m_t0.toSimplePointF_sV();
-    return Node_sV(tFinal.x, tFinal.y);
+    QPointF tFinal = tDelta + m_t0.toQPointF();
+    return Node_sV(tFinal.x(), tFinal.y());
 }
 QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const
 {
-    return convertTimeToCanvas(p.toSimplePointF_sV());
+    return convertTimeToCanvas(p.toQPointF());
 }
-QPoint Canvas::convertTimeToCanvas(const SimplePointF_sV &p) const
+QPoint Canvas::convertTimeToCanvas(const QPointF &p) const
 {
-    QPoint tDelta = convertTimeToDistance(SimplePointF_sV(
-                                              p.x-m_t0.x(),
-                                              p.y-m_t0.y()
+    QPoint tDelta = convertTimeToDistance(QPointF(
+                                              p.x()-m_t0.x(),
+                                              p.y()-m_t0.y()
                                               ));
     QPoint out(
                 tDelta.x() + m_distLeft,
@@ -532,25 +532,25 @@ QPoint Canvas::convertTimeToCanvas(const SimplePointF_sV &p) const
                 );
     return out;
 }
-SimplePointF_sV Canvas::convertDistanceToTime(const QPoint &p) const
+QPointF Canvas::convertDistanceToTime(const QPoint &p) const
 {
-    SimplePointF_sV out(
+    QPointF out(
                 float(p.x()) / m_secResX,
                 float(p.y()) / m_secResY
             );
     return out;
 }
-QPoint Canvas::convertTimeToDistance(const SimplePointF_sV &time) const
+QPoint Canvas::convertTimeToDistance(const QPointF &time) const
 {
     QPoint out(
-                time.x*m_secResX,
-                time.y*m_secResY
+                time.x()*m_secResX,
+                time.y()*m_secResY
            );
     return out;
 }
 float Canvas::delta(int px) const
 {
-    return convertDistanceToTime(QPoint(px, 0)).x;
+    return convertDistanceToTime(QPoint(px, 0)).x();
 }
 
 
@@ -610,7 +610,10 @@ void Canvas::slotSetToolMode(ToolMode mode)
 void Canvas::slotDeleteNode()
 {
     qDebug() << "Deleting node at " << m_states.prevMousePos;
-//    m_nodes->find()
+    int index = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
+    if (index >= 0) {
+        m_nodes->deleteNode(index);
+    }
 }
 void Canvas::slotSnapInNode()
 {

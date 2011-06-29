@@ -48,6 +48,7 @@ public:
       */
     bool add(const Node_sV nod);
     uint deleteSelected();
+    void deleteNode(int index);
 
     void unselectAll();
 
@@ -71,8 +72,9 @@ public:
 
 
     NodeContext context(qreal tx, qreal ty, qreal tdelta) const;
-    NodeContext context(SimplePointF_sV point, qreal delta) const;
+    NodeContext context(QPointF point, qreal delta) const;
     void setCurveType(qreal segmentTime, CurveType type);
+    void fixHandles(int leftIndex);
 
 
 
@@ -87,7 +89,7 @@ public:
       of \c tdelta around the point <tt>(tx|ty)</tt>, or -1 if no such node exists.
       @todo Replace other functions with this one
       */
-    int find(SimplePointF_sV pos, qreal tdelta) const;
+    int find(QPointF pos, qreal tdelta) const;
     /**
       \return The position of the first node belonging to the handle at <tt>(tx|ty)</tt>
       if there is one within a radius uf \c tdelta, and if its mode is not set to linear.
@@ -128,7 +130,7 @@ private:
     QList<Node_sV> m_list;
     const float m_minDist;
 
-    qreal bezierSourceTime(qreal targetTime, SimplePointF_sV p0, SimplePointF_sV p1, SimplePointF_sV p2, SimplePointF_sV p3) const;
+    qreal bezierSourceTime(qreal targetTime, QPointF p0, QPointF p1, QPointF p2, QPointF p3) const;
 };
 
 QDebug operator<<(QDebug qd, const NodeList_sV &list);
