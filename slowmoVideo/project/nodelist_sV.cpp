@@ -192,10 +192,10 @@ bool NodeList_sV::validate() const
 
 void NodeList_sV::moveSelected(const Node_sV &time)
 {
-    qreal maxRMove = 1000;
-    qreal maxLMove = -1000;
-    qreal maxUMove = 1000;
-    qreal maxDMove = -1000;
+    qreal maxRMove = 100000;
+    qreal maxLMove = -100000;
+    qreal maxUMove = 100000;
+    qreal maxDMove = -100000;
     const Node_sV *left = NULL;
     const Node_sV *right;
     for (int i = 0; i < m_list.size(); i++) {
@@ -227,11 +227,6 @@ void NodeList_sV::moveSelected(const Node_sV &time)
                                 (right->xUnmoved()+right->leftNodeHandle().x()) +
                                 m_minDist);
             }
-        }
-
-        if (right->selected()) {
-            maxUMove = qMin(maxUMove, m_maxY - right->yUnmoved());
-            maxDMove = qMax(maxDMove, 0-right->yUnmoved());
         }
 
         left = right;

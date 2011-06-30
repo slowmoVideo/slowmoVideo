@@ -27,6 +27,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDockWidget>
 #include <QDebug>
 #include <QMessageBox>
+#include <QtGui/QStatusBar>
 
 #include <QDir>
 #include <QFileDialog>
@@ -66,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_renderProgressDialog(NULL)
 {
     ui->setupUi(this);
+    m_statusBar = new QStatusBar(this);
+    setStatusBar(m_statusBar);
 
     m_project = new Project_sV();
 
@@ -160,6 +163,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete m_wInputMonitor;
     delete m_wInputMonitorDock;
+    delete m_statusBar;
 
     if (m_project != NULL) {
         delete m_project;
@@ -330,6 +334,7 @@ void MainWindow::slotSaveProject(QString filename)
     }
     if (filename.length() == 0) {
         qDebug() << "No filename given, won't save. (Perhaps an empty project?)";
+        m_statusBar->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
     } else {
         qDebug() << "Saving project as " << filename;
         XmlProjectRW_sV writer;

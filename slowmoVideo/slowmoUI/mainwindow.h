@@ -11,7 +11,6 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include "canvas.h"
 #include "inputMonitor.h"
 #include "../project/project_sV.h"
@@ -20,6 +19,7 @@ namespace Ui {
     class MainWindow;
 }
 
+#include <QMainWindow>
 #include <QMap>
 #include <QList>
 #include <QTime>
@@ -70,6 +70,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QStatusBar *m_statusBar;
     QSettings m_settings;
 
     Project_sV *m_project;

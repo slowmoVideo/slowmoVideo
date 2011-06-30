@@ -25,6 +25,9 @@ QImage Shutter_sV::combine(QStringList images)
     }
     matrix /= images.size();
 
-    QImage result(matrix.toBytesArray(), matrix.width(), matrix.height(), QImage::Format_ARGB32);
+    unsigned char *bytes = matrix.toBytesArray();
+    QImage result(bytes, matrix.width(), matrix.height(), QImage::Format_ARGB32);
+    delete bytes;
+
     return result;
 }
