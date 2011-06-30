@@ -1,5 +1,6 @@
 #include "testFlowField_sV.h"
 #include "testFlowRW_sV.h"
+#include "testIntMatrix_sV.h"
 
 #include <QtTest/QtTest>
 
@@ -10,4 +11,7 @@ int main()
 
     TestFlowField_sV flowField;
     QTest::qExec(&flowField);
+
+    TestIntMatrix_sV intMatrix;
+    QTest::qExec(&intMatrix);
 }

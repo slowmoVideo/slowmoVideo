@@ -81,6 +81,8 @@ private:
     bool m_stopRendering;
     qreal m_nextFrameTime;
 
+    qreal m_prevTime;
+
 private slots:
     void slotRenderFrom(qreal time);
 

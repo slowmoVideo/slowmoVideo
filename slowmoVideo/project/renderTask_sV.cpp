@@ -20,7 +20,8 @@ the Free Software Foundation, either version 3 of the License, or
 RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
-    m_stopRendering(false)
+    m_stopRendering(false),
+    m_prevTime(-1)
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
@@ -105,7 +106,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s").arg(frameNumber).arg(time).arg(srcTime));
             try {
-                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize);
+                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_prevTime);
 
                 m_renderTarget->slotConsumeFrame(rendered, frameNumber);
                 m_nextFrameTime = time + 1/m_fps;
@@ -116,6 +117,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
                 m_stopRendering = true;
                 emit signalRenderingAborted(err.message());
             }
+
+            m_prevTime = srcTime;
         }
 
     } else {

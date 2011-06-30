@@ -10,6 +10,8 @@ set(CMAKE_C_FLAGS
 set(LIB_SRC
   defs_sV.cpp
   defs_sV.hpp
+  shutter_sV.cpp
+  intMatrix_sV.cpp
   interpolate_sV.cpp
   bezierTools_sV.cpp
 )

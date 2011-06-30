@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
+#include "../lib/shutter_sV.h"
 #include "../lib/interpolate_sV.h"
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
@@ -116,16 +117,31 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize) const throw(FlowBuildingError)
+QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, float previousTime) const throw(FlowBuildingError)
 {
     float framePos = timeToFrame(time);
+    float prevFramePos = -1;
     if (framePos > m_frameSource->framesCount()) {
         qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_frameSource->framesCount() << " frames)";
         Q_ASSERT(false);
+        // TODO throw error
     } else {
         qDebug() << "Source frame @" << time << " is " << framePos;
     }
-    if (framePos-floor(framePos) > MIN_FRAME_DIST) {
+    if (previousTime >= 0) {
+        prevFramePos = timeToFrame(previousTime);
+    }
+
+    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1) {
+        QStringList frames;
+        int left = std::min(floor(prevFramePos), floor(framePos));
+        int right = std::max(ceil(prevFramePos), ceil(framePos));
+        for (int f = left; f <= right; f++) {
+            frames << m_frameSource->framePath(f, frameSize);
+        }
+        qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
+        return Shutter_sV::combine(frames);
+    } else if (framePos-floor(framePos) > MIN_FRAME_DIST) {
 
         QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
         QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
