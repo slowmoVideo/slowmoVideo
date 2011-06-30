@@ -85,6 +85,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     output.flush();
     outFile.close();
 
+    project->setProjectFilename(filename);
+
     return 0;
 }
 
@@ -242,6 +244,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                 qDebug() << "Reading project file: version " << version;
 
                 Project_sV *project = new Project_sV();
+                project->setProjectFilename(filename);
 
                 while (xml.readNextStartElement()) {
                     if (xml.name() == "info") {

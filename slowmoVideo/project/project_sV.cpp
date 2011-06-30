@@ -77,6 +77,14 @@ void Project_sV::setProjectDir(QString projectDir)
     m_flowSource->slotUpdateProjectDir();
 }
 
+void Project_sV::setProjectFilename(QString filename)
+{
+    m_projectFilename = filename;
+}
+QString Project_sV::projectFilename() const {
+    return m_projectFilename;
+}
+
 void Project_sV::readSettings(const QSettings &settings)
 {
     if (dynamic_cast<V3dFlowSource_sV *>(m_flowSource) != NULL) {

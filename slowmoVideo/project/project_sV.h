@@ -49,6 +49,11 @@ public:
     ~Project_sV();
 
     void setProjectDir(QString projectDir);
+    /** The project filename should be set when saving or loading the project. */
+    void setProjectFilename(QString filename);
+    /** \return The filename this project was last saved as. */
+    QString projectFilename() const;
+
     void readSettings(const QSettings &settings);
 
     /** \param frameSource will be managed (deleted) by the project. If \c NULL, an empty frame source will be used. */
@@ -76,6 +81,8 @@ public:
 
 private:
     QDir m_projDir;
+    QString m_projectFilename;
+
     AbstractFrameSource_sV *m_frameSource;
     AbstractFlowSource_sV *m_flowSource;
     NodeList_sV *m_nodes;

@@ -60,7 +60,9 @@ public:
         Help,
         New,
         Open,
-        Save
+        Save,
+        Save_Same,
+        Save_As
     };
 
     static void displayHelp(QPainter &davinci);
@@ -68,6 +70,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QSettings m_settings;
 
     Project_sV *m_project;
 
@@ -84,6 +87,7 @@ private:
     QSignalMapper *m_signalMapper;
     QList<QShortcut *> m_shortcutList;
     QMap<int, QString> m_keyList;
+
 
 
     static void fillCommandList();
@@ -108,6 +112,13 @@ private slots:
     void slotCloseFrameSourceProgress();
 
     void slotRenderingAborted(QString message);
+
+    void slotSaveProject(QString filename = "");
+    void slotSaveProjectDialog();
+    void slotLoadProjectDialog();
+
+    void slotToggleHelp();
+    void slotShowAboutDialog();
 
 
 signals:

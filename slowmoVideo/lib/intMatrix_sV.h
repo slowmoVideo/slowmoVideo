@@ -1,6 +1,17 @@
+/*
+slowmoVideo creates slow-motion videos from normal-speed videos.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef INTMATRIX_SV_H
 #define INTMATRIX_SV_H
 
+/** \brief Simple matrix that can add image data to itself. */
 class IntMatrix_sV
 {
 public:
