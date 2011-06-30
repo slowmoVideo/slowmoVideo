@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "progressDialog.h"
 #include "renderingDialog.h"
 #include "preferencesDialog.h"
+#include "aboutDialog.h"
 
 #include "../lib/defs_sV.hpp"
 #include "../project/renderTask_sV.h"
@@ -113,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
+    ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
 
 
 
@@ -146,6 +148,8 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
     b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
     b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
+    b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
+    b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
     Q_ASSERT(b);
 
@@ -402,7 +406,8 @@ void MainWindow::resetDialogs()
 
 void MainWindow::slotShowAboutDialog()
 {
-    // TODO
+    AboutDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::slotShowPreferencesDialog()

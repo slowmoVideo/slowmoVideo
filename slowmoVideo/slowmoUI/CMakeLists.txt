@@ -14,6 +14,7 @@ set(SRCS
   progressDialog.cpp
   renderingDialog.cpp
   tagAddDialog.cpp
+  aboutDialog.cpp
 )
 
 set(SRCS_UI
@@ -25,6 +26,7 @@ set(SRCS_UI
   progressDialog.ui
   renderingDialog.ui
   tagAddDialog.ui
+  aboutDialog.ui
 )
 
 set(SRCS_MOC
@@ -36,6 +38,7 @@ set(SRCS_MOC
   progressDialog.h
   renderingDialog.h
   tagAddDialog.h
+  aboutDialog.h
 )
 
 set(RES
