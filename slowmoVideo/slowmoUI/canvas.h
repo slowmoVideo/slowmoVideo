@@ -26,6 +26,8 @@ the Free Software Foundation, either version 3 of the License, or
 #define SELECT_RADIUS 8
 #define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3
+#define SCROLL_FACTOR 3
+#define ZOOM_FACTOR 1.414
 
 
 

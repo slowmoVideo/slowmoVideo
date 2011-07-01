@@ -466,13 +466,19 @@ void Canvas::wheelEvent(QWheelEvent *e)
 {
     // Mouse wheel movement in degrees
     int deg = e->delta()/8;
+    qDebug() << "Wheel degrees: " << deg;
 
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         Node_sV n0 = convertCanvasToTime(e->pos());
 
         // Update the line resolution
-        m_secResX += deg;
-        m_secResY += deg;
+        if (deg > 0) {
+            m_secResX *= ZOOM_FACTOR;
+            m_secResY *= ZOOM_FACTOR;
+        } else {
+            m_secResX /= ZOOM_FACTOR;
+            m_secResY /= ZOOM_FACTOR;
+        }
         if (m_secResX < 4) { m_secResX = 4; }
         if (m_secResY < 4) { m_secResY = 4; }
 
@@ -483,12 +489,12 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_t0.y() < 0) { m_t0.setY(0); }
     } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
         //Vertical scrolling
-        m_t0 += Node_sV(0, (convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x());
+        m_t0 += Node_sV(0, SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x());
         if (m_t0.y() < 0) { m_t0.setY(0); }
         if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }
     } else {
         // Horizontal scrolling
-        m_t0 -= Node_sV((convertCanvasToTime(QPoint(deg, 0)) - convertCanvasToTime(QPoint(0,0))).x(),0);
+        m_t0 -= Node_sV(SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x(),0);
         if (m_t0.x() < 0) { m_t0.setX(0); }
     }
 
