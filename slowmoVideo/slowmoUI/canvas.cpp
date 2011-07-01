@@ -111,6 +111,9 @@ Canvas::~Canvas()
 void Canvas::load(Project_sV *project)
 {
     m_project = project;
+    m_t0 = m_project->preferences()->viewport_t0();
+    m_secResX = m_project->preferences()->viewport_secRes().x();
+    m_secResY = m_project->preferences()->viewport_secRes().y();
     qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
     m_tags = project->tags();
@@ -502,15 +505,19 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_t0.x() < 0) { m_t0.setX(0); }
         if (m_t0.y() < 0) { m_t0.setY(0); }
     } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+        // Horizontal scrolling
+        m_t0 -= Node_sV(SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x(),0);
+        if (m_t0.x() < 0) { m_t0.setX(0); }
+    } else {
         //Vertical scrolling
         m_t0 += Node_sV(0, SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x());
         if (m_t0.y() < 0) { m_t0.setY(0); }
         if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }
-    } else {
-        // Horizontal scrolling
-        m_t0 -= Node_sV(SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x(),0);
-        if (m_t0.x() < 0) { m_t0.setX(0); }
     }
+
+    m_project->preferences()->viewport_t0() = m_t0.toQPointF();
+    m_project->preferences()->viewport_secRes().rx() = m_secResX;
+    m_project->preferences()->viewport_secRes().ry() = m_secResY;
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
@@ -601,7 +608,7 @@ void Canvas::slotAddTag()
 
         if (dialog.exec() == QDialog::Accepted) {
             Tag_sV tag = dialog.buildTag(convertCanvasToTime(m_states.prevMousePos).toQPointF());
-            m_project->preferences()->lastSelectedTagAxis(tag.axis());
+            m_project->preferences()->lastSelectedTagAxis() = tag.axis();
 
             m_tags->push_back(tag);
             qDebug() << "Tag added. Number is now: " << m_tags->size();

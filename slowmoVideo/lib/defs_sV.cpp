@@ -1,16 +1,25 @@
 #include "defs_sV.hpp"
 
 Error_sV::Error_sV(QString msg) :
-    m_message(msg) {}
+    m_message(msg)
+{
+    qDebug() << msg;
+}
 
 QString Error_sV::message() const {
     return m_message;
 }
 
 FlowBuildingError::FlowBuildingError(QString msg) :
-    Error_sV(msg) {}
+    Error_sV(msg)
+{
+    qDebug() << "Flow building error: " << msg;
+}
 FrameSourceError::FrameSourceError(QString msg) :
-    Error_sV(msg) {}
+    Error_sV(msg)
+{
+    qDebug() << "Frame source error: " << msg;
+}
 
 QString toString(const QSize &size)
 {

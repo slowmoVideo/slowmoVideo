@@ -25,6 +25,7 @@ class Node_sV
 public:
     Node_sV();
     Node_sV(const qreal &x, const qreal &y);
+    Node_sV(const QPointF &point);
 
     bool operator<(const Node_sV &other) const;
     bool operator==(const Node_sV &other) const;

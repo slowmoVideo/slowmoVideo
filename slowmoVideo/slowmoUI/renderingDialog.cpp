@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../lib/defs_sV.hpp"
 #include "../project/project_sV.h"
+#include "../project/projectPreferences_sV.h"
 #include "../project/renderTask_sV.h"
 #include "../project/imagesRenderTarget_sV.h"
 
@@ -30,12 +31,22 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->timeStart->setEnabled(false);
     ui->timeEnd->setEnabled(false);
 
+    ui->imagesOutputDir->setText(m_project->preferences()->imagesOutputDir());
+    ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
+
+    QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
+    if (ui->cbFps->findText(fps) < 0) {
+        ui->cbFps->addItem(fps);
+        ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
+    }
+
     m_targetGroup = new QButtonGroup(this);
     m_targetGroup->addButton(ui->radioImages);
     m_targetGroup->addButton(ui->radioVideo);
 
     ui->cbSize->addItem("Original size", QVariant(FrameSize_Orig));
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
+    ui->cbSize->setCurrentIndex(ui->cbSize->findData(QVariant(m_project->preferences()->renderFrameSize())));
 
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
@@ -59,13 +70,23 @@ RenderingDialog::~RenderingDialog()
 RenderTask_sV* RenderingDialog::buildTask()
 {
     if (slotValidate()) {
+        const FrameSize size = (FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt();
+        const QString imagesOutputDir = ui->imagesOutputDir->text();
+        const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
+        const float fps = ui->cbFps->currentText().toFloat();
+
         RenderTask_sV *task = new RenderTask_sV(m_project);
-        task->setFPS(ui->cbFps->currentText().toFloat());
-        task->setSize((FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt());
+        task->setFPS(fps);
+        task->setSize(size);
         ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV();
-        renderTarget->setFilenamePattern(ui->imagesFilenamePattern->text());
-        renderTarget->setTargetDir(ui->imagesOutputDir->text());
+        renderTarget->setFilenamePattern(imagesFilenamePattern);
+        renderTarget->setTargetDir(imagesOutputDir);
         task->setRenderTarget(renderTarget);
+
+        m_project->preferences()->imagesOutputDir() = imagesOutputDir;
+        m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
+        m_project->preferences()->renderFrameSize() = size;
+        m_project->preferences()->renderFPS() = fps;
         return task;
     } else {
         return NULL;
@@ -108,6 +129,7 @@ void RenderingDialog::slotBrowseImagesDir()
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.setDirectory(ui->imagesOutputDir->text());
     if (dialog.exec() == QDialog::Accepted) {
         ui->imagesOutputDir->setText(dialog.selectedFiles().at(0));
     }

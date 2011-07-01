@@ -27,7 +27,7 @@ public:
       Reads an XML project file.
       @return NULL if an error ocurred.
       */
-    Project_sV* loadProject(QString filename) const throw(FrameSourceError);
+    Project_sV* loadProject(QString filename) const throw(FrameSourceError, Error_sV);
     /**
       Saves a project to an XML project file.
       */

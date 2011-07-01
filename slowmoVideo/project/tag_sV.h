@@ -16,6 +16,7 @@ public:
     qreal time() const { return m_time; }
     const QString& description() const { return m_description; }
 
+    void setAxis(TagAxis axis);
     void setTime(qreal time);
     void setDescription(QString desc);
 

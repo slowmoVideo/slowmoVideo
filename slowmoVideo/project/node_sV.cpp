@@ -17,10 +17,15 @@ Node_sV::Node_sV() :
 {
     init();
 }
-
 Node_sV::Node_sV(const qreal &x, const qreal &y) :
     m_x(x),
     m_y(y)
+{
+    init();
+}
+Node_sV::Node_sV(const QPointF &point) :
+    m_x(point.x()),
+    m_y(point.y())
 {
     init();
 }

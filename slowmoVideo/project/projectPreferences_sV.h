@@ -8,13 +8,28 @@ public:
     ProjectPreferences_sV();
 
     /**
-      \param tagAxis If set to a value >= 0, remember the value.
-      \return the previously selected tag axis.
+      \return Reference to the previously selected tag axis
       */
-    TagAxis lastSelectedTagAxis(int tagAxis = -1);
+    TagAxis& lastSelectedTagAxis();
+    QPointF& viewport_t0();
+    QPointF& viewport_secRes();
+
+    // Rendering
+    FrameSize& renderFrameSize();
+    float& renderFPS();
+    QString& imagesOutputDir();
+    QString& imagesFilenamePattern();
 
 private:
     TagAxis m_tagAxis;
+    QPointF m_viewport_t0;
+    QPointF m_viewport_secRes;
+
+    FrameSize m_renderFrameSize;
+    float m_renderFPS;
+
+    QString m_imagesOutputDir;
+    QString m_imagesFilenamePattern;
 
 };
 

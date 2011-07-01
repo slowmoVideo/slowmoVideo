@@ -323,6 +323,8 @@ void MainWindow::slotLoadProjectDialog()
             loadProject(project);
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+        } catch (Error_sV &err) {
+            QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
         }
     }
 }

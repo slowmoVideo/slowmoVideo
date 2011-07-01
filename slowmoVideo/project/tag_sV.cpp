@@ -11,6 +11,11 @@ Tag_sV::Tag_sV(qreal time, QString description, TagAxis axis) :
     m_description(description)
 { }
 
+void Tag_sV::setAxis(TagAxis axis)
+{
+    m_axis = axis;
+}
+
 void Tag_sV::setDescription(QString desc)
 {
     m_description = desc;
