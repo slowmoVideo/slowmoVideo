@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "project_sV.h"
+#include "projectPreferences_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
@@ -48,6 +49,7 @@ Project_sV::Project_sV(QString projectDir) :
 
 void Project_sV::init()
 {
+    m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
     m_flowSource = new V3dFlowSource_sV(this);
 
@@ -58,6 +60,7 @@ void Project_sV::init()
 
 Project_sV::~Project_sV()
 {
+    delete m_preferences;
     delete m_frameSource;
     delete m_flowSource;
     delete m_tags;

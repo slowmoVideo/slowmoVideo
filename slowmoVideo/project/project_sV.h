@@ -23,6 +23,7 @@ extern "C" {
 #include <QtGui/QImage>
 #include <QSettings>
 
+class ProjectPreferences_sV;
 class Flow_sV;
 class AbstractFrameSource_sV;
 class AbstractFlowSource_sV;
@@ -33,6 +34,8 @@ class QSignalMapper;
 class QProcess;
 class QRegExp;
 class QTimer;
+
+/** \brief slowmoVideo project holding all important information. */
 class Project_sV : public QObject
 {
     Q_OBJECT
@@ -47,6 +50,8 @@ public:
       */
     Project_sV(QString projectDir);
     ~Project_sV();
+
+    ProjectPreferences_sV* preferences() { return m_preferences; }
 
     void setProjectDir(QString projectDir);
     /** The project filename should be set when saving or loading the project. */
@@ -82,6 +87,8 @@ public:
 private:
     QDir m_projDir;
     QString m_projectFilename;
+
+    ProjectPreferences_sV *m_preferences;
 
     AbstractFrameSource_sV *m_frameSource;
     AbstractFlowSource_sV *m_flowSource;

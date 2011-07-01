@@ -1,5 +1,6 @@
 set(SRCS_PROJ
   project_sV.cpp
+  projectPreferences_sV.cpp
   tag_sV.cpp
   node_sV.cpp
   nodelist_sV.cpp

@@ -1,12 +1,13 @@
 #ifndef TAG_SV_H
 #define TAG_SV_H
 
+#include "../lib/defs_sV.hpp"
 #include <QString>
 
+/** \brief Tags are used for marking positions in time in the project. */
 class Tag_sV
 {
 public:
-    enum TagAxis { TagAxis_Source };
 
     Tag_sV(TagAxis axis = TagAxis_Source);
     Tag_sV(qreal time, QString description, TagAxis axis = TagAxis_Source);

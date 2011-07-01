@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "tagAddDialog.h"
 
+#include "../project/projectPreferences_sV.h"
 #include "../project/abstractFrameSource_sV.h"
 
 #include <cmath>
@@ -31,12 +32,15 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainterPath>
 #include <QtGui/QMenu>
 
-QColor Canvas::selectedCol(255, 196, 0);
-QColor Canvas::lineCol(220, 220, 220);
-QColor Canvas::nodeCol(240, 240, 240);
-QColor Canvas::gridCol(100, 100, 100);
-QColor Canvas::labelCol(0, 77, 255);
-QColor Canvas::backgroundCol(30, 30, 40);
+QColor Canvas::selectedCol  (  0, 175, 255, 100);
+QColor Canvas::lineCol      (255, 255, 255);
+QColor Canvas::nodeCol      (240, 240, 240);
+QColor Canvas::gridCol      (255, 255, 255,  40);
+QColor Canvas::fatGridCol   (255, 255, 255,  80);
+QColor Canvas::handleLineCol(255, 255, 255, 128);
+QColor Canvas::srcTagCol    ( 30, 245,   0, 150);
+QColor Canvas::outTagCol    ( 30, 245,   0, 150);
+QColor Canvas::backgroundCol( 34,  34,  34);
 
 /// \todo zoom in/out, scrolling etc.: scaling
 /// \todo move with MMB
@@ -166,7 +170,7 @@ bool Canvas::insideCanvas(const QPoint &pos)
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter davinci(this);
-    davinci.setRenderHint(QPainter::Antialiasing, true);
+    davinci.setRenderHint(QPainter::Antialiasing, false);
 
     davinci.fillRect(0, 0, width(), height(), backgroundCol);
 
@@ -175,6 +179,11 @@ void Canvas::paintEvent(QPaintEvent *)
     for (int tx = ceil(m_t0.x()); true; tx++) {
         QPoint pos = convertTimeToCanvas(Node_sV(tx, m_t0.y()));
         if (insideCanvas(pos)) {
+            if (tx%10 == 0) {
+                davinci.setPen(fatGridCol);
+            } else {
+                davinci.setPen(gridCol);
+            }
             davinci.drawLine(pos.x(), pos.y(), pos.x(), m_distTop);
         } else {
             break;
@@ -184,6 +193,11 @@ void Canvas::paintEvent(QPaintEvent *)
     for (int ty = ceil(m_t0.y()); true; ty++) {
         QPoint pos = convertTimeToCanvas(Node_sV(m_t0.x(), ty));
         if (insideCanvas(pos)) {
+            if (ty%10 == 0) {
+                davinci.setPen(fatGridCol);
+            } else {
+                davinci.setPen(gridCol);
+            }
             davinci.drawLine(pos.x(), pos.y(), width()-1 - m_distRight, pos.y());
         } else {
             break;
@@ -214,18 +228,29 @@ void Canvas::paintEvent(QPaintEvent *)
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
 
     // Tags
-    davinci.setPen(labelCol);
+    davinci.setRenderHint(QPainter::Antialiasing, false);
     for (int i = 0; i < m_tags->size(); i++) {
         Tag_sV tag = m_tags->at(i);
-        QPoint p = convertTimeToCanvas(Node_sV(m_t0.x(), tag.time()));
-        if (insideCanvas(p)) {
-            davinci.drawLine(m_distLeft, p.y(), width()-m_distRight, p.y());
-            davinci.drawText(m_distLeft+10, p.y()-1, tag.description());
+        if (tag.axis() == TagAxis_Source) {
+            QPoint p = convertTimeToCanvas(Node_sV(m_t0.x(), tag.time()));
+            if (insideCanvas(p)) {
+                davinci.setPen(srcTagCol);
+                davinci.drawLine(m_distLeft, p.y(), width()-m_distRight, p.y());
+                davinci.drawText(m_distLeft+10, p.y()-1, tag.description());
+            }
+        } else {
+            QPoint p = convertTimeToCanvas(Node_sV(tag.time(), m_t0.y()));
+            if (insideCanvas(p)) {
+                davinci.setPen(outTagCol);
+                davinci.drawLine(p.x(), height()-1 - m_distBottom, p.x(), m_distTop);
+                davinci.drawText(p.x()+2, m_distTop, tag.description());
+            }
         }
     }
 
     // Nodes
     davinci.setPen(lineCol);
+    davinci.setRenderHint(QPainter::Antialiasing, true);
     const Node_sV *prev = NULL;
     const Node_sV *curr = NULL;
     for (int i = 0; i < m_nodes->size(); i++) {
@@ -237,9 +262,7 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (curr->selected()) {
             davinci.setPen(QPen(QBrush(selectedCol), 2.0));
-            davinci.drawRoundedRect(p.x()-NODE_SELECTED_RADIUS, p.y()-NODE_SELECTED_RADIUS,
-                                    2*NODE_SELECTED_RADIUS+1, 2*NODE_SELECTED_RADIUS+1,
-                                    1, 1);
+            davinci.fillRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1, selectedCol);
         }
         if (prev != NULL) {
             davinci.setPen(lineCol);
@@ -256,23 +279,14 @@ void Canvas::paintEvent(QPaintEvent *)
             }
         }
 
-//        // Handles
-//        if (i > 0 && curr->leftCurveType() != CurveType_Linear && prev->rightCurveType() != CurveType_Linear) {
-//            // TODO improve
-//            QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle());
-//            davinci.drawLine(convertTimeToCanvas(*curr), h);
-//            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
-//            h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
-//            davinci.drawLine(convertTimeToCanvas(*prev), h);
-//            davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
-//        }
         // Handles
-        if (curr->leftCurveType() != CurveType_Linear && i > 0) {
+        davinci.setPen(handleLineCol);
+        if (i > 0 && curr->leftCurveType() != CurveType_Linear && prev->rightCurveType() != CurveType_Linear) {
             QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle());
+            davinci.drawLine(convertTimeToCanvas(*curr), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
-        }
-        if (curr->rightCurveType() != CurveType_Linear && i < m_nodes->size()-1) {
-            QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->rightNodeHandle());
+            h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
+            davinci.drawLine(convertTimeToCanvas(*prev), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
         }
 
@@ -583,11 +597,16 @@ void Canvas::slotAbort(Canvas::Abort abort)
 void Canvas::slotAddTag()
 {
     if (m_mouseWithinWidget) {
-        TagAddDialog dialog;
+        TagAddDialog dialog(m_project->preferences()->lastSelectedTagAxis(), this);
+
         if (dialog.exec() == QDialog::Accepted) {
-            m_tags->push_back(Tag_sV(convertCanvasToTime(m_states.prevMousePos).y(), dialog.m_text));
+            Tag_sV tag = dialog.buildTag(convertCanvasToTime(m_states.prevMousePos).toQPointF());
+            m_project->preferences()->lastSelectedTagAxis(tag.axis());
+
+            m_tags->push_back(tag);
             qDebug() << "Tag added. Number is now: " << m_tags->size();
             repaint();
+
         } else {
             qDebug() << "Tag dialog not accepted.";
         }

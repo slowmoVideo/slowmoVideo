@@ -21,8 +21,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 
-#define NODE_RADIUS 4
-#define NODE_SELECTED_RADIUS 10
+#define NODE_RADIUS 6
 #define SELECT_RADIUS 8
 #define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3
@@ -53,8 +52,11 @@ public:
     static QColor lineCol;
     static QColor nodeCol;
     static QColor gridCol;
+    static QColor fatGridCol;
     static QColor selectedCol;
-    static QColor labelCol;
+    static QColor srcTagCol;
+    static QColor outTagCol;
+    static QColor handleLineCol;
     static QColor backgroundCol;
 
     void load(Project_sV *project);

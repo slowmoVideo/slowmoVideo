@@ -77,3 +77,16 @@ QString toString(const QPointF &p)
 {
     return QString("(%1|%2)").arg(p.x()).arg(p.y());
 }
+
+QString toString(const TagAxis axis)
+{
+    switch (axis) {
+    case TagAxis_Source:
+        return QString("Source axis");
+    case TagAxis_Output:
+        return QString("Output axis");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown axis");
+    }
+}

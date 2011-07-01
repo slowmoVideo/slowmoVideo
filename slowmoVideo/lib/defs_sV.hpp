@@ -11,6 +11,7 @@ enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 enum NodeContext { NodeContext_Node, NodeContext_Segment, NodeContext_Handle, NodeContext_None };
 enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
+enum TagAxis { TagAxis_Source = 1, TagAxis_Output = 2 };
 
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);
@@ -37,6 +38,7 @@ QString toString(const FlowDirection &dir);
 QString toString(const NodeContext &context);
 QString toString(const CurveType &curveType);
 QString toString(const QPointF &p);
+QString toString(const TagAxis &axis);
 
 inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
     switch (direction) {
