@@ -365,9 +365,8 @@ void NodeList_sV::fixHandles(int leftIndex)
         if (leftHandle < 0) { leftHandle = 0; }
         if (rightHandle > 0) { rightHandle = 0; }
 
-        if (rightHandle < right+leftHandle && (leftHandle-rightHandle) > 0) {
-            //                v  to ensure that the assertion holds even in case of rounding errors
-            qreal factor = .9999 * right / (leftHandle -rightHandle);
+        if (leftHandle > right+rightHandle && (leftHandle-rightHandle) > 0) {
+            qreal factor = right / (leftHandle - rightHandle);
             qDebug() << "Factor: " << factor << ", left: " << leftHandle << ", right: " << rightHandle << ", distance: " << right;
             leftHandle *= factor;
             rightHandle *= factor;
@@ -375,7 +374,7 @@ void NodeList_sV::fixHandles(int leftIndex)
             Q_ASSERT(leftHandle <= right+rightHandle);
         }
         m_list[leftIndex].setRightNodeHandle(leftHandle, m_list.at(leftIndex).rightNodeHandle().y());
-        m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).rightNodeHandle().y());
+        m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).leftNodeHandle().y());
     }
 }
 

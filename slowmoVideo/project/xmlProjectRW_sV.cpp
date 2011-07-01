@@ -73,7 +73,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
         tags.appendChild(tagToDom(&doc, project->tags()->at(i)));
     }
 
-    qDebug() << doc.toString(2);
+//    qDebug() << doc.toString(2);
 
     QFile outFile(filename);
     if (!outFile.open(QIODevice::WriteOnly)) {
@@ -212,7 +212,9 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     } else if (frameSourceType.compare("empty") == 0) {
         EmptyFrameSource_sV *frameSource = new EmptyFrameSource_sV(project);
         project->loadFrameSource(frameSource);
+        reader->skipCurrentElement();
     } else {
+        reader->skipCurrentElement();
         qDebug() << "Unknown frame source: " << frameSourceType << "; Cannot load!";
         throw FrameSourceError(QString::fromUtf8("Unknown frame source “%1”. Cannot load the project.").arg(frameSourceType.toString()));
     }
@@ -283,24 +285,26 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                         node.select(QVariant(xml.readElementText()).toBool());
                                     } else if (xml.name() == "leftHandle") {
                                         while (xml.readNextStartElement()) {
+                                            QString text = xml.readElementText();
                                             if (xml.name() == "type") {
-                                                node.setLeftCurveType((CurveType)xml.readElementText().toInt());
+                                                node.setLeftCurveType((CurveType)text.toInt());
                                             } else if (xml.name() == "x") {
-                                                node.setLeftNodeHandle(xml.readElementText().toFloat(), node.leftNodeHandle().y());
+                                                node.setLeftNodeHandle(text.toDouble(), node.leftNodeHandle().y());
                                             } else if (xml.name() == "y") {
-                                                node.setLeftNodeHandle(node.leftNodeHandle().x(), xml.readElementText().toFloat());
+                                                node.setLeftNodeHandle(node.leftNodeHandle().x(), text.toDouble());
                                             } else {
                                                 xml.skipCurrentElement();
                                             }
                                         }
                                     } else if (xml.name() == "rightHandle") {
                                         while (xml.readNextStartElement()) {
+                                            QString text = xml.readElementText();
                                             if (xml.name() == "type") {
-                                                node.setRightCurveType((CurveType)xml.readElementText().toInt());
+                                                node.setRightCurveType((CurveType)text.toInt());
                                             } else if (xml.name() == "x") {
-                                                node.setRightNodeHandle(xml.readElementText().toFloat(), node.rightNodeHandle().y());
+                                                node.setRightNodeHandle(text.toDouble(), node.rightNodeHandle().y());
                                             } else if (xml.name() == "y") {
-                                                node.setRightNodeHandle(node.rightNodeHandle().x(), xml.readElementText().toFloat());
+                                                node.setRightNodeHandle(node.rightNodeHandle().x(), text.toDouble());
                                             } else {
                                                 xml.skipCurrentElement();
                                             }
@@ -333,9 +337,15 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                             }
                         }
                     } else {
+                        qDebug() << "Unknown element: " << xml.name();
                         xml.skipCurrentElement();
                     }
                 }
+                xml.readNextStartElement();
+                if (xml.name().length() > 0) {
+                    qDebug() << "Did not read the whole project file! Stopped at: " << xml.name();
+                }
+                Q_ASSERT(xml.name().length() == 0);
 
                 return project;
 
