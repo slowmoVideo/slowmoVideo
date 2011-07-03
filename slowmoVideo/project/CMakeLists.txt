@@ -4,6 +4,7 @@ set(SRCS_PROJ
   tag_sV.cpp
   node_sV.cpp
   nodelist_sV.cpp
+  nodeHandle_sV.cpp
   renderTask_sV.cpp
   abstractProjectRW_sV.h
   xmlProjectRW_sV.cpp

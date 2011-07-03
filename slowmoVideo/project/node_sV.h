@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef NODE_SV_H
 #define NODE_SV_H
 
+#include "nodeHandle_sV.h"
 #include "../lib/defs_sV.hpp"
 #include <QtGlobal>
 #include <QtCore/QPointF>
@@ -49,8 +50,8 @@ public:
     void abortMove();
     void confirmMove();
 
-    const QPointF& leftNodeHandle() const;
-    const QPointF& rightNodeHandle() const;
+    const NodeHandle_sV& leftNodeHandle() const;
+    const NodeHandle_sV& rightNodeHandle() const;
     CurveType leftCurveType() const;
     CurveType rightCurveType() const;
 
@@ -71,8 +72,8 @@ private:
 
     bool m_selected;
 
-    QPointF m_leftHandle;
-    QPointF m_rightHandle;
+    NodeHandle_sV m_leftHandle;
+    NodeHandle_sV m_rightHandle;
     CurveType m_leftCurveType;
     CurveType m_rightCurveType;
 

@@ -22,7 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 #define NODE_RADIUS 6
-#define SELECT_RADIUS 8
+#define SELECT_RADIUS 12
 #define HANDLE_RADIUS 4
 #define MOVE_THRESHOLD 3
 #define SCROLL_FACTOR 3
@@ -54,6 +54,7 @@ public:
     static QColor gridCol;
     static QColor fatGridCol;
     static QColor selectedCol;
+    static QColor hoverCol;
     static QColor srcTagCol;
     static QColor outTagCol;
     static QColor handleLineCol;
@@ -100,6 +101,11 @@ private:
     QList<Tag_sV> *m_tags;
 
     ToolMode m_mode;
+    /**
+      Saves states about mouse events.
+      The prev... variables are updated when the mouse moves,
+      the initial... variables only on mouse clicks.
+      */
     struct {
         bool nodesMoved;
         bool selectAttempted;
@@ -109,6 +115,7 @@ private:
         int nodeOfHandle;
         QPoint prevMousePos;
         QPoint initialMousePos;
+        Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;
         Qt::MouseButtons initialButtons;
 

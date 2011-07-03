@@ -33,6 +33,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QMenu>
 
 QColor Canvas::selectedCol  (  0, 175, 255, 100);
+QColor Canvas::hoverCol     (255, 175,   0, 200);
 QColor Canvas::lineCol      (255, 255, 255);
 QColor Canvas::nodeCol      (240, 240, 240);
 QColor Canvas::gridCol      (255, 255, 255,  40);
@@ -174,8 +175,16 @@ void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter davinci(this);
     davinci.setRenderHint(QPainter::Antialiasing, false);
-
     davinci.fillRect(0, 0, width(), height(), backgroundCol);
+
+    QList<NodeList_sV::PointerWithDistance> nearObjects = m_nodes->objectsNear(
+                convertCanvasToTime(m_states.prevMousePos).toQPointF(),
+                delta(SELECT_RADIUS));
+    if (m_states.prevModifiers.testFlag(Qt::ShiftModifier)) {
+        while (nearObjects.size() > 0 && nearObjects.at(0).type == NodeList_sV::PointerWithDistance::Node) {
+            nearObjects.removeFirst();
+        }
+    }
 
     davinci.setPen(gridCol);
     // x grid
@@ -261,12 +270,15 @@ void Canvas::paintEvent(QPaintEvent *)
 
         QPoint p = convertTimeToCanvas(*curr);
 
-        davinci.setPen(nodeCol);
-        davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (curr->selected()) {
             davinci.setPen(QPen(QBrush(selectedCol), 2.0));
             davinci.fillRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1, selectedCol);
         }
+        davinci.setPen(nodeCol);
+        if (nearObjects.size() > 0 && curr == nearObjects.at(0).ptr) {
+            davinci.setPen(hoverCol);
+        }
+        davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (prev != NULL) {
             davinci.setPen(lineCol);
             if (prev->rightCurveType() == CurveType_Bezier && curr->leftCurveType() == CurveType_Bezier) {
@@ -283,11 +295,19 @@ void Canvas::paintEvent(QPaintEvent *)
         }
 
         // Handles
-        davinci.setPen(handleLineCol);
         if (i > 0 && curr->leftCurveType() != CurveType_Linear && prev->rightCurveType() != CurveType_Linear) {
+            davinci.setPen(handleLineCol);
+            if (nearObjects.size() > 0 && &curr->leftNodeHandle() == nearObjects.at(0).ptr) {
+                davinci.setPen(hoverCol);
+            }
             QPoint h = convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle());
             davinci.drawLine(convertTimeToCanvas(*curr), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
+
+            davinci.setPen(handleLineCol);
+            if (nearObjects.size() > 0 && &prev->rightNodeHandle() == nearObjects.at(0).ptr) {
+                davinci.setPen(hoverCol);
+            }
             h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
             davinci.drawLine(convertTimeToCanvas(*prev), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
@@ -326,6 +346,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.reset();
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
+    m_states.prevModifiers = e->modifiers();
     m_states.initialModifiers = e->modifiers();
     m_states.initialButtons = e->buttons();
     m_states.context = m_nodes->context(time, delta(SELECT_RADIUS));
@@ -342,6 +363,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
     m_states.travel((m_states.prevMousePos - e->pos()).manhattanLength());
     m_states.prevMousePos = e->pos();
+    m_states.prevModifiers = e->modifiers();
 
     if (e->buttons().testFlag(Qt::LeftButton)) {
 
@@ -437,6 +459,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
         NodeContext context = m_nodes->context(time.x(), time.y(), convertCanvasToTime(QPoint(m_distLeft+5,0)).x());
         qDebug() << "Context at " << time << " is: " << toString(context);
+    } else if (m_states.initialButtons.testFlag(Qt::MiddleButton)) {
+        QList<NodeList_sV::PointerWithDistance> nearObjects = m_nodes->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
+        qDebug() << "Nearby objects:";
+        for (int i = 0; i < nearObjects.size(); i++) {
+            qDebug() << nearObjects.at(i).type << " at distance " << nearObjects.at(i).dist;
+//            if (dynamic_cast<const Node_sV*>(nearObjects.at(i).ptr) != NULL) {
+
+//                qDebug() << "Node.";
+//            } else if (dynamic_cast<const NodeHandle_sV*>(nearObjects.at(i).ptr != NULL)) {
+//                qDebug() << "Node handle.";
+//            } else if (dynamic_cast<const NodeList_sV::Segment_sV*>(nearObjects.at(i).ptr) != NULL) {
+//                qDebug() << "Segment";
+//            }
+        }
     }
 }
 

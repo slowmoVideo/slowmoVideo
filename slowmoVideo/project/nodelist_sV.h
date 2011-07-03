@@ -33,6 +33,28 @@ class NodeList_sV
 public:
     NodeList_sV(float minDist = 1/30.0f);
 
+    struct PointerWithDistance {
+        enum ObjectType { Node = 1, Handle = 2, Segment = 3 };
+        const void* ptr;
+        qreal dist;
+        ObjectType type;
+        bool operator <(const PointerWithDistance &other) const {
+            return type < other.type || (type == other.type &&  dist < other.dist);
+        }
+        PointerWithDistance(const void* ptr, qreal dist, ObjectType type) :
+            ptr(ptr),
+            dist(dist),
+            type(type)
+        { }
+    };
+
+    struct Segment_sV {
+        int leftNodeIndex;
+        Segment_sV(int index) :
+            leftNodeIndex(index)
+        { }
+    };
+
 
     void setMaxY(qreal time);
 
@@ -104,6 +126,8 @@ public:
       */
     void findBySegment(qreal tx, int& leftIndex_out, int& rightIndex_out) const;
 
+    QList<PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;
+
     /**
       @return The index of the node whose time is equal or greater than
       the given time, or -1 if there is no such node.
@@ -128,9 +152,11 @@ public:
 private:
     qreal m_maxY;
     QList<Node_sV> m_list;
+    QList<Segment_sV> m_segments;
     const float m_minDist;
 
     qreal bezierSourceTime(qreal targetTime, QPointF p0, QPointF p1, QPointF p2, QPointF p3) const;
+    inline qreal dist2(QPointF point) const;
 };
 
 QDebug operator<<(QDebug qd, const NodeList_sV &list);

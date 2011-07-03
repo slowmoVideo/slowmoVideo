@@ -1,3 +1,13 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "tagAddDialog.h"
 #include "ui_tagAddDialog.h"
 #include <QtGui/QKeyEvent>
@@ -9,7 +19,6 @@ TagAddDialog::TagAddDialog(TagAxis defaultAxis, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->bOk->setEnabled(false);
-//    ui->horizontalSpacer->
 
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
@@ -60,7 +69,6 @@ void TagAddDialog::slotTextChanged(const QString &text)
 
 void TagAddDialog::slotUpdateAxis()
 {
-    qDebug() << "Updating axis to ";// << toString(m_axis);
     QSizePolicy::Policy upperPolicy = QSizePolicy::Fixed;
     QSizePolicy::Policy lowerPolicy = QSizePolicy::Expanding;
     if (m_axis == TagAxis_Output) {

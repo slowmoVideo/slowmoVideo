@@ -102,6 +102,10 @@ bool NodeList_sV::add(const Node_sV node)
         m_list.append(node);
         qSort(m_list);
 
+        if (m_list.size() > 1) {
+            m_segments.append(Segment_sV(m_list.size()-2));
+        }
+
         // Reset curve type of neighbours if this is a linear node
         int index = m_list.indexOf(node);
         if (index > 0 && node.leftCurveType() == CurveType_Linear) {
@@ -125,24 +129,32 @@ uint NodeList_sV::deleteSelected()
     for (int i = 0; i < m_list.size(); ) {
         if (m_list.at(i).selected()) {
             m_list.removeOne(m_list.at(i));
+            if (m_list.size() > 0) {
+                m_segments.removeLast();
+            }
             counter++;
         } else {
             i++;
         }
     }
+    validate();
     return counter;
 }
 void NodeList_sV::deleteNode(int index)
 {
     Q_ASSERT(index >= 0);
     Q_ASSERT(index < m_list.size());
-    m_list.removeAt(index);
+    if (m_list.size() > 0) {
+        m_list.removeAt(index);
+    }
+    m_segments.removeLast();
     if (index > m_list.size() && (index-1) >= 0) {
         if (m_list.at(index-1).rightCurveType() != m_list.at(index).leftCurveType()) {
             m_list[index-1].setRightCurveType(CurveType_Linear);
             m_list[index].setLeftCurveType(CurveType_Linear);
         }
     }
+    validate();
 }
 
 void NodeList_sV::unselectAll()
@@ -183,6 +195,10 @@ bool NodeList_sV::validate() const
                 break;
             }
         }
+    }
+    if (valid) {
+        Q_ASSERT(   (m_list.size() == 0 && m_segments.size() == 0)
+                 || (m_list.size() > 0 && m_segments.size() == m_list.size()-1) );
     }
     return valid;
 }
@@ -439,6 +455,46 @@ void NodeList_sV::findBySegment(qreal tx, int &leftIndex_out, int &rightIndex_ou
             rightIndex_out = -1;
         }
     }
+}
+
+QList<NodeList_sV::PointerWithDistance> NodeList_sV::objectsNear(QPointF pos, qreal tmaxdist) const
+{
+    qreal maxdist2 = std::pow(tmaxdist, 2);
+
+    QList<PointerWithDistance> objects;
+    qreal dist;
+    for (int i = 0; i < m_list.size(); i++) {
+
+        dist = dist2(m_list.at(i).toQPointF()  -  pos);
+        if (dist <= maxdist2) {
+            objects << PointerWithDistance(&m_list[i], dist, PointerWithDistance::Node);
+        }
+
+        if (m_list.at(i).leftCurveType() != CurveType_Linear) {
+            dist = dist2(m_list.at(i).toQPointF() + m_list.at(i).leftNodeHandle()  -  pos);
+            if (dist <= maxdist2) {
+                objects << PointerWithDistance(&m_list[i].leftNodeHandle(), dist, PointerWithDistance::Handle);
+            }
+        }
+        if (m_list.at(i).rightCurveType() != CurveType_Linear) {
+            dist = dist2(m_list.at(i).toQPointF() + m_list.at(i).rightNodeHandle()  -  pos);
+            if (dist <= maxdist2) {
+                objects << PointerWithDistance(&m_list[i].rightNodeHandle(), dist, PointerWithDistance::Handle);
+            }
+        }
+        if (i > 0) {
+            if (m_list.at(i-1).x() < pos.x() && m_list.at(i).x() > pos.x()) {
+                objects << PointerWithDistance(&m_segments[i-1], std::pow(sourceTime(pos.x()) - pos.y(), 2), PointerWithDistance::Segment);
+            }
+        }
+    }
+
+    qSort(objects);
+    return objects;
+}
+qreal NodeList_sV::dist2(QPointF point) const
+{
+    return std::pow(point.x(), 2) + std::pow(point.y(), 2);
 }
 
 int NodeList_sV::nodeAfter(qreal time) const

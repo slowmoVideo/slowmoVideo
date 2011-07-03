@@ -35,6 +35,8 @@ void Node_sV::init()
     m_moveX = 0;
     m_moveY = 0;
     m_selected = false;
+    m_leftHandle.setParentNode(this);
+    m_rightHandle.setParentNode(this);
     m_leftCurveType = CurveType_Linear;
     m_rightCurveType = CurveType_Linear;
 }
@@ -58,8 +60,8 @@ bool Node_sV::selected() const { return m_selected; }
 
 ////////// Curve types, handles
 
-const QPointF& Node_sV::leftNodeHandle() const { return m_leftHandle; }
-const QPointF& Node_sV::rightNodeHandle() const { return m_rightHandle; }
+const NodeHandle_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
+const NodeHandle_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
 CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
 CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
 
