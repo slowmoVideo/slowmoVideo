@@ -32,10 +32,13 @@ Node_sV::Node_sV(const QPointF &point) :
 Node_sV::Node_sV(const Node_sV &other) :
     m_x(other.x()),
     m_y(other.y()),
-    m_leftHandle(other.leftNodeHandle()),
-    m_rightHandle(other.rightNodeHandle())
+    m_leftHandle(other.m_leftHandle),
+    m_rightHandle(other.m_rightHandle)
 {
+    qDebug() << "Node_sV(const Node_sV &other) called";
     init();
+    m_leftCurveType = other.m_leftCurveType;
+    m_rightCurveType = other.m_rightCurveType;
 }
 
 void Node_sV::init()
@@ -112,7 +115,6 @@ void Node_sV::confirmMove()
 
 
 ////////// Operators
-
 
 bool Node_sV::operator <(const Node_sV& other) const
 {
