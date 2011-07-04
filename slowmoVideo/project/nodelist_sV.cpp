@@ -157,6 +157,17 @@ void NodeList_sV::deleteNode(int index)
     validate();
 }
 
+
+void NodeList_sV::select(const Node_sV *node, bool newSelection)
+{
+    if (newSelection) {
+        unselectAll();
+        const_cast<Node_sV*>(node)->select(true);
+    } else {
+        const_cast<Node_sV*>(node)->select(!node->selected());
+    }
+}
+
 void NodeList_sV::unselectAll()
 {
     for (int i = 0; i < m_list.size(); i++) {
@@ -303,6 +314,7 @@ void NodeList_sV::abortMove()
     }
 }
 
+/// \todo access by NodeHandle_sV*
 void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos)
 {
     Q_ASSERT(nodeIndex >= 0);
@@ -340,20 +352,20 @@ void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos)
 
 ////////// Info
 
-NodeContext NodeList_sV::context(QPointF point, qreal delta) const { return context(point.x(), point.y(), delta); }
-NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
-{
-    if (findByHandle(tx, ty, tdelta) >= 0) {
-        return NodeContext_Handle;
-    }
-    if (find(QPointF(tx, ty), tdelta) >= 0) {
-        return NodeContext_Node;
-    }
-    if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
-        return NodeContext_Segment;
-    }
-    return NodeContext_None;
-}
+//NodeContext NodeList_sV::context(QPointF point, qreal delta) const { return context(point.x(), point.y(), delta); }
+//NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
+//{
+//    if (findByHandle(tx, ty, tdelta) >= 0) {
+//        return NodeContext_Handle;
+//    }
+//    if (find(QPointF(tx, ty), tdelta) >= 0) {
+//        return NodeContext_Node;
+//    }
+//    if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
+//        return NodeContext_Segment;
+//    }
+//    return NodeContext_None;
+//}
 
 
 
@@ -398,6 +410,11 @@ void NodeList_sV::fixHandles(int leftIndex)
 
 
 ////////// Access
+
+int NodeList_sV::indexOf(const Node_sV *node) const
+{
+    return m_list.indexOf(*node);
+}
 
 int NodeList_sV::find(qreal time) const
 {

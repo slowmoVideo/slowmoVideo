@@ -1,5 +1,5 @@
 /*
-slowmoUI is a user interface for slowmoVideo.
+This file is part of slowmoVideo.
 Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -11,19 +11,22 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef NODEHANDLE_SV_H
 #define NODEHANDLE_SV_H
 
+#include "canvasObject_sV.h"
 #include <QtCore/QPointF>
 
 class Node_sV;
 
-class NodeHandle_sV : public QPointF
+class NodeHandle_sV : public QPointF, public CanvasObject_sV
 {
 public:
     NodeHandle_sV();
     NodeHandle_sV(qreal x, qreal y);
     NodeHandle_sV(const QPointF &other);
+    NodeHandle_sV(const NodeHandle_sV &other);
+    ~NodeHandle_sV() {}
 
     void setParentNode(Node_sV *node);
-    Node_sV* parentNode();
+    const Node_sV* parentNode() const;
 
 
 private:

@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define PROJECT_SV_H
 
 #include "tag_sV.h"
+#include "nodelist_sV.h"
 #include "../lib/defs_sV.hpp"
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -28,7 +29,6 @@ class Flow_sV;
 class AbstractFrameSource_sV;
 class AbstractFlowSource_sV;
 class RenderTask_sV;
-class NodeList_sV;
 class FlowField_sV;
 class QSignalMapper;
 class QProcess;
@@ -81,6 +81,13 @@ public:
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
+    /** \brief Searches for objects near the given \c pos.
+
+      This search includes tags.
+
+      \see NodeList_sV::objectsNear() Used by this method. Does not include tags.
+      */
+    QList<NodeList_sV::PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;
 
 
 

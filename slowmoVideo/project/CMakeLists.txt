@@ -4,6 +4,7 @@ set(SRCS_PROJ
   tag_sV.cpp
   node_sV.cpp
   nodelist_sV.cpp
+  segment_sV.cpp
   nodeHandle_sV.cpp
   renderTask_sV.cpp
   abstractProjectRW_sV.h
@@ -16,6 +17,7 @@ set(SRCS_PROJ
   imagesRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
   v3dFlowSource_sV.cpp
+  canvasObject_sV.h
 )
 
 set(SRCS_MOC

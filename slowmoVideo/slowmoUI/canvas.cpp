@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../project/abstractFrameSource_sV.h"
 
 #include <cmath>
+#include <typeinfo>
 
 #include <QtCore/QDebug>
 
@@ -72,6 +73,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     setContextMenuPolicy(Qt::DefaultContextMenu);
 
     m_states.prevMousePos = QPoint(0,0);
+    m_states.initialContextObject = NULL;
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
@@ -311,6 +313,10 @@ void Canvas::paintEvent(QPaintEvent *)
             h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
             davinci.drawLine(convertTimeToCanvas(*prev), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
+        } else {
+            if (i > 0) {
+                qDebug() << "Curve types (" << i << "): left = " << toString(prev->rightCurveType()) << ", right = " << toString(curr->leftCurveType());
+            }
         }
 
         prev = &m_nodes->at(i);
@@ -342,19 +348,20 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
 
 void Canvas::mousePressEvent(QMouseEvent *e)
 {
-    QPointF time = convertCanvasToTime(e->pos()).toQPointF();
     m_states.reset();
+
     m_states.prevMousePos = e->pos();
     m_states.initialMousePos = e->pos();
+
     m_states.prevModifiers = e->modifiers();
     m_states.initialModifiers = e->modifiers();
     m_states.initialButtons = e->buttons();
-    m_states.context = m_nodes->context(time, delta(SELECT_RADIUS));
-    if (m_states.context == NodeContext_Handle) {
-        m_states.nodeOfHandle = m_nodes->findByHandle(time.x(), time.y(), delta(SELECT_RADIUS));
-        m_states.leftHandle = e->pos().x() < convertTimeToCanvas(m_nodes->at(m_states.nodeOfHandle)).x();
+
+    m_states.initialContextObject = objectAt(e->pos(), e->modifiers());
+
+    if (m_states.initialContextObject != NULL) {
+        qDebug() << "Mouse pressed. Context: " << typeid(*m_states.initialContextObject).name();
     }
-    qDebug() << "Mouse pressed. Context: " << toString(m_states.context);
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *e)
@@ -372,34 +379,51 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
         qDebug() << "Diff: " << diff;
 
         if (m_mode == ToolMode_Select) {
-            if (m_states.context == NodeContext_Handle) {
-                qDebug() << "Moving handle" << m_states.nodeOfHandle << "; left? " << m_states.leftHandle;
-                if (m_states.nodeOfHandle >= 0) {
+            if (dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject) != NULL) {
+                const NodeHandle_sV *handle = dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject);
+                int index = m_nodes->indexOf(handle->parentNode());
+                qDebug() << "Moving handle" << handle << " of node " << handle->parentNode()
+                         << QString(" (%1)").arg(index);
+                qDebug() << "Parent node x: " << handle->parentNode()->x();
+                qDebug() << "Handle x: " << handle->x();
+
+                if (index >= 0) {
                     m_nodes->moveHandle(
-                                m_states.nodeOfHandle,
-                                m_states.leftHandle,
-                                convertCanvasToTime(e->pos())-m_nodes->at(m_states.nodeOfHandle)
+                                index,
+                                &handle->parentNode()->leftNodeHandle() == handle,
+                                convertCanvasToTime(e->pos())-m_nodes->at(index)
                                 );
+                } else {
+                    for (int i = 0; i < m_nodes->size(); i++) {
+                        qDebug() << "Node " << i << " is at " << &m_nodes->at(i);
+                    }
                 }
-            } else {
-                qDebug() << "Moving node.";
+            } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+                const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
+                qDebug() << "Moving node " << node;
                 if (!m_states.moveAborted) {
                     if (m_states.countsAsMove()) {
-                        if (!m_states.selectAttempted) {
-                            m_states.selectAttempted = true;
-                            selectAt(m_states.initialMousePos, e->modifiers().testFlag(Qt::ControlModifier));
-                        }
-                        if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                            if (qAbs(diff.x()) < qAbs(diff.y())) {
-                                diff.setX(0);
-                            } else {
-                                diff.setY(0);
+                        if (!node->selected()) {
+                            if (!m_states.selectAttempted) {
+                                m_states.selectAttempted = true;
+                                m_nodes->select(node, !e->modifiers().testFlag(Qt::ControlModifier));
+                            }
+                            if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                                if (qAbs(diff.x()) < qAbs(diff.y())) {
+                                    diff.setX(0);
+                                } else {
+                                    diff.setY(0);
+                                }
                             }
                         }
                         m_nodes->moveSelected(diff);
                     }
                 }
                 m_states.nodesMoved = true;
+            } else {
+                if (m_states.initialContextObject != NULL) {
+                    qDebug() << "Trying to move " << typeid(*m_states.initialContextObject).name() << ": Not supported yet!";
+                }
             }
 
         } else if (m_mode == ToolMode_Move) {
@@ -428,18 +452,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                     m_nodes->confirmMove();
                     qDebug() << "Move confirmed.";
                 } else {
-                    if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom) {
+                    if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom
+                            && !m_states.selectAttempted) {
+
                         // Try to select a node below the mouse. If there is none, add a point.
-                        bool selected = selectAt(m_states.initialMousePos, m_states.initialModifiers.testFlag(Qt::ControlModifier));
-                        if (!selected) {
+                        if (m_states.initialContextObject == NULL || dynamic_cast<const Node_sV*>(m_states.initialContextObject) == NULL) {
                             if (m_mode == ToolMode_Select) {
                                 Node_sV p = convertCanvasToTime(m_states.initialMousePos);
                                 m_nodes->add(p);
                             } else {
                                 qDebug() << "Not adding node. Mode is " << m_mode;
                             }
-                        } else {
-                            qDebug() << "Node selected.";
+
+                        } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+                            m_nodes->select((const Node_sV*) m_states.initialContextObject, !m_states.initialModifiers.testFlag(Qt::ControlModifier));
                         }
                         repaint();
 
@@ -455,22 +481,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                 break;
             }
         }
-    } else if (m_states.initialButtons.testFlag(Qt::RightButton)) {
-        Node_sV time = convertCanvasToTime(m_states.prevMousePos);
-        NodeContext context = m_nodes->context(time.x(), time.y(), convertCanvasToTime(QPoint(m_distLeft+5,0)).x());
-        qDebug() << "Context at " << time << " is: " << toString(context);
-    } else if (m_states.initialButtons.testFlag(Qt::MiddleButton)) {
-        QList<NodeList_sV::PointerWithDistance> nearObjects = m_nodes->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
+    } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MiddleButton)) {
+        QList<NodeList_sV::PointerWithDistance> nearObjects = m_project->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
         qDebug() << "Nearby objects:";
         for (int i = 0; i < nearObjects.size(); i++) {
-            qDebug() << nearObjects.at(i).type << " at distance " << nearObjects.at(i).dist;
+            qDebug() << typeid(*(nearObjects.at(i).ptr)).name() << " at distance " << nearObjects.at(i).dist;
 //            if (dynamic_cast<const Node_sV*>(nearObjects.at(i).ptr) != NULL) {
-
 //                qDebug() << "Node.";
-//            } else if (dynamic_cast<const NodeHandle_sV*>(nearObjects.at(i).ptr != NULL)) {
+//            } else if (dynamic_cast<const NodeHandle_sV*>(nearObjects.at(i).ptr) != NULL) {
 //                qDebug() << "Node handle.";
-//            } else if (dynamic_cast<const NodeList_sV::Segment_sV*>(nearObjects.at(i).ptr) != NULL) {
+//            } else if (dynamic_cast<const Segment_sV*>(nearObjects.at(i).ptr) != NULL) {
 //                qDebug() << "Segment";
+//            } else if (dynamic_cast<const Tag_sV*>(nearObjects.at(i).ptr) != NULL) {
+//                const Tag_sV *tag = dynamic_cast<const Tag_sV*>(nearObjects.at(i).ptr);
+//                qDebug() << "Tag: " << tag->description();
 //            }
         }
     }
@@ -480,30 +504,31 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
 {
     qDebug() << "Context menu requested";
     QMenu menu;
-    NodeContext context = m_nodes->context(
-                convertCanvasToTime(e->pos()).toQPointF(),
-                convertCanvasToTime(QPoint(m_distLeft+5,0)).x()
-                );
-    switch(context) {
-    case NodeContext_Node: {
-        int nodeIndex = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
+
+    const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
+
+    if (dynamic_cast<const Node_sV*>(obj)) {
+        int nodeIndex = m_nodes->indexOf((const Node_sV*)obj);
+
         menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
         menu.addAction(m_aSnapInNode);
-        break; }
-    case NodeContext_Segment: {
-        int leftNode, rightNode;
-        m_nodes->findBySegment(convertCanvasToTime(m_states.prevMousePos).x(), leftNode, rightNode);
 
-        menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(rightNode))->setEnabled(false);
+    } else if (dynamic_cast<const Segment_sV*>(obj) != NULL) {
+        const Segment_sV* segment = (const Segment_sV*) obj;
+        int leftNode = segment->leftNodeIndex();
+
+        menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
         menu.addSeparator()->setText("Handle actions");
         menu.addAction(m_aResetLeftHandle);
         menu.addAction(m_aResetRightHandle);
-        break; }
-    default:
-        qDebug() << "No context menu available for context " << toString(context);
+
+    } else {
+        if (obj != NULL) {
+            qDebug() << "No context menu available for object of type " << typeid(*obj).name();
+        }
         return;
     }
     menu.exec(e->globalPos());
@@ -561,6 +586,27 @@ void Canvas::wheelEvent(QWheelEvent *e)
     Q_ASSERT(m_t0.y() >= 0);
 
     repaint();
+}
+
+
+
+const CanvasObject_sV* Canvas::objectAt(QPoint pos, Qt::KeyboardModifiers modifiers) const
+{
+    QList<NodeList_sV::PointerWithDistance> nearObjects =
+            m_project->objectsNear(convertCanvasToTime(pos).toQPointF(), convertDistanceToTime(QPoint(SELECT_RADIUS,0)).x());
+
+    if (modifiers.testFlag(Qt::ShiftModifier)) {
+        // Ignore nodes with Shift pressed
+        while (nearObjects.size() > 0 && dynamic_cast<const Node_sV*>(nearObjects.at(0).ptr) != NULL) {
+            nearObjects.removeFirst();
+        }
+    }
+
+    if (nearObjects.size() > 0) {
+        return nearObjects.at(0).ptr;
+    } else {
+        return NULL;
+    }
 }
 
 

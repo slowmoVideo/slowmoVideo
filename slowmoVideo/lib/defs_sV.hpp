@@ -9,7 +9,6 @@
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
-enum NodeContext { NodeContext_Node, NodeContext_Segment, NodeContext_Handle, NodeContext_None };
 enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
 enum TagAxis { TagAxis_Source = 1, TagAxis_Output = 2 };
 
@@ -35,7 +34,6 @@ public: FrameSourceError(QString msg);
 QString toString(const QSize& size);
 QString toString(const FrameSize &size);
 QString toString(const FlowDirection &dir);
-QString toString(const NodeContext &context);
 QString toString(const CurveType &curveType);
 QString toString(const QPointF &p);
 QString toString(const TagAxis &axis);

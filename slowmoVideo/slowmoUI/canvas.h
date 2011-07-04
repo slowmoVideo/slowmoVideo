@@ -110,21 +110,22 @@ private:
         bool nodesMoved;
         bool selectAttempted;
         bool moveAborted;
-        bool leftHandle;
-        NodeContext context;
-        int nodeOfHandle;
+
         QPoint prevMousePos;
         QPoint initialMousePos;
+
         Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;
+
         Qt::MouseButtons initialButtons;
+
+        const CanvasObject_sV *initialContextObject;
 
         void reset() {
             moveAborted = false;
             nodesMoved = false;
             selectAttempted = false;
-            context = NodeContext_None;
-            nodeOfHandle = -1;
+            initialContextObject = NULL;
             travelledDistance = 0;
         }
         void travel(int length) { travelledDistance += length; }
@@ -158,6 +159,8 @@ private:
     bool selectAt(const QPoint& pos, bool addToSelection = false);
 
     void drawModes(QPainter &davinci, int top, int right);
+
+    const CanvasObject_sV* objectAt(QPoint pos, Qt::KeyboardModifiers modifiers) const;
 
 private slots:
     void slotDeleteNode();

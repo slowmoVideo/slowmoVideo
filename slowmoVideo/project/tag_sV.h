@@ -2,15 +2,16 @@
 #define TAG_SV_H
 
 #include "../lib/defs_sV.hpp"
+#include "canvasObject_sV.h"
 #include <QString>
 
 /** \brief Tags are used for marking positions in time in the project. */
-class Tag_sV
+class Tag_sV : public CanvasObject_sV
 {
 public:
-
     Tag_sV(TagAxis axis = TagAxis_Source);
     Tag_sV(qreal time, QString description, TagAxis axis = TagAxis_Source);
+    ~Tag_sV() {}
 
     TagAxis axis() const { return m_axis; }
     qreal time() const { return m_time; }

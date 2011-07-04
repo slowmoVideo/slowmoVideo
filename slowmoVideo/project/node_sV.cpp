@@ -29,6 +29,14 @@ Node_sV::Node_sV(const QPointF &point) :
 {
     init();
 }
+Node_sV::Node_sV(const Node_sV &other) :
+    m_x(other.x()),
+    m_y(other.y()),
+    m_leftHandle(other.leftNodeHandle()),
+    m_rightHandle(other.rightNodeHandle())
+{
+    init();
+}
 
 void Node_sV::init()
 {
@@ -39,6 +47,8 @@ void Node_sV::init()
     m_rightHandle.setParentNode(this);
     m_leftCurveType = CurveType_Linear;
     m_rightCurveType = CurveType_Linear;
+    Q_ASSERT(this == m_leftHandle.parentNode());
+    Q_ASSERT(this == m_rightHandle.parentNode());
 }
 
 

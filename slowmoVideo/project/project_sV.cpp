@@ -194,3 +194,24 @@ float Project_sV::timeToFrame(float time) const
     return time * m_frameSource->fps();
 }
 
+QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qreal tmaxdist) const
+{
+    QList<NodeList_sV::PointerWithDistance> list = m_nodes->objectsNear(pos, tmaxdist);
+
+    qreal dist;
+    for (int i = 0; i < m_tags->size(); i++) {
+        if (fabs(m_tags->at(i).axis() == TagAxis_Source)) {
+            dist = fabs(pos.y() - m_tags->at(i).time());
+        } else {
+            dist = fabs(pos.x() - m_tags->at(i).time());
+        }
+        if (dist <= tmaxdist) {
+            list << NodeList_sV::PointerWithDistance(&m_tags->at(i), dist, NodeList_sV::PointerWithDistance::Tag);
+        }
+    }
+
+    qSort(list);
+
+    return list;
+}
+

@@ -12,6 +12,8 @@ the Free Software Foundation, either version 3 of the License, or
 #define NODELIST_SV_H
 
 #include "node_sV.h"
+#include "segment_sV.h"
+#include "canvasObject_sV.h"
 #include "../lib/defs_sV.hpp"
 
 #include <QList>
@@ -33,25 +35,25 @@ class NodeList_sV
 public:
     NodeList_sV(float minDist = 1/30.0f);
 
+    /// For sorting objects
     struct PointerWithDistance {
-        enum ObjectType { Node = 1, Handle = 2, Segment = 3 };
-        const void* ptr;
+
+        /// Defines the order on object types. Nodes will come first in a sorted list.
+        enum ObjectType { Node = 1, Handle = 2, Tag = 3, Segment = 4 };
+        /// Pointer to the object
+        const CanvasObject_sV* ptr;
+        /// Distance to the object from the search position (e.g. mouse position)
         qreal dist;
+        /// The object type should only be used for sorting!
         ObjectType type;
+
         bool operator <(const PointerWithDistance &other) const {
             return type < other.type || (type == other.type &&  dist < other.dist);
         }
-        PointerWithDistance(const void* ptr, qreal dist, ObjectType type) :
+        PointerWithDistance(const CanvasObject_sV* ptr, qreal dist, ObjectType type) :
             ptr(ptr),
             dist(dist),
             type(type)
-        { }
-    };
-
-    struct Segment_sV {
-        int leftNodeIndex;
-        Segment_sV(int index) :
-            leftNodeIndex(index)
         { }
     };
 
@@ -68,10 +70,11 @@ public:
       @return true if the node has been added. The node is NOT added
       if it is too close to another node.
       */
-    bool add(const Node_sV nod);
+    bool add(const Node_sV node);
     uint deleteSelected();
     void deleteNode(int index);
 
+    void select(const Node_sV *node, bool newSelection = true);
     void unselectAll();
 
     void shift(qreal after, qreal by);
@@ -93,13 +96,16 @@ public:
     void moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos);
 
 
-    NodeContext context(qreal tx, qreal ty, qreal tdelta) const;
-    NodeContext context(QPointF point, qreal delta) const;
     void setCurveType(qreal segmentTime, CurveType type);
     void fixHandles(int leftIndex);
 
 
 
+    /**
+      \brief Returns the \c node's index in the node list
+      \return -1 if the node could not be located
+      */
+    int indexOf(const Node_sV *node) const;
     /**
       @return The position of the node whose target time (x()) is <= time,
       or -1 if there is no such node.
@@ -125,7 +131,12 @@ public:
       value for this index is -1.
       */
     void findBySegment(qreal tx, int& leftIndex_out, int& rightIndex_out) const;
-
+    /**
+      \brief Searches for node objects (nodes, handles, and segments) around a position.
+      \param pos Center of the search position.
+      \param tmaxdist This is the search radius. Elements are included if their euclidian distance
+       to \c pos is <= tmaxdist, except for segments where only the x position is taken into account.
+       */
     QList<PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;
 
     /**

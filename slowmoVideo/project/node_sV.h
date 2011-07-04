@@ -11,8 +11,9 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef NODE_SV_H
 #define NODE_SV_H
 
-#include "nodeHandle_sV.h"
 #include "../lib/defs_sV.hpp"
+#include "nodeHandle_sV.h"
+#include "canvasObject_sV.h"
 #include <QtGlobal>
 #include <QtCore/QPointF>
 
@@ -21,12 +22,14 @@ the Free Software Foundation, either version 3 of the License, or
 
   \todo Save handles
   */
-class Node_sV
+class Node_sV : public CanvasObject_sV
 {
 public:
     Node_sV();
     Node_sV(const qreal &x, const qreal &y);
     Node_sV(const QPointF &point);
+    Node_sV(const Node_sV &other);
+    ~Node_sV() {}
 
     bool operator<(const Node_sV &other) const;
     bool operator==(const Node_sV &other) const;
