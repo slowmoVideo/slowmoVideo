@@ -314,15 +314,16 @@ void NodeList_sV::abortMove()
     }
 }
 
-/// \todo access by NodeHandle_sV*
-void NodeList_sV::moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos)
+void NodeList_sV::moveHandle(const NodeHandle_sV *handle, Node_sV relPos)
 {
+    Node_sV otherNode;
+    Node_sV *currentNode = const_cast<Node_sV*>(handle->parentNode());
+
+    int nodeIndex = indexOf(handle->parentNode());
     Q_ASSERT(nodeIndex >= 0);
     Q_ASSERT(nodeIndex < m_list.size());
 
-    Node_sV *currentNode = &m_list[nodeIndex];
-    Node_sV otherNode;
-    if (leftHandle) {
+    if (handle == &currentNode->leftNodeHandle()) {
         //  o------[]
         if (nodeIndex > 0) {
             // Ensure that it does not overlap with the left node's handle (injectivity)
@@ -439,25 +440,6 @@ int NodeList_sV::find(QPointF pos, qreal tdelta) const
     }
     return -1;
 }
-int NodeList_sV::findByHandle(qreal tx, qreal ty, qreal tdelta) const
-{
-    for (int i = 0; i < m_list.size(); i++) {
-        Node_sV node = m_list[i];
-        if (node.leftCurveType() != CurveType_Linear) {
-            if (std::pow(node.xUnmoved() + node.leftNodeHandle().x() - tx, 2) + std::pow(node.yUnmoved() + node.leftNodeHandle().y() - ty, 2)
-                    < std::pow(tdelta, 2)) {
-                return i;
-            }
-        }
-        if (node.rightCurveType() != CurveType_Linear) {
-            if (std::pow(node.xUnmoved() + node.rightNodeHandle().x() - tx, 2) + std::pow(node.yUnmoved() + node.rightNodeHandle().y() - ty, 2)
-                    < std::pow(tdelta, 2)) {
-                return i;
-            }
-        }
-    }
-    return -1;
-}
 
 void NodeList_sV::findBySegment(qreal tx, int &leftIndex_out, int &rightIndex_out) const
 {
@@ -529,15 +511,7 @@ int NodeList_sV::nodeAfter(qreal time) const
     Q_ASSERT(pos < 0 || m_list.at(pos).xUnmoved() >= time);
     return pos;
 }
-const Node_sV* NodeList_sV::near(qreal t) const
-{
-    for (int i = 0; i < m_list.size(); i++) {
-        if (fabs(m_list.at(i).x() - t) < m_minDist) {
-            return &m_list.at(i);
-        }
-    }
-    return NULL;
-}
+
 const Node_sV& NodeList_sV::at(int i) const { return m_list.at(i); }
 Node_sV& NodeList_sV::operator[](int i) { return m_list[i]; }
 int NodeList_sV::size() const { return m_list.size(); }
@@ -551,7 +525,7 @@ int NodeList_sV::size() const { return m_list.size(); }
 QDebug operator<<(QDebug dbg, const NodeList_sV &list)
 {
     for (int i = 0; i < list.size(); i++) {
-        dbg.nospace() << list.near(i) << " ";
+        dbg.nospace() << list.at(i) << " ";
     }
     return dbg.maybeSpace();
 }

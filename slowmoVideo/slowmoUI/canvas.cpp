@@ -389,8 +389,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
                 if (index >= 0) {
                     m_nodes->moveHandle(
-                                index,
-                                &handle->parentNode()->leftNodeHandle() == handle,
+                                handle,
                                 convertCanvasToTime(e->pos())-m_nodes->at(index)
                                 );
                 } else {
@@ -513,6 +512,9 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
         menu.addAction(m_aSnapInNode);
+        menu.addSeparator()->setText("Handle actions");
+        menu.addAction(m_aResetLeftHandle);
+        menu.addAction(m_aResetRightHandle);
 
     } else if (dynamic_cast<const Segment_sV*>(obj) != NULL) {
         const Segment_sV* segment = (const Segment_sV*) obj;
@@ -521,9 +523,6 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
-        menu.addSeparator()->setText("Handle actions");
-        menu.addAction(m_aResetLeftHandle);
-        menu.addAction(m_aResetRightHandle);
 
     } else {
         if (obj != NULL) {
@@ -740,19 +739,15 @@ void Canvas::slotChangeCurveType(int curveType)
 }
 void Canvas::slotResetHandle(const QString &position)
 {
-    int leftNode, rightNode;
-    m_nodes->findBySegment(convertCanvasToTime(m_states.prevMousePos).x(), leftNode, rightNode);
-    if (position == "left") {
-        if (leftNode >= 0) {
-            m_nodes->moveHandle(leftNode, false, Node_sV());
-        }
-    } else if (position == "right") {
-        if (rightNode >= 0) {
-            m_nodes->moveHandle(rightNode, true, Node_sV());
+    if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+        Node_sV *node = const_cast<Node_sV*>(dynamic_cast<const Node_sV*>(m_states.initialContextObject));
+        if (position == "left") {
+            node->setLeftNodeHandle(0, 0);
+        } else {
+            node->setRightNodeHandle(0, 0);
         }
     } else {
-        qDebug() << "Unknown handle position: " << position;
-        Q_ASSERT(false);
+        qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
 }
 

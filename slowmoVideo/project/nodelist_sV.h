@@ -93,7 +93,7 @@ public:
       */
     void abortMove();
 
-    void moveHandle(int nodeIndex, bool leftHandle, Node_sV relPos);
+    void moveHandle(const NodeHandle_sV *handle, Node_sV relPos);
 
 
     void setCurveType(qreal segmentTime, CurveType type);
@@ -119,12 +119,6 @@ public:
       */
     int find(QPointF pos, qreal tdelta) const;
     /**
-      \return The position of the first node belonging to the handle at <tt>(tx|ty)</tt>
-      if there is one within a radius uf \c tdelta, and if its mode is not set to linear.
-      \see find(qreal) for finding nodes directly.
-      */
-    int findByHandle(qreal tx, qreal ty, qreal tdelta) const;
-    /**
       \brief Searches for a segment (or path) between two nodes at time \c tx.
 
       If a left or right node does not exist (when \c tx is outside of the curve), the return
@@ -144,13 +138,9 @@ public:
       the given time, or -1 if there is no such node.
       */
     int nodeAfter(qreal time) const;
-    /**
-      @return A pointer to the node at the given time (or not further
-      than minDist away), or NULL if there is no node at t.
-      */
-    const Node_sV* near(qreal t) const;
+
     const Node_sV& at(int i) const;
-    Node_sV& operator[](int i);
+    Node_sV& operator [](int i);
     int size() const;
 
     /**

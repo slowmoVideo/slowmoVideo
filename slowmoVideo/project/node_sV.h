@@ -19,8 +19,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 /**
   \brief Node for defining the input/output curve
-
-  \todo Save handles
   */
 class Node_sV : public CanvasObject_sV
 {
