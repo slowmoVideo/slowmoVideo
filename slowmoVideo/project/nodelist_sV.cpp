@@ -256,6 +256,11 @@ void NodeList_sV::moveSelected(const Node_sV &time)
             }
         }
 
+        if (right->selected()) {
+            maxDMove = qMax(maxDMove, -right->yUnmoved());
+            maxUMove = qMin(maxUMove, m_maxY-right->yUnmoved());
+        }
+
         left = right;
     }
     if (m_list.size() > 0 && m_list.at(0).selected()) {

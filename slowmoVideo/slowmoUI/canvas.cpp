@@ -45,7 +45,6 @@ QColor Canvas::outTagCol    ( 30, 245,   0, 150);
 QColor Canvas::backgroundCol( 34,  34,  34);
 
 /// \todo move with MMB
-/// \todo end of video line (1 frame too much)
 
 Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),
@@ -121,7 +120,7 @@ void Canvas::load(Project_sV *project)
     m_nodes = project->nodes();
     m_tags = project->tags();
     qDebug() << "Frame source: " << project->frameSource();
-    m_tmax.setY(project->frameSource()->framesCount() / project->frameSource()->fps());
+    m_tmax.setY(project->frameSource()->maxTime());
     qDebug() << "tMaxY set to " << m_tmax.y();
     repaint();
 }

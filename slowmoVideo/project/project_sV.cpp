@@ -107,6 +107,7 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
     } else {
         m_frameSource = frameSource;
     }
+    m_nodes->setMaxY(m_frameSource->maxTime());
 }
 
 void Project_sV::replaceRenderTask(RenderTask_sV *task)

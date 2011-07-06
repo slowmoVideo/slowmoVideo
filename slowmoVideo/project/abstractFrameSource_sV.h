@@ -67,6 +67,7 @@ public:
     virtual int frameRateNum() const = 0;
     virtual int frameRateDen() const = 0;
     float fps() const throw(Div0Exception);
+    double maxTime() const throw(Div0Exception);
 
     /**
       \fn frameAt()

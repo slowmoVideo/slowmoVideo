@@ -41,7 +41,6 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     // Project Preferences
     QDomElement preferences = doc.createElement("preferences");
     root.appendChild(preferences);
-    /// \todo rendering settings
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderFPS = doc.createElement("renderFPS");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");

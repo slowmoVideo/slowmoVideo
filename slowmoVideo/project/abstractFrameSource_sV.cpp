@@ -29,3 +29,8 @@ float AbstractFrameSource_sV::fps() const throw(Div0Exception)
     }
     return float(num)/float(den);
 }
+
+double AbstractFrameSource_sV::maxTime() const throw(Div0Exception)
+{
+    return (framesCount()-1)/fps();
+}
