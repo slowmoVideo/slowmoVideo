@@ -48,6 +48,8 @@ private:
     QStringList m_images;
     QString m_imagesMsg;
 
+    QSettings m_settings;
+
 
 private slots:
     void slotSelectProjectDir();

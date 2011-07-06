@@ -66,4 +66,5 @@ void ProgressDialog::slotAllTasksFinished()
 {
     ui->progress->setValue(ui->progress->maximum());
     setWorking(false);
+    setWindowTitle("(Finished) " + windowTitle());
 }

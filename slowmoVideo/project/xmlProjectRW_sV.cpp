@@ -268,6 +268,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
 
                 Project_sV *project = new Project_sV();
                 project->setProjectFilename(filename);
+                project->setProjectDir(QFileInfo(filename).absolutePath());
 
                 while (xml.readNextStartElement()) {
                     if (xml.name() == "info") {
@@ -283,12 +284,11 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                             if (version < 2 && xml.name() == "inputFile") {
                                 QString inFilename = xml.readElementText();
                                 qDebug() << "Input file: " << inFilename;
-                                project->setProjectDir(QFileInfo(filename).absolutePath());
                                 project->loadFrameSource(new VideoFrameSource_sV(project, inFilename));
                             } else if (xml.name() == "frameSource") {
                                 loadFrameSource(&xml, project);
                             } else if (xml.name() == "projectDir") {
-                                project->setProjectDir(xml.readElementText());
+                                xml.skipCurrentElement();
                             } else {
                                 xml.skipCurrentElement();
                             }

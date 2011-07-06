@@ -35,7 +35,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
 
     QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
-    if (ui->cbFps->findText(fps) < 0) {
+    if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
         ui->cbFps->addItem(fps);
         ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
     }

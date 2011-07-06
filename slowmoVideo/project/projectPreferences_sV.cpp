@@ -6,6 +6,7 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_viewport_t0(0, 0),
     m_viewport_secRes(50, 50),
     m_renderFrameSize(FrameSize_Orig),
+    m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg")
 {

@@ -70,6 +70,7 @@ bool ImagesFrameSource_sV::initialized() const
     return m_initialized;
 }
 
+/// \todo What if image missing?
 void ImagesFrameSource_sV::slotContinueInitialization()
 {
     emit signalNextTask("Creating preview images from the input images", m_imagesList.size());

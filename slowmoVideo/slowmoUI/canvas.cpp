@@ -44,8 +44,8 @@ QColor Canvas::srcTagCol    ( 30, 245,   0, 150);
 QColor Canvas::outTagCol    ( 30, 245,   0, 150);
 QColor Canvas::backgroundCol( 34,  34,  34);
 
-/// \todo zoom in/out, scrolling etc.: scaling
 /// \todo move with MMB
+/// \todo end of video line (1 frame too much)
 
 Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),

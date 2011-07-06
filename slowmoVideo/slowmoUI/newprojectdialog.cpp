@@ -34,6 +34,7 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
     m_buttonGroup->addButton(ui->radioImages);
     ui->radioVideo->setChecked(true);
 
+    ui->projectDir->setText(m_settings.value("directories/lastProjectDir", QDir::current().absolutePath()).toString());
     m_videoInfo.streamsCount = 0;
 
     bool b = true;
@@ -68,10 +69,16 @@ Project_sV* NewProjectDialog::buildProject() throw(FrameSourceError)
     AbstractFrameSource_sV *frameSource = NULL;
     if (ui->radioVideo->isChecked()) {
         frameSource = new VideoFrameSource_sV(project, ui->inputVideo->text());
+        m_settings.setValue("directories/lastInputVideo", QFileInfo(ui->inputVideo->text()).absolutePath());
     } else {
         frameSource = new ImagesFrameSource_sV(project, m_images);
+        m_settings.setValue("directories/lastInputImage", QFileInfo(m_images.last()).absolutePath());
     }
     project->loadFrameSource(frameSource);
+
+    m_settings.setValue("directories/lastProjectDir", ui->projectDir->text());
+    m_settings.setValue("directories/lastProjectDir", ui->projectDir->text());
+
     return project;
 }
 const QString NewProjectDialog::projectFilename() const
@@ -84,6 +91,11 @@ void NewProjectDialog::slotSelectVideoFile()
     QFileDialog dialog(this, "Select input video file");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFile);
+    if (ui->inputVideo->text().length() > 0) {
+        dialog.setDirectory(ui->inputVideo->text());
+    } else {
+        dialog.setDirectory(m_settings.value("directories/lastInputVideo", QDir::homePath()).toString());
+    }
     if (dialog.exec() == QDialog::Accepted) {
         ui->inputVideo->setText(dialog.selectedFiles().at(0));
         ui->txtVideoInfo->clear();
@@ -97,6 +109,11 @@ void NewProjectDialog::slotSelectImages()
     QFileDialog dialog(this, "Select input images");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFiles);
+    if (m_images.size() > 0) {
+        dialog.setDirectory(QFileInfo(m_images.last()).absolutePath());
+    } else {
+        dialog.setDirectory(m_settings.value("directories/lastInputImage", QDir::homePath()).toString());
+    }
     if (dialog.exec() == QDialog::Accepted) {
 
         m_images = dialog.selectedFiles();
@@ -115,6 +132,11 @@ void NewProjectDialog::slotSelectProjectDir()
     QFileDialog dialog(this, "Select a project directory");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::Directory);
+    if (ui->projectDir->text().length() > 0) {
+        dialog.setDirectory(ui->projectDir->text());
+    } else {
+        dialog.setDirectory(m_settings.value("directories/lastProjectDir").toString());
+    }
     if (dialog.exec() == QDialog::Accepted) {
         ui->projectDir->setText(dialog.selectedFiles().at(0));
         slotUpdateButtonStates();
