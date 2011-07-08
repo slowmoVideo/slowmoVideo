@@ -129,7 +129,8 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, float previousTime) const throw(FlowBuildingError)
+QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, const InterpolationType interpolation,
+                                      float previousTime) const throw(FlowBuildingError)
 {
     float framePos = timeToFrame(time);
     float prevFramePos = -1;
@@ -153,27 +154,47 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, flo
         }
         qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
         return Shutter_sV::combine(frames);
+
     } else if (framePos-floor(framePos) > MIN_FRAME_DIST) {
 
         QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
         QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
         QImage out(left.size(), QImage::Format_RGB888);
 
-        FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-        FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
+        const float pos = framePos-floor(framePos);
+        if (interpolation == InterpolationType_Twoway) {
+            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
 
-        Q_ASSERT(forwardFlow != NULL);
-        Q_ASSERT(backwardFlow != NULL);
+            Q_ASSERT(forwardFlow != NULL);
+            Q_ASSERT(backwardFlow != NULL);
 
-        if (forwardFlow == NULL || backwardFlow == NULL) {
-            qDebug() << "No flow received!";
+            if (forwardFlow == NULL || backwardFlow == NULL) {
+                qDebug() << "No flow received!";
+                Q_ASSERT(false);
+            }
+
+            Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
+            delete forwardFlow;
+            delete backwardFlow;
+
+        } else if (interpolation == InterpolationType_Forward) {
+            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+
+            Q_ASSERT(forwardFlow != NULL);
+
+            if (forwardFlow == NULL) {
+                qDebug() << "No flow received!";
+                Q_ASSERT(false);
+            }
+
+            Interpolate_sV::forwardFlow(left, forwardFlow, pos, out);
+            delete forwardFlow;
+
+        } else {
+            qDebug() << "Unsupported interpolation type!";
             Q_ASSERT(false);
         }
-
-        Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, framePos-floor(framePos), out);
-
-        delete forwardFlow;
-        delete backwardFlow;
         return out;
     } else {
         qDebug() << "No interpolation necessary.";

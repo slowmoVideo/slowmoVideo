@@ -312,10 +312,6 @@ void Canvas::paintEvent(QPaintEvent *)
             h = convertTimeToCanvas(prev->toQPointF() + prev->rightNodeHandle());
             davinci.drawLine(convertTimeToCanvas(*prev), h);
             davinci.drawEllipse(QPoint(h.x(), h.y()), HANDLE_RADIUS, HANDLE_RADIUS);
-        } else {
-            if (i > 0) {
-                qDebug() << "Curve types (" << i << "): left = " << toString(prev->rightCurveType()) << ", right = " << toString(curr->leftCurveType());
-            }
         }
 
         prev = &m_nodes->at(i);

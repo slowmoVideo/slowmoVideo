@@ -82,3 +82,16 @@ QString toString(const TagAxis axis)
         return QString("Unknown axis");
     }
 }
+
+QString toString(const InterpolationType &interpolation)
+{
+    switch (interpolation) {
+    case InterpolationType_Forward:
+        return QString("Forward interpolation");
+    case InterpolationType_Twoway:
+        return QString("Two-way interpolation");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown interpolation");
+    }
+}

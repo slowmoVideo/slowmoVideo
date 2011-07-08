@@ -48,6 +48,10 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
     ui->cbSize->setCurrentIndex(ui->cbSize->findData(QVariant(m_project->preferences()->renderFrameSize())));
 
+    ui->cbInterpolation->addItem(toString(InterpolationType_Twoway), QVariant(InterpolationType_Twoway));
+    ui->cbInterpolation->addItem(toString(InterpolationType_Forward), QVariant(InterpolationType_Forward));
+    ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
+
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
@@ -70,6 +74,7 @@ RenderingDialog::~RenderingDialog()
 RenderTask_sV* RenderingDialog::buildTask()
 {
     if (slotValidate()) {
+        const InterpolationType interpolation = (InterpolationType)ui->cbInterpolation->itemData(ui->cbInterpolation->currentIndex()).toInt();
         const FrameSize size = (FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt();
         const QString imagesOutputDir = ui->imagesOutputDir->text();
         const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
@@ -78,6 +83,7 @@ RenderTask_sV* RenderingDialog::buildTask()
         RenderTask_sV *task = new RenderTask_sV(m_project);
         task->setFPS(fps);
         task->setSize(size);
+        task->setInterpolationType(interpolation);
         ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV();
         renderTarget->setFilenamePattern(imagesFilenamePattern);
         renderTarget->setTargetDir(imagesOutputDir);
@@ -85,6 +91,7 @@ RenderTask_sV* RenderingDialog::buildTask()
 
         m_project->preferences()->imagesOutputDir() = imagesOutputDir;
         m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
+        m_project->preferences()->renderInterpolationType() = interpolation;
         m_project->preferences()->renderFrameSize() = size;
         m_project->preferences()->renderFPS() = fps;
         return task;

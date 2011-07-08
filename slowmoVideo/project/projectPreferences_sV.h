@@ -16,6 +16,7 @@ public:
 
     // Rendering
     FrameSize& renderFrameSize();
+    InterpolationType& renderInterpolationType();
     float& renderFPS();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
@@ -26,6 +27,7 @@ private:
     QPointF m_viewport_secRes;
 
     FrameSize m_renderFrameSize;
+    InterpolationType m_renderInterpolationType;
     float m_renderFPS;
 
     QString m_imagesOutputDir;

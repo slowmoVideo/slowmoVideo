@@ -183,6 +183,32 @@
       <widget class="QComboBox" name="cbSize"/>
      </item>
      <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Minimum</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Interpolation:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbInterpolation"/>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -340,6 +366,8 @@
   <tabstop>timeStart</tabstop>
   <tabstop>timeEnd</tabstop>
   <tabstop>cbFps</tabstop>
+  <tabstop>cbSize</tabstop>
+  <tabstop>cbInterpolation</tabstop>
   <tabstop>radioVideo</tabstop>
   <tabstop>radioImages</tabstop>
   <tabstop>imagesOutputDir</tabstop>

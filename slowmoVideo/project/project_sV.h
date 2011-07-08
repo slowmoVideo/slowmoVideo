@@ -77,7 +77,9 @@ public:
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
-    QImage interpolateFrameAt(float time, const FrameSize frameSize, float previousTime = -1) const throw(FlowBuildingError);
+    QImage interpolateFrameAt(float time, const FrameSize frameSize,
+                              const InterpolationType interpolation, float previousTime = -1) const
+    throw(FlowBuildingError);
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 

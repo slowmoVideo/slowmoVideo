@@ -51,6 +51,7 @@ public:
     void setTimeRange(float start, float end);
     void setFPS(float fps);
     void setSize(FrameSize size);
+    void setInterpolationType(const InterpolationType interpolation);
 
 public slots:
     void slotContinueRendering();
@@ -77,6 +78,7 @@ private:
 
     float m_fps;
     FrameSize m_frameSize;
+    InterpolationType m_interpolationType;
 
     bool m_stopRendering;
     qreal m_nextFrameTime;

@@ -42,6 +42,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement preferences = doc.createElement("preferences");
     root.appendChild(preferences);
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
+    QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
     QDomElement renderFPS = doc.createElement("renderFPS");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
@@ -49,6 +50,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
     preferences.appendChild(renderFrameSize);
+    preferences.appendChild(renderInterpolation);
     preferences.appendChild(renderFPS);
     preferences.appendChild(imagesOutputDir);
     preferences.appendChild(imagesFilenamePattern);
@@ -56,6 +58,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
     renderFrameSize.setAttribute("size", project->preferences()->renderFrameSize());
+    renderInterpolation.setAttribute("type", project->preferences()->renderInterpolationType());
     renderFPS.setAttribute("fps", project->preferences()->renderFPS());
     imagesOutputDir.setAttribute("dir", project->preferences()->imagesOutputDir());
     imagesFilenamePattern.setAttribute("pattern", project->preferences()->imagesFilenamePattern());
@@ -362,6 +365,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "renderFrameSize") {
                                 project->preferences()->renderFrameSize() = (FrameSize) xml.attributes().value("size").toString().toInt();
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "renderInterpolationType") {
+                                project->preferences()->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderFPS") {
                                 project->preferences()->renderFPS() = xml.attributes().value("fps").toString().toFloat();

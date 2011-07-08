@@ -27,6 +27,7 @@ RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_timeEnd = m_project->nodes()->endTime();
     m_fps = 24;
     m_frameSize = FrameSize_Small;
+    m_interpolationType = InterpolationType_Forward;
 
     m_nextFrameTime = m_project->nodes()->startTime();
 }
@@ -67,6 +68,11 @@ void RenderTask_sV::setSize(FrameSize size)
     m_frameSize = size;
 }
 
+void RenderTask_sV::setInterpolationType(const InterpolationType interpolation)
+{
+    m_interpolationType = interpolation;
+}
+
 void RenderTask_sV::slotStopRendering()
 {
     m_stopRendering = true;
@@ -104,9 +110,10 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             qreal srcTime = m_project->nodes()->sourceTime(time);
 
             qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
-            emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s").arg(frameNumber).arg(time).arg(srcTime));
+            emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
+                                .arg(frameNumber).arg(time).arg(srcTime).arg(frameNumber));
             try {
-                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_prevTime);
+                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_interpolationType, m_prevTime);
 
                 m_renderTarget->slotConsumeFrame(rendered, frameNumber);
                 m_nextFrameTime = time + 1/m_fps;
