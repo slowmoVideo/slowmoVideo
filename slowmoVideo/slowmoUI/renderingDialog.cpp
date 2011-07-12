@@ -48,11 +48,14 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
     ui->cbSize->setCurrentIndex(ui->cbSize->findData(QVariant(m_project->preferences()->renderFrameSize())));
 
-    ui->cbInterpolation->addItem(toString(InterpolationType_Twoway), QVariant(InterpolationType_Twoway));
     ui->cbInterpolation->addItem(toString(InterpolationType_Forward), QVariant(InterpolationType_Forward));
     ui->cbInterpolation->addItem(toString(InterpolationType_ForwardNew), QVariant(InterpolationType_ForwardNew));
+    ui->cbInterpolation->addItem(toString(InterpolationType_Twoway), QVariant(InterpolationType_Twoway));
+    ui->cbInterpolation->addItem(toString(InterpolationType_TwowayNew), QVariant(InterpolationType_TwowayNew));
     ui->cbInterpolation->addItem(toString(InterpolationType_Bezier), QVariant(InterpolationType_Bezier));
-    ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
+    if (ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())) >= 0) {
+        ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
+    }
 
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));

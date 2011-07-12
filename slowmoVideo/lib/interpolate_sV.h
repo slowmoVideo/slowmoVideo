@@ -38,6 +38,7 @@ class Interpolate_sV {
     static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void newForwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
+    static void newTwowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowLeftRight, const FlowField_sV *flowRightLeft, float pos, QImage &output);
     static void bezierFlow(const QImage& left, const QImage& right, const FlowField_sV *flowCurrPrev, const FlowField_sV *flowCurrNext, float pos, QImage &output);
 
 
@@ -48,32 +49,6 @@ private:
     };
     struct ColorMatrix4x4 {
         QColor c00, c10, c01, c11;
-    };
-    struct Source {
-        float fromX;
-        float fromY;
-        bool isSet;
-        Source() : isSet(false) {}
-        void set(float x, float y) {
-            fromX = x; fromY = y; isSet = true;
-        }
-    };
-    struct SourceField {
-        Source *field;
-        int width;
-        int height;
-        SourceField(int width, int height) : width(width), height(height) {
-            field = new Source[width*height];
-        }
-        ~SourceField() { delete field; }
-        inline Source& at(int x, int y) { return field[width*y + x]; }
-        void reset() {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    field[y*width + x].isSet = false;
-                }
-            }
-        }
     };
 
     static void blend(ColorMatrix4x4& colors, const QColor &blendCol, float posX, float posY);

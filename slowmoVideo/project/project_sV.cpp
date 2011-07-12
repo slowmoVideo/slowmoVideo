@@ -180,6 +180,22 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
             delete forwardFlow;
             delete backwardFlow;
 
+        } else if (interpolation == InterpolationType_TwowayNew) {
+            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
+
+            Q_ASSERT(forwardFlow != NULL);
+            Q_ASSERT(backwardFlow != NULL);
+
+            if (forwardFlow == NULL || backwardFlow == NULL) {
+                qDebug() << "No flow received!";
+                Q_ASSERT(false);
+            }
+
+            Interpolate_sV::newTwowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
+            delete forwardFlow;
+            delete backwardFlow;
+
         } else if (interpolation == InterpolationType_Forward) {
             FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
 

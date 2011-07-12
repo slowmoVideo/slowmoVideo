@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "interpolate_sV.h"
 #include "flowField_sV.h"
+#include "sourceField_sV.h"
 #include "vector_sV.h"
 #include "bezierTools_sV.h"
 
@@ -95,10 +96,6 @@ void Interpolate_sV::blend(ColorMatrix4x4 &c, const QColor &blendCol, float posX
     Q_ASSERT(posX >= 0 && posX <= 1);
     Q_ASSERT(posY >= 0 && posY <= 1);
 
-    float fx, fy;
-
-    fx = 1-posX;
-    fy = 1-posY;
     if (c.c00.alpha() == 0) { c.c00 = blendCol; }
     else { c.c00 = blend(c.c00, blendCol, std::sqrt((1-posX) * (1-posY))); }
 
@@ -134,31 +131,67 @@ void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const F
             backward.moveY = flowBackward->y(x, y);
 
 #ifdef INTERPOLATE
-	    posX = x - pos*forward.moveX;
-	    posY = y - pos*forward.moveY;
-	    posX = CLAMP(posX, 0, Wmax);
-	    posY = CLAMP(posY, 0, Hmax);
-	    colLeft = interpolate(left, posX, posY);
-	    
+            posX = x - pos*forward.moveX;
+            posY = y - pos*forward.moveY;
+            posX = CLAMP(posX, 0, Wmax);
+            posY = CLAMP(posY, 0, Hmax);
+            colLeft = interpolate(left, posX, posY);
+
             posX = x - (1-pos)*backward.moveX;
             posY = y - (1-pos)*backward.moveY;
-	    posX = CLAMP(posX, 0, Wmax);
-	    posY = CLAMP(posY, 0, Hmax);
-	    colRight = interpolate(right, posX, posY);
+            posX = CLAMP(posX, 0, Wmax);
+            posY = CLAMP(posY, 0, Hmax);
+            colRight = interpolate(right, posX, posY);
 #else
-	    colLeft = QColor(left.pixel(x - pos*forward.moveX, y - pos*forward.moveY));
-	    colRight = QColor(right.pixel(x - (1-pos)*backward.moveX , y - (1-pos)*backward.moveY));
+            colLeft = QColor(left.pixel(x - pos*forward.moveX, y - pos*forward.moveY));
+            colRight = QColor(right.pixel(x - (1-pos)*backward.moveX , y - (1-pos)*backward.moveY));
 #endif
-	    r = (1-pos)*colLeft.redF() + pos*colRight.redF();
-	    g = (1-pos)*colLeft.greenF() + pos*colRight.greenF();
-	    b = (1-pos)*colLeft.blueF() + pos*colRight.blueF();
-	    colOut = QColor::fromRgbF(
-				      CLAMP1(r),
-				      CLAMP1(g),
-				      CLAMP1(b)
-				      );
-	    output.setPixel(x,y, colOut.rgb());
-	}
+            r = (1-pos)*colLeft.redF() + pos*colRight.redF();
+            g = (1-pos)*colLeft.greenF() + pos*colRight.greenF();
+            b = (1-pos)*colLeft.blueF() + pos*colRight.blueF();
+            colOut = QColor::fromRgbF(
+                                      CLAMP1(r),
+                                      CLAMP1(g),
+                                      CLAMP1(b)
+                                      );
+            output.setPixel(x,y, colOut.rgb());
+        }
+    }
+}
+
+
+void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
+                                   const FlowField_sV *flowLeftRight, const FlowField_sV *flowRightLeft,
+                                   float pos, QImage &output)
+{
+    const int W = left.width();
+    const int H = left.height();
+
+    SourceField_sV leftSourcePixel(flowLeftRight, pos);
+    leftSourcePixel.inpaint();
+    SourceField_sV rightSourcePixel(flowRightLeft, 1-pos);
+    rightSourcePixel.inpaint();
+
+    float aspect = .5 + std::cos(M_PI*pos)/2;
+
+    float fx, fy;
+    QColor colLeft, colRight;
+    for (int y = 0; y < H; y++) {
+        for (int x = 0; x < W; x++) {
+            fx = leftSourcePixel.at(x,y).fromX;
+            fx = CLAMP(fx, 0, W-1.01);
+            fy = leftSourcePixel.at(x,y).fromY;
+            fy = CLAMP(fy, 0, H-1.01);
+            colLeft = interpolate(left, fx, fy);
+
+            fx = rightSourcePixel.at(x,y).fromX;
+            fx = CLAMP(fx, 0, W-1.01);
+            fy = rightSourcePixel.at(x,y).fromY;
+            fy = CLAMP(fy, 0, H-1.01);
+            colRight = interpolate(right, fx, fy);
+
+            output.setPixel(x,y, blend(colLeft, colRight, aspect).rgba());
+        }
     }
 }
 
@@ -197,68 +230,25 @@ void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, f
 
 void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow, float pos, QImage &output)
 {
-    const int Wmax = left.width()-1;
-    const int Hmax = left.height()-1;
+    const int W = left.width();
+    const int H = left.height();
 
-    output.fill(qRgba(0,0,0,0));
+    // Calculate the source flow field
+    SourceField_sV field(flow, pos);
+    field.inpaint();
 
-    SourceField field(left.width(), left.height());
-
-    // Convert the optical flow to «where did the pixel come from?»
-    // from the target image's perspective
-    for (int y = 0; y < left.height(); y++) {
-        for (int x = 0; x < left.width(); x++) {
-
-            float tx = x + pos * flow->x(x,y);
-            float ty = y + pos * flow->y(x,y);
-
-            // +.5: Round to nearest
-            int ix = floor(tx+.5);
-            int iy = floor(ty+.5);
-
-            // The position the pixel moved to is a float, but to avoid very complex
-            // interpolation (how to set a pixel at (55.3, 97.16) to red?), this information
-            // is reverted (where did (55, 97) come from? -> (50.8, 101.23) which can be
-            // interpolated easily from the source image)
-            if (ix >= 0 && iy >= 0 &&
-                    ix < Wmax && iy < Hmax) {
-                field.at(ix, iy).set(x + (ix-tx), y + (iy-ty));
-            }
-
-        }
-    }
-
-    // Try to fill the holes that may exist
-    for (int y = 0; y < Hmax; y++) {
-        for (int x = 0; x < Wmax; x++) {
-            if (!field.at(x,y).isSet) {
-                float fx = 0, fy = 0;
-                int count = 0;
-                for (int yy = std::max(0, y-1); yy < std::min(Hmax, y+2); yy++) {
-                    for (int xx = std::max(0, x-1); xx < std::min(Wmax, x+2); xx++) {
-                        if (field.at(xx,yy).isSet) {
-                            count++;
-                            fx += field.at(xx,yy).fromX;
-                            fy += field.at(xx,yy).fromY;
-                        }
-                    }
-                }
-                if (count > 0) {
-                    fx /= count;
-                    fy /= count;
-                    field.at(x,y).set(fx, fy);
-                }
-            }
-        }
-    }
-
-    // Finally draw the pixels
-    for (int y = 0; y < Hmax; y++) {
-        for (int x = 0; x < Wmax; x++) {
-            if (field.at(x,y).fromX >= 0 && field.at(x,y).fromX <= Wmax-1
-                    && field.at(x,y).fromY >= 0 && field.at(x,y).fromY <= Hmax-1) {
-                output.setPixel(x,y, interpolate(left, field.at(x,y).fromX, field.at(x,y).fromY).rgba());
-            }
+    // Draw the pixels
+    float fx, fy;
+    for (int y = 0; y < H; y++) {
+        for (int x = 0; x < W; x++) {
+            // Since interpolate() uses the floor()+1 values,
+            // set the maximum to a little less than size-1
+            // such that the pixel always lies inside.
+            fx = field.at(x,y).fromX;
+            fx = CLAMP(fx, 0, W-1.01);
+            fy = field.at(x,y).fromY;
+            fy = CLAMP(fy, 0, H-1.01);
+            output.setPixel(x,y, interpolate(left, fx, fy).rgba());
         }
     }
 }

@@ -15,6 +15,7 @@ set(LIB_SRC
   intMatrix_sV.cpp
   interpolate_sV.cpp
   bezierTools_sV.cpp
+  sourceField_sV.cpp
 )
 
 set(LIB_SRC_VI
