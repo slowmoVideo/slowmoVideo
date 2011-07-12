@@ -95,9 +95,12 @@ public:
 
     void moveHandle(const NodeHandle_sV *handle, Node_sV relPos);
 
-
+    /// Sets the curve type for the segment at time \c segmentTime.
     void setCurveType(qreal segmentTime, CurveType type);
+
     void fixHandles(int leftIndex);
+
+    void set1xSpeed(qreal segmentTime);
 
 
 

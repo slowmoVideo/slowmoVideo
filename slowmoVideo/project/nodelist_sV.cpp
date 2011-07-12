@@ -413,6 +413,31 @@ void NodeList_sV::fixHandles(int leftIndex)
         m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).leftNodeHandle().y());
     }
 }
+void NodeList_sV::set1xSpeed(qreal segmentTime)
+{
+    int left, right;
+    findBySegment(segmentTime, left, right);
+    if (left >= 0 && right >= 0) {
+        Node_sV *leftN = &m_list[left];
+        Node_sV *rightN = &m_list[right];
+        qreal y = leftN->y() + (rightN->x()-leftN->x());
+        if (y > m_maxY) {
+            qDebug() << "1x speed would shoot over maximum time. Correcting.";
+            y = m_maxY;
+            qreal xNew = leftN->x() + (m_maxY - leftN->y());
+            /// \todo Setting y after adding the node (+sorting): Pointer points to the new node! Fix?
+            rightN->setY(m_maxY);
+            if (xNew - leftN->x() >= m_minDist) {
+                add(Node_sV(xNew, m_maxY));
+            }
+        } else {
+            rightN->setY(y);
+        }
+    } else {
+        qDebug() << "Outside segment.";
+    }
+    validate();
+}
 
 
 

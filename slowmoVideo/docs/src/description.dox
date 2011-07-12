@@ -1,9 +1,15 @@
 /**
 \mainpage slowmoVideo
 
-slowmoVideo is a library for generating slow-motion videos by frame interpolation with optical flow.
+slowmoVideo is a library for generating slow-motion videos by frame interpolation with optical flow. It contains:
+\li Libraries for reading and writing optical flow (such that it does not need to be re-calculated every time)
+\li Classes for project management, including reading and writing project files including defined curves, and rendering
+\li Algorithms for interpolating frames with optical flow (like forward and twoway)
 
 \section slowmoUI
 slowmoUI is a user interface for slowmoVideo for drawing the frame mapping curve (\em speed curve), creating new projects, and rendering.
+
+\section visualizeFlow
+visualizeFlow renders flow files that have been saved with the slowmoVideo libraries to image files, making it easier for human beings to «read» the flow data.
 
 */

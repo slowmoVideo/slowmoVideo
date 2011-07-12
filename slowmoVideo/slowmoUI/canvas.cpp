@@ -86,6 +86,8 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
+    m_a1xSpeed = new QAction(QString::fromUtf8("Set speed to 1×"), this);
+
     m_handleMapper = new QSignalMapper(this);
     m_aResetLeftHandle = new QAction("Reset left handle", this);
     m_aResetRightHandle = new QAction("Reset right handle", this);
@@ -102,6 +104,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     b &= connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
+    b &= connect(m_a1xSpeed, SIGNAL(triggered()), this, SLOT(slotSet1xSpeed()));
     Q_ASSERT(b);
 }
 
@@ -233,8 +236,10 @@ void Canvas::paintEvent(QPaintEvent *)
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
         davinci.drawText(m_states.prevMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
-        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 20, Qt::AlignRight,
-                         QString("f %1").arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2));
+        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 50, Qt::AlignRight,
+                         QString("f %1\n%2 s")
+                         .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
+                         .arg(time.y()));
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -518,6 +523,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
+        menu.addAction(m_a1xSpeed);
 
     } else {
         if (obj != NULL) {
@@ -744,6 +750,11 @@ void Canvas::slotResetHandle(const QString &position)
     } else {
         qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
+}
+void Canvas::slotSet1xSpeed()
+{
+    qDebug() << "Setting curve to 1x speed.";
+    m_nodes->set1xSpeed(convertCanvasToTime(m_states.prevMousePos).x());
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)

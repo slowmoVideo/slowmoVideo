@@ -144,6 +144,7 @@ private:
     QAction *m_aBezier;
     QAction *m_aResetLeftHandle;
     QAction *m_aResetRightHandle;
+    QAction *m_a1xSpeed;
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
@@ -167,6 +168,7 @@ private slots:
     void slotSnapInNode();
     void slotChangeCurveType(int curveType);
     void slotResetHandle(const QString &position);
+    void slotSet1xSpeed();
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);
