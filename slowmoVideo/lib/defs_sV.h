@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 
+/// Holds information about a video input file.
 typedef struct VideoInfoSV {
     /// Frame rate numerator
     int frameRateNum;

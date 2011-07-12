@@ -15,23 +15,33 @@ enum InterpolationType { InterpolationType_Forward = 0, InterpolationType_Forwar
                          InterpolationType_Twoway = 10, InterpolationType_TwowayNew = 11,
                          InterpolationType_Bezier = 20 };
 
+/// Default colours used in slowmoVideo (e.g. in the user interface)
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);
     static QColor colBad(247, 122, 48);
 }
 
+/// For general errors.
 class Error_sV {
 public:
+    /// Creates a new error object with the given information message.
     Error_sV(QString msg);
+    /// Returns the information message.
     QString message() const;
 private:
     QString m_message;
 };
+/// For errors related to building optical flow.
 class FlowBuildingError : public Error_sV {
-public: FlowBuildingError(QString msg);
+public:
+    /// Default constructor.
+    FlowBuildingError(QString msg);
 };
+/// For errors related to the frame source.
 class FrameSourceError : public Error_sV {
-public: FrameSourceError(QString msg);
+public:
+    /// Default constructor.
+    FrameSourceError(QString msg);
 };
 
 QString toString(const QSize& size);

@@ -11,21 +11,37 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef INTMATRIX_SV_H
 #define INTMATRIX_SV_H
 
-/** \brief Simple matrix that can add image data to itself. */
+/**
+  \brief Simple matrix that can add image data to itself.
+
+  This matrix is used for shutter simulation (i.e. motion blur).
+*/
 class IntMatrix_sV
 {
 public:
+    /**
+      \brief Creates a new image matrix.
+
+      \b channels should match the number of channels of the images that will be added.
+      */
     IntMatrix_sV(int width, int height, int channels);
     ~IntMatrix_sV();
 
+    /// Matrix width
     int width() const;
+    /// Matrix height
     int height() const;
+    /// Number of colour channels
     int channels() const;
 
+    /// Adds the input bytes (as row-wise image data, usually) to this matrix.
     void operator +=(const unsigned char *bytes);
+    /// Scales the matrix, e.g. by the number of images added.
     void operator /=(int divisor);
 
+    /// Converts the image to a byte array. Internal values are stored as int.
     unsigned char* toBytesArray() const;
+    /// Image data.
     const int* data() const;
 
 private:

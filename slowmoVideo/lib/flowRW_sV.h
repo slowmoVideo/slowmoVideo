@@ -24,12 +24,19 @@ class FlowRW_sV
 {
 public:
 
+    /// Holds information about a flow file
     struct FlowInfo_sV {
+        /// Flow field width
         int width;
+        /// Flow field height
         int height;
+        /// Flow field version for future changes in the file format
         char version;
+        /// Magic number (first few bytes)
         std::string magic;
+        /// Should be set to true if the flow is valid (valid magic number, valid version etc.)
         bool valid;
+        /// Initially set to invalid.
         FlowInfo_sV() {
             magic = "flow_sV";
             version = '1';
@@ -38,7 +45,7 @@ public:
     };
 
     /** \fn load(std::string)
-      \return \tt NULL, if the file could not be loaded, and the flow field otherwise.
+      \return \c NULL, if the file could not be loaded, and the flow field otherwise.
       */
     /** \fn save(std::string, FlowField_sV*);
       \see FlowField_sV::FlowField_sV(int, int, float*, FlowField_sV::GLFormat)

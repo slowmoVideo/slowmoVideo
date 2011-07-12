@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 class Shutter_sV
 {
 public:
+    /// Combines the given images to a new image by addition and division.
     static QImage combine(QStringList images);
 };
 

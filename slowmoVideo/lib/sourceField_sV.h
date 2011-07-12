@@ -53,20 +53,33 @@ public:
     SourceField_sV(const FlowField_sV *flow, float pos);
     ~SourceField_sV();
 
+    /**
+      Represents a source flow pixel.
+      For a Source at <pre>(x|y)</pre>, the pixel at <pre>(x|y)</pre> originated at <pre>(fromX|fromY)</pre>.
+      This value usually is a float and the colour at its location should therefore be interpolated to avoid aliasing artifacts.
+      */
     struct Source {
+        /// x coordinate of the origin
         float fromX;
+        /// y coordinate of the origin
         float fromY;
+        /// \c false if this item is still a «hole» (see inpaint())
         bool isSet;
+        /// Creates an empty Source (i.e. a hole)
         Source() : isSet(false) {}
+        /// Creates an initialized Source
         Source(float fromX, float fromY) : fromX(fromX), fromY(fromY), isSet(true) {}
+        /// Sets the source coordinates. Is not a hole anymore afterwards.
         void set(float x, float y) {
             fromX = x; fromY = y; isSet = true;
         }
     };
 
+    /// Source array. Only public for the inline function at().
     Source *m_field;
 
 
+    /// Returns the Source at the given coordinates, for calculating the colour at <pre>(x|y)</pre>.
     inline Source& at(int x, int y)
     {
         return m_field[m_width*y + x];

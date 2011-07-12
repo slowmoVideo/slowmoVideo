@@ -35,6 +35,9 @@ class Interpolate_sV {
     /** \fn twowayFlow()
       Interpolates a frame using optical flow from the first to the second frame, as well as from the second to the first frame.
       */
+    /** \fn newTwowayFlow()
+      Like twowayFlow(), but uses forward and backward flow correctly. See also newForwardFlow().
+      */
     static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void newForwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
