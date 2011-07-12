@@ -145,7 +145,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
         prevFramePos = timeToFrame(previousTime);
     }
 
-    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1) {
+    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1.2) {
         QStringList frames;
         int left = std::min(floor(prevFramePos), floor(framePos));
         int right = std::max(ceil(prevFramePos), ceil(framePos));
@@ -159,9 +159,11 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
 
         QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
         QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
-        QImage out(left.size(), QImage::Format_RGB888);
+        QImage out(left.size(), QImage::Format_ARGB32);
 
+        /// Position between two frames, on [0 1]
         const float pos = framePos-floor(framePos);
+
         if (interpolation == InterpolationType_Twoway) {
             FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
             FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
@@ -190,6 +192,30 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
 
             Interpolate_sV::forwardFlow(left, forwardFlow, pos, out);
             delete forwardFlow;
+
+        } else if (interpolation == InterpolationType_ForwardNew) {
+            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+
+            Q_ASSERT(forwardFlow != NULL);
+
+            if (forwardFlow == NULL) {
+                qDebug() << "No flow received!";
+                Q_ASSERT(false);
+            }
+
+            Interpolate_sV::newForwardFlow(left, forwardFlow, pos, out);
+            delete forwardFlow;
+
+        } else if (interpolation == InterpolationType_Bezier) {
+            FlowField_sV *currNext = requestFlow(floor(framePos)+2, floor(framePos)+1, frameSize); // Allowed to be NULL
+            FlowField_sV *currPrev = requestFlow(floor(framePos)+0, floor(framePos)+1, frameSize);
+
+            Q_ASSERT(currPrev != NULL);
+
+            Interpolate_sV::bezierFlow(left, right, currPrev, currNext, pos, out);
+
+            delete currNext;
+            delete currPrev;
 
         } else {
             qDebug() << "Unsupported interpolation type!";

@@ -10,6 +10,7 @@ set(CMAKE_C_FLAGS
 set(LIB_SRC
   defs_sV.cpp
   defs_sV.hpp
+  vector_sV.cpp
   shutter_sV.cpp
   intMatrix_sV.cpp
   interpolate_sV.cpp

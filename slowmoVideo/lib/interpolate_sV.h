@@ -8,6 +8,7 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
+#include <QtGui/QColor>
 
 class QImage;
 class FlowField_sV;
@@ -20,17 +21,62 @@ class Interpolate_sV {
  public:
     /** \fn forwardFlow()
       Interpolates a frame using only the flow from the first to the second frame.
+      This algorithm is simplified and only partly correct since it assumes the flow field
+      to tell where a pixel came from and not where it went to, which usually leads to artifacts
+      like on object boundaries or like objects that do not move as far as they should,
+      but is much easier to interpolate.
+      */
+    /** \fn newForwardFlow
+      Like forwardFlow(), but uses the forward flow correctly. This includes more work like
+      filling holes if an object expanded (a pixel then becomes larger, or «multiplies», which cannot
+      be expressed with usual optical flow (<em>where did the pixel go to?</em> cannot be answered
+      since it went to multiple locations). The benefit is that this algorithm works more precisely.
       */
     /** \fn twowayFlow()
       Interpolates a frame using optical flow from the first to the second frame, as well as from the second to the first frame.
       */
     static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
+    static void newForwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
+    static void bezierFlow(const QImage& left, const QImage& right, const FlowField_sV *flowCurrPrev, const FlowField_sV *flowCurrNext, float pos, QImage &output);
+
 
 private:
     struct Movement {
         float moveX;
         float moveY;
     };
+    struct ColorMatrix4x4 {
+        QColor c00, c10, c01, c11;
+    };
+    struct Source {
+        float fromX;
+        float fromY;
+        bool isSet;
+        Source() : isSet(false) {}
+        void set(float x, float y) {
+            fromX = x; fromY = y; isSet = true;
+        }
+    };
+    struct SourceField {
+        Source *field;
+        int width;
+        int height;
+        SourceField(int width, int height) : width(width), height(height) {
+            field = new Source[width*height];
+        }
+        ~SourceField() { delete field; }
+        inline Source& at(int x, int y) { return field[width*y + x]; }
+        void reset() {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    field[y*width + x].isSet = false;
+                }
+            }
+        }
+    };
+
+    static void blend(ColorMatrix4x4& colors, const QColor &blendCol, float posX, float posY);
+    static QColor blend(const QColor& left, const QColor& right, float pos);
 
 };

@@ -37,6 +37,9 @@ void ProgressDialog::slotNextTask(const QString taskDescription, int taskSize)
     ui->lblTaskDesc->setText(taskDescription);
     ui->progress->setMaximum(taskSize);
     ui->progress->setValue(0);
+    if (windowTitle().startsWith("(Finished) ")) {
+        setWindowTitle(windowTitle().remove(0, strlen("(Finished) ")));
+    }
     setWorking(true);
 }
 void ProgressDialog::slotTaskProgress(int progress)

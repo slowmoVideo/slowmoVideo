@@ -1,3 +1,6 @@
+/// \todo Include shader files in binary
+/// \todo Check that (width|height)/2^nLevels >= 1
+
 #include "Base/v3d_image.h"
 #include "Base/v3d_imageprocessing.h"
 #include "Base/v3d_timer.h"

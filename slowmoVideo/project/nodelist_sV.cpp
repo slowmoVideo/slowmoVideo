@@ -16,6 +16,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 
+/// \todo adding nodes: check if inside bounds
+
 NodeList_sV::NodeList_sV(float minDist) :
     m_maxY(10),
     m_list(),

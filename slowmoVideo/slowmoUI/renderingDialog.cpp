@@ -37,8 +37,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
     if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
         ui->cbFps->addItem(fps);
-        ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
     }
+    ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
 
     m_targetGroup = new QButtonGroup(this);
     m_targetGroup->addButton(ui->radioImages);
@@ -50,6 +50,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     ui->cbInterpolation->addItem(toString(InterpolationType_Twoway), QVariant(InterpolationType_Twoway));
     ui->cbInterpolation->addItem(toString(InterpolationType_Forward), QVariant(InterpolationType_Forward));
+    ui->cbInterpolation->addItem(toString(InterpolationType_ForwardNew), QVariant(InterpolationType_ForwardNew));
+    ui->cbInterpolation->addItem(toString(InterpolationType_Bezier), QVariant(InterpolationType_Bezier));
     ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
 
     bool b = true;

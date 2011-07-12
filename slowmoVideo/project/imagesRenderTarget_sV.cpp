@@ -42,6 +42,8 @@ void ImagesRenderTarget_sV::slotConsumeFrame(const QImage &image, const int fram
     bool ok;
     ok = image.save(path);
     if (!ok) {
-        qDebug() << "Writing image to " << path << " failed!";
+        qDebug() << "  Writing image to " << path << " failed!";
+    } else {
+        qDebug() << "  Saved frame number " << frameNumber << " to " << path;
     }
 }

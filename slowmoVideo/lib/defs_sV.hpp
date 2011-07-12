@@ -11,7 +11,7 @@ enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
 enum TagAxis { TagAxis_Source = 1, TagAxis_Output = 2 };
-enum InterpolationType { InterpolationType_Forward = 1, InterpolationType_Twoway = 2 };
+enum InterpolationType { InterpolationType_Forward = 1, InterpolationType_Twoway = 2, InterpolationType_ForwardNew, InterpolationType_Bezier = 4 };
 
 namespace Colours_sV {
     static QColor colOk(158, 245, 94);

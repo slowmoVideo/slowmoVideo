@@ -481,7 +481,7 @@ void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskS
 }
 void MainWindow::slotFrameSourceTasksFinished()
 {
-    QTimer::singleShot(2000, this, SLOT(slotCloseFrameSourceProgress()));
+    QTimer::singleShot(200, this, SLOT(slotCloseFrameSourceProgress()));
 }
 void MainWindow::slotCloseFrameSourceProgress()
 {

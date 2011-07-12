@@ -87,9 +87,13 @@ QString toString(const InterpolationType &interpolation)
 {
     switch (interpolation) {
     case InterpolationType_Forward:
-        return QString("Forward interpolation");
+        return QString("Forward interpolation (fast)");
+    case InterpolationType_ForwardNew:
+        return QString("Forward interpolation (accurate)");
     case InterpolationType_Twoway:
-        return QString("Two-way interpolation");
+        return QString("Two-way interpolation (fast)");
+    case InterpolationType_Bezier:
+        return QString::fromUtf8("Bézier interpolation");
     default:
         Q_ASSERT(false);
         return QString("Unknown interpolation");

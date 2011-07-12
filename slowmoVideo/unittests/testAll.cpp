@@ -2,6 +2,7 @@
 #include "testFlowRW_sV.h"
 #include "testIntMatrix_sV.h"
 #include "testXmlProjectRW_sV.h"
+#include "testVector_sV.h"
 
 #include <QtTest/QtTest>
 
@@ -18,4 +19,7 @@ int main()
 
     TestXmlProjectRW_sV xmlRW;
     QTest::qExec(&xmlRW);
+
+    TestVector_sV vector;
+    QTest::qExec(&vector);
 }
