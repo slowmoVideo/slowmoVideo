@@ -172,7 +172,7 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
     SourceField_sV rightSourcePixel(flowRightLeft, 1-pos);
     rightSourcePixel.inpaint();
 
-    float aspect = .5 + std::cos(M_PI*pos)/2;
+    float aspect = 1 - (.5 + std::cos(M_PI*pos)/2);
 
     float fx, fy;
     QColor colLeft, colRight;
