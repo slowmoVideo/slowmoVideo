@@ -1,0 +1,9 @@
+/**
+\mainpage slowmoVideo
+
+slowmoVideo is a library for generating slow-motion videos by frame interpolation with optical flow.
+
+\section slowmoUI
+slowmoUI is a user interface for slowmoVideo for drawing the frame mapping curve (\em speed curve), creating new projects, and rendering.
+
+*/

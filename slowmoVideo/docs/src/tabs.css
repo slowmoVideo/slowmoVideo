@@ -1,0 +1,22 @@
+.tablist {
+    clear: left;
+}
+.tablist li {
+    border-top: 1px solid #999;
+    border-bottom: 1px dotted #999;
+    float: left;
+    list-style-type: none;
+}
+.tablist li a {
+    display: block;
+    padding: .5em;
+}
+.tablist li a:hover {
+    background-color: #999;
+}
+.tabs2 .tablist li {
+    border-top: none;
+}
+#searchli {
+    border: none;
+}
