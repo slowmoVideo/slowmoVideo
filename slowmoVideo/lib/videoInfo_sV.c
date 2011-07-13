@@ -28,7 +28,7 @@ VideoInfoSV getInfo(const char filename[])
     AVFormatContext *pFormatContext;
  
     int ret;
-    if ((ret = av_open_input_file(&pFormatContext, filename, NULL, 0, NULL)) != 0) {
+    if ((ret = avformat_open_input(&pFormatContext, filename, NULL, NULL)) != 0) {
 	printf("Could not open file %s.\n", filename);
 	return info;
     }
