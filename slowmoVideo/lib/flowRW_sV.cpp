@@ -63,7 +63,7 @@ FlowRW_sV::FlowInfo_sV FlowRW_sV::readInfo(std::string filename)
     return info;
 }
 
-FlowField_sV* FlowRW_sV::load(std::string filename)
+FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowBuildingError)
 {
     std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
@@ -79,17 +79,17 @@ FlowField_sV* FlowRW_sV::load(std::string filename)
     file.read((char*) &width, sizeof(int));
     file.read((char*) &height, sizeof(int));
     if (file.rdstate() != std::ios::goodbit) {
-        std::cerr << "Failed to read width/height from " << filename << "." << std::endl;
-        return NULL;
+        file.close();
+        throw FlowBuildingError(QString("Failed to read width/height from %1.").arg(filename.c_str()));
     }
 
     FlowField_sV *field = new FlowField_sV(width, height);
 
     file.read((char*) field->data(), sizeof(float)*field->dataSize());
     if (file.rdstate() != std::ios::goodbit) {
-        std::cerr << "Failed to read data from " << filename << "." << std::endl;
         delete field;
-        return NULL;
+        file.close();
+        throw FlowBuildingError(QString("Failed to read data from %1.").arg(filename.c_str()));
     }
     file.close();
 

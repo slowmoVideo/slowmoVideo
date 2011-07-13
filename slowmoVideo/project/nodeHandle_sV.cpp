@@ -42,3 +42,9 @@ const Node_sV* NodeHandle_sV::parentNode() const
 {
     return m_parentNode;
 }
+
+QDebug operator <<(QDebug qd, const NodeHandle_sV& h)
+{
+    qd.nospace() << "(" << h.x() << "|" << h.y() << "):" << &h << "@" << h.parentNode();
+    return qd.maybeSpace();
+}

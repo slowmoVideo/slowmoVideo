@@ -70,7 +70,7 @@ public:
       @return true if the node has been added. The node is NOT added
       if it is too close to another node.
       */
-    bool add(const Node_sV node);
+    bool add(Node_sV node);
     uint deleteSelected();
     void deleteNode(int index);
 
@@ -118,7 +118,6 @@ public:
     /**
       @return The position of the first node in the list which is within a radius
       of \c tdelta around the point <tt>(tx|ty)</tt>, or -1 if no such node exists.
-      @todo Replace other functions with this one
       */
     int find(QPointF pos, qreal tdelta) const;
     /**

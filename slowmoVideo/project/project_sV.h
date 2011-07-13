@@ -51,6 +51,9 @@ public:
     Project_sV(QString projectDir);
     ~Project_sV();
 
+    /// \todo generate ID here
+    QString initID();
+
     ProjectPreferences_sV* preferences() { return m_preferences; }
 
     void setProjectDir(QString projectDir);
@@ -72,6 +75,7 @@ public:
     RenderTask_sV *renderTask() { return m_renderTask; }
     void replaceRenderTask(RenderTask_sV *task);
 
+    /// Returns the length of the output video in seconds (distance from the first to the last node).
     float length() const;
 
 
@@ -79,7 +83,7 @@ public:
 
     QImage interpolateFrameAt(float time, const FrameSize frameSize,
                               const InterpolationType interpolation, float previousTime = -1) const
-    throw(FlowBuildingError);
+    throw(FlowBuildingError, InterpolationError);
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
@@ -95,6 +99,7 @@ public:
 
 private:
     QDir m_projDir;
+    QString m_projectID;
     QString m_projectFilename;
 
     ProjectPreferences_sV *m_preferences;

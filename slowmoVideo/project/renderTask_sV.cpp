@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "renderTask_sV.h"
 #include "abstractRenderTarget_sV.h"
+#include "emptyFrameSource_sV.h"
 
 #include <QImage>
 #include <QMetaObject>
@@ -98,6 +99,10 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("No rendering target given! Aborting rendering.");
         return;
     }
+    if (dynamic_cast<EmptyFrameSource_sV*>(const_cast<Project_sV*>(m_project)->frameSource()) != NULL) {
+        m_stopRendering = true;
+        emit signalRenderingAborted("Empty frame source, cannot be rendered.");
+    }
 
     int frameNumber = (time - m_project->nodes()->startTime()) * m_fps;
     if (!m_stopRendering) {
@@ -123,6 +128,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;
                 emit signalRenderingAborted(err.message());
+            } catch (InterpolationError &err) {
+                emit signalItemDesc(err.message());
             }
 
             m_prevTime = srcTime;

@@ -130,14 +130,13 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
 }
 
 QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, const InterpolationType interpolation,
-                                      float previousTime) const throw(FlowBuildingError)
+                                      float previousTime) const throw(FlowBuildingError, InterpolationError)
 {
     float framePos = timeToFrame(time);
     float prevFramePos = -1;
     if (framePos > m_frameSource->framesCount()) {
-        qDebug() << "Requested frame " << framePos << ": Not within valid range. (" << m_frameSource->framesCount() << " frames)";
-        Q_ASSERT(false);
-        // TODO throw error
+        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
+                                 .arg(framePos).arg(m_frameSource->framesCount()));
     } else {
         qDebug() << "Source frame @" << time << " is " << framePos;
     }

@@ -43,6 +43,11 @@ public:
     /// Default constructor.
     FrameSourceError(QString msg);
 };
+class InterpolationError : public Error_sV {
+public:
+    /// Default constructor
+    InterpolationError(QString msg);
+};
 
 QString toString(const QSize& size);
 QString toString(const FrameSize &size);

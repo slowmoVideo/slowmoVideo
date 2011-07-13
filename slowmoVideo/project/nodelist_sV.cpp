@@ -16,8 +16,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 
-/// \todo adding nodes: check if inside bounds
-
 NodeList_sV::NodeList_sV(float minDist) :
     m_maxY(10),
     m_list(),
@@ -86,9 +84,14 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
     return srcTime;
 }
 
-bool NodeList_sV::add(const Node_sV node)
+bool NodeList_sV::add(Node_sV node)
 {
     bool add = true;
+
+    qDebug() << "Before adding: " << *this;
+
+    node.setX(qMax(.0, node.x()));
+    node.setY(qMax(.0, qMin(m_maxY, node.y())));
 
     int pos = find(node.x());
     if (pos >= 0 && m_list.size() > pos) {
@@ -120,6 +123,8 @@ bool NodeList_sV::add(const Node_sV node)
         fixHandles(index-1);
         fixHandles(index);
     }
+
+    qDebug() << "After adding: " << *this;
 
     validate();
     return add;
@@ -185,7 +190,8 @@ bool NodeList_sV::validate() const
     for (int i = 0; i < m_list.size() && valid; i++) {
         valid =    m_list.at(i).x() >= 0
                 && m_list.at(i).y() >= 0
-                && m_list.at(i).x() - last >= m_minDist;
+                && m_list.at(i).x() - last >= m_minDist
+                && m_list.at(i).y() <= m_maxY;
         if (!valid) {
             qDebug() << "Invalid node position for node " << i << " (" << m_list.size() << " total); Distance is " << m_list.at(i).x() - last;
             qDebug() << "Positions: " << last << "/" << m_list.at(i).x();
@@ -335,7 +341,12 @@ void NodeList_sV::moveHandle(const NodeHandle_sV *handle, Node_sV relPos)
         if (nodeIndex > 0) {
             // Ensure that it does not overlap with the left node's handle (injectivity)
             otherNode = m_list.at(nodeIndex-1);
+            qDebug() << "Left node: " << otherNode;
+            qDebug() << "Right node: " << currentNode;
+            qDebug() << "Before overlapping check: " << relPos;
             relPos.setX(qMax(relPos.x(), -(currentNode->x() - otherNode.x() - otherNode.rightNodeHandle().x())));
+            qDebug() << "After overlapping check: " << relPos;
+            qDebug() << "Space left: " << currentNode->x() + relPos.x() - (otherNode.x() + otherNode.rightNodeHandle().x());
         }
         // Additionally the handle has to stay on the left of its node
         relPos.setX(qMin(relPos.x(), .0));
@@ -425,7 +436,6 @@ void NodeList_sV::set1xSpeed(qreal segmentTime)
             qDebug() << "1x speed would shoot over maximum time. Correcting.";
             y = m_maxY;
             qreal xNew = leftN->x() + (m_maxY - leftN->y());
-            /// \todo Setting y after adding the node (+sorting): Pointer points to the new node! Fix?
             rightN->setY(m_maxY);
             if (xNew - leftN->x() >= m_minDist) {
                 add(Node_sV(xNew, m_maxY));

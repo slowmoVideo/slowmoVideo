@@ -39,6 +39,8 @@ Node_sV::Node_sV(const Node_sV &other) :
     init();
     m_leftCurveType = other.m_leftCurveType;
     m_rightCurveType = other.m_rightCurveType;
+    Q_ASSERT(this == m_leftHandle.parentNode());
+    Q_ASSERT(this == m_rightHandle.parentNode());
 }
 
 void Node_sV::init()
@@ -143,6 +145,22 @@ void Node_sV::operator -=(const Node_sV& other)
     m_x -= other.m_x;
     m_y -= other.m_y;
 }
+void Node_sV::operator =(const Node_sV& other)
+{
+    qDebug() << "Operator= called with other = " << &other << "; this: " << this;
+    if (this != &other) {
+        qDebug() << "Other: " << other;
+        m_x = other.m_x;
+        m_y = other.m_y;
+        m_leftHandle.setX(other.leftNodeHandle().x());
+        m_leftHandle.setY(other.leftNodeHandle().y());
+        m_rightHandle.setX(other.rightNodeHandle().x());
+        m_rightHandle.setY(other.rightNodeHandle().y());
+        qDebug() << "This: " << *this;
+    }
+    Q_ASSERT(this == m_leftHandle.parentNode());
+    Q_ASSERT(this == m_rightHandle.parentNode());
+}
 
 
 
@@ -158,6 +176,6 @@ QDebug operator<<(QDebug qd, const Node_sV& n)
     qd.nospace() << "(";
     qd.nospace() << n.x() << "|" << n.y();
     if (n.selected()) { qd.nospace() << "|s"; }
-    qd.nospace() << ")";
+    qd.nospace() << ")@" << &n << " l: " << n.leftNodeHandle() << ", r: " << n.rightNodeHandle() << "\n";
     return qd.maybeSpace();
 }

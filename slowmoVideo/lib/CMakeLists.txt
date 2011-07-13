@@ -28,6 +28,8 @@ set(LIB_SRC_ARGS
 )
 
 set(LIB_SRC_FLOW
+  defs_sV.hpp
+  defs_sV.cpp
   flowRW_sV.cpp
   flowField_sV.cpp
 )

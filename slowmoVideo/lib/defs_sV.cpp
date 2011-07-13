@@ -20,6 +20,11 @@ FrameSourceError::FrameSourceError(QString msg) :
 {
     qDebug() << "Frame source error: " << msg;
 }
+InterpolationError::InterpolationError(QString msg) :
+    Error_sV(msg)
+{
+    qDebug() << "Interpolation error : " << msg;
+}
 
 QString toString(const QSize &size)
 {

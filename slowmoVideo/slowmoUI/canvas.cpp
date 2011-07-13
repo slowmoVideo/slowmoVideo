@@ -382,6 +382,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
             if (dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject) != NULL) {
                 const NodeHandle_sV *handle = dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject);
                 int index = m_nodes->indexOf(handle->parentNode());
+                if (index < 0) {
+                    qDebug () << "FAIL!";
+                }
                 qDebug() << "Moving handle" << handle << " of node " << handle->parentNode()
                          << QString(" (%1)").arg(index);
                 qDebug() << "Parent node x: " << handle->parentNode()->x();

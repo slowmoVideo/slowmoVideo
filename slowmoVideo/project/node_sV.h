@@ -35,6 +35,9 @@ public:
     Node_sV operator+(const Node_sV &other) const;
     void operator+=(const Node_sV &other);
     void operator-=(const Node_sV &other);
+    /// This assignment operator explicitly needs to be defined since otherwise
+    /// the handle's parent relationship gets lost (pointer to a temporary node is copied).
+    void operator =(const Node_sV &other);
 
     qreal x() const;
     qreal y() const;

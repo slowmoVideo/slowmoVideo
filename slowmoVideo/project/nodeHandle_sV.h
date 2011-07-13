@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "canvasObject_sV.h"
 #include <QtCore/QPointF>
+#include <QtCore/QDebug>
 
 class Node_sV;
 
@@ -32,5 +33,7 @@ public:
 private:
     Node_sV *m_parentNode;
 };
+
+QDebug operator<<(QDebug qd, const NodeHandle_sV& n);
 
 #endif // NODEHANDLE_SV_H

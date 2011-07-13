@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef FLOWRW_SV_H
 #define FLOWRW_SV_H
 
+#include "defs_sV.hpp"
 #include <string>
 
 class FlowField_sV;
@@ -18,7 +19,6 @@ class FlowField_sV;
 /**
   \brief Reads and writes Optical Flow fields.
   \see FlowField_sV
-  \todo Cast exception if the file is not a valid flow file
   */
 class FlowRW_sV
 {
@@ -54,7 +54,7 @@ public:
       \return Information about the flow file (like dimension); Does not read the whole file and is therefore faster than load(std::string).
       */
     static void save(std::string filename, FlowField_sV *flowField);
-    static FlowField_sV* load(std::string filename);
+    static FlowField_sV* load(std::string filename) throw(FlowBuildingError);
 
     static FlowInfo_sV readInfo(std::string filename);
 
