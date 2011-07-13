@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef FLOWRW_SV_H
 #define FLOWRW_SV_H
 
-#include "defs_sV.hpp"
+//#include "defs_sV.hpp"
 #include <string>
 
 class FlowField_sV;
@@ -44,6 +44,11 @@ public:
         }
     };
 
+    struct FlowRWError {
+        std::string message;
+        FlowRWError(std::string msg) : message(msg) {}
+    };
+
     /** \fn load(std::string)
       \return \c NULL, if the file could not be loaded, and the flow field otherwise.
       */
@@ -54,7 +59,7 @@ public:
       \return Information about the flow file (like dimension); Does not read the whole file and is therefore faster than load(std::string).
       */
     static void save(std::string filename, FlowField_sV *flowField);
-    static FlowField_sV* load(std::string filename) throw(FlowBuildingError);
+    static FlowField_sV* load(std::string filename) throw(FlowRWError);
 
     static FlowInfo_sV readInfo(std::string filename);
 

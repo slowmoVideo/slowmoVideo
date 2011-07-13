@@ -81,7 +81,11 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
         qDebug() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame;
     }
 
-    return FlowRW_sV::load(flowFileName.toStdString());
+    try {
+        return FlowRW_sV::load(flowFileName.toStdString());
+    } catch (FlowRW_sV::FlowRWError &err) {
+        throw FlowBuildingError(err.message.c_str());
+    }
 }
 
 const QString V3dFlowSource_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
