@@ -1436,7 +1436,7 @@ namespace V3D_GPU
 
       char const * uTexSpec = _uvBufferHighPrecision ? "rgba=32f tex2D" : "rgba=16f tex2D";
       char const * pTexSpec  = _pBufferHighPrecision ? "rgba=32f tex2D" : "rgba=16f tex2D";
-      char const * qTexSpec  = _pBufferHighPrecision ? "rgb=32f tex2D" : "rgb=16f tex2D";
+//      char const * qTexSpec  = _pBufferHighPrecision ? "rgb=32f tex2D" : "rgb=16f tex2D";
 
       for (int level = 0; level < _nLevels; ++level)
       {

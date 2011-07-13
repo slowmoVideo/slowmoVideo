@@ -82,7 +82,7 @@ namespace V3D
             _total_time += elapsed;
             if (_history)
             {
-               if (_count == _history_size)
+               if ((int)_count == _history_size)
                   _total_time -= _history[_history_index];
                else
                   ++_count;

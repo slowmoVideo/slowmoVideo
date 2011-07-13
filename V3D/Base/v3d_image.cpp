@@ -51,7 +51,6 @@ namespace
    pnm_getuint(FILE * const file, unsigned int& res)
    {
       char ch;
-      unsigned int i;
 
       do
       {
@@ -275,10 +274,10 @@ namespace V3D
 
          fread(pixels, width*height*3, 1, file);
 
-         for (int y = 0; y < height; ++y)
+         for (int y = 0; y < (int)height; ++y)
          {
             int const rowOfs = 3*width*y;
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < (int)width; ++x)
             {
                image(x, y, 0) = pixels[rowOfs + 3*x + 0];
                image(x, y, 1) = pixels[rowOfs + 3*x + 1];

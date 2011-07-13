@@ -198,7 +198,7 @@ namespace V3D
 
          int toOrig(int el) const
          {
-            assert(el >= 0 && el < _bwdMap.size());
+            assert(el >= 0 && el < (int)_bwdMap.size());
             return _bwdMap[el];
          }
 

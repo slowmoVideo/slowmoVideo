@@ -42,6 +42,7 @@ set (V3D_INCLUDE_DIRS ${V3D_DIR}/.)
 
 include_directories(${V3D_INCLUDE_DIRS} ${EXTRA_INC_DIRS})
 
+add_definitions(-DDISABLE_REDEFINITIONS)
 #--------------------------------------------------
 enable_feature (V3DLIB_ENABLE_LIBJPEG)
 enable_feature (V3DLIB_ENABLE_LIBPNG)

@@ -90,7 +90,7 @@ namespace V3D
          void copyFrom( const Image<Elem2> &im )
          {
             resize(im.width(),im.height(),im.numChannels());
-            for(int i=0; i<im.numChannels(); i++)
+            for(int i = 0; i < (int)im.numChannels(); i++)
                std::copy(im.begin(i),im.end(i),begin(i));
          }
 

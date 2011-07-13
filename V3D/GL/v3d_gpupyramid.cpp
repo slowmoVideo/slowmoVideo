@@ -132,19 +132,19 @@ namespace V3D_GPU
       {
          glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _pyrFbIDs[level]);
          glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _pyrTexID, level);
-         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid buffer");
+//         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid buffer");
       }
 
       for (int level = 0; level < nLevels-1; ++level)
       {
          glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tmpFbIDs[level]);
          glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _tmpTexID, level);
-         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp buffer");
+//         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp buffer");
       }
 
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tmp2FbID);
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _tmpTex2ID, 0);
-      bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp2 buffer");
+//      bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp2 buffer");
 
       checkGLErrorsHere0();
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -273,7 +273,7 @@ namespace V3D_GPU
    {
       int const W = (_width >> level);
       int const H = (_height >> level);
-      GLenum const textureTarget = GL_TEXTURE_2D;
+//      GLenum const textureTarget = GL_TEXTURE_2D;
 
 //    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _fbID);
 //    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _pyrTexID, level);
@@ -350,19 +350,19 @@ namespace V3D_GPU
       {
          glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _pyrFbIDs[level]);
          glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _pyrTexID, level);
-         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid buffer");
+//         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid buffer");
       }
 
       for (int level = 0; level < nLevels-1; ++level)
       {
          glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tmpFbIDs[level]);
          glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _tmpTexID, level);
-         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp buffer");
+//         bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp buffer");
       }
 
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tmp2FbID);
       glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _tmpTex2ID, 0);
-      bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp2 buffer");
+//      bool status = checkFrameBufferStatus(__FILE__, __LINE__, "pyramid tmp2 buffer");
 
       checkGLErrorsHere0();
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -502,7 +502,7 @@ namespace V3D_GPU
    {
       int const W = (_width >> level);
       int const H = (_height >> level);
-      GLenum const textureTarget = GL_TEXTURE_2D;
+//      GLenum const textureTarget = GL_TEXTURE_2D;
 
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _pyrFbIDs[level]);
       glViewport(0, 0, W, H);

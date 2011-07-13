@@ -510,7 +510,7 @@ namespace V3D_GPU
    {
       GLint curFboID;
       glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &curFboID);
-      return (_fboID == curFboID);
+      return ((int)_fboID == curFboID);
    }
 
    void
@@ -640,7 +640,7 @@ namespace V3D_GPU
       ostringstream oss;
       oss << "FBO operation (" << what << ") on unbound frame buffer attempted";
 
-      if (curFboID != _fboID)
+      if (curFboID != (int)_fboID)
       {
          raiseGLErrorHere2(oss.str().c_str(), this->_fboName);
          return false;
@@ -657,7 +657,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
-      while (errnum = glGetError())
+      while ((errnum = glGetError()))
       {
          errstr = reinterpret_cast<const char *>(gluErrorString(errnum));
          if (errstr)
@@ -680,7 +680,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
-      while (errnum = glGetError())
+      while ((errnum = glGetError()))
       {
          hasError = true;
          errstr = reinterpret_cast<const char *>(gluErrorString(errnum));
@@ -704,7 +704,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
-      while (errnum = glGetError())
+      while ((errnum = glGetError()))
       {
          errstr = reinterpret_cast<const char *>(gluErrorString(errnum));
          if (errstr)
