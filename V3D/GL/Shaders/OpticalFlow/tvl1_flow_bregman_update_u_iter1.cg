@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_bregman_update_u_iter1 = STRINGIFY(
+#endif
+
 void main(uniform sampler2D u_tex   : TEXUNIT0, // (u^x, u^y)
           uniform sampler2D vd_tex  : TEXUNIT1, // (v^x, v^y, d^x, d^y)
           uniform sampler2D p_tex : TEXUNIT2,
@@ -42,3 +46,7 @@ void main(uniform sampler2D u_tex   : TEXUNIT0, // (u^x, u^y)
    u_out.xy = u_new;
    u_out.zw = div_p + vd.xy - vd.zw;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

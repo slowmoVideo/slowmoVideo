@@ -1,3 +1,6 @@
+
+#include "config.h"
+
 #if defined(V3DLIB_ENABLE_GPGPU)
 
 #include "v3d_gpubase.h"

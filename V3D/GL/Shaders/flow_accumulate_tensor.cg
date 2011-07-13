@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string flow_accumulate_tensor = STRINGIFY(
+#endif
+
 // T1 holds the elements 11..22, T3 holds the last column
 void createTensor(float3 v, out float3 T1, out float3 T2)
 {
@@ -105,3 +109,6 @@ void main(uniform sampler2D warped_tex : TEXUNIT0, // (It, Ix, Iy)
    tensor1_out = res1;
    tensor2_out = res2;
 }
+#ifdef INCLUDE_SOURCE
+);
+#endif

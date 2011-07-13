@@ -1,5 +1,7 @@
 // -*- C++ -*-
 
+#include "config.h"
+
 #ifndef V3D_TIMER_H
 #define V3D_TIMER_H
 

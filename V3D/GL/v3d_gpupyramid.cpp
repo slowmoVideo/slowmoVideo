@@ -1,3 +1,5 @@
+#include "config.h"
+
 #if defined(V3DLIB_GPGPU_ENABLE_CG)
 
 #include "v3d_gpupyramid.h"
@@ -171,7 +173,11 @@ namespace V3D_GPU
       if (pass1HorizShader == 0)
       {
          pass1HorizShader = new Cg_FragmentProgram("PyramidCreator::buildPyramidForGrayscaleImage::pass1HorizShader");
+#ifdef INCLUDE_SOURCE
+         pass1HorizShader->setProgram(GlShaderStrings::pyramid_pass1v.c_str());
+#else
          pass1HorizShader->setProgramFromFile("pyramid_pass1v.cg");
+#endif
          pass1HorizShader->compile();
          checkGLErrorsHere0();
       } // end if (pass1HorizShader == 0)
@@ -179,7 +185,11 @@ namespace V3D_GPU
       if (pass1VertShader == 0)
       {
          pass1VertShader = new Cg_FragmentProgram("PyramidCreator::buildPyramidForGrayscaleImage::pass1VertShader");
+#ifdef INCLUDE_SOURCE
+         pass1VertShader->setProgram(GlShaderStrings::pyramid_pass1h.c_str());
+#else
          pass1VertShader->setProgramFromFile("pyramid_pass1h.cg");
+#endif
          pass1VertShader->compile();
          checkGLErrorsHere0();
       } // end if (pass1VertShader == 0)
@@ -187,7 +197,11 @@ namespace V3D_GPU
       if (pass2Shader == 0)
       {
          pass2Shader = new Cg_FragmentProgram("PyramidCreator::buildPyramidForGrayscaleImage::pass2Shader");
+#ifdef INCLUDE_SOURCE
+         pass2Shader->setProgram(GlShaderStrings::pyramid_pass2.c_str());
+#else
          pass2Shader->setProgramFromFile("pyramid_pass2.cg");
+#endif
          pass2Shader->compile();
          checkGLErrorsHere0();
       } // end if (pass2Shader == 0)
@@ -362,7 +376,11 @@ namespace V3D_GPU
       {
          _pass1HorizShader
             = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1HorizShader");
+#ifdef INCLUDE_SOURCE
+         _pass1HorizShader->setProgram(GlShaderStrings::pyramid_with_derivative_pass1v.c_str());
+#else
          _pass1HorizShader->setProgramFromFile("pyramid_with_derivative_pass1v.cg");
+#endif
          _pass1HorizShader->compile(args);
          checkGLErrorsHere0();
       } // end if (_pass1HorizShader == 0)
@@ -371,7 +389,11 @@ namespace V3D_GPU
       {
          _pass1VertShader
             = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1VertShader");
+#ifdef INCLUDE_SOURCE
+         _pass1VertShader->setProgram(GlShaderStrings::pyramid_with_derivative_pass1h.c_str());
+#else
          _pass1VertShader->setProgramFromFile("pyramid_with_derivative_pass1h.cg");
+#endif
          _pass1VertShader->compile(args);
          checkGLErrorsHere0();
       } // end if (_pass1VertShader == 0)
@@ -380,7 +402,11 @@ namespace V3D_GPU
       {
          _pass2Shader
             = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass2Shader");
+#ifdef INCLUDE_SOURCE
+         _pass2Shader->setProgram(GlShaderStrings::pyramid_with_derivative_pass2.c_str());
+#else
          _pass2Shader->setProgramFromFile("pyramid_with_derivative_pass2.cg");
+#endif
          _pass2Shader->compile();
          checkGLErrorsHere0();
       } // end if (_pass2Shader == 0)

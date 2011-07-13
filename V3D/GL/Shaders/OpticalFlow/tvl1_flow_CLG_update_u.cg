@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_CLG_update_u = STRINGIFY(
+#endif
+
 #if 0
 
 float evalObjective(float tau, float3 T1, float3 T2, float2 uv, float2 g, float lambda, float2 eps_primal)
@@ -171,4 +175,8 @@ void main(uniform sampler2D uv_src     : TEXUNIT0, // u
    uv_out.z  = 0;
 }
 
+#endif
+
+#ifdef INCLUDE_SOURCE
+);
 #endif

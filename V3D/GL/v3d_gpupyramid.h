@@ -1,4 +1,7 @@
 // -*- C++ -*-
+
+#include "config.h"
+
 #ifndef V3D_GPU_PYRAMID_H
 #define V3D_GPU_PYRAMID_H
 

@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string pyramid_with_derivative_pass1h = STRINGIFY(
+#endif
+
 #ifndef PRESMOOTHING
 #define PRESMOOTHING 0
 #endif
@@ -166,7 +170,11 @@ void main(uniform sampler2D src_tex : TEXUNIT0,
 
    float4 const df1 = float4(0, -1, 0, 1) / 2.0f;
 
-   half4 rawVal1, rawVal2, rawVal3, rawVal4, rawVal5;
+   half4 rawVal1;
+   half4 rawVal2;
+   half4 rawVal3;
+   half4 rawVal4;
+   half4 rawVal5;
 
    rawVal1 = tex2D(src_tex, st0.zw);
    rawVal2 = tex2D(src_tex, st1.xy);
@@ -174,7 +182,8 @@ void main(uniform sampler2D src_tex : TEXUNIT0,
    rawVal4 = tex2D(src_tex, st2.xy);
    rawVal5 = tex2D(src_tex, st2.zw);
 
-   float4 g1, dg1;
+   float4 g1;
+   float4 dg1;
 
    g1.x  = pack_2half(rawVal1.xy);
    dg1.x = pack_2half(rawVal1.zw);
@@ -194,3 +203,7 @@ void main(uniform sampler2D src_tex : TEXUNIT0,
    color.y = dv_dx;
    color.z = dv_dy;
 }
+
+#ifdef INCLUDE_SOURCE
+   );
+#endif

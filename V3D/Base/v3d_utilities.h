@@ -1,4 +1,7 @@
 // -*- C++ -*-
+
+#include "config.h"
+
 // General utility procedures that do not fit anywhere else.
 #ifndef V3D_UTILITIES_H
 #define V3D_UTILITIES_H

@@ -59,6 +59,8 @@ enable_feature_libraries (V3DLIB_ENABLE_OPENCV highgui cvaux cv)
 #set (CMAKE_BUILD_TYPE Release)
 set (CMAKE_BUILD_TYPE Debug)
 
+include_directories(Config)
+
 set (GL_SRC
     GL/v3d_gpubase.cpp
     GL/v3d_gpuflow.cpp
@@ -68,6 +70,7 @@ set (GL_SRC
 
 set (ALL_SRC
     ${GL_SRC}
+    Config/config.h
     Base/v3d_image.cpp
     Base/v3d_imageprocessing.h
     Base/v3d_exception.h
@@ -115,7 +118,7 @@ set (SHADERS
     ./GL/Shaders/flow_warp_image.cg
 )
 
-foreach (FILENAME "${SHADERS}")
+foreach (FILENAME ${SHADERS})
     set(FILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
     set(FILE_DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
     configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)

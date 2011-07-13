@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_relaxed_update_uv_with_gain = STRINGIFY(
+#endif
+
 float3 thresholdingStep(float3 a, float3 c, float b)
 {
    float const d = dot(a*a, c);
@@ -76,3 +80,7 @@ void main(uniform sampler2D uv_src     : TEXUNIT0, // (u, v, alpha)
    uv_out.xy = UV.xy + theta.x * div_p;
    uv_out.z  = UV.z  + theta_delta * div_q;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

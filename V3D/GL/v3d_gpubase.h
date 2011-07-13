@@ -1,4 +1,7 @@
 // -*- C++ -*-
+
+#include "config.h"
+
 #ifndef V3D_GPUBASE_H
 #define V3D_GPUBASE_H
 

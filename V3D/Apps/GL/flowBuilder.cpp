@@ -185,10 +185,14 @@ int main( int argc, char** argv)
                "[ <lambda=" << lambda << "> [<nIterations=" << nIterations << ">] ]" << std::endl;
        return -1;
    }
+#ifdef INCLUDE_SOURCE
+   std::cout << "Using internal shader files." << std::endl;
+#else
    if (getenv("V3D_SHADER_DIR") == NULL) {
        std::cout << "V3D_SHADER_DIR environment variable needs to be set!";
        return -2;
    }
+#endif
 
    loadImageFile(argv[1], leftImage);
    loadImageFile(argv[2], rightImage);

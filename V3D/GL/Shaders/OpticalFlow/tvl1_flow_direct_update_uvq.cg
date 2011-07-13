@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_direct_update_uvq = STRINGIFY(
+#endif
+
 void main(uniform sampler2D uvq_src    : TEXUNIT0, // (u, v)
           uniform sampler2D p_uv_src   : TEXUNIT1, // (p1_u, p1_v, p2_u, p2_v)
           uniform sampler2D warped_tex : TEXUNIT2, // (c, Ix, Iy)
@@ -55,3 +59,7 @@ void main(uniform sampler2D uvq_src    : TEXUNIT0, // (u, v)
 
    uvq_out = uvq;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

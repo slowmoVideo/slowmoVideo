@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_relaxed_update_p = STRINGIFY(
+#endif
+
 float2 tv(float4 uv_grad)
 {
    return float2(length(uv_grad.xz), length(uv_grad.yw));
@@ -37,3 +41,7 @@ void main(uniform sampler2D uv_src     : TEXUNIT0, // (u, v)
 
    p_uv_out = p_uv;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

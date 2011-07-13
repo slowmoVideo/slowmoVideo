@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_CLG_PD_update_q = STRINGIFY(
+#endif
+
 void main(uniform sampler2D uv_src      : TEXUNIT0, // u
           uniform sampler2D q_src       : TEXUNIT2,
           uniform sampler2D tensor1_tex : TEXUNIT3, // (a11, a12, a22)
@@ -27,3 +31,7 @@ void main(uniform sampler2D uv_src      : TEXUNIT0, // u
    float const denom = max(1.0f, lambda.y * length(q));
    q_out = q / denom;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

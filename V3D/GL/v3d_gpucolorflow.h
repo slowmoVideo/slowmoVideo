@@ -1,5 +1,7 @@
 // -*- C++ -*-
 
+#include "config.h"
+
 #ifndef V3D_GPU_COLOR_FLOW_H
 #define V3D_GPU_COLOR_FLOW_H
 

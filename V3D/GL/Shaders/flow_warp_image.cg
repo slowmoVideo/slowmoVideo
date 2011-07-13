@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string flow_warp_image = STRINGIFY(
+#endif
+
 float signum(float x)
 {
    return (x < 0) ? -1 : 1;
@@ -49,7 +53,8 @@ void main(uniform sampler2D uv_src : TEXTURE0, // (u, v)
    float2 const dt0 = float2(0, 1);
    float2 const ds = float2(0.5, 0);
    float2 const dt = float2(0, 0.5);
-   float2 I0grad, I1grad;
+   float2 I0grad;
+   float2 I1grad;
    I0grad.x = 0.5f * (tex2D(I0_tex, st0 + st3.xy*ds0).x - tex2D(I0_tex, st0 - st3.xy*ds0).x);
    I0grad.y = 0.5f * (tex2D(I0_tex, st0 + st3.xy*dt0).x - tex2D(I0_tex, st0 - st3.xy*dt0).x);
    I1grad.x = tex2D(I1_tex, st0 + st3.xy*(uv+ds)).x - tex2D(I1_tex, st0 + st3.xy*(uv-ds)).x;
@@ -78,3 +83,7 @@ void main(uniform sampler2D uv_src : TEXTURE0, // (u, v)
    color_out.yz = I1.yz / len;
 #endif
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

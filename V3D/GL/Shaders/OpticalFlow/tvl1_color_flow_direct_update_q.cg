@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_color_flow_direct_update_q = STRINGIFY(
+#endif
+
 void main(uniform sampler2D uv_src       : TEXUNIT0, // (u, v)
           uniform sampler2D q_src        : TEXUNIT2,
           uniform sampler2D warped_R_tex : TEXUNIT3, // (c, Ix, Iy)
@@ -38,3 +42,7 @@ void main(uniform sampler2D uv_src       : TEXUNIT0, // (u, v)
    q += timestep * b;
    q_out = clamp(q, -lambda_q*normalizer, lambda_q*normalizer);
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

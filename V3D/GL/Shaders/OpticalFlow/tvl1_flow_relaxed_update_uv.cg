@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_relaxed_update_uv = STRINGIFY(
+#endif
+
 float thresholdingStep(float a2, float b, float lambda_theta)
 {
    float lam_a2 = lambda_theta * a2;
@@ -59,3 +63,7 @@ void main(uniform sampler2D uv_src     : TEXUNIT0, // (u, v)
    uv_out.xy = UV + theta * div_p;
    uv_out.z  = 0;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

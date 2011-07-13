@@ -1,4 +1,7 @@
 // -*- C++ -*-
+
+#include "config.h"
+
 #ifndef V3D_IMAGE_H
 #define V3D_IMAGE_H
 

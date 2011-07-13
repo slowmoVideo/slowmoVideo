@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string pyramid_with_derivative_pass1v = STRINGIFY(
+#endif
+
 #ifndef PRESMOOTHING
 #define PRESMOOTHING 0
 #endif
@@ -124,3 +128,7 @@ void main(uniform sampler2D src_tex : TEXUNIT0,
    color.xy = unpack_2half(v);
    color.zw = unpack_2half(dv);
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

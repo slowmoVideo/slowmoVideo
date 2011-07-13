@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_color_flow_QR_update_uv = STRINGIFY(
+#endif
+
 float3 thresholdingStep(float3 a2, float3 b, float lambda_theta)
 {
    float3 lam_a2 = lambda_theta * a2;
@@ -66,3 +70,7 @@ void main(uniform sampler2D uv_src       : TEXUNIT0, // (u, v)
    UV += uv;
    uv_out.xy = UV + theta * div_p;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

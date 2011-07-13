@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_DR_update_v = STRINGIFY(
+#endif
+
 float thresholdingStep(float a2, float b, float lambda)
 {
    float lam_a2 = lambda * a2;
@@ -27,3 +31,7 @@ void main(uniform sampler2D u_src   : TEXUNIT0, // (u^x, u^y)
    float step = thresholdingStep(r2, c, lambda_theta);
    v_out.xy = v + vv + step*warped.yz - u;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

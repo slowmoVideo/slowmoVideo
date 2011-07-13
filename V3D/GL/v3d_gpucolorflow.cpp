@@ -1,3 +1,5 @@
+#include "config.h"
+
 #if defined(V3DLIB_GPGPU_ENABLE_CG)
 
 #include "Base/v3d_utilities.h"
@@ -170,15 +172,21 @@ namespace V3D_GPU
       TVL1_ColorFlowEstimatorBase::allocate(W, H);
 
       _shader_uv = new Cg_FragmentProgram("tvl1_color_flow_direct_update_uv");
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_direct_update_uv.cg");
-      _shader_uv->compile();
-
       _shader_q = new Cg_FragmentProgram("tvl1_color_flow_direct_update_q");
-      _shader_q->setProgramFromFile("OpticalFlow/tvl1_color_flow_direct_update_q.cg");
-      _shader_q->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_direct_update_p");
+
+#ifdef INCLUDE_SOURCE
+      _shader_uv->setProgram(GlShaderStrings::tvl1_color_flow_direct_update_uv.c_str());
+      _shader_q->setProgram(GlShaderStrings::tvl1_color_flow_direct_update_q.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_direct_update_p.c_str());
+#else
+      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_direct_update_uv.cg");
+      _shader_q->setProgramFromFile("OpticalFlow/tvl1_color_flow_direct_update_q.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_direct_update_p.cg");
+#endif
+
+      _shader_q->compile();
+      _shader_uv->compile();
       _shader_p->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);
@@ -349,15 +357,21 @@ namespace V3D_GPU
       TVL1_ColorFlowEstimatorBase::allocate(W, H);
 
       _shader_uv = new Cg_FragmentProgram("tvl1_color_flow_new_update_uv");
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_new_update_uv.cg");
-      _shader_uv->compile();
-
       _shader_q = new Cg_FragmentProgram("tvl1_color_flow_new_update_q");
-      _shader_q->setProgramFromFile("OpticalFlow/tvl1_color_flow_new_update_q.cg");
-      _shader_q->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_new_update_p");
+
+#ifdef INCLUDE_SOURCE
+      _shader_uv->setProgram(GlShaderStrings::tvl1_color_flow_new_update_uv.c_str());
+//      _shader_p->setProgram(GlShaderStrings::tvl1_color_flow_new_update_p.c_str());   // Does not exist anywhere ...
+      _shader_q->setProgram(GlShaderStrings::tvl1_color_flow_new_update_q.c_str());
+#else
+      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_new_update_uv.cg");
+      _shader_q->setProgramFromFile("OpticalFlow/tvl1_color_flow_new_update_q.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_new_update_p.cg");
+#endif
+
+      _shader_uv->compile();
+      _shader_q->compile();
       _shader_p->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);
@@ -527,12 +541,16 @@ namespace V3D_GPU
       TVL1_ColorFlowEstimatorBase::allocate(W, H);
 
       _shader_uv = new Cg_FragmentProgram("tvl1_color_flow_new_update_uv");
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_QR_update_uv.cg");
-      _shader_uv->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_relaxed_update_p");
+#ifdef INCLUDE_SOURCE
+      _shader_uv->setProgram(GlShaderStrings::tvl1_color_flow_QR_update_uv.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_new_update_p.c_str());
+#else
+      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_QR_update_uv.cg");
       //_shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_p.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_new_update_p.cg");
+#endif
+      _shader_uv->compile();
       _shader_p->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);

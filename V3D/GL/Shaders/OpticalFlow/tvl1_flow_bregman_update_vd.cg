@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_bregman_update_vd = STRINGIFY(
+#endif
+
 float thresholdingStep(float a2, float b, float lambda)
 {
    float lam_a2 = lambda * a2;
@@ -30,3 +34,7 @@ void main(uniform sampler2D u_src   : TEXUNIT0, // (u^x, u^y)
    vd.zw = -step*warped.yz;
    vd_out = vd;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

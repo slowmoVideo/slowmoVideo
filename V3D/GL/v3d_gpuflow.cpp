@@ -1,3 +1,6 @@
+
+#include "config.h"
+
 #if defined(V3DLIB_GPGPU_ENABLE_CG)
 
 #include "Base/v3d_utilities.h"
@@ -196,11 +199,17 @@ namespace V3D_GPU
       TVL1_FlowEstimatorBase::allocate(W, H);
 
       _shader_uv = new Cg_FragmentProgram("tvl1_flow_relaxed_update_uv");
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_uv.cg");
-      _shader_uv->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_relaxed_update_p");
+
+#ifdef INCLUDE_SOURCE
+      _shader_uv->setProgram(GlShaderStrings::tvl1_flow_relaxed_update_uv.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_relaxed_update_p.c_str());
+#else
+      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_uv.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_p.cg");
+#endif
+
+      _shader_uv->compile();
       _shader_p->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);
@@ -340,7 +349,11 @@ namespace V3D_GPU
       if (!shader)
       {
          shader = new Cg_FragmentProgram("tvl1_flow_relaxed_compute_UV");
+#ifdef INCLUDE_SOURCE
+         shader->setProgram(GlShaderStrings::tvl1_flow_relaxed_compute_UV.c_str());
+#else
          shader->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_compute_UV.cg");
+#endif
          shader->compile();
       } // end if
 
@@ -374,15 +387,21 @@ namespace V3D_GPU
       TVL1_FlowEstimatorBase::allocate(W, H);
 
       _shader_uv = new Cg_FragmentProgram("tvl1_flow_relaxed_update_uv_with_gain");
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_uv_with_gain.cg");
-      _shader_uv->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_relaxed_update_p");
-      _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_p.cg");
-      _shader_p->compile();
-
       _shader_q = new Cg_FragmentProgram("tvl1_flow_relaxed_update_q_with_gain");
+
+#ifdef INCLUDE_SOURCE
+      _shader_uv->setProgram(GlShaderStrings::tvl1_flow_relaxed_update_uv_with_gain.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_relaxed_update_p.c_str());
+      _shader_q->setProgram(GlShaderStrings::tvl1_flow_relaxed_update_q_with_gain.c_str());
+#else
+      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_uv_with_gain.cg");
+      _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_p.cg");
       _shader_q->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_q_with_gain.cg");
+#endif
+
+      _shader_uv->compile();
+      _shader_p->compile();
       _shader_q->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);
@@ -571,11 +590,17 @@ namespace V3D_GPU
       TVL1_FlowEstimatorBase::allocate(W, H);
 
       _shader_uvq = new Cg_FragmentProgram("tvl1_flow_direct_update_uvq");
-      _shader_uvq->setProgramFromFile("OpticalFlow/tvl1_flow_direct_update_uvq.cg");
-      _shader_uvq->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_direct_update_p");
+
+#ifdef INCLUDE_SOURCE
+      _shader_uvq->setProgram(GlShaderStrings::tvl1_flow_direct_update_uvq.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_direct_update_p.c_str());
+#else
+      _shader_uvq->setProgramFromFile("OpticalFlow/tvl1_flow_direct_update_uvq.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_direct_update_p.cg");
+#endif
+
+      _shader_uvq->compile();
       _shader_p->compile();
 
       _uqBuffer1Pyramid.resize(_nLevels);
@@ -1206,11 +1231,17 @@ namespace V3D_GPU
       TVL1_FlowEstimatorBase::allocate(W, H);
 
       _shader_u = new Cg_FragmentProgram("tvl1_flow_CLG_update_u");
-      _shader_u->setProgramFromFile("OpticalFlow/tvl1_flow_CLG_update_u.cg");
-      _shader_u->compile();
-
       _shader_p = new Cg_FragmentProgram("tvl1_flow_CLG_update_p");
+
+#ifdef INCLUDE_SOURCE
+      _shader_u->setProgram(GlShaderStrings::tvl1_flow_CLG_update_u.c_str());
+      _shader_p->setProgram(GlShaderStrings::tvl1_flow_new_update_p.c_str());
+#else
+      _shader_u->setProgramFromFile("OpticalFlow/tvl1_flow_CLG_update_u.cg");
       _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_new_update_p.cg");
+#endif
+
+      _shader_u->compile();
       _shader_p->compile();
 
       _uBuffer1Pyramid.resize(_nLevels);
@@ -1595,7 +1626,11 @@ namespace V3D_GPU
       if (shader == 0)
       {
          shader = new Cg_FragmentProgram("v3d_gpuflow::warpImageWithFlowField::shader");
+#ifdef INCLUDE_SOURCE
+         shader->setProgram(GlShaderStrings::flow_warp_image.c_str());
+#else
          shader->setProgramFromFile("flow_warp_image.cg");
+#endif
          shader->compile();
          checkGLErrorsHere0();
       }
@@ -1650,7 +1685,11 @@ namespace V3D_GPU
       if (shader == 0)
       {
          shader = new Cg_FragmentProgram("v3d_gpuflow::warpImageWithFlowFieldAndGain::shader");
+#ifdef INCLUDE_SOURCE
+         shader->setProgram(GlShaderStrings::flow_warp_image_with_gain.c_str());
+#else
          shader->setProgramFromFile("flow_warp_image_with_gain.cg");
+#endif
          shader->compile();
          checkGLErrorsHere0();
       }
@@ -1710,7 +1749,11 @@ namespace V3D_GPU
       if (shader == 0)
       {
          shader = new Cg_FragmentProgram("v3d_gpuflow::accumulateStructureTensor::shader");
+#ifdef INCLUDE_SOURCE
+         shader->setProgram(GlShaderStrings::flow_accumulate_tensor.c_str());
+#else
          shader->setProgramFromFile("flow_accumulate_tensor.cg");
+#endif
          shader->compile();
          checkGLErrorsHere0();
       }
@@ -1748,7 +1791,11 @@ namespace V3D_GPU
       if (shader == 0)
       {
          shader = new Cg_FragmentProgram("v3d_gpuflow::computeCholeskyFromTensor::shader");
+#ifdef INCLUDE_SOURCE
+         shader->setProgram(GlShaderStrings::flow_cholesky_3x3.c_str());
+#else
          shader->setProgramFromFile("flow_cholesky_3x3.cg");
+#endif
          shader->compile();
          checkGLErrorsHere0();
       }

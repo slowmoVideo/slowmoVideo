@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_relaxed_update_q_with_gain = STRINGIFY(
+#endif
+
 void main(uniform sampler2D uv_src : TEXUNIT0, // (u, v, gain)
           uniform sampler2D q_src  : TEXUNIT1, // (q1, q2)
                   float2 st0  : TEXCOORD0,
@@ -33,3 +37,7 @@ void main(uniform sampler2D uv_src : TEXUNIT0, // (u, v, gain)
    q_out.yz = 0;
 #endif
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string flow_cholesky_3x3 = STRINGIFY(
+#endif
+
 float const eps = 1e-10f;
 
 float square_root(float x)
@@ -23,3 +27,7 @@ void main(uniform sampler2D tensor1_tex : TEXUNIT0, // (a11, a12, a22)
    R2_out.y = (t2.y - R1_out.y*R2_out.x) / R1_out.z;  // r23 = (a23 - r12*r13)/r22
    R2_out.z = square_root(t2.z - dot(R2_out.xy, R2_out.xy)); // r33 = sqrt(a33 - r13^2 - r23^2)
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

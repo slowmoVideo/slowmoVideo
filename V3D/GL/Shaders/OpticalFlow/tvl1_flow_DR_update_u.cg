@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string tvl1_flow_DR_update_u = STRINGIFY(
+#endif
+
 void main(uniform sampler2D v_src    : TEXUNIT1, // (v^x, v^y)
           uniform sampler2D p_uv_src : TEXUNIT2, // (p1_u, p1_v, p2_u, p2_v)
                   float2 st0  : TEXCOORD0,
@@ -29,3 +33,7 @@ void main(uniform sampler2D v_src    : TEXUNIT1, // (v^x, v^y)
 
    u_out.xy = v - theta*div_p;
 }
+
+#ifdef INCLUDE_SOURCE
+);
+#endif

@@ -1,3 +1,7 @@
+#ifdef INCLUDE_SOURCE
+static std::string pyramid_pass1v = STRINGIFY(
+#endif
+
 void main(uniform sampler2D src_tex : TEXUNIT0,
                             float4 st0 : TEXCOORD0,
                             float4 st1 : TEXCOORD1,
@@ -25,3 +29,7 @@ void main(uniform sampler2D src_tex : TEXUNIT0,
 
    color = unpack_4ubyte(v);
 }
+
+#ifdef INCLUDE_SOURCE
+   );
+#endif
