@@ -1,5 +1,5 @@
 
-#include "ffmpegTestEncode.h"
+#include "../lib/ffmpegEncode_sV.h"
 
 int main()
 {

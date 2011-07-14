@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../project/projectPreferences_sV.h"
 #include "../project/renderTask_sV.h"
 #include "../project/imagesRenderTarget_sV.h"
+#include "../project/videoRenderTarget_sV.h"
 
 #include <QButtonGroup>
 #include <QFileDialog>
@@ -43,6 +44,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     m_targetGroup = new QButtonGroup(this);
     m_targetGroup->addButton(ui->radioImages);
     m_targetGroup->addButton(ui->radioVideo);
+    ui->radioImages->setChecked(true);
 
     ui->cbSize->addItem("Original size", QVariant(FrameSize_Orig));
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
@@ -58,16 +60,23 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     }
 
     bool b = true;
+    b &= connect(m_targetGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateRenderTarget()));
+
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+
     b &= connect(ui->cbFps, SIGNAL(editTextChanged(QString)), this, SLOT(slotValidate()));
 //    b &= connect(ui->cbFps, SIGNAL(currentIndexChanged(int)), this, SLOT(slotValidate())); // necessary?
+
     b &= connect(ui->imagesOutputDir, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
     b &= connect(ui->imagesFilenamePattern, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    b &= connect(ui->videoOutputFile, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+
     b &= connect(ui->bImagesBrowseDir, SIGNAL(clicked()), this, SLOT(slotBrowseImagesDir()));
+    b &= connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
     Q_ASSERT(b);
 
-    slotValidate();
+    slotUpdateRenderTarget();
 }
 
 RenderingDialog::~RenderingDialog()
@@ -89,10 +98,19 @@ RenderTask_sV* RenderingDialog::buildTask()
         task->setFPS(fps);
         task->setSize(size);
         task->setInterpolationType(interpolation);
-        ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV();
-        renderTarget->setFilenamePattern(imagesFilenamePattern);
-        renderTarget->setTargetDir(imagesOutputDir);
-        task->setRenderTarget(renderTarget);
+
+        if (ui->radioImages->isChecked()) {
+            ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);
+            renderTarget->setFilenamePattern(imagesFilenamePattern);
+            renderTarget->setTargetDir(imagesOutputDir);
+            task->setRenderTarget(renderTarget);
+        } else if (ui->radioVideo->isChecked()) {
+            VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
+            renderTarget->setTargetFile(ui->videoOutputFile->text());
+            task->setRenderTarget(renderTarget);
+        } else {
+            Q_ASSERT(false);
+        }
 
         m_project->preferences()->imagesOutputDir() = imagesOutputDir;
         m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
@@ -116,23 +134,41 @@ bool RenderingDialog::slotValidate()
         ui->cbFps->setStyleSheet(QString("QComboBox { background-color: %1; }").arg(Colours_sV::colBad.name()));
     }
 
-    if (ui->imagesFilenamePattern->text().contains("%1")) {
-        ui->imagesFilenamePattern->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
-    } else {
-        ok = false;
-        ui->imagesFilenamePattern->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
-    }
+    if (ui->radioImages->isChecked()) {
+        if (ui->imagesFilenamePattern->text().contains("%1")) {
+            ui->imagesFilenamePattern->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        } else {
+            ok = false;
+            ui->imagesFilenamePattern->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        }
 
-    if (ui->imagesOutputDir->text().length() > 0) {
-        ui->imagesOutputDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        if (ui->imagesOutputDir->text().length() > 0) {
+            ui->imagesOutputDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        } else {
+            ok = false;
+            ui->imagesOutputDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        }
+    } else if (ui->radioVideo->isChecked()) {
+        if (ui->videoOutputFile->text().length() > 0) {
+            ui->videoOutputFile->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        } else {
+            ok = false;
+            ui->videoOutputFile->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        }
     } else {
-        ok = false;
-        ui->imagesOutputDir->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        Q_ASSERT(false);
     }
 
     ui->bOk->setEnabled(ok);
 
     return ok;
+}
+
+void RenderingDialog::slotUpdateRenderTarget()
+{
+    ui->groupImages->setVisible(ui->radioImages->isChecked());
+    ui->groupVideo->setVisible(ui->radioVideo->isChecked());
+    slotValidate();
 }
 
 void RenderingDialog::slotBrowseImagesDir()
@@ -144,5 +180,16 @@ void RenderingDialog::slotBrowseImagesDir()
     dialog.setDirectory(ui->imagesOutputDir->text());
     if (dialog.exec() == QDialog::Accepted) {
         ui->imagesOutputDir->setText(dialog.selectedFiles().at(0));
+    }
+}
+
+void RenderingDialog::slotBrowseVideoFile()
+{
+    QFileDialog dialog(this, "Output video file");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setDirectory(QFileInfo(ui->videoOutputFile->text()).absolutePath());
+    if (dialog.exec() == QDialog::Accepted) {
+        ui->videoOutputFile->setText(dialog.selectedFiles().at(0));
     }
 }

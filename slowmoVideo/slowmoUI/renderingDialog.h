@@ -46,6 +46,8 @@ private:
 
 private slots:
     void slotBrowseImagesDir();
+    void slotBrowseVideoFile();
+    void slotUpdateRenderTarget();
 
 };
 

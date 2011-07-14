@@ -52,6 +52,12 @@ public:
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
 
+    /// Rendered frames per second
+    float fps() { return m_fps; }
+    /// Output frame resolution
+    QSize resolution() { return m_resolution; }
+
+
 public slots:
     void slotContinueRendering();
     void slotStopRendering();
@@ -76,9 +82,11 @@ private:
     float m_timeEnd;
 
     float m_fps;
+    QSize m_resolution;
     FrameSize m_frameSize;
     InterpolationType m_interpolationType;
 
+    bool m_initialized;
     bool m_stopRendering;
     qreal m_nextFrameTime;
 

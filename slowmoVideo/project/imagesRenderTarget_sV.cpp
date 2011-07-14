@@ -12,7 +12,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QDebug>
 
-ImagesRenderTarget_sV::ImagesRenderTarget_sV()
+ImagesRenderTarget_sV::ImagesRenderTarget_sV(RenderTask_sV *parentRenderTask) :
+    AbstractRenderTarget_sV(parentRenderTask)
 {
     m_targetDir = QDir::temp();
     m_filenamePattern = "rendered-%1.jpg";

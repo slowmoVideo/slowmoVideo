@@ -1,4 +1,4 @@
-/**
+/*
   This code is based on http://ffmpeg.org/doxygen/trunk/encoding_8c-source.html
   and has been adjusted with a lot of help from Tjoppen at irc.freenode.org#ffmpeg. (Thanks!)
   Copyright (c) 2001 Fabrice Bellard
@@ -9,17 +9,26 @@
   (at your option) any later version.
   */
 
-#include "ffmpegTestEncode.h"
+#include "ffmpegEncode_sV.h"
 #include <libswscale/swscale.h>
+
+void setErrorMessage(VideoOut_sV *video, const char *msg)
+{
+    if (video->errorMessage != NULL) {
+        free(video->errorMessage);
+    }
+    video->errorMessage = malloc(strlen(msg)+1);
+    strcpy(video->errorMessage, msg);
+}
 
 void prepareDefault(VideoOut_sV *video)
 {
-    prepare(video, 352, 288, 400000,
-                 1, 24, 0);
+    prepare(video, "/tmp/ffmpegTest.avi", 352, 288, 400000,
+                 1, 24);
 }
 
-void prepare(VideoOut_sV *video, const int width, const int height, const int bitrate,
-             const unsigned int numerator, const unsigned int denominator, const int eatsRGB)
+int prepare(VideoOut_sV *video, const char *filename, const int width, const int height, const int bitrate,
+             const unsigned int numerator, const unsigned int denominator)
 {
 
     /* must be called before using avcodec lib */
@@ -35,19 +44,22 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->codec = avcodec_find_encoder(CODEC_ID_MPEG1VIDEO);
     if (!video->codec) {
         fprintf(stderr, "codec not found\n");
-        exit(1);
+        setErrorMessage(video, "Selected codec could not be found!");
+        return -2;
     }
 
 
     video->frameNr = 0;
+    video->errorMessage = NULL;
 
     video->cc = avcodec_alloc_context3(video->codec);
 
-    /* put sample parameters */
     video->cc->bit_rate = bitrate;
+
     /* resolution must be a multiple of two */
     video->cc->width = width;
     video->cc->height = height;
+
     /* frames per second */
     video->cc->time_base= (AVRational){numerator, denominator};
     video->cc->gop_size = 10; /* emit one intra frame every ten frames */
@@ -55,10 +67,16 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->cc->pix_fmt = PIX_FMT_YUV420P;
 
 
+    printf("Settings: %dx%d, %d bits/s (tolerance: %d), %d fps\n", video->cc->width, video->cc->height,
+           video->cc->bit_rate, video->cc->bit_rate_tolerance, video->cc->time_base.num);
+    fflush(stdout);
+
+
     /* open it */
     if (avcodec_open(video->cc, video->codec) < 0) {
+        setErrorMessage(video, "Selected codec could not be opened, see debug output for details.");
         fprintf(stderr, "could not open codec\n");
-        exit(1);
+        return -3;
     }
 
 
@@ -76,11 +94,18 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->rgbLinesize[2] = 0;
     video->rgbLinesize[3] = 0;
 
-    video->filename = "/tmp/ffmpegTest.avi";
+    video->filename = malloc(strlen(filename)+1);
+    strcpy(video->filename, filename);
     video->file = fopen(video->filename, "wb");
     if (!video->file) {
         fprintf(stderr, "could not open %s\n", video->filename);
-        exit(1);
+        char *msg = "Could not open file: ";
+        char *msgAll = malloc(sizeof(char) * (strlen(filename) + strlen(msg)));
+        strcpy(msgAll, msg);
+        strcat(msgAll, filename);
+        setErrorMessage(video, msgAll);
+        free(msgAll);
+        return -1;
     }
 
     /* alloc image and output buffer */

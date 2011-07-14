@@ -8,16 +8,13 @@ set(SRCS
     test.cpp
 )
 
-add_library(encode STATIC ffmpegTestEncode.c)
-target_link_libraries(encode ${FFMPEG_LIBRARIES})
-
 add_executable(Test ${SRCS})
 target_link_libraries(Test sVproj ${QT_LIBRARIES})
 
 add_executable(encodeTest encodeTest.c)
-target_link_libraries(encodeTest encode ${FFMPEG_LIBRARIES})
+target_link_libraries(encodeTest sVencode ${FFMPEG_LIBRARIES})
 
 add_executable(encodeFramesTest ffmpegTestEncodeFrames.cpp)
-target_link_libraries(encodeFramesTest encode ${FFMPEG_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(encodeFramesTest sVencode ${FFMPEG_LIBRARIES} ${QT_LIBRARIES})
 
 install(TARGETS Test DESTINATION bin)

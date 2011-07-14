@@ -15,6 +15,7 @@ set(SRCS_PROJ
   emptyFrameSource_sV.cpp
   abstractRenderTarget_sV.cpp
   imagesRenderTarget_sV.cpp
+  videoRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
   v3dFlowSource_sV.cpp
   canvasObject_sV.h
@@ -32,4 +33,4 @@ set(SRCS_MOC
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 add_library(sVproj STATIC ${SRCS_PROJ} ${MOC_OUT})
-target_link_libraries(sVproj sV sVinfo sVflow ${QT_LIBRARIES})
+target_link_libraries(sVproj sV sVinfo sVflow sVencode ${QT_LIBRARIES})

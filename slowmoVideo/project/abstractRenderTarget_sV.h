@@ -11,18 +11,28 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef ABSTRACTRENDERTARGET_SV_H
 #define ABSTRACTRENDERTARGET_SV_H
 
-#include <QImage>
+#include <QtGui/QImage>
+#include "../lib/defs_sV.hpp"
 
+class RenderTask_sV;
 
 /** \brief Should represent a render target like video or an image sequence */
 class AbstractRenderTarget_sV
 {
 public:
-    AbstractRenderTarget_sV();
+    AbstractRenderTarget_sV(RenderTask_sV *parentRenderTask);
     virtual ~AbstractRenderTarget_sV();
+
+    RenderTask_sV* renderTask() { return m_renderTask; }
+
+    virtual void openRenderTarget() throw(Error_sV) {}
+    virtual void closeRenderTarget() throw(Error_sV) {}
 
 public slots:
     virtual void slotConsumeFrame(const QImage &image, const int frameNumber) = 0;
+
+private:
+    RenderTask_sV *m_renderTask;
 
 };
 

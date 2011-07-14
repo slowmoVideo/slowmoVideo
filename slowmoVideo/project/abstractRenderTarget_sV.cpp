@@ -10,7 +10,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "abstractRenderTarget_sV.h"
 
-AbstractRenderTarget_sV::AbstractRenderTarget_sV()
+AbstractRenderTarget_sV::AbstractRenderTarget_sV(RenderTask_sV *renderTask) :
+    m_renderTask(renderTask)
 {
 }
 

@@ -47,6 +47,9 @@ target_link_libraries(sV ${QT_LIBRARIES})
 add_library(sVinfo STATIC ${LIB_SRC_VI})
 target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})
 
+add_library(sVencode STATIC ffmpegEncode_sV.c)
+target_link_libraries(sVencode ${FFMPEG_LIBRARIES})
+
 add_library(sVflow STATIC ${LIB_SRC_FLOW})
 install(TARGETS sVflow DESTINATION "lib")
 install(FILES ${HEADERS} DESTINATION "include")

@@ -15,10 +15,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QDir>
 
+class RenderTask_sV;
+
 class ImagesRenderTarget_sV : public AbstractRenderTarget_sV
 {
 public:
-    ImagesRenderTarget_sV();
+    ImagesRenderTarget_sV(RenderTask_sV *parentRenderTask);
 
     void setTargetDir(const QDir dir);
     bool setFilenamePattern(const QString pattern);

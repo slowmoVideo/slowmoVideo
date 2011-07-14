@@ -10,7 +10,7 @@
 #endif
 
 extern "C" {
-#include "ffmpegTestEncode.h"
+#include "../lib/ffmpegEncode_sV.h"
 }
 
 #include <QtCore/QDebug>
@@ -27,7 +27,7 @@ int main()
     davinci.setPen(QColor(40, 80, 255, 20));
 
     VideoOut_sV video;
-    prepare(&video, width, height, 1000000, 1, 25, true);
+    prepare(&video, "/tmp/ffmpegEncodedFrames.avi", width, height, 1000000, 1, 25);
 
 
     eatSample(&video);
