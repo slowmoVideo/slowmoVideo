@@ -17,7 +17,7 @@ typedef struct VideoOut_sV {
 void prepareDefault(VideoOut_sV *video);
 void prepare(VideoOut_sV *video, const int width, const int height, const int bitrate,
              const unsigned int numerator, const unsigned int denominator, const int eatsRGB);
-void eatRGBA(VideoOut_sV *video, const unsigned char *data);
+void eatARGB(VideoOut_sV *video, const unsigned char *data);
 void eatSample(VideoOut_sV *video);
 void finish(VideoOut_sV *video);
 

@@ -18,6 +18,6 @@ add_executable(encodeTest encodeTest.c)
 target_link_libraries(encodeTest encode ${FFMPEG_LIBRARIES})
 
 add_executable(encodeFramesTest ffmpegTestEncodeFrames.cpp)
-target_link_libraries(encodeFramesTest encode ${FFMPEG_LIBRARIES})
+target_link_libraries(encodeFramesTest encode ${FFMPEG_LIBRARIES} ${QT_LIBRARIES})
 
 install(TARGETS Test DESTINATION bin)

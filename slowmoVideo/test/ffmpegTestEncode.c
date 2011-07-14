@@ -5,6 +5,7 @@
   */
 
 #include "ffmpegTestEncode.h"
+#include <libswscale/swscale.h>
 
 void prepareDefault(VideoOut_sV *video)
 {
@@ -47,11 +48,7 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->c->time_base= (AVRational){numerator, denominator};
     video->c->gop_size = 10; /* emit one intra frame every ten frames */
     video->c->max_b_frames=1;
-    if (eatsRGB == 1) {
-        video->c->pix_fmt = PIX_FMT_ARGB;
-    } else {
-        video->c->pix_fmt = PIX_FMT_YUV420P;
-    }
+    video->c->pix_fmt = PIX_FMT_YUV420P;
 
     /* open it */
     if (avcodec_open(video->c, video->codec) < 0) {
@@ -67,38 +64,35 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     }
 
     /* alloc image and output buffer */
-    video->outbuf_size = 100000;
-    video->outbuf = malloc(video->outbuf_size);
+    video->outbuf_size = 1000000;
+    video->outbuf = av_malloc(video->outbuf_size);
 
-    /* the image can be allocated by any means and av_image_alloc() is
-     * just the most convenient way if av_malloc() is to be used */
-    av_image_alloc(video->picture->data, video->picture->linesize,
-                   video->c->width, video->c->height, video->c->pix_fmt, 1);
+    avpicture_alloc(video->picture, PIX_FMT_YUV420P, video->c->width, video->c->height);
 }
 
-void eatRGBA(VideoOut_sV *video, const unsigned char *data)
+void eatARGB(VideoOut_sV *video, const unsigned char *data)
 {
-    fflush(stdout);
-    /* prepare a dummy image */
-    /* Y */
-    int x, y;
-    for(y = 0; y < video->c->height; y++) {
-        for(x = 0; x < video->c->width; x++) {
-            video->picture->data[0][y * video->picture->linesize[0] + x] = x + y + video->frameNr * 3;
-        }
-    }
+    AVFrame* picture = avcodec_alloc_frame();
 
-    /* Cb and Cr */
-    for(y = 0; y < video->c->height/2; y++) {
-        for(x = 0; x < video->c->width/2; x++) {
-            video->picture->data[1][y * video->picture->linesize[1] + x] = 128 + y + video->frameNr * 2;
-            video->picture->data[2][y * video->picture->linesize[2] + x] = 64 + x + video->frameNr * 5;
-        }
-    }
+    fflush(stdout);
+
+    avpicture_alloc(picture, PIX_FMT_BGRA, video->c->width, video->c->height);
+
+    struct SwsContext* fooContext = sws_getContext(
+                video->c->width, video->c->height,
+                PIX_FMT_BGRA,
+                video->c->width, video->c->height,
+                PIX_FMT_YUV420P,
+                SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+    picture->data[0] = data;
+    //perform the conversion
+    sws_scale(fooContext, picture->data, picture->linesize, 0, video->c->height,
+              video->picture->data, video->picture->linesize);
+    // Here is where I try to convert to YUV
 
     /* encode the image */
     video->out_size = avcodec_encode_video(video->c, video->outbuf, video->outbuf_size, video->picture);
-    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->out_size);
     fwrite(video->outbuf, 1, video->out_size, video->f);
     video->frameNr++;
 }
@@ -148,7 +142,7 @@ void finish(VideoOut_sV *video)
     video->outbuf[3] = 0xb7;
     fwrite(video->outbuf, 1, 4, video->f);
     fclose(video->f);
-    free(video->outbuf);
+    av_free(video->outbuf);
 
     avcodec_close(video->c);
     av_free(video->c);
