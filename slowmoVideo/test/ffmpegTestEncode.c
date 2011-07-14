@@ -37,7 +37,6 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->frameNr = 0;
 
     video->c = avcodec_alloc_context3(video->codec);
-    video->picture = avcodec_alloc_frame();
 
     /* put sample parameters */
     video->c->bit_rate = bitrate;
@@ -50,11 +49,27 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     video->c->max_b_frames=1;
     video->c->pix_fmt = PIX_FMT_YUV420P;
 
+
     /* open it */
     if (avcodec_open(video->c, video->codec) < 0) {
         fprintf(stderr, "could not open codec\n");
         exit(1);
     }
+
+
+
+    video->rgbConversionContext = sws_getContext(
+                video->c->width, video->c->height,
+                PIX_FMT_BGRA,
+                video->c->width, video->c->height,
+                PIX_FMT_YUV420P,
+                SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    // One line size for each plane. RGB consists of one plane only.
+    // (YUV420p consists of 3, Y, Cb, and Cr
+    video->rgbLinesize[0] = video->c->width*4;
+    video->rgbLinesize[1] = 0;
+    video->rgbLinesize[2] = 0;
+    video->rgbLinesize[3] = 0;
 
     video->filename = "/tmp/ffmpegTest.avi";
     video->f = fopen(video->filename, "wb");
@@ -64,35 +79,28 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
     }
 
     /* alloc image and output buffer */
-    video->outbuf_size = 1000000;
+    video->outbuf_size = avpicture_get_size(video->c->pix_fmt, width, height);
     video->outbuf = av_malloc(video->outbuf_size);
 
-    avpicture_alloc(video->picture, PIX_FMT_YUV420P, video->c->width, video->c->height);
+    video->picture = avcodec_alloc_frame();
+    avpicture_alloc((AVPicture*)video->picture, video->c->pix_fmt, video->c->width, video->c->height);
 }
 
 void eatARGB(VideoOut_sV *video, const unsigned char *data)
 {
-    AVFrame* picture = avcodec_alloc_frame();
-
     fflush(stdout);
 
-    avpicture_alloc(picture, PIX_FMT_BGRA, video->c->width, video->c->height);
+    printf("Line size: %d %d %d %d\n", video->picture->linesize[0], video->picture->linesize[1], video->picture->linesize[2], video->picture->linesize[3]);
 
-    struct SwsContext* fooContext = sws_getContext(
-                video->c->width, video->c->height,
-                PIX_FMT_BGRA,
-                video->c->width, video->c->height,
-                PIX_FMT_YUV420P,
-                SWS_FAST_BILINEAR, NULL, NULL, NULL);
-
-    picture->data[0] = data;
-    //perform the conversion
-    sws_scale(fooContext, picture->data, picture->linesize, 0, video->c->height,
-              video->picture->data, video->picture->linesize);
-    // Here is where I try to convert to YUV
+    sws_scale(video->rgbConversionContext,
+              &data, video->rgbLinesize,
+              0, video->c->height,
+              video->picture->data, video->picture->linesize
+              );
 
     /* encode the image */
     video->out_size = avcodec_encode_video(video->c, video->outbuf, video->outbuf_size, video->picture);
+    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->out_size);
     fwrite(video->outbuf, 1, video->out_size, video->f);
     video->frameNr++;
 }
@@ -148,5 +156,6 @@ void finish(VideoOut_sV *video)
     av_free(video->c);
     av_free(video->picture->data[0]);
     av_free(video->picture);
+    sws_freeContext(video->rgbConversionContext);
     printf("\nWrote to %s.\n", video->filename);
 }

@@ -31,16 +31,11 @@ int main()
 
 
     eatSample(&video);
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 5; i++) {
 
         img.fill(QColor(100, 100, 100).rgb());
         davinci.drawLine(0, 2*i, width-1, 2*i);
         davinci.fillRect(0, 0, 100, 2*i, QColor(255, 0, 0));
-
-        qDebug() << "Null image? " << img.isNull();
-
-        unsigned char *ptr = img.bits();
-        qDebug() << ptr[0] << ptr[1];
 
         eatARGB(&video, img.bits());
     }

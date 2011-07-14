@@ -7,6 +7,8 @@ typedef struct VideoOut_sV {
     AVCodec *codec;
     AVCodecContext *c;
     AVFrame *picture;
+    struct SwsContext* rgbConversionContext;
+    int rgbLinesize[4];
     FILE *f;
     const char *filename;
     int outbuf_size, out_size;
