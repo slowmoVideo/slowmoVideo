@@ -1,7 +1,12 @@
 /**
   This code is based on http://ffmpeg.org/doxygen/trunk/encoding_8c-source.html
+  and has been adjusted with a lot of help from Tjoppen at irc.freenode.org#ffmpeg. (Thanks!)
   Copyright (c) 2001 Fabrice Bellard
                 2011 Simon A. Eugster
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
   */
 
 #include "ffmpegTestEncode.h"
@@ -36,22 +41,22 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
 
     video->frameNr = 0;
 
-    video->c = avcodec_alloc_context3(video->codec);
+    video->cc = avcodec_alloc_context3(video->codec);
 
     /* put sample parameters */
-    video->c->bit_rate = bitrate;
+    video->cc->bit_rate = bitrate;
     /* resolution must be a multiple of two */
-    video->c->width = width;
-    video->c->height = height;
+    video->cc->width = width;
+    video->cc->height = height;
     /* frames per second */
-    video->c->time_base= (AVRational){numerator, denominator};
-    video->c->gop_size = 10; /* emit one intra frame every ten frames */
-    video->c->max_b_frames=1;
-    video->c->pix_fmt = PIX_FMT_YUV420P;
+    video->cc->time_base= (AVRational){numerator, denominator};
+    video->cc->gop_size = 10; /* emit one intra frame every ten frames */
+    video->cc->max_b_frames=1;
+    video->cc->pix_fmt = PIX_FMT_YUV420P;
 
 
     /* open it */
-    if (avcodec_open(video->c, video->codec) < 0) {
+    if (avcodec_open(video->cc, video->codec) < 0) {
         fprintf(stderr, "could not open codec\n");
         exit(1);
     }
@@ -59,31 +64,31 @@ void prepare(VideoOut_sV *video, const int width, const int height, const int bi
 
 
     video->rgbConversionContext = sws_getContext(
-                video->c->width, video->c->height,
+                video->cc->width, video->cc->height,
                 PIX_FMT_BGRA,
-                video->c->width, video->c->height,
+                video->cc->width, video->cc->height,
                 PIX_FMT_YUV420P,
                 SWS_FAST_BILINEAR, NULL, NULL, NULL);
     // One line size for each plane. RGB consists of one plane only.
     // (YUV420p consists of 3, Y, Cb, and Cr
-    video->rgbLinesize[0] = video->c->width*4;
+    video->rgbLinesize[0] = video->cc->width*4;
     video->rgbLinesize[1] = 0;
     video->rgbLinesize[2] = 0;
     video->rgbLinesize[3] = 0;
 
     video->filename = "/tmp/ffmpegTest.avi";
-    video->f = fopen(video->filename, "wb");
-    if (!video->f) {
+    video->file = fopen(video->filename, "wb");
+    if (!video->file) {
         fprintf(stderr, "could not open %s\n", video->filename);
         exit(1);
     }
 
     /* alloc image and output buffer */
-    video->outbuf_size = avpicture_get_size(video->c->pix_fmt, width, height);
-    video->outbuf = av_malloc(video->outbuf_size);
+    video->outbufSize = avpicture_get_size(video->cc->pix_fmt, width, height);
+    video->outbuf = av_malloc(video->outbufSize);
 
     video->picture = avcodec_alloc_frame();
-    avpicture_alloc((AVPicture*)video->picture, video->c->pix_fmt, video->c->width, video->c->height);
+    avpicture_alloc((AVPicture*)video->picture, video->cc->pix_fmt, video->cc->width, video->cc->height);
 }
 
 void eatARGB(VideoOut_sV *video, const unsigned char *data)
@@ -94,14 +99,14 @@ void eatARGB(VideoOut_sV *video, const unsigned char *data)
 
     sws_scale(video->rgbConversionContext,
               &data, video->rgbLinesize,
-              0, video->c->height,
+              0, video->cc->height,
               video->picture->data, video->picture->linesize
               );
 
     /* encode the image */
-    video->out_size = avcodec_encode_video(video->c, video->outbuf, video->outbuf_size, video->picture);
-    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->out_size);
-    fwrite(video->outbuf, 1, video->out_size, video->f);
+    video->outSize = avcodec_encode_video(video->cc, video->outbuf, video->outbufSize, video->picture);
+    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->outSize);
+    fwrite(video->outbuf, 1, video->outSize, video->file);
     video->frameNr++;
 }
 
@@ -111,36 +116,36 @@ void eatSample(VideoOut_sV *video)
     /* prepare a dummy image */
     /* Y */
     int x, y;
-    for(y = 0; y < video->c->height; y++) {
-        for(x = 0; x < video->c->width; x++) {
+    for(y = 0; y < video->cc->height; y++) {
+        for(x = 0; x < video->cc->width; x++) {
             video->picture->data[0][y * video->picture->linesize[0] + x] = x + y + video->frameNr * 3;
         }
     }
 
     /* Cb and Cr */
-    for(y = 0; y < video->c->height/2; y++) {
-        for(x = 0; x < video->c->width/2; x++) {
+    for(y = 0; y < video->cc->height/2; y++) {
+        for(x = 0; x < video->cc->width/2; x++) {
             video->picture->data[1][y * video->picture->linesize[1] + x] = 128 + y + video->frameNr * 2;
             video->picture->data[2][y * video->picture->linesize[2] + x] = 64 + x + video->frameNr * 5;
         }
     }
 
     /* encode the image */
-    video->out_size = avcodec_encode_video(video->c, video->outbuf, video->outbuf_size, video->picture);
-    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->out_size);
-    fwrite(video->outbuf, 1, video->out_size, video->f);
+    video->outSize = avcodec_encode_video(video->cc, video->outbuf, video->outbufSize, video->picture);
+    printf("encoding frame %3d (size=%5d)\n", video->frameNr, video->outSize);
+    fwrite(video->outbuf, 1, video->outSize, video->file);
     video->frameNr++;
 }
 
 void finish(VideoOut_sV *video)
 {
     /* get the delayed frames */
-    for(; video->out_size; video->frameNr++) {
+    for(; video->outSize; video->frameNr++) {
         fflush(stdout);
 
-        video->out_size = avcodec_encode_video(video->c, video->outbuf, video->outbuf_size, NULL);
-        printf("write frame %3d (size=%5d)\n", video->frameNr, video->out_size);
-        fwrite(video->outbuf, 1, video->out_size, video->f);
+        video->outSize = avcodec_encode_video(video->cc, video->outbuf, video->outbufSize, NULL);
+        printf("write frame %3d (size=%5d)\n", video->frameNr, video->outSize);
+        fwrite(video->outbuf, 1, video->outSize, video->file);
     }
 
     /* add sequence end code to have a real mpeg file */
@@ -148,12 +153,12 @@ void finish(VideoOut_sV *video)
     video->outbuf[1] = 0x00;
     video->outbuf[2] = 0x01;
     video->outbuf[3] = 0xb7;
-    fwrite(video->outbuf, 1, 4, video->f);
-    fclose(video->f);
+    fwrite(video->outbuf, 1, 4, video->file);
+    fclose(video->file);
     av_free(video->outbuf);
 
-    avcodec_close(video->c);
-    av_free(video->c);
+    avcodec_close(video->cc);
+    av_free(video->cc);
     av_free(video->picture->data[0]);
     av_free(video->picture);
     sws_freeContext(video->rgbConversionContext);

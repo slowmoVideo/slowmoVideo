@@ -1,19 +1,33 @@
 #ifndef FFMPEGTESTENCODE_H
 #define FFMPEGTESTENCODE_H
 
+/**
+  Copyright (c) 2011 Simon A. Eugster
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  */
+
 #include "libavcodec/avcodec.h"
 
+/// This struct can eat frames and produces videos!
 typedef struct VideoOut_sV {
     AVCodec *codec;
-    AVCodecContext *c;
+    AVCodecContext *cc;
     AVFrame *picture;
+    int frameNr;
+
     struct SwsContext* rgbConversionContext;
     int rgbLinesize[4];
-    FILE *f;
+
+    FILE *file;
     const char *filename;
-    int outbuf_size, out_size;
+
+    int outbufSize, outSize;
     uint8_t *outbuf;
-    int frameNr;
+
 } VideoOut_sV;
 
 void prepareDefault(VideoOut_sV *video);
