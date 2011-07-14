@@ -46,6 +46,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement renderFPS = doc.createElement("renderFPS");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
+    QDomElement videoFilename = doc.createElement("videoFilename");
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
@@ -54,6 +55,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     preferences.appendChild(renderFPS);
     preferences.appendChild(imagesOutputDir);
     preferences.appendChild(imagesFilenamePattern);
+    preferences.appendChild(videoFilename);
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
@@ -62,6 +64,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     renderFPS.setAttribute("fps", project->preferences()->renderFPS());
     imagesOutputDir.setAttribute("dir", project->preferences()->imagesOutputDir());
     imagesFilenamePattern.setAttribute("pattern", project->preferences()->imagesFilenamePattern());
+    videoFilename.setAttribute("file", project->preferences()->videoFilename());
     prevTagAxis.setAttribute("axis", QVariant(project->preferences()->lastSelectedTagAxis()).toString());
     viewport_t0.setAttribute("x", project->preferences()->viewport_t0().x());
     viewport_t0.setAttribute("y", project->preferences()->viewport_t0().y());
@@ -377,6 +380,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "imagesFilenamePattern") {
                                 project->preferences()->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "videoFilename") {
+                                project->preferences()->videoFilename() = xml.attributes().value("file").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "prevTagAxis") {
                                 project->preferences()->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();

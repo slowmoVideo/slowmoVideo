@@ -34,6 +34,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     ui->imagesOutputDir->setText(m_project->preferences()->imagesOutputDir());
     ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
+    ui->videoOutputFile->setText(m_project->preferences()->videoFilename());
 
     QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
     if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {

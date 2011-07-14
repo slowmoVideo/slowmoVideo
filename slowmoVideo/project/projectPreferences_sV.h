@@ -20,6 +20,7 @@ public:
     float& renderFPS();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
+    QString& videoFilename();
 
 private:
     TagAxis m_tagAxis;
@@ -32,6 +33,7 @@ private:
 
     QString m_imagesOutputDir;
     QString m_imagesFilenamePattern;
+    QString m_videoFilename;
 
 };
 

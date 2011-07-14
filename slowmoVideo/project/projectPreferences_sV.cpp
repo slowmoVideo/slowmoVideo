@@ -9,7 +9,8 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderInterpolationType(InterpolationType_Twoway),
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
-    m_imagesFilenamePattern("rendered-%1.jpg")
+    m_imagesFilenamePattern("rendered-%1.jpg"),
+    m_videoFilename("/tmp/rendered.mpg")
 {
 }
 
@@ -47,4 +48,8 @@ QString& ProjectPreferences_sV::imagesOutputDir()
 QString& ProjectPreferences_sV::imagesFilenamePattern()
 {
     return m_imagesFilenamePattern;
+}
+QString& ProjectPreferences_sV::videoFilename()
+{
+    return m_videoFilename;
 }
