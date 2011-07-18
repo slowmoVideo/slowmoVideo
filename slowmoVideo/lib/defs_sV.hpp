@@ -11,6 +11,15 @@
 #define BITS_64
 #endif
 
+#if defined WIN32 || defined WIN64
+#define WINDOWS
+#elif defined __linux__
+#define LINUX
+#elif defined TARGET_OS_MAC
+#define OSX
+#endif
+
+
 namespace Version_sV {
     static int major = 0;
     static int minor = 1;
@@ -20,6 +29,15 @@ namespace Version_sV {
 #else
     static QString bits("32-bit");
 #endif
+    static QString platform(
+#if defined LINUX
+            "Linux"
+#elif defined OSX
+            "OSX"
+#elif defined WINDOWS
+            "Windows"
+#endif
+            );
 }
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
