@@ -7,6 +7,21 @@
 #include <QtCore/QPoint>
 #include <QtGui/QColor>
 
+#if _WIN64 || __amd64__
+#define BITS_64
+#endif
+
+namespace Version_sV {
+    static int major = 0;
+    static int minor = 1;
+    static QString version(QString("%1.%2").arg(major).arg(minor));
+#ifdef BITS_64
+    static QString bits("64-bit");
+#else
+    static QString bits("32-bit");
+#endif
+}
+
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
 enum FrameSize { FrameSize_Orig = 1, FrameSize_Small = 2 };
 enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
