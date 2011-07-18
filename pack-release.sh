@@ -23,7 +23,7 @@
     make -j3 install
 )
 
-dirname="slowmoVideo-$(install/bin/slowmoInfo version)"
+dirname="slowmoVideo-$(install/bin/slowmoInfo version)-$(install/bin/slowmoInfo platform)-$(install/bin/slowmoInfo bits)"
 filename="${dirname}-$(date -u +%b%d).tar.bz2"
 echo "Dirname: ${dirname}"
 if [ -e ${dirname} ]
