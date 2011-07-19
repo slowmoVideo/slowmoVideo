@@ -39,11 +39,20 @@ void VideoRenderTarget_sV::setTargetFile(const QString &filename)
 {
     m_filename = filename;
 }
+void VideoRenderTarget_sV::setVcodec(const QString &codec)
+{
+    m_vcodec = codec;
+}
 
 void VideoRenderTarget_sV::openRenderTarget() throw(Error_sV)
 {
+    char *vcodec = NULL;
+    if (m_vcodec.length() > 0) {
+        vcodec = (char*)malloc(m_vcodec.length()+1);
+        strcpy(vcodec, m_vcodec.toStdString().c_str());
+    }
     int worked =
-    prepare(m_videoOut, m_filename.toStdString().c_str(),
+    prepare(m_videoOut, m_filename.toStdString().c_str(), vcodec,
             renderTask()->resolution().width(), renderTask()->resolution().height(),
             renderTask()->fps() * renderTask()->resolution().width() * renderTask()->resolution().height(),
             1, renderTask()->fps());

@@ -36,20 +36,11 @@ InterpolationType& ProjectPreferences_sV::renderInterpolationType()
     return m_renderInterpolationType;
 }
 
-float& ProjectPreferences_sV::renderFPS()
-{
-    return m_renderFPS;
-}
+float& ProjectPreferences_sV::renderFPS() { return m_renderFPS; }
+QString& ProjectPreferences_sV::renderTarget() { return m_renderTarget; }
 
-QString& ProjectPreferences_sV::imagesOutputDir()
-{
-    return m_imagesOutputDir;
-}
-QString& ProjectPreferences_sV::imagesFilenamePattern()
-{
-    return m_imagesFilenamePattern;
-}
-QString& ProjectPreferences_sV::videoFilename()
-{
-    return m_videoFilename;
-}
+QString& ProjectPreferences_sV::imagesOutputDir() { return m_imagesOutputDir; }
+QString& ProjectPreferences_sV::imagesFilenamePattern() { return m_imagesFilenamePattern; }
+
+QString& ProjectPreferences_sV::videoFilename() { return m_videoFilename; }
+QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }

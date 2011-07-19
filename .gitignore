@@ -1,8 +1,10 @@
 *~
+*.txt.user
 
 install
 
 /*.png
+/slowmoVideo*.bz2
 flowScripts/*.avi
 flowScripts/*.pyc
 

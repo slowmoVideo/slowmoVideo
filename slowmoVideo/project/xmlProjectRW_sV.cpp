@@ -44,27 +44,33 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
     QDomElement renderFPS = doc.createElement("renderFPS");
+    QDomElement renderTarget = doc.createElement("renderTarget");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
     QDomElement videoFilename = doc.createElement("videoFilename");
+    QDomElement videoCodec = doc.createElement("videoCodec");
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
     preferences.appendChild(renderFrameSize);
     preferences.appendChild(renderInterpolation);
     preferences.appendChild(renderFPS);
+    preferences.appendChild(renderTarget);
     preferences.appendChild(imagesOutputDir);
     preferences.appendChild(imagesFilenamePattern);
     preferences.appendChild(videoFilename);
+    preferences.appendChild(videoCodec);
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
     renderFrameSize.setAttribute("size", project->preferences()->renderFrameSize());
     renderInterpolation.setAttribute("type", project->preferences()->renderInterpolationType());
     renderFPS.setAttribute("fps", project->preferences()->renderFPS());
+    renderTarget.setAttribute("target", project->preferences()->renderTarget());
     imagesOutputDir.setAttribute("dir", project->preferences()->imagesOutputDir());
     imagesFilenamePattern.setAttribute("pattern", project->preferences()->imagesFilenamePattern());
     videoFilename.setAttribute("file", project->preferences()->videoFilename());
+    videoCodec.setAttribute("codec", project->preferences()->videoCodec());
     prevTagAxis.setAttribute("axis", QVariant(project->preferences()->lastSelectedTagAxis()).toString());
     viewport_t0.setAttribute("x", project->preferences()->viewport_t0().x());
     viewport_t0.setAttribute("y", project->preferences()->viewport_t0().y());
@@ -375,6 +381,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                             } else if (xml.name() == "renderFPS") {
                                 project->preferences()->renderFPS() = xml.attributes().value("fps").toString().toFloat();
                                 xml.skipCurrentElement();
+                            } else if (xml.name() == "renderTarget") {
+                                project->preferences()->renderTarget() = xml.attributes().value("target").toString();
+                                xml.skipCurrentElement();
                             } else if (xml.name() == "imagesOutputDir") {
                                 project->preferences()->imagesOutputDir() = xml.attributes().value("dir").toString();
                                 xml.skipCurrentElement();
@@ -383,6 +392,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoFilename") {
                                 project->preferences()->videoFilename() = xml.attributes().value("file").toString();
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "videoCodec") {
+                                project->preferences()->videoCodec() = xml.attributes().value("codec").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "prevTagAxis") {
                                 project->preferences()->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();

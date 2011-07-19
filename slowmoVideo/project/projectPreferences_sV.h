@@ -18,9 +18,11 @@ public:
     FrameSize& renderFrameSize();
     InterpolationType& renderInterpolationType();
     float& renderFPS();
+    QString& renderTarget();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
     QString& videoFilename();
+    QString& videoCodec();
 
 private:
     TagAxis m_tagAxis;
@@ -30,10 +32,12 @@ private:
     FrameSize m_renderFrameSize;
     InterpolationType m_renderInterpolationType;
     float m_renderFPS;
+    QString m_renderTarget;
 
     QString m_imagesOutputDir;
     QString m_imagesFilenamePattern;
     QString m_videoFilename;
+    QString m_vcodec;
 
 };
 

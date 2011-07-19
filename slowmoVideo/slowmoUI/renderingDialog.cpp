@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../project/renderTask_sV.h"
 #include "../project/imagesRenderTarget_sV.h"
 #include "../project/videoRenderTarget_sV.h"
+#include "../project/emptyFrameSource_sV.h"
 
 #include <QButtonGroup>
 #include <QFileDialog>
@@ -35,6 +36,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->imagesOutputDir->setText(m_project->preferences()->imagesOutputDir());
     ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
     ui->videoOutputFile->setText(m_project->preferences()->videoFilename());
+    ui->vcodec->setText(m_project->preferences()->videoCodec());
 
     QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
     if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
@@ -45,7 +47,11 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     m_targetGroup = new QButtonGroup(this);
     m_targetGroup->addButton(ui->radioImages);
     m_targetGroup->addButton(ui->radioVideo);
-    ui->radioImages->setChecked(true);
+    if (m_project->preferences()->renderTarget() == "images") {
+        ui->radioImages->setChecked(true);
+    } else {
+        ui->radioVideo->setChecked(true);
+    }
 
     ui->cbSize->addItem("Original size", QVariant(FrameSize_Orig));
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
@@ -108,6 +114,7 @@ RenderTask_sV* RenderingDialog::buildTask()
         } else if (ui->radioVideo->isChecked()) {
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
             renderTarget->setTargetFile(ui->videoOutputFile->text());
+            renderTarget->setVcodec(ui->vcodec->text());
             task->setRenderTarget(renderTarget);
         } else {
             Q_ASSERT(false);
@@ -115,9 +122,12 @@ RenderTask_sV* RenderingDialog::buildTask()
 
         m_project->preferences()->imagesOutputDir() = imagesOutputDir;
         m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
+        m_project->preferences()->videoFilename() = ui->videoOutputFile->text();
+        m_project->preferences()->videoCodec() = ui->vcodec->text();
         m_project->preferences()->renderInterpolationType() = interpolation;
         m_project->preferences()->renderFrameSize() = size;
         m_project->preferences()->renderFPS() = fps;
+        m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
         return task;
     } else {
         return NULL;
@@ -159,6 +169,8 @@ bool RenderingDialog::slotValidate()
     } else {
         Q_ASSERT(false);
     }
+
+    ok &= dynamic_cast<EmptyFrameSource_sV*>(m_project->frameSource()) == NULL;
 
     ui->bOk->setEnabled(ok);
 

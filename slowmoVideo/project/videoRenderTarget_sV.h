@@ -25,6 +25,7 @@ public:
 
     /// openRenderTarget() will throw an error if the target file cannot be opened.
     void setTargetFile(const QString& filename);
+    void setVcodec(const QString& codec);
 
     void openRenderTarget() throw(Error_sV);
     void closeRenderTarget() throw(Error_sV);
@@ -34,6 +35,7 @@ public slots:
 
 private:
     QString m_filename;
+    QString m_vcodec;
     VideoOut_sV *m_videoOut;
 
     int m_width;
