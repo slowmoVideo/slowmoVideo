@@ -67,6 +67,7 @@ int open_video(VideoOut_sV *video)
         video->outbufSizeV = 200000;
         video->outbufV = av_malloc(video->outbufSizeV);
     }
+    return 0;
 }
 
 int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const int width, const int height, const int bitrate,
