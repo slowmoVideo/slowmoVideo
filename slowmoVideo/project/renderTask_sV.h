@@ -53,7 +53,7 @@ public:
     void setInterpolationType(const InterpolationType interpolation);
 
     /// Rendered frames per second
-    float fps() { return m_fps; }
+    Fps_sV fps() { return m_fps; }
     /// Output frame resolution
     QSize resolution() { return m_resolution; }
 
@@ -81,7 +81,7 @@ private:
     float m_timeStart;
     float m_timeEnd;
 
-    float m_fps;
+    Fps_sV m_fps;
     QSize m_resolution;
     FrameSize m_frameSize;
     InterpolationType m_interpolationType;

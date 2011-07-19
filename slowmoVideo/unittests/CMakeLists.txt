@@ -5,6 +5,7 @@ set(SRCS
     testVector_sV.cpp
     testIntMatrix_sV.cpp
     testXmlProjectRW_sV.cpp
+    testDefs_sV.cpp
     testAll.cpp
 )
 set(SRCS_MOC
@@ -12,6 +13,7 @@ set(SRCS_MOC
     testFlowField_sV.h
     testVector_sV.h
     testIntMatrix_sV.h
+    testDefs_sV.h
     testXmlProjectRW_sV.h
 )
 

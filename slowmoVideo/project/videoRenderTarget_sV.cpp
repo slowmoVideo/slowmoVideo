@@ -54,8 +54,8 @@ void VideoRenderTarget_sV::openRenderTarget() throw(Error_sV)
     int worked =
     prepare(m_videoOut, m_filename.toStdString().c_str(), vcodec,
             renderTask()->resolution().width(), renderTask()->resolution().height(),
-            renderTask()->fps() * renderTask()->resolution().width() * renderTask()->resolution().height(),
-            1, renderTask()->fps());
+            renderTask()->fps().fps() * renderTask()->resolution().width() * renderTask()->resolution().height(),
+            renderTask()->fps().den, renderTask()->fps().num);
     if (worked != 0) {
         throw Error_sV(QString("Video could not be prepared. \n%2 (%1)").arg(worked).arg(m_videoOut->errorMessage));
     }

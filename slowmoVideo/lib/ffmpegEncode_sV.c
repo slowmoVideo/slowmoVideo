@@ -143,7 +143,8 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
            of which frame timestamps are represented. for fixed-fps content,
            timebase should be 1/framerate and timestamp increments should be
            identically 1. */
-        cc->time_base= (AVRational){numerator, denominator};
+        cc->time_base = (AVRational){numerator, denominator};
+
         cc->gop_size = 12; /* emit one intra frame every ten frames */
 
 
@@ -186,8 +187,9 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         }
 
 
-        printf("Settings: %dx%d, %d bits/s (tolerance: %d), %d fps\n", cc->width, cc->height,
-               cc->bit_rate, cc->bit_rate_tolerance, cc->time_base.num);
+        printf("Settings: %dx%d, %d bits/s (tolerance: %d), %d/%d fps\n", cc->width, cc->height,
+               cc->bit_rate, cc->bit_rate_tolerance, cc->time_base.den, cc->time_base.num);
+//        printf("Stream settings: %d/%d fps\n", video->streamV->time_base.den, video->streamV->time_base.num);
         fflush(stdout);
     } else {
         const char *s = "No codec ID given.\n";
@@ -203,12 +205,6 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     if (video->streamV) {
         int ret = open_video(video);
         if (ret != 0) {
-            char s[400];
-            sprintf(s, "Could not open video. Maybe format and codec are incompatible "
-                    "(for example, ffv1 requires .mov)?\n"
-                    "Currently used: Format = %s, Codec = %s).\n",
-                    video->fc->oformat->long_name, video->streamV->codec->codec->long_name);
-            setErrorMessage(video, s);
             return ret;
         }
     } else {

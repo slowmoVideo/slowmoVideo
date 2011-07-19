@@ -138,6 +138,14 @@
        <property name="editable">
         <bool>true</bool>
        </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>23.976</string>
+        </property>
+       </item>
        <item>
         <property name="text">
          <string>24</string>
@@ -150,7 +158,27 @@
        </item>
        <item>
         <property name="text">
+         <string>29.976</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>30</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>50</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>60</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>72</string>
         </property>
        </item>
       </widget>
@@ -442,6 +470,9 @@
   <tabstop>imagesOutputDir</tabstop>
   <tabstop>bImagesBrowseDir</tabstop>
   <tabstop>imagesFilenamePattern</tabstop>
+  <tabstop>videoOutputFile</tabstop>
+  <tabstop>bBrowseVideoOutputFile</tabstop>
+  <tabstop>vcodec</tabstop>
   <tabstop>bAbort</tabstop>
   <tabstop>bOk</tabstop>
  </tabstops>

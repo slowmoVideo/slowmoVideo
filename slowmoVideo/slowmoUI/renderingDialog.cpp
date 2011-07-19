@@ -138,7 +138,8 @@ bool RenderingDialog::slotValidate()
 {
     bool ok = true;
 
-    ui->cbFps->currentText().toFloat(&ok);
+    float fps = ui->cbFps->currentText().toFloat(&ok);
+    ok &= fps > 0;
     if (ok) {
         ui->cbFps->setStyleSheet(QString("QComboBox { background-color: %1; }").arg(Colours_sV::colOk.name()));
     } else {

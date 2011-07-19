@@ -21,17 +21,16 @@ the Free Software Foundation, either version 3 of the License, or
 RenderTask_sV::RenderTask_sV(const Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
+    m_fps(24),
     m_initialized(false),
     m_stopRendering(false),
     m_prevTime(-1)
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
-    m_fps = 24;
-    m_frameSize = FrameSize_Small;
     m_interpolationType = InterpolationType_Forward;
 
-    m_resolution = const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_frameSize).size();
+    setSize(FrameSize_Small);
 
     m_nextFrameTime = m_project->nodes()->startTime();
 }
@@ -64,12 +63,13 @@ void RenderTask_sV::setTimeRange(float start, float end)
 void RenderTask_sV::setFPS(float fps)
 {
     Q_ASSERT(fps > 0);
-    m_fps = fps;
+    m_fps = Fps_sV(fps);
 }
 
 void RenderTask_sV::setSize(FrameSize size)
 {
     m_frameSize = size;
+    m_resolution = const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_frameSize).size();
 }
 
 void RenderTask_sV::setInterpolationType(const InterpolationType interpolation)
@@ -101,7 +101,7 @@ void RenderTask_sV::slotContinueRendering()
     qDebug() << "Continuing rendering at " << m_nextFrameTime;
 
     emit signalRenderingContinued();
-    emit signalNewTask("Rendering slowmo ...", int(m_fps * (m_timeEnd-m_timeStart)));
+    emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
     QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
 }
 
@@ -117,7 +117,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("Empty frame source, cannot be rendered.");
     }
 
-    int frameNumber = (time - m_project->nodes()->startTime()) * m_fps;
+    int frameNumber = (time - m_project->nodes()->startTime()) * m_fps.fps();
     if (!m_stopRendering) {
 
         if (time > m_timeEnd) {
@@ -135,7 +135,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
                 QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_interpolationType, m_prevTime);
 
                 m_renderTarget->slotConsumeFrame(rendered, frameNumber);
-                m_nextFrameTime = time + 1/m_fps;
+                m_nextFrameTime = time + 1/m_fps.fps();
 
                 emit signalTaskProgress(frameNumber);
                 emit signalFrameRendered(time, frameNumber);

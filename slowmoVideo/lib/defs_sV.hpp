@@ -1,3 +1,13 @@
+/*
+slowmoVideo creates slow-motion videos from normal-speed videos.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef DEFS_SV_HPP
 #define DEFS_SV_HPP
 
@@ -6,6 +16,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QPoint>
 #include <QtGui/QColor>
+#include <cmath>
 
 #if _WIN64 || __amd64__
 #define BITS_64
@@ -20,15 +31,23 @@
 #endif
 
 
+/// Contains information about this slowmoVideo version
 namespace Version_sV {
+    /// Major version number
     static int major = 0;
+    /// Minor version number
     static int minor = 1;
+    /// Version number as string
     static QString version(QString("%1.%2").arg(major).arg(minor));
+    /// Architecture
+    static QString bits(
 #ifdef BITS_64
-    static QString bits("64-bit");
+            "64-bit"
 #else
-    static QString bits("32-bit");
+            "32-bit"
 #endif
+                        );
+    /// Platform
     static QString platform(
 #if defined LINUX
             "Linux"
@@ -53,6 +72,41 @@ namespace Colours_sV {
     static QColor colOk(158, 245, 94);
     static QColor colBad(247, 122, 48);
 }
+
+/// FPS representation, can guess numerator/denominator from a float value.
+struct Fps_sV {
+    /// numerator
+    int num;
+    /// denominator
+    int den;
+    /// den is assumed to be > 0.
+    Fps_sV(int num, int den) :
+        num(num), den(den) {}
+    /// Converts a float fps number to a fractional.
+    /// 23.97 and 29.97 are detected.
+    Fps_sV(float fps)
+    {
+        // Check for 23.976 and similar numbers (24*1000/1001)
+        if (fabs(1000*ceil(fps)-1001*fps) < 7) {
+            num = 1000*ceil(fps);
+            den = 1001;
+        } else {
+            num = 100000*fps;
+            den = 100000;
+            // Prettify
+            for (int i = 10; i > 1; i--) {
+                while (num % i == 0 && den % i == 0) {
+                    num /= i;
+                    den /= i;
+                }
+            }
+        }
+    }
+    /// Frames per second as float.
+    float fps() {
+        return float(num)/den;
+    }
+};
 
 /// For general errors.
 class Error_sV {
