@@ -132,7 +132,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
                                 .arg(frameNumber).arg(time).arg(srcTime).arg(frameNumber));
             try {
-                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_interpolationType, m_prevTime);
+                QImage rendered = m_project->interpolateFrameAtTime(srcTime, m_frameSize, m_interpolationType, m_prevTime);
 
                 m_renderTarget->slotConsumeFrame(rendered, frameNumber);
                 m_nextFrameTime = time + 1/m_fps.fps();

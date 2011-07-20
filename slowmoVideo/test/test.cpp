@@ -58,7 +58,12 @@ void testBezier()
 
 }
 
+void testFloatArg()
+{
+    qDebug() << QString("%2").arg(24.249, 8, 'f', 2, '0');
+}
+
 int main()
 {
-    testBezier();
+    testFloatArg();
 }

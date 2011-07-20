@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
+#include "motionBlur_sV.h"
 #include "../lib/shutter_sV.h"
 #include "../lib/interpolate_sV.h"
 #include "../lib/flowRW_sV.h"
@@ -52,6 +53,7 @@ void Project_sV::init()
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
     m_flowSource = new V3dFlowSource_sV(this);
+    m_motionBlur = new MotionBlur_sV(this);
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
@@ -63,6 +65,7 @@ Project_sV::~Project_sV()
     delete m_preferences;
     delete m_frameSource;
     delete m_flowSource;
+    delete m_motionBlur;
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
@@ -78,6 +81,7 @@ void Project_sV::setProjectDir(QString projectDir)
     }
     m_frameSource->slotUpdateProjectDir();
     m_flowSource->slotUpdateProjectDir();
+    m_motionBlur->slotUpdateProjectDir();
 }
 
 void Project_sV::setProjectFilename(QString filename)
@@ -129,43 +133,25 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, const InterpolationType interpolation,
-                                      float previousTime) const throw(FlowBuildingError, InterpolationError)
+QImage Project_sV::interpolateFrameAt(float frame, const FrameSize frameSize, const InterpolationType interpolation) const
+throw(FlowBuildingError, InterpolationError)
 {
-    float framePos = timeToFrame(time);
-    float prevFramePos = -1;
-    if (framePos > m_frameSource->framesCount()) {
+    if (frame > m_frameSource->framesCount()) {
         throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
-                                 .arg(framePos).arg(m_frameSource->framesCount()));
-    } else {
-        qDebug() << "Source frame @" << time << " is " << framePos;
+                                 .arg(frame).arg(m_frameSource->framesCount()));
     }
-    if (previousTime >= 0) {
-        prevFramePos = timeToFrame(previousTime);
-    }
+    if (frame-floor(frame) > MIN_FRAME_DIST) {
 
-    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1.2) {
-        QStringList frames;
-        int left = std::min(floor(prevFramePos), floor(framePos));
-        int right = std::max(ceil(prevFramePos), ceil(framePos));
-        for (int f = left; f <= right; f++) {
-            frames << m_frameSource->framePath(f, frameSize);
-        }
-        qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
-        return Shutter_sV::combine(frames);
-
-    } else if (framePos-floor(framePos) > MIN_FRAME_DIST) {
-
-        QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
-        QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
+        QImage left = m_frameSource->frameAt(floor(frame), frameSize);
+        QImage right = m_frameSource->frameAt(floor(frame)+1, frameSize);
         QImage out(left.size(), QImage::Format_ARGB32);
 
         /// Position between two frames, on [0 1]
-        const float pos = framePos-floor(framePos);
+        const float pos = frame-floor(frame);
 
         if (interpolation == InterpolationType_Twoway) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
+            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
+            FlowField_sV *backwardFlow = requestFlow(floor(frame)+1, floor(frame), frameSize);
 
             Q_ASSERT(forwardFlow != NULL);
             Q_ASSERT(backwardFlow != NULL);
@@ -180,8 +166,8 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
             delete backwardFlow;
 
         } else if (interpolation == InterpolationType_TwowayNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
+            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
+            FlowField_sV *backwardFlow = requestFlow(floor(frame)+1, floor(frame), frameSize);
 
             Q_ASSERT(forwardFlow != NULL);
             Q_ASSERT(backwardFlow != NULL);
@@ -196,7 +182,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
             delete backwardFlow;
 
         } else if (interpolation == InterpolationType_Forward) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
 
             Q_ASSERT(forwardFlow != NULL);
 
@@ -209,7 +195,7 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
             delete forwardFlow;
 
         } else if (interpolation == InterpolationType_ForwardNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
+            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
 
             Q_ASSERT(forwardFlow != NULL);
 
@@ -222,8 +208,8 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
             delete forwardFlow;
 
         } else if (interpolation == InterpolationType_Bezier) {
-            FlowField_sV *currNext = requestFlow(floor(framePos)+2, floor(framePos)+1, frameSize); // Allowed to be NULL
-            FlowField_sV *currPrev = requestFlow(floor(framePos)+0, floor(framePos)+1, frameSize);
+            FlowField_sV *currNext = requestFlow(floor(frame)+2, floor(frame)+1, frameSize); // Allowed to be NULL
+            FlowField_sV *currPrev = requestFlow(floor(frame)+0, floor(frame)+1, frameSize);
 
             Q_ASSERT(currPrev != NULL);
 
@@ -239,7 +225,39 @@ QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, con
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
-        return m_frameSource->frameAt(floor(framePos), frameSize);
+        return m_frameSource->frameAt(floor(frame), frameSize);
+    }
+}
+
+QImage Project_sV::interpolateFrameAtTime(float time, const FrameSize frameSize, const InterpolationType interpolation,
+                                      float previousTime) const throw(FlowBuildingError, InterpolationError)
+{
+    float framePos = timeToFrame(time);
+    float prevFramePos = -1;
+    if (framePos > m_frameSource->framesCount()) {
+        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
+                                 .arg(framePos).arg(m_frameSource->framesCount()));
+    } else {
+        qDebug() << "Source frame @" << time << " is " << framePos;
+    }
+    if (previousTime >= 0) {
+        prevFramePos = timeToFrame(previousTime);
+    }
+
+    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1.2) {
+//        QStringList frames;
+//        int left = std::min(floor(prevFramePos), floor(framePos));
+//        int right = std::max(ceil(prevFramePos), ceil(framePos));
+//        for (int f = left; f <= right; f++) {
+//            frames << m_frameSource->framePath(f, frameSize);
+//        }
+//        qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
+//        return Shutter_sV::combine(frames);
+        qDebug() << "Simulating NEW shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
+        return m_motionBlur->blur(prevFramePos, framePos, 4, frameSize);
+
+    } else {
+        return interpolateFrameAt(framePos, frameSize, interpolation);
     }
 }
 
