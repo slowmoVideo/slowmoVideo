@@ -35,26 +35,15 @@ fi
 
 mkdir ${dirname}
 mkdir ${dirname}/bin
-mkdir ${dirname}/res
 
 (
 cd install/bin
 if [ $? == 0 ]
 then
     cp slowmoUI flowBuilder visualizeFlow ../../${dirname}/bin
+    cp -r res ../../${dirname}/bin/
 else
     echo "install/bin/ not found, exiting"
-    exit -1
-fi
-)
-
-(
-cd install/res
-if [ $? == 0 ]
-then
-    cp *.png ../../${dirname}/res
-else
-    echo "install/res/ not found, exiting"
     exit -1
 fi
 )
