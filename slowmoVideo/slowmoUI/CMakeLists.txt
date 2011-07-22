@@ -15,6 +15,8 @@ set(SRCS
   dialogues/preferencesDialog.cpp
   dialogues/progressDialog.cpp
   dialogues/renderingDialog.cpp
+  dialogues/shutterFunctionDialog.cpp
+  dialogues/shutterFunctionFrame.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
 )
@@ -27,6 +29,7 @@ set(SRCS_UI
   dialogues/preferencesDialog.ui
   dialogues/progressDialog.ui
   dialogues/renderingDialog.ui
+  dialogues/shutterFunctionDialog.ui
   dialogues/tagAddDialog.ui
   dialogues/aboutDialog.ui
 )
@@ -39,6 +42,8 @@ set(SRCS_MOC
   dialogues/preferencesDialog.h
   dialogues/progressDialog.h
   dialogues/renderingDialog.h
+  dialogues/shutterFunctionDialog.h
+  dialogues/shutterFunctionFrame.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
 )

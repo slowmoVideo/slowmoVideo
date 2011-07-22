@@ -31,7 +31,9 @@ public:
     void updateFunction(const QString& function);
 
     QString id();
-    float evaluate(const float x0, const float dt, const float dy, const float t0);
+    float evaluate(const float x, const float dt, const float dy, const float t0);
+
+    void operator =(const ShutterFunction_sV &other);
 
 private:
     QString m_id;

@@ -176,7 +176,7 @@ QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpola
                     (sourceFrame-floor(sourceFrame))/fps.fps(),
                     fps.fps(),
                     rightNode->y()-leftNode->y(),
-                    outTime
+                    outTime-m_nodes->startTime()
                     );
         return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
     } else {

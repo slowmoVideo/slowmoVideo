@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "mainwindow.h"
 #include "tagAddDialog.h"
+#include "shutterFunctionDialog.h"
 
 #include "project/projectPreferences_sV.h"
 #include "project/abstractFrameSource_sV.h"
@@ -87,6 +88,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
     m_a1xSpeed = new QAction(QString::fromUtf8("Set speed to 1×"), this);
+    m_aShutterFunction = new QAction("Set/edit shutter function", this);
 
     m_handleMapper = new QSignalMapper(this);
     m_aResetLeftHandle = new QAction("Reset left handle", this);
@@ -105,6 +107,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
     b &= connect(m_a1xSpeed, SIGNAL(triggered()), this, SLOT(slotSet1xSpeed()));
+    b &= connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
     Q_ASSERT(b);
 }
 
@@ -527,6 +530,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
         menu.addAction(m_a1xSpeed);
+        menu.addAction(m_aShutterFunction);
 
     } else {
         if (obj != NULL) {
@@ -758,6 +762,17 @@ void Canvas::slotSet1xSpeed()
 {
     qDebug() << "Setting curve to 1x speed.";
     m_nodes->set1xSpeed(convertCanvasToTime(m_states.prevMousePos).x());
+}
+void Canvas::slotSetShutterFunction()
+{
+    int left = m_nodes->find(convertDistanceToTime(QPoint(m_states.prevMousePos.x(), 0)).x());
+    if (left == m_nodes->size()-1) {
+        left = m_nodes->size()-2;
+    }
+    const Node_sV *leftNode = &m_nodes->at(left);
+    const Node_sV *rightNode = &m_nodes->at(left+1);
+    ShutterFunctionDialog sfd(rightNode->y()-leftNode->y(), leftNode->x()-m_nodes->startTime(), this);
+    sfd.exec();
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)
