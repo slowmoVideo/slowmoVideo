@@ -11,8 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef TAGADDDIALOG_H
 #define TAGADDDIALOG_H
 
-#include "../project/tag_sV.h"
-#include "../lib/defs_sV.hpp"
+#include "project/tag_sV.h"
+#include "lib/defs_sV.hpp"
 #include <QDialog>
 
 namespace Ui {

@@ -14,10 +14,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDialog>
 #include <QtCore/QStringList>
 
-#include "../project/project_sV.h"
+#include "project/project_sV.h"
 
 extern "C" {
-    #include "../lib/videoInfo_sV.h"
+    #include "lib/videoInfo_sV.h"
 }
 
 namespace Ui {

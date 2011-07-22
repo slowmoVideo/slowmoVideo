@@ -14,8 +14,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "tagAddDialog.h"
 
-#include "../project/projectPreferences_sV.h"
-#include "../project/abstractFrameSource_sV.h"
+#include "project/projectPreferences_sV.h"
+#include "project/abstractFrameSource_sV.h"
 
 #include <cmath>
 #include <typeinfo>

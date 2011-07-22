@@ -8,11 +8,11 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include "newprojectdialog.h"
-#include "ui_newprojectdialog.h"
+#include "newProjectDialog.h"
+#include "ui_newProjectDialog.h"
 
-#include "../project/videoFrameSource_sV.h"
-#include "../project/imagesFrameSource_sV.h"
+#include "project/videoFrameSource_sV.h"
+#include "project/imagesFrameSource_sV.h"
 
 
 #include <QDebug>

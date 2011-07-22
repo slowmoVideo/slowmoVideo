@@ -4,42 +4,46 @@
 # http://www.cmake.org/pipermail/cmake/2008-September/023908.html
 
 
+include_directories(${slowmoVideo_SOURCE_DIR})
+
 set(SRCS
   main.cpp
   mainwindow.cpp
   canvas.cpp
   inputMonitor.cpp
-  newprojectdialog.cpp
-  preferencesDialog.cpp
-  progressDialog.cpp
-  renderingDialog.cpp
-  tagAddDialog.cpp
-  aboutDialog.cpp
+  dialogues/newProjectDialog.cpp
+  dialogues/preferencesDialog.cpp
+  dialogues/progressDialog.cpp
+  dialogues/renderingDialog.cpp
+  dialogues/tagAddDialog.cpp
+  dialogues/aboutDialog.cpp
 )
 
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
   inputMonitor.ui
-  newprojectdialog.ui
-  preferencesDialog.ui
-  progressDialog.ui
-  renderingDialog.ui
-  tagAddDialog.ui
-  aboutDialog.ui
+  dialogues/newProjectDialog.ui
+  dialogues/preferencesDialog.ui
+  dialogues/progressDialog.ui
+  dialogues/renderingDialog.ui
+  dialogues/tagAddDialog.ui
+  dialogues/aboutDialog.ui
 )
 
 set(SRCS_MOC
   mainwindow.h
   canvas.h
   inputMonitor.h
-  newprojectdialog.h
-  preferencesDialog.h
-  progressDialog.h
-  renderingDialog.h
-  tagAddDialog.h
-  aboutDialog.h
+  dialogues/newProjectDialog.h
+  dialogues/preferencesDialog.h
+  dialogues/progressDialog.h
+  dialogues/renderingDialog.h
+  dialogues/tagAddDialog.h
+  dialogues/aboutDialog.h
 )
+
+include_directories(dialogues)
 
 set(RES
   #res/iconAdd.png

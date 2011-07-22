@@ -11,16 +11,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "newprojectdialog.h"
+#include "newProjectDialog.h"
 #include "progressDialog.h"
 #include "renderingDialog.h"
 #include "preferencesDialog.h"
 #include "aboutDialog.h"
 
-#include "../lib/defs_sV.hpp"
-#include "../project/renderTask_sV.h"
-#include "../project/xmlProjectRW_sV.h"
-#include "../project/abstractFrameSource_sV.h"
+#include "lib/defs_sV.hpp"
+#include "project/renderTask_sV.h"
+#include "project/xmlProjectRW_sV.h"
+#include "project/abstractFrameSource_sV.h"
 
 #include <QtCore>
 #include <QObject>

@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "canvas.h"
 #include "inputMonitor.h"
-#include "../project/project_sV.h"
+#include "project/project_sV.h"
 
 namespace Ui {
     class MainWindow;

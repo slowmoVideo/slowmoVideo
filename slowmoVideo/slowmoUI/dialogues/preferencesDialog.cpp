@@ -1,7 +1,7 @@
 #include "preferencesDialog.h"
 #include "ui_preferencesDialog.h"
 
-#include "../lib/defs_sV.hpp"
+#include "lib/defs_sV.hpp"
 #include <QtCore/QProcess>
 #include <QtGui/QFileDialog>
 

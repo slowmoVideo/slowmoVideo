@@ -10,7 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "aboutDialog.h"
 #include "ui_aboutDialog.h"
-#include "../lib/defs_sV.hpp"
+#include "lib/defs_sV.hpp"
 
 AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent),

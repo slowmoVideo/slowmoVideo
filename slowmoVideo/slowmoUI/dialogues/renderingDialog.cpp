@@ -11,13 +11,13 @@ the Free Software Foundation, either version 3 of the License, or
 #include "renderingDialog.h"
 #include "ui_renderingDialog.h"
 
-#include "../lib/defs_sV.hpp"
-#include "../project/project_sV.h"
-#include "../project/projectPreferences_sV.h"
-#include "../project/renderTask_sV.h"
-#include "../project/imagesRenderTarget_sV.h"
-#include "../project/videoRenderTarget_sV.h"
-#include "../project/emptyFrameSource_sV.h"
+#include "lib/defs_sV.hpp"
+#include "project/project_sV.h"
+#include "project/projectPreferences_sV.h"
+#include "project/renderTask_sV.h"
+#include "project/imagesRenderTarget_sV.h"
+#include "project/videoRenderTarget_sV.h"
+#include "project/emptyFrameSource_sV.h"
 
 #include <QButtonGroup>
 #include <QFileDialog>
