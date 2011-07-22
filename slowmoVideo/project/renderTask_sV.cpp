@@ -18,7 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "nodelist_sV.h"
 #include "../lib/defs_sV.hpp"
 
-RenderTask_sV::RenderTask_sV(const Project_sV *project) :
+RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
     m_fps(24),
@@ -117,7 +117,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("Empty frame source, cannot be rendered.");
     }
 
-    int frameNumber = (time - m_project->nodes()->startTime()) * m_fps.fps();
+    int outputFrame = (time - m_project->nodes()->startTime()) * m_fps.fps();
     if (!m_stopRendering) {
 
         if (time > m_timeEnd) {
@@ -128,17 +128,17 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
 
-            qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
+            qDebug() << "Rendering frame number " << outputFrame << " @" << time << " from source time " << srcTime;
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
-                                .arg(frameNumber).arg(time).arg(srcTime).arg(frameNumber));
+                                .arg(outputFrame).arg(time).arg(srcTime).arg(outputFrame));
             try {
-                QImage rendered = m_project->interpolateFrameAtTime(srcTime, m_frameSize, m_interpolationType, m_prevTime);
+                QImage rendered = m_project->render(time, m_fps, m_interpolationType, m_frameSize);
 
-                m_renderTarget->slotConsumeFrame(rendered, frameNumber);
+                m_renderTarget->slotConsumeFrame(rendered, outputFrame);
                 m_nextFrameTime = time + 1/m_fps.fps();
 
-                emit signalTaskProgress(frameNumber);
-                emit signalFrameRendered(time, frameNumber);
+                emit signalTaskProgress(outputFrame);
+                emit signalFrameRendered(time, outputFrame);
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;
                 emit signalRenderingAborted(err.message());

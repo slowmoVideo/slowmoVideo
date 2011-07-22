@@ -6,6 +6,7 @@ set(SRCS
     testIntMatrix_sV.cpp
     testXmlProjectRW_sV.cpp
     testDefs_sV.cpp
+    testShutterFunction_sV.cpp
     testAll.cpp
 )
 set(SRCS_MOC
@@ -14,6 +15,7 @@ set(SRCS_MOC
     testVector_sV.h
     testIntMatrix_sV.h
     testDefs_sV.h
+    testShutterFunction_sV.h
     testXmlProjectRW_sV.h
 )
 

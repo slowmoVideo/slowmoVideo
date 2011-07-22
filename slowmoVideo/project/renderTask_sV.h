@@ -27,7 +27,7 @@ class RenderTask_sV : public QObject
 {
     Q_OBJECT
 public:
-    RenderTask_sV(const Project_sV *project);
+    RenderTask_sV(Project_sV *project);
     ~RenderTask_sV();
 
     /**
@@ -75,7 +75,7 @@ signals:
     void signalFrameRendered(qreal time, int frameNumber);
 
 private:
-    const Project_sV *m_project;
+    Project_sV *m_project;
     AbstractRenderTarget_sV *m_renderTarget;
 
     float m_timeStart;

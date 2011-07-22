@@ -20,23 +20,20 @@ V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project, float lambda) :
     AbstractFlowSource_sV(project),
     m_lambda(lambda)
 {
-    m_dirFlowSmall = project->getDirectory("oFlowSmall");
-    m_dirFlowOrig = project->getDirectory("oFlowOrig");
-
-    m_dirFlowSmall.mkpath(".");
-    m_dirFlowOrig.mkpath(".");
+    createDirectories();
 }
 
 void V3dFlowSource_sV::slotUpdateProjectDir()
 {
     m_dirFlowSmall.rmdir(".");
     m_dirFlowOrig.rmdir(".");
+    createDirectories();
+}
 
-    m_dirFlowSmall = project()->getDirectory("oFlowSmall");
-    m_dirFlowOrig = project()->getDirectory("oFlowOrig");
-
-    m_dirFlowSmall.mkpath(".");
-    m_dirFlowOrig.mkpath(".");
+void V3dFlowSource_sV::createDirectories()
+{
+    m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
+    m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
 void V3dFlowSource_sV::setLambda(float lambda)

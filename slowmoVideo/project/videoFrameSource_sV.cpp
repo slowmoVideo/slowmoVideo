@@ -46,8 +46,7 @@ throw(FrameSourceError) :
         throw FrameSourceError("ffmpeg executable not found! Cannot load " + filename);
     }
 
-    m_dirFramesSmall = project->getDirectory("framesSmall");
-    m_dirFramesOrig = project->getDirectory("framesOrig");
+    createDirectories();
 
     m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
@@ -68,9 +67,13 @@ void VideoFrameSource_sV::slotUpdateProjectDir()
     // Delete old directories if they are empty
     m_dirFramesSmall.rmdir(".");
     m_dirFramesOrig.rmdir(".");
+    createDirectories();
+}
 
-    m_dirFramesSmall = project()->getDirectory("framesSmall");
-    m_dirFramesOrig = project()->getDirectory("framesOrig");
+void VideoFrameSource_sV::createDirectories()
+{
+    m_dirFramesSmall = project()->getDirectory("frames/small");
+    m_dirFramesOrig = project()->getDirectory("frames/orig");
 }
 
 void VideoFrameSource_sV::initialize()

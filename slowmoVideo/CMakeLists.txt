@@ -30,6 +30,7 @@ include(cmake/macros.cmake)
 
 SET(QT_USE_QTXML TRUE)
 SET(QT_USE_QTTEST TRUE)
+SET(QT_USE_QTSCRIPT TRUE)
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})

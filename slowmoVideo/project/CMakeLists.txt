@@ -18,6 +18,9 @@ set(SRCS_PROJ
   videoRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
   v3dFlowSource_sV.cpp
+  interpolator_sV.cpp
+  shutterFunction_sV.cpp
+  shutterFunctionList_sV.cpp
   motionBlur_sV.cpp
   canvasObject_sV.h
 )

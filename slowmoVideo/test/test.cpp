@@ -5,8 +5,10 @@
 #include "../project/videoFrameSource_sV.h"
 #include "../lib/bezierTools_sV.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
+#include <QtScript/QScriptEngine>
 
 
 void testSave()
@@ -63,7 +65,20 @@ void testFloatArg()
     qDebug() << QString("%2").arg(24.249, 8, 'f', 2, '0');
 }
 
+void testQtScript()
+{
+    int argc = 0;
+    QCoreApplication app(argc, NULL);
+    QScriptEngine engine;
+    QScriptValue val = engine.evaluate("1+2");
+
+    QScriptValue fx = engine.evaluate("(function(x, dy) { return Math.PI; })");
+    QScriptValueList args;
+    args << .5 << 0;
+    qDebug() << fx.call(QScriptValue(), args).toString();
+}
+
 int main()
 {
-    testFloatArg();
+    testQtScript();
 }

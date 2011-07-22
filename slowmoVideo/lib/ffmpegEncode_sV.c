@@ -288,7 +288,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
 
             if (cc->coded_frame->pts != AV_NOPTS_VALUE) {
                 pkt.pts = av_rescale_q(cc->coded_frame->pts, cc->time_base, video->streamV->time_base);
-                printf("pkt.pts is %d.\n", pkt.pts);
+//                printf("pkt.pts is %d.\n", pkt.pts);
             }
             if(cc->coded_frame->key_frame) {
                 pkt.flags |= AV_PKT_FLAG_KEY;

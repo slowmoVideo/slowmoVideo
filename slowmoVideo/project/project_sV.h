@@ -29,6 +29,7 @@ class Flow_sV;
 class AbstractFrameSource_sV;
 class AbstractFlowSource_sV;
 class MotionBlur_sV;
+class ShutterFunctionList_sV;
 class RenderTask_sV;
 class FlowField_sV;
 class QSignalMapper;
@@ -82,12 +83,7 @@ public:
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
-    QImage interpolateFrameAt(float frame, const FrameSize frameSize,
-                              const InterpolationType interpolation) const
-    throw(FlowBuildingError, InterpolationError);
-    QImage interpolateFrameAtTime(float time, const FrameSize frameSize,
-                              const InterpolationType interpolation, float previousTime = -1) const
-    throw(FlowBuildingError, InterpolationError);
+    QImage render(float outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size);
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
@@ -111,11 +107,13 @@ private:
     AbstractFrameSource_sV *m_frameSource;
     AbstractFlowSource_sV *m_flowSource;
     MotionBlur_sV *m_motionBlur;
+
     NodeList_sV *m_nodes;
     QList<Tag_sV> *m_tags;
     RenderTask_sV *m_renderTask;
+    ShutterFunctionList_sV *m_shutterFunctions;
 
-    float timeToFrame(float time) const;
+    float sourceTimeToFrame(float time) const;
 
     void init();
 

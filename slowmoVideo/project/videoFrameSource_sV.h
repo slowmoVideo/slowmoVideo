@@ -68,7 +68,7 @@ private:
     bool m_initialized;
 
 
-    const QString framesDirStr(FrameSize frameSize) const;
+    void createDirectories();
     /**
       Extracts the frames from the video file into single images
       */

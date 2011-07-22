@@ -79,6 +79,7 @@ const NodeHandle_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
 const NodeHandle_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
 CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
 CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
+const QString Node_sV::shutterFunctionID() const { return m_shutterFunctionID; }
 
 void Node_sV::setLeftCurveType(CurveType type) { m_leftCurveType = type; }
 void Node_sV::setRightCurveType(CurveType type) { m_rightCurveType = type; }
@@ -89,6 +90,10 @@ void Node_sV::setLeftNodeHandle(qreal x, qreal y) {
 void Node_sV::setRightNodeHandle(qreal x, qreal y) {
     Q_ASSERT(x >= 0);
     m_rightHandle.rx() = x; m_rightHandle.ry() = y;
+}
+void Node_sV::setShutterFunctionID(QString id)
+{
+    m_shutterFunctionID = id;
 }
 
 

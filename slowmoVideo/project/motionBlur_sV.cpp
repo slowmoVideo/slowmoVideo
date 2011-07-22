@@ -1,35 +1,57 @@
+/*
+This file is part of slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #include "motionBlur_sV.h"
 #include "project_sV.h"
 #include "abstractFrameSource_sV.h"
+#include "interpolator_sV.h"
 #include "../lib/shutter_sV.h"
 
-MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
-    m_project(project)
+MotionBlur_sV::MotionBlur_sV(Project_sV *project, int minSamples) :
+    m_project(project),
+    m_minSamples(minSamples)
 {
     createDirectories();
 }
 
-QImage MotionBlur_sV::blur(float startFrame, float endFrame, float shutterPercent, FrameSize size)
+QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, FrameSize size)
 {
+    if (replaySpeed > 0.5) {
+        return fastBlur(startFrame, endFrame, size);
+    } else {
+        return slowmoBlur(startFrame, endFrame, size);
+    }
+}
+
+QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
+{
+    /// \todo Check if endFrame-startFrame large enough!
+    /// \todo m_minSamples
+
+
     float low, high;
     if (startFrame < endFrame) {
         low = startFrame; high = endFrame;
     } else {
         low = endFrame; high = startFrame;
     }
+    low = qMax(low, float(0));
+    high = qMin(high, (float)m_project->frameSource()->framesCount());
+
+    float pos = ceil(4*low)/4.0;    // Round to quarters
 
     QStringList frameList;
 
-    float pos = ceil(4*low)/4.0;
-    pos = qMax(float(0), pos);
-    float endPos = low + shutterPercent * (high-low);
-    endPos = qMin(endPos, (float)m_project->frameSource()->framesCount());
-
-
     qDebug() << "start: " << startFrame << ", end: " << endFrame << ", low: " << low
-             << ", high: " << high << ", percent: " << shutterPercent;
-    qDebug() << "pos: " << pos << ", endPos: " << endPos;
-    while (pos < endPos) {
+             << ", high: " << high << ", pos: " << pos;
+    while (pos < high) {
         qDebug() << "pos: " << pos;
         frameList << cachedFramePath(pos, size);
         pos += .25;
@@ -38,9 +60,33 @@ QImage MotionBlur_sV::blur(float startFrame, float endFrame, float shutterPercen
     return Shutter_sV::combine(frameList);
 }
 
-QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size)
+QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize size)
 {
-    QString name = QString("%2/cached%1.png").arg(framePos, 8, 'f', 2, '0');
+    float low, high;
+    if (startFrame < endFrame) {
+        low = startFrame; high = endFrame;
+    } else {
+        low = endFrame; high = startFrame;
+    }
+    low = qMax(low, float(0));
+    high = qMin(high, (float)m_project->frameSource()->framesCount());
+
+    QStringList frameList;
+    float increment = (high-low)/(m_minSamples-1);
+    for (float pos = low; pos <= high; pos += increment) {
+        qDebug() << "pos: " << pos;
+        frameList << cachedFramePath(pos, size, true);
+    }
+
+    return Shutter_sV::combine(frameList);
+}
+
+QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size, bool highPrecision)
+{
+    int precision = 2;
+    if (highPrecision) { precision = 6; }
+    int width = 5+1 + precision;
+    QString name = QString("%2/cached%1.png").arg(framePos, width, 'f', precision, '0');
     if (size == FrameSize_Small) {
         name = name.arg(m_dirCacheSmall.absolutePath());
     } else if (size == FrameSize_Orig) {
@@ -51,7 +97,8 @@ QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size)
     }
     if (!QFileInfo(name).exists()) {
         qDebug() << name << " does not exist yet. Interpolating.";
-        QImage frm = m_project->interpolateFrameAt(framePos, size, InterpolationType_TwowayNew);
+        /// \todo
+        QImage frm = Interpolator_sV::interpolate(m_project, framePos, InterpolationType_TwowayNew, size);
         frm.save(name);
     } else {
         qDebug() << "Frame is cached already: " << name;
@@ -69,6 +116,6 @@ void MotionBlur_sV::slotUpdateProjectDir()
 
 void MotionBlur_sV::createDirectories()
 {
-    m_dirCacheSmall = m_project->getDirectory("cacheMotionBlurSmall");
-    m_dirCacheOrig = m_project->getDirectory("cacheMotionBlurOrig");
+    m_dirCacheSmall = m_project->getDirectory("cache/motionBlurSmall");
+    m_dirCacheOrig = m_project->getDirectory("cache/motionBlurOrig");
 }

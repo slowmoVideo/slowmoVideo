@@ -58,11 +58,13 @@ public:
     const NodeHandle_sV& rightNodeHandle() const;
     CurveType leftCurveType() const;
     CurveType rightCurveType() const;
+    const QString shutterFunctionID() const;
 
     void setLeftNodeHandle(qreal x, qreal y);
     void setRightNodeHandle(qreal x, qreal y);
     void setLeftCurveType(CurveType type);
     void setRightCurveType(CurveType type);
+    void setShutterFunctionID(QString id);
 
     QPointF toQPointF() const;
 
@@ -80,6 +82,8 @@ private:
     NodeHandle_sV m_rightHandle;
     CurveType m_leftCurveType;
     CurveType m_rightCurveType;
+
+    QString m_shutterFunctionID;
 
     void init();
 };

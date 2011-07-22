@@ -13,7 +13,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
+#include "interpolator_sV.h"
 #include "motionBlur_sV.h"
+#include "shutterFunction_sV.h"
+#include "shutterFunctionList_sV.h"
 #include "../lib/shutter_sV.h"
 #include "../lib/interpolate_sV.h"
 #include "../lib/flowRW_sV.h"
@@ -53,10 +56,11 @@ void Project_sV::init()
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
     m_flowSource = new V3dFlowSource_sV(this);
-    m_motionBlur = new MotionBlur_sV(this);
+    m_motionBlur = new MotionBlur_sV(this, 3); ///< \todo motion blur samples as argument
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
+    m_shutterFunctions = new ShutterFunctionList_sV();
     m_renderTask = NULL;
 }
 
@@ -69,6 +73,7 @@ Project_sV::~Project_sV()
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
+    delete m_shutterFunctions;
 }
 
 void Project_sV::setProjectDir(QString projectDir)
@@ -133,131 +138,49 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::interpolateFrameAt(float frame, const FrameSize frameSize, const InterpolationType interpolation) const
-throw(FlowBuildingError, InterpolationError)
+QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
 {
-    if (frame > m_frameSource->framesCount()) {
-        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
-                                 .arg(frame).arg(m_frameSource->framesCount()));
+    if (outTime < 0 || outTime > m_nodes->endTime()) {
+        qDebug() << "Output time out of bounds";
+        Q_ASSERT(false);
     }
-    if (frame-floor(frame) > MIN_FRAME_DIST) {
 
-        QImage left = m_frameSource->frameAt(floor(frame), frameSize);
-        QImage right = m_frameSource->frameAt(floor(frame)+1, frameSize);
-        QImage out(left.size(), QImage::Format_ARGB32);
+    float sourceTime = m_nodes->sourceTime(outTime);
+    if (sourceTime < 0) {
+        sourceTime = 0;
+    }
+    if (sourceTime > m_frameSource->maxTime()) {
+        sourceTime = m_frameSource->maxTime();
+    }
 
-        /// Position between two frames, on [0 1]
-        const float pos = frame-floor(frame);
+    float sourceFrame = sourceTimeToFrame(sourceTime);
 
-        if (interpolation == InterpolationType_Twoway) {
-            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(frame)+1, floor(frame), frameSize);
+    int leftIndex = m_nodes->find(outTime);
+    if (leftIndex < 0) {
+        qDebug() << "left node is not here!";
+        Q_ASSERT(false);
+    }
+    if (leftIndex == m_nodes->size()-1) {
+        // outTime is at the very end of the node.
+        // Take next to last node to still have a right node.
+        leftIndex--;
+    }
 
-            Q_ASSERT(forwardFlow != NULL);
-            Q_ASSERT(backwardFlow != NULL);
+    const Node_sV *leftNode = &(*m_nodes)[leftIndex];
+    const Node_sV *rightNode = &(*m_nodes)[leftIndex+1];
 
-            if (forwardFlow == NULL || backwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
+    ShutterFunction_sV *shutterFunction = m_shutterFunctions->function(leftNode->shutterFunctionID());
 
-            Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
-            delete forwardFlow;
-            delete backwardFlow;
-
-        } else if (interpolation == InterpolationType_TwowayNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(frame)+1, floor(frame), frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-            Q_ASSERT(backwardFlow != NULL);
-
-            if (forwardFlow == NULL || backwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::newTwowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
-            delete forwardFlow;
-            delete backwardFlow;
-
-        } else if (interpolation == InterpolationType_Forward) {
-            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-
-            if (forwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::forwardFlow(left, forwardFlow, pos, out);
-            delete forwardFlow;
-
-        } else if (interpolation == InterpolationType_ForwardNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(frame), floor(frame)+1, frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-
-            if (forwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::newForwardFlow(left, forwardFlow, pos, out);
-            delete forwardFlow;
-
-        } else if (interpolation == InterpolationType_Bezier) {
-            FlowField_sV *currNext = requestFlow(floor(frame)+2, floor(frame)+1, frameSize); // Allowed to be NULL
-            FlowField_sV *currPrev = requestFlow(floor(frame)+0, floor(frame)+1, frameSize);
-
-            Q_ASSERT(currPrev != NULL);
-
-            Interpolate_sV::bezierFlow(left, right, currPrev, currNext, pos, out);
-
-            delete currNext;
-            delete currPrev;
-
-        } else {
-            qDebug() << "Unsupported interpolation type!";
-            Q_ASSERT(false);
-        }
-        return out;
+    if (shutterFunction != NULL) {
+        float shutter = shutterFunction->evaluate(
+                    (sourceFrame-floor(sourceFrame))/fps.fps(),
+                    fps.fps(),
+                    rightNode->y()-leftNode->y(),
+                    outTime
+                    );
+        return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
     } else {
-        qDebug() << "No interpolation necessary.";
-        return m_frameSource->frameAt(floor(frame), frameSize);
-    }
-}
-
-QImage Project_sV::interpolateFrameAtTime(float time, const FrameSize frameSize, const InterpolationType interpolation,
-                                      float previousTime) const throw(FlowBuildingError, InterpolationError)
-{
-    float framePos = timeToFrame(time);
-    float prevFramePos = -1;
-    if (framePos > m_frameSource->framesCount()) {
-        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
-                                 .arg(framePos).arg(m_frameSource->framesCount()));
-    } else {
-        qDebug() << "Source frame @" << time << " is " << framePos;
-    }
-    if (previousTime >= 0) {
-        prevFramePos = timeToFrame(previousTime);
-    }
-
-    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1.2) {
-//        QStringList frames;
-//        int left = std::min(floor(prevFramePos), floor(framePos));
-//        int right = std::max(ceil(prevFramePos), ceil(framePos));
-//        for (int f = left; f <= right; f++) {
-//            frames << m_frameSource->framePath(f, frameSize);
-//        }
-//        qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
-//        return Shutter_sV::combine(frames);
-        qDebug() << "Simulating NEW shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
-        return m_motionBlur->blur(prevFramePos, framePos, 4, frameSize);
-
-    } else {
-        return interpolateFrameAt(framePos, frameSize, interpolation);
+        return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);
     }
 }
 
@@ -269,7 +192,7 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
 }
 
 inline
-float Project_sV::timeToFrame(float time) const
+float Project_sV::sourceTimeToFrame(float time) const
 {
     Q_ASSERT(time >= 0);
     return time * m_frameSource->fps();

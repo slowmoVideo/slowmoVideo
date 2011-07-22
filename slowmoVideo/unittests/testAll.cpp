@@ -4,6 +4,7 @@
 #include "testXmlProjectRW_sV.h"
 #include "testVector_sV.h"
 #include "testDefs_sV.h"
+#include "testShutterFunction_sV.h"
 
 #include <QtTest/QtTest>
 
@@ -26,4 +27,7 @@ int main()
 
     TestDefs_sV defs;
     QTest::qExec(&defs);
+
+    TestShutterFunction_sV shutter;
+    QTest::qExec(&shutter);
 }

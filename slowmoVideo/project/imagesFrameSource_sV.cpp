@@ -32,7 +32,7 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
         m_sizeSmall = m_sizeSmall/2;
     }
 
-    m_dirImagesSmall = project->getDirectory("imagesSmall");
+    createDirectories();
 }
 
 QString ImagesFrameSource_sV::validateImages(const QStringList images)
@@ -57,7 +57,12 @@ const QStringList ImagesFrameSource_sV::inputFiles() const
 void ImagesFrameSource_sV::slotUpdateProjectDir()
 {
     m_dirImagesSmall.rmdir(".");
-    m_dirImagesSmall = project()->getDirectory("imagesSmall");
+    createDirectories();
+}
+
+void ImagesFrameSource_sV::createDirectories()
+{
+    m_dirImagesSmall = m_project->getDirectory("frames/imagesSmall");
 }
 
 void ImagesFrameSource_sV::initialize()

@@ -51,6 +51,8 @@ private:
     bool m_stopInitialization;
     int m_nextFrame;
 
+    void createDirectories();
+
 
 private slots:
     void slotContinueInitialization();

@@ -15,7 +15,7 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     IntMatrix_sV mat(w, h, c);
 
     mat += orig;
-    dumpMatrix(&mat);
+//    dumpMatrix(&mat);
     data = mat.toBytesArray();
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == orig[i]);
@@ -23,7 +23,7 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     delete data;
 
     mat += orig;
-    dumpMatrix(&mat);
+//    dumpMatrix(&mat);
     data = mat.toBytesArray();
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == 2*orig[i]);
@@ -31,7 +31,7 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     delete data;
 
     mat /= 2;
-    dumpMatrix(&mat);
+//    dumpMatrix(&mat);
     data = mat.toBytesArray();
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == orig[i]);
