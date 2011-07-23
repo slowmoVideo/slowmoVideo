@@ -40,7 +40,7 @@ int open_video(VideoOut_sV *video)
     if (!codec) {
         char s[200];
         sprintf(s, "Codec for ID %d could not be found.\n", cc->codec_id);
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return 3;
     } else {
@@ -51,7 +51,7 @@ int open_video(VideoOut_sV *video)
     if (avcodec_open(cc, codec) < 0) {
         char s[200];
         sprintf(s, "Could not open codec %s.\n", codec->long_name);
-        fprintf(stderr, s);
+        fputs(s, stderr);
         return 3;
     }
 
@@ -86,14 +86,20 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     av_register_all();
 
     /* allocate the output media context */
+#if LIBAVFORMAT_VERSION_MAJOR  < 53
+    video->fc = avformat_alloc_context();
+    video->fc->oformat = av_guess_format(NULL, filename, NULL);
+    strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
+#else
     avformat_alloc_output_context2(&video->fc, NULL, NULL, filename);
     if (!video->fc) {
         printf("Could not deduce output format from file extension: using MPEG.\n");
         avformat_alloc_output_context2(&video->fc, NULL, "mpeg", filename);
     }
+#endif
     if (!video->fc) {
         const char *s = "Could allocate the output context, even MPEG is not available.\n";
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return 2;
     }
@@ -104,9 +110,9 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     if (vcodec != NULL) {
         AVCodec *codec = avcodec_find_encoder_by_name(vcodec);
         if (codec == NULL) {
-            char s[strlen(vcodec)+50];
-            sprintf(s, "No codec available for %s.\n", vcodec);
-            fprintf(stderr, s);
+            char s[strlen(vcodec)+150];
+            sprintf(s, "No codec available for %s. Check the output of \nffmpeg -codecs\nto see a list of available codecs.\n", vcodec);
+            fputs(s, stderr);
             setErrorMessage(video, s);
             return 2;
         }
@@ -122,7 +128,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         video->streamV = av_new_stream(video->fc, 0);
         if (!video->streamV) {
             const char *s = "Could not allocate the video stream.\n";
-            fprintf(stderr, s);
+            fputs(s, stderr);
             setErrorMessage(video, s);
             return 2;
         }
@@ -181,7 +187,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         if (video->rgbConversionContext == NULL) {
             char s[200];
             sprintf(s, "Cannot initialize the RGB conversion context. Incorrect size (%dx%d)?\n", cc->width, cc->height);
-            fprintf(stderr, s);
+            fputs(s, stderr);
             setErrorMessage(video, s);
             return 2;
         }
@@ -193,12 +199,16 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         fflush(stdout);
     } else {
         const char *s = "No codec ID given.\n";
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return 2;
     }
 
+#if LIBAVFORMAT_VERSION_MAJOR  < 53
+    dump_format(video->fc, 0, filename, 1);
+#else
     av_dump_format(video->fc, 0, filename, 1);
+#endif
 
     /* now that all the parameters are set, we can open the audio and
        video codecs and allocate the necessary encode buffers */
@@ -209,7 +219,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         }
     } else {
         const char *s = "Could not open video stream.\n";
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return 2;
     }
@@ -218,13 +228,17 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
     /* open the output file, if needed */
     if (!(video->format->flags & AVFMT_NOFILE)) {
+#if LIBAVFORMAT_VERSION_MAJOR < 53
+        if (url_fopen(&video->fc->pb, filename, URL_WRONLY) < 0) {
+#else
         if (avio_open(&video->fc->pb, filename, AVIO_FLAG_WRITE) < 0) {
+#endif
             fprintf(stderr, "could not open %s\n", video->filename);
             char *msg = "Could not open file: ";
             char *msgAll = malloc(sizeof(char) * (strlen(filename) + strlen(msg)));
             strcpy(msgAll, msg);
             strcat(msgAll, filename);
-            fprintf(stderr, msgAll);
+            fputs(msgAll, stderr);
             setErrorMessage(video, msgAll);
             free(msgAll);
             return 5;
@@ -232,7 +246,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     }
 
     /* write the stream header, if any */
+#if LIBAVFORMAT_VERSION_MAJOR < 53
+    av_write_header(video->fc);
+#else
     avformat_write_header(video->fc, NULL);
+#endif
 
 
     /* alloc image and output buffer */
@@ -244,7 +262,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
                     video->streamV->codec->width, video->streamV->codec->height);
     if (!video->picture) {
         const char *s = "Could not allocate AVPicture.\n";
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return 2;
     }
@@ -305,7 +323,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
     }
     if (ret != 0) {
         const char *s = "Error while writing video frame (interleaved_write).\n";
-        fprintf(stderr, s);
+        fputs(s, stderr);
         setErrorMessage(video, s);
         return ret;
     }
@@ -345,7 +363,7 @@ void eatSample(VideoOut_sV *video)
 
         if (cc->coded_frame->pts != AV_NOPTS_VALUE) {
             pkt.pts = av_rescale_q(cc->coded_frame->pts, cc->time_base, video->streamV->time_base);
-            printf("pkt.pts is %d.\n", pkt.pts);
+            printf("pkt.pts is %ld.\n", pkt.pts);
         }
         if(cc->coded_frame->key_frame) {
             pkt.flags |= AV_PKT_FLAG_KEY;
@@ -386,7 +404,11 @@ void finish(VideoOut_sV *video)
 
     if (!(video->format->flags & AVFMT_NOFILE)) {
         /* close the output file */
+#if LIBAVFORMAT_VERSION_MAJOR < 53
+        url_fclose(video->fc->pb);
+#else
         avio_close(video->fc->pb);
+#endif
     }
 
     /* free the stream */
