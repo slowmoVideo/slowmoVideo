@@ -13,6 +13,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "canvasObject_sV.h"
 
+/**
+  \brief Dummy object for a segment between two nodes
+  */
 class Segment_sV : public CanvasObject_sV
 {
 public:

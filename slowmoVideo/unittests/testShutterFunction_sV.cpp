@@ -45,3 +45,20 @@ void TestShutterFunction_sV::testFunctions()
         QVERIFY(fabs(cpp - qsc) < .0001);
     }
 }
+
+void TestShutterFunction_sV::testWithVariables()
+{
+    ShutterFunction_sV f;
+    f.updateFunction("var dx = 1/fps; \n"
+                     "var speed = dy/dx;\n"
+                     "if (speed < 1) { speed = 0; }\n"
+                     "return speed;");
+    float dx = 1.0/24;
+    for (float dy = 0; dy <= 1; dy += .1) {
+        float speed = dy/dx;
+        if (speed < 1) { speed = 0; }
+        float qsc = f.evaluate(0, 0, 24, 0, dy);
+//        qDebug() << "QScript says " << qsc << " (Qt: " << speed << ")";
+        QVERIFY(fabs(speed-qsc) < .0001);
+    }
+}

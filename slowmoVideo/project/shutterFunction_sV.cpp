@@ -57,9 +57,10 @@ ShutterFunction_sV::~ShutterFunction_sV()
     delete m_scriptEngine;
 }
 
-/// \todo Copy the ID?
 void ShutterFunction_sV::operator =(const ShutterFunction_sV &other)
 {
+    qDebug() << "Shutter functions should not be copied!";
+    Q_ASSERT(false);
     if (this != &other) {
         m_id = other.m_id;
         m_function = other.m_function;

@@ -29,10 +29,10 @@
 /// Variables should not be changed from the outside.
 typedef struct VideoOut_sV {
 
-    AVFrame *picture;
-    AVFormatContext *fc;
-    AVOutputFormat *format;
-    AVStream *streamV;
+    AVFrame *picture; ///< Temporary picture for the incoming frame
+    AVFormatContext *fc; ///< Video's format context
+    AVOutputFormat *format; ///< Just a shortcut to fc->format
+    AVStream *streamV; ///< Video output stream
 
     /// Current frame number that is encoded
     int frameNr;
@@ -45,7 +45,8 @@ typedef struct VideoOut_sV {
     /// Video filename
     char *filename;
 
-    int outbufSizeV, outSize;
+    int outSize;
+    int outbufSizeV;
     uint8_t *outbufV;
 
     /// Set if an error occurs (file does not exist, for example), for more accurate information.

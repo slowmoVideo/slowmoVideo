@@ -140,7 +140,7 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
 
 QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
 {
-    if (outTime < 0 || outTime > m_nodes->endTime()) {
+    if (outTime < m_nodes->startTime() || outTime > m_nodes->endTime()) {
         qDebug() << "Output time out of bounds";
         Q_ASSERT(false);
     }
@@ -177,17 +177,20 @@ QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpola
             dy = m_nodes->sourceTime(outTime+1/fps.fps())-sourceTime;
         }
         float shutter = shutterFunction->evaluate(
-                    (sourceFrame-floor(sourceFrame))/fps.fps(), // x on [0,1]
+                    (outTime-leftNode->x())/(rightNode->x()-leftNode->x()), // x on [0,1]
                     outTime, // t
                     fps.fps(), // FPS
                     sourceFrame, // y
                     dy // dy to next frame
                     );
         qDebug() << "Shutter value for output time " << outTime << " is " << shutter;
-        return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
-    } else {
-        return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);
+        if (shutter > 0) {
+            try {
+                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
+            } catch (RangeTooSmallError_sV &err) {}
+        }
     }
+    return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);
 }
 
 FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError)

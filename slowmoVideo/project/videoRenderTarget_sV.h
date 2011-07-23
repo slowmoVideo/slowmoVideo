@@ -20,11 +20,13 @@ class RenderTask_sV;
 class VideoRenderTarget_sV : public AbstractRenderTarget_sV
 {
 public:
+    /// Constructs a new video render target
     VideoRenderTarget_sV(RenderTask_sV *parentRenderTask);
     virtual ~VideoRenderTarget_sV();
 
     /// openRenderTarget() will throw an error if the target file cannot be opened.
     void setTargetFile(const QString& filename);
+    /// Set a custom video codec (see <pre>ffmpeg -codecs</pre> for a list of available codecs).
     void setVcodec(const QString& codec);
 
     void openRenderTarget() throw(Error_sV);

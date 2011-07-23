@@ -14,6 +14,7 @@ private slots:
     void cleanupTestCase();
     void testZeroFunction();
     void testFunctions();
+    void testWithVariables();
 
 private:
     QCoreApplication *app;

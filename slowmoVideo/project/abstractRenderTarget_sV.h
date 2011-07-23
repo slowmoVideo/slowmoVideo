@@ -25,10 +25,13 @@ public:
 
     RenderTask_sV* renderTask() { return m_renderTask; }
 
+    /// Prepares the render target (if necessary), like initializing video streams etc.
     virtual void openRenderTarget() throw(Error_sV) {}
+    /// Finishes the render target (e.g. writes the trailer to a video file)
     virtual void closeRenderTarget() throw(Error_sV) {}
 
 public slots:
+    /// Adds one frame to the output
     virtual void slotConsumeFrame(const QImage &image, const int frameNumber) = 0;
 
 private:

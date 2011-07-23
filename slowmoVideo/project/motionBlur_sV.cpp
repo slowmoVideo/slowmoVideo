@@ -21,7 +21,7 @@ MotionBlur_sV::MotionBlur_sV(Project_sV *project, int minSamples) :
     createDirectories();
 }
 
-QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, FrameSize size)
+QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, FrameSize size) throw(RangeTooSmallError_sV)
 {
     if (replaySpeed > 0.5) {
         return fastBlur(startFrame, endFrame, size);
@@ -30,11 +30,9 @@ QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, 
     }
 }
 
-QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
+QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size) throw(RangeTooSmallError_sV)
 {
-    /// \todo Check if endFrame-startFrame large enough!
-    /// \todo m_minSamples
-
+    /// \todo Use m_minSamples
 
     float low, high;
     if (startFrame < endFrame) {
@@ -57,7 +55,13 @@ QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
         pos += .25;
     }
 
-    return Shutter_sV::combine(frameList);
+    if (frameList.size() > 1) {
+        return Shutter_sV::combine(frameList);
+    } else {
+        throw RangeTooSmallError_sV(QString("Range too small: Start frame is %1, end frame is %2. "
+                                            "Using normal interpolation.").arg(startFrame).arg(endFrame));
+    }
+
 }
 
 QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize size)

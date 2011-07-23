@@ -69,8 +69,8 @@ enum InterpolationType { InterpolationType_Forward = 0, InterpolationType_Forwar
 
 /// Default colours used in slowmoVideo (e.g. in the user interface)
 namespace Colours_sV {
-    static QColor colOk(158, 245, 94);
-    static QColor colBad(247, 122, 48);
+    static QColor colOk(158, 245, 94); ///< For checked text fields that are OK
+    static QColor colBad(247, 122, 48); ///< For checked text fields that are invalid
 }
 
 /// FPS representation, can guess numerator/denominator from a float value.
