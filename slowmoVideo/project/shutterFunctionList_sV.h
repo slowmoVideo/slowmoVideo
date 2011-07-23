@@ -13,22 +13,32 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QMap>
 #include <QtCore/QString>
+#include <QtCore/QRegExp>
+class NodeList_sV;
 class ShutterFunction_sV;
 
 class ShutterFunctionList_sV
 {
 public:
-    ShutterFunctionList_sV();
+    ShutterFunctionList_sV(NodeList_sV *nodes);
+    ~ShutterFunctionList_sV();
 
-    const QString nextID();
+    static QRegExp regexID;
+
+    int size() const;
+    const QString nextID() const;
     bool updateID(ShutterFunction_sV *function, const QString id);
 
     // can return NULL!
     ShutterFunction_sV* function(const QString id);
-    bool addFunction(ShutterFunction_sV *function, bool generateID);
+    const ShutterFunction_sV* at(int index) const;
+    ShutterFunction_sV* addFunction(const ShutterFunction_sV function, bool generateID);
+    // todo: update references on nodes
+    bool removeFunction(const QString id);
 
 private:
     QList<ShutterFunction_sV*> m_functions;
+    NodeList_sV *m_nodes;
 };
 
 #endif // SHUTTERFUNCTIONLIST_SV_H

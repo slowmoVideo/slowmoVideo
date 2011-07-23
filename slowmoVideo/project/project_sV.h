@@ -12,7 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define PROJECT_SV_H
 
 #include "tag_sV.h"
-#include "nodelist_sV.h"
+#include "nodeList_sV.h"
 #include "../lib/defs_sV.hpp"
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -73,6 +73,7 @@ public:
     AbstractFlowSource_sV* flowSource() { return m_flowSource; }
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
+    ShutterFunctionList_sV* shutterFunctions() { return m_shutterFunctions; }
 
     RenderTask_sV *renderTask() { return m_renderTask; }
     void replaceRenderTask(RenderTask_sV *task);

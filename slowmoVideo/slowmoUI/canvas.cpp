@@ -66,6 +66,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_mode(ToolMode_Select)
 {
     ui->setupUi(this);
+    m_shutterFunctionDialog = NULL;
 
     // Enable mouse tracking (not only when a mouse button is pressed)
     this->setMouseTracking(true);
@@ -114,10 +115,19 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 Canvas::~Canvas()
 {
     delete ui;
+    if (m_shutterFunctionDialog != NULL) {
+        delete m_shutterFunctionDialog;
+    }
 }
 
 void Canvas::load(Project_sV *project)
 {
+    if (m_shutterFunctionDialog != NULL) {
+        m_shutterFunctionDialog->close();
+        delete m_shutterFunctionDialog;
+        m_shutterFunctionDialog = NULL;
+    }
+
     m_project = project;
     m_t0 = m_project->preferences()->viewport_t0();
     m_secResX = m_project->preferences()->viewport_secRes().x();
@@ -128,6 +138,8 @@ void Canvas::load(Project_sV *project)
     qDebug() << "Frame source: " << project->frameSource();
     m_tmax.setY(project->frameSource()->maxTime());
     qDebug() << "tMaxY set to " << m_tmax.y();
+
+
     repaint();
 }
 
@@ -456,6 +468,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                 if (m_states.countsAsMove()) {
                     m_nodes->confirmMove();
                     qDebug() << "Move confirmed.";
+                    emit nodesChanged();
                 } else {
                     if (m_states.initialMousePos.x() >= m_distLeft && m_states.initialMousePos.y() < this->height()-m_distBottom
                             && !m_states.selectAttempted) {
@@ -465,6 +478,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                             if (m_mode == ToolMode_Select) {
                                 Node_sV p = convertCanvasToTime(m_states.initialMousePos);
                                 m_nodes->add(p);
+                                emit nodesChanged();
                             } else {
                                 qDebug() << "Not adding node. Mode is " << m_mode;
                             }
@@ -483,6 +497,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
             case ToolMode_Move:
                 m_nodes->confirmMove();
                 qDebug() << "Move confirmed.";
+                emit nodesChanged();
                 break;
             }
         }
@@ -718,6 +733,7 @@ void Canvas::slotDeleteNodes()
     qDebug() << nDel << " deleted.";
     if (nDel > 0) {
         repaint();
+        emit nodesChanged();
     }
 }
 
@@ -734,16 +750,19 @@ void Canvas::slotDeleteNode()
     int index = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
     if (index >= 0) {
         m_nodes->deleteNode(index);
+        emit nodesChanged();
     }
 }
 void Canvas::slotSnapInNode()
 {
+    /// \todo implement
     qDebug() << "Snapping in at " << m_states.prevMousePos;
 }
 void Canvas::slotChangeCurveType(int curveType)
 {
     qDebug() << "Changing curve type to " << toString((CurveType)curveType) << " at " << convertCanvasToTime(m_states.prevMousePos).x();
     m_nodes->setCurveType(convertCanvasToTime(m_states.prevMousePos).x(), (CurveType) curveType);
+    emit nodesChanged();
 }
 void Canvas::slotResetHandle(const QString &position)
 {
@@ -754,6 +773,7 @@ void Canvas::slotResetHandle(const QString &position)
         } else {
             node->setRightNodeHandle(0, 0);
         }
+        emit nodesChanged();
     } else {
         qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
@@ -762,6 +782,7 @@ void Canvas::slotSet1xSpeed()
 {
     qDebug() << "Setting curve to 1x speed.";
     m_nodes->set1xSpeed(convertCanvasToTime(m_states.prevMousePos).x());
+    emit nodesChanged();
 }
 void Canvas::slotSetShutterFunction()
 {
@@ -769,10 +790,19 @@ void Canvas::slotSetShutterFunction()
     if (left == m_nodes->size()-1) {
         left = m_nodes->size()-2;
     }
-    const Node_sV *leftNode = &m_nodes->at(left);
-    const Node_sV *rightNode = &m_nodes->at(left+1);
-    ShutterFunctionDialog sfd(rightNode->y()-leftNode->y(), leftNode->x()-m_nodes->startTime(), this);
-    sfd.exec();
+
+    if (m_shutterFunctionDialog == NULL) {
+        m_shutterFunctionDialog = new ShutterFunctionDialog(m_project, this);
+        bool b = true;
+        b &= connect(this, SIGNAL(nodesChanged()), m_shutterFunctionDialog, SLOT(slotNodesUpdated()));
+        Q_ASSERT(b);
+    }
+
+    m_shutterFunctionDialog->setSegment(left);
+    if (!m_shutterFunctionDialog->isVisible()) {
+        m_shutterFunctionDialog->show();
+    }
+
 }
 
 QDebug operator <<(QDebug qd, const Canvas::ToolMode &mode)

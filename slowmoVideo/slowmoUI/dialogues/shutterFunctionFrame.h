@@ -10,7 +10,7 @@ class ShutterFunctionFrame : public QFrame
 public:
     ShutterFunctionFrame(QWidget * parent = 0, Qt::WindowFlags f = 0);
 
-    void updateValues(float dy, float t0);
+    void updateValues(float y, float dy);
 
 public slots:
     void slotDisplayFunction(const QString &function);
@@ -22,8 +22,8 @@ protected slots:
 private:
     ShutterFunction_sV m_function;
     int m_frameHeight;
+    float m_y;
     float m_dy;
-    float m_t0;
 
 };
 

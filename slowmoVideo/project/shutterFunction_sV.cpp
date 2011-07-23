@@ -15,12 +15,12 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtScript/QScriptValue>
 
 QString ShutterFunction_sV::templateHeader(
-        "// x0 in [0,1]: Position of the left frame between two nodes \n"
-        "// dt: 1/fps \n"
-        "// dy: Source frames covered by this frame \n"
-        "//     (0.1 for 10 % replay speed and fpsIn == fpsOut) \n"
-        "// t0: Output time at the beginning of this frame \n\n"
-        "(function(x, dt, dy, t0) \n"
+        "// x:   on [0,1] \n"
+        "// t:   output time \n"
+        "// fps: Frames per second (1/dt) \n"
+        "// y:   source time at position x \n"
+        "// dy:  Source time delta to next output frame \n"
+        "(function(x, t, fps, y, dy) \n"
         "{");
 QString ShutterFunction_sV::templateBody(
         "  // Replace this with your function \n"
@@ -40,10 +40,17 @@ ShutterFunction_sV::ShutterFunction_sV(const QString &function)
     init();
     updateFunction(function);
 }
+ShutterFunction_sV::ShutterFunction_sV(const ShutterFunction_sV &other)
+{
+    init();
+    m_id = other.m_id;
+    updateFunction(other.m_function);
+}
+
 void ShutterFunction_sV::init()
 {
     m_scriptEngine = new QScriptEngine();
-    qDebug() << "Script engine initialized.";
+    qDebug() << "Script engine initialized for function " << this;
 }
 ShutterFunction_sV::~ShutterFunction_sV()
 {
@@ -65,9 +72,13 @@ void ShutterFunction_sV::setID(const QString id)
 {
     m_id = id;
 }
-QString ShutterFunction_sV::id()
+QString ShutterFunction_sV::id() const
 {
     return m_id;
+}
+QString ShutterFunction_sV::function() const
+{
+    return m_function;
 }
 
 
@@ -77,15 +88,15 @@ void ShutterFunction_sV::updateFunction(const QString &function)
     m_function = function;
 
     QString f = QString("%1%2%3").arg(templateHeader).arg(m_function).arg(templateFooter);
-    qDebug() << "===== Function is:\n" << f << "\n=====";
+//    qDebug() << "===== Function is:\n" << f << "\n=====";
 
     m_compiledFunction = m_scriptEngine->evaluate(f);
 }
 
-float ShutterFunction_sV::evaluate(const float x, const float dt, const float dy, const float t0)
+float ShutterFunction_sV::evaluate(const float x, const float t, const float fps, const float y, const float dy)
 {
     QScriptValueList args;
-    args << x << dt << dy << t0;
+    args << x << t << fps << y << dy;
     QString result = m_compiledFunction.call(QScriptValue(), args).toString();
 
     float val;
@@ -96,7 +107,7 @@ float ShutterFunction_sV::evaluate(const float x, const float dt, const float dy
     }
     if (!ok) {
         val = 0;
-        qDebug() << "Error: Could not evaluate function " << m_id;
+//        qDebug() << "Error: Could not evaluate function " << m_id;
     } else {
 //        qDebug() << "Evaluated at " << x0 << ": " << val;
     }

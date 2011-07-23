@@ -15,6 +15,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "v3dFlowSource_sV.h"
 #include "interpolator_sV.h"
 #include "motionBlur_sV.h"
+#include "nodeList_sV.h"
+#include "renderTask_sV.h"
 #include "shutterFunction_sV.h"
 #include "shutterFunctionList_sV.h"
 #include "../lib/shutter_sV.h"
@@ -28,8 +30,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 #include <QFileInfo>
 
-#include "renderTask_sV.h"
-#include "nodelist_sV.h"
 
 #define MIN_FRAME_DIST .001
 
@@ -60,7 +60,7 @@ void Project_sV::init()
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
-    m_shutterFunctions = new ShutterFunctionList_sV();
+    m_shutterFunctions = new ShutterFunctionList_sV(m_nodes);
     m_renderTask = NULL;
 }
 
@@ -172,12 +172,18 @@ QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpola
     ShutterFunction_sV *shutterFunction = m_shutterFunctions->function(leftNode->shutterFunctionID());
 
     if (shutterFunction != NULL) {
+        float dy = 0;
+        if (outTime+1/fps.fps() <= m_nodes->endTime()) {
+            dy = m_nodes->sourceTime(outTime+1/fps.fps())-sourceTime;
+        }
         float shutter = shutterFunction->evaluate(
-                    (sourceFrame-floor(sourceFrame))/fps.fps(),
-                    fps.fps(),
-                    rightNode->y()-leftNode->y(),
-                    outTime-m_nodes->startTime()
+                    (sourceFrame-floor(sourceFrame))/fps.fps(), // x on [0,1]
+                    outTime, // t
+                    fps.fps(), // FPS
+                    sourceFrame, // y
+                    dy // dy to next frame
                     );
+        qDebug() << "Shutter value for output time " << outTime << " is " << shutter;
         return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
     } else {
         return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);

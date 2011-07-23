@@ -12,7 +12,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "project_sV.h"
 #include "projectPreferences_sV.h"
-#include "nodelist_sV.h"
+#include "shutterFunctionList_sV.h"
+#include "shutterFunction_sV.h"
+#include "nodeList_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "imagesFrameSource_sV.h"
@@ -87,6 +89,19 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     resources.appendChild(frameSource(&doc, project->frameSource()));
 
 
+    // Shutter functions
+    QDomElement shutterFunctions = doc.createElement("shutterFunctions");
+    root.appendChild(shutterFunctions);
+    for (int i = 0; i < project->shutterFunctions()->size(); i++) {
+        QDomElement func = doc.createElement("function");
+        func.setAttribute("id", project->shutterFunctions()->at(i)->id());
+        QDomElement code = doc.createElement("code");
+        func.appendChild(code);
+        code.appendChild(doc.createTextNode(project->shutterFunctions()->at(i)->function()));
+        shutterFunctions.appendChild(func);
+    }
+
+
     // Nodes
     QDomElement nodes = doc.createElement("nodes");
     root.appendChild(nodes);
@@ -127,6 +142,7 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     QDomElement selected = doc->createElement("selected");
     QDomElement leftHandle = doc->createElement("leftHandle");
     QDomElement rightHandle = doc->createElement("rightHandle");
+    QDomElement shutterFunc = doc->createElement("shutterFunction");
     QDomElement leftCurveType = doc->createElement("type");
     QDomElement rightCurveType = doc->createElement("type");
     QDomElement leftX = doc->createElement("x");
@@ -138,9 +154,13 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     el.appendChild(selected);
     el.appendChild(leftHandle);
     el.appendChild(rightHandle);
+    if (node->shutterFunctionID().length() > 0) {
+        el.appendChild(shutterFunc);
+    }
     x.appendChild(doc->createTextNode(QString("%1").arg(node->xUnmoved())));
     y.appendChild(doc->createTextNode(QString("%1").arg(node->yUnmoved())));
     selected.appendChild(doc->createTextNode(QString("%1").arg(node->selected())));
+    shutterFunc.appendChild(doc->createTextNode(node->shutterFunctionID()));
 
     leftHandle.appendChild(leftX);
     leftHandle.appendChild(leftY);
@@ -304,6 +324,23 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                 xml.skipCurrentElement();
                             }
                         }
+                    } else if (xml.name() == "shutterFunctions") {
+                        ShutterFunction_sV func;
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "function") {
+                                func.setID(xml.attributes().value("id").toString());
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "code") {
+                                        func.updateFunction(xml.readElementText());
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+                                project->shutterFunctions()->addFunction(func, false);
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
                     } else if (xml.name() == "nodes") {
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "node") {
@@ -315,6 +352,8 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                         node.setY(QVariant(xml.readElementText()).toFloat());
                                     } else if (xml.name() == "selected") {
                                         node.select(QVariant(xml.readElementText()).toBool());
+                                    } else if (xml.name() == "shutterFunction") {
+                                        node.setShutterFunctionID(xml.readElementText());
                                     } else if (xml.name() == "leftHandle") {
                                         while (xml.readNextStartElement()) {
                                             QString text = xml.readElementText();

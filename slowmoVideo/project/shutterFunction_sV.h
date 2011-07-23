@@ -21,6 +21,7 @@ class ShutterFunction_sV
 public:
     ShutterFunction_sV();
     ShutterFunction_sV(const QString& function);
+    ShutterFunction_sV(const ShutterFunction_sV& other);
     ~ShutterFunction_sV();
 
     static QString templateHeader;
@@ -30,8 +31,16 @@ public:
     void setID(const QString id);
     void updateFunction(const QString& function);
 
-    QString id();
-    float evaluate(const float x, const float dt, const float dy, const float t0);
+    QString id() const;
+    QString function() const;
+    /**
+      \param x x location between two nodes, scaled to <pre>[0,1]</pre>
+      \param t Output time
+      \param fps Frames per second
+      \param y Source frame at position x
+      \param dy y change to the next frame
+      */
+    float evaluate(const float x, const float t, const float fps, const float y, const float dy);
 
     void operator =(const ShutterFunction_sV &other);
 

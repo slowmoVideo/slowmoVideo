@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "shutterFunctionList_sV.h"
 #include "shutterFunction_sV.h"
+#include "nodeList_sV.h"
 
 #include <QtCore/QDebug>
 #include <QtScript/QScriptValue>
@@ -17,12 +18,26 @@ the Free Software Foundation, either version 3 of the License, or
 
 /// \todo Functions must be unique (ID), allow duplication and modification
 
+QRegExp ShutterFunctionList_sV::regexID("^[\\d\\w]+$");
 
-ShutterFunctionList_sV::ShutterFunctionList_sV()
+ShutterFunctionList_sV::ShutterFunctionList_sV(NodeList_sV *nodes) :
+    m_nodes(nodes)
 {
 }
 
-const QString ShutterFunctionList_sV::nextID()
+ShutterFunctionList_sV::~ShutterFunctionList_sV()
+{
+    for (int i = 0; i < m_functions.size(); i++) {
+        delete m_functions.at(i);
+    }
+}
+
+int ShutterFunctionList_sV::size() const
+{
+    return m_functions.size();
+}
+
+const QString ShutterFunctionList_sV::nextID() const
 {
     int nr = 1;
     QString id;
@@ -46,8 +61,13 @@ const QString ShutterFunctionList_sV::nextID()
 
 bool ShutterFunctionList_sV::updateID(ShutterFunction_sV *function, const QString id)
 {
+    if (id.length() == 0 || regexID.indexIn(id) != 0) {
+        qDebug() << "Not a valid ID: " << id;
+        return false;
+    }
     for (int i = 0; i < m_functions.size(); i++) {
-        if (m_functions.at(i)->id() == id) {
+        if (function != m_functions.at(i) && m_functions.at(i)->id() == id) {
+            qDebug() << "ID already exists!";
             return false;
         }
     }
@@ -55,18 +75,47 @@ bool ShutterFunctionList_sV::updateID(ShutterFunction_sV *function, const QStrin
     return true;
 }
 
-bool ShutterFunctionList_sV::addFunction(ShutterFunction_sV *function, bool generateID)
+ShutterFunction_sV* ShutterFunctionList_sV::addFunction(const ShutterFunction_sV function, bool generateID)
 {
-    if (m_functions.contains(function)) {
-        qDebug() << "Function already is in this list.";
-        Q_ASSERT(false);
-        return false;
-    }
+    ShutterFunction_sV *fun = new ShutterFunction_sV(function);
     if (generateID) {
-        function->setID(nextID());
+        fun->setID(nextID());
     }
-    m_functions.append(function);
-    return true;
+    for (int i = 0; i < m_functions.size(); i++) {
+        if (m_functions.at(i)->id() == fun->id()) {
+            qDebug() << "Function ID is already here!";
+            delete fun;
+            Q_ASSERT(false);
+            return NULL;
+        }
+    }
+    m_functions.append(fun);
+    return fun;
+}
+
+bool ShutterFunctionList_sV::removeFunction(const QString id)
+{
+    for (int i = 0; i < m_functions.size(); i++) {
+        if (m_functions.at(i)->id() == id) {
+            delete m_functions.at(i);
+            m_functions.removeAt(i);
+
+            for (int i = 0; i < m_nodes->size(); i++) {
+                if (m_nodes->at(i).shutterFunctionID() == id) {
+                    (*m_nodes)[i].setShutterFunctionID("");
+                }
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
+const ShutterFunction_sV* ShutterFunctionList_sV::at(int index) const
+{
+    Q_ASSERT(index < m_functions.size());
+    return m_functions.at(index);
 }
 
 ShutterFunction_sV* ShutterFunctionList_sV::function(const QString id)

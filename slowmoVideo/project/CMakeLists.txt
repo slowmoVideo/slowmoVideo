@@ -3,7 +3,7 @@ set(SRCS_PROJ
   projectPreferences_sV.cpp
   tag_sV.cpp
   node_sV.cpp
-  nodelist_sV.cpp
+  nodeList_sV.cpp
   segment_sV.cpp
   nodeHandle_sV.cpp
   renderTask_sV.cpp

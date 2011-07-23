@@ -20,9 +20,13 @@ public:
     ~Segment_sV() {}
 
     int leftNodeIndex() const;
+    bool selected() const;
+
+    void select(bool select = true);
 
 private:
     int m_leftNodeIndex;
+    bool m_selected;
 };
 
 #endif // SEGMENT_SV_H

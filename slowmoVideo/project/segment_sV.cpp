@@ -11,11 +11,22 @@ the Free Software Foundation, either version 3 of the License, or
 #include "segment_sV.h"
 
 Segment_sV::Segment_sV(int index) :
-    m_leftNodeIndex(index)
+    m_leftNodeIndex(index),
+    m_selected(false)
 {
 }
 
 int Segment_sV::leftNodeIndex() const
 {
      return m_leftNodeIndex;
+}
+
+bool Segment_sV::selected() const
+{
+    return m_selected;
+}
+
+void Segment_sV::select(bool select)
+{
+    m_selected = select;
 }

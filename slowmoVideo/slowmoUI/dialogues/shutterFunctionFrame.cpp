@@ -11,10 +11,10 @@ ShutterFunctionFrame::ShutterFunctionFrame(QWidget *parent, Qt::WindowFlags f) :
     m_frameHeight(100)
 {
 }
-void ShutterFunctionFrame::updateValues(float dy, float t0)
+void ShutterFunctionFrame::updateValues(float y, float dy)
 {
+    m_y = y;
     m_dy = dy;
-    m_t0 = t0;
 }
 
 void ShutterFunctionFrame::paintEvent(QPaintEvent *e)
@@ -43,7 +43,7 @@ void ShutterFunctionFrame::paintEvent(QPaintEvent *e)
     float t;
     for (x = 0; x < width(); x++) {
         t = float(x)/width();
-        y = height()-1 - m_frameHeight*m_function.evaluate(t, 1.0/24, m_dy, m_t0);
+        y = height()-1 - m_frameHeight*m_function.evaluate(t, t, 24, m_y, m_dy);
         p.drawPoint(x, y);
     }
 }
@@ -51,7 +51,11 @@ void ShutterFunctionFrame::paintEvent(QPaintEvent *e)
 void ShutterFunctionFrame::wheelEvent(QWheelEvent *e)
 {
     if (e->delta() > 0) {
+        int old = m_frameHeight;
         m_frameHeight *= 1.4;
+        if (m_frameHeight == old) {
+            m_frameHeight++;
+        }
     } else {
         m_frameHeight /= 1.4;
         if (m_frameHeight < 1) {
@@ -65,9 +69,12 @@ void ShutterFunctionFrame::slotDisplayFunction(const QString &function)
 {
     m_function.updateFunction(function);
 
-    float max = qMax(m_function.evaluate(0, 1.0/24, m_dy, m_t0), qMax(
-                         m_function.evaluate(.5, 1.0/24, m_dy, m_t0),
-                         m_function.evaluate(1, 1.0/24, m_dy, m_t0)));
+    float max = qMax(m_function.evaluate(0, 0, 1.0/24, m_y, m_dy), qMax(
+                         m_function.evaluate(.5, .5, 1.0/24, m_y, m_dy),
+                         m_function.evaluate(1, 1, 1.0/24, m_y, m_dy)));
+    if (max > 50) {
+        max = 50;
+    }
     if (max > 0) {
         while (m_frameHeight*max > height()) {
             m_frameHeight /= 1.4;
@@ -79,5 +86,5 @@ void ShutterFunctionFrame::slotDisplayFunction(const QString &function)
             m_frameHeight /= 1.4;
         }
     }
-
+    repaint();
 }

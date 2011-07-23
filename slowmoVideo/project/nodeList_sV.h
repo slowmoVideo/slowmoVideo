@@ -58,12 +58,12 @@ public:
     };
 
 
-    void setMaxY(qreal time);
+    void setMaxY(qreal time); ///< Sets the maximum y value that is allowed, usually the duration of the input.
 
-    qreal sourceTime(qreal targetTime) const;
-    qreal startTime() const;
-    qreal endTime() const;
-    qreal totalTime() const;
+    qreal sourceTime(qreal targetTime) const; ///< Calculates the source time in seconds for the given output time.
+    qreal startTime() const; ///< Time of the first node
+    qreal endTime() const; ///< Time of the rightmost node. See totalTime() for the curve length.
+    qreal totalTime() const; ///< Length of the curve, ignores space (startTime())at the beginning.
 
     /**
       Add a new node at the given position.

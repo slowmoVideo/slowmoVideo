@@ -8,7 +8,7 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include "nodelist_sV.h"
+#include "nodeList_sV.h"
 #include "node_sV.h"
 #include "../lib/bezierTools_sV.h"
 

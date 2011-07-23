@@ -11,12 +11,16 @@ class TestXmlProjectRW_sV : public QObject
 {
     Q_OBJECT
 
+
 private slots:
+    void initTestCase();
+    void cleanupTestCase();
     void slotTestHandles();
     void init();
     void cleanup();
 
 private:
+    QCoreApplication *app;
     Project_sV *m_project;
 
 };

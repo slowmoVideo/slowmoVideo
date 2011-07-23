@@ -12,7 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define CANVAS_H
 
 #include "project/node_sV.h"
-#include "project/nodelist_sV.h"
+#include "project/nodeList_sV.h"
 #include "project/project_sV.h"
 #include "project/tag_sV.h"
 
@@ -32,6 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class QColor;
 class QPoint;
+class ShutterFunctionDialog;
 
 namespace Ui {
     class Canvas;
@@ -72,6 +73,7 @@ public slots:
 
 signals:
     void signalMouseInputTimeChanged(qreal frame);
+    void nodesChanged();
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -85,6 +87,7 @@ protected:
 private:
     Ui::Canvas *ui;
     Project_sV *m_project;
+    ShutterFunctionDialog *m_shutterFunctionDialog;
     bool m_mouseWithinWidget;
     int m_distLeft;
     int m_distBottom;

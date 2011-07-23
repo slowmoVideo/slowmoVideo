@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QImage>
 #include <QMetaObject>
 #include "project_sV.h"
-#include "nodelist_sV.h"
+#include "nodeList_sV.h"
 #include "../lib/defs_sV.hpp"
 
 RenderTask_sV::RenderTask_sV(Project_sV *project) :

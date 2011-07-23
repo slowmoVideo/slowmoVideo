@@ -33,7 +33,8 @@ Node_sV::Node_sV(const Node_sV &other) :
     m_x(other.x()),
     m_y(other.y()),
     m_leftHandle(other.m_leftHandle),
-    m_rightHandle(other.m_rightHandle)
+    m_rightHandle(other.m_rightHandle),
+    m_shutterFunctionID(other.m_shutterFunctionID)
 {
     qDebug() << "Node_sV(const Node_sV &other) called";
     init();
@@ -161,6 +162,7 @@ void Node_sV::operator =(const Node_sV& other)
         m_leftHandle.setY(other.leftNodeHandle().y());
         m_rightHandle.setX(other.rightNodeHandle().x());
         m_rightHandle.setY(other.rightNodeHandle().y());
+        m_shutterFunctionID = other.m_shutterFunctionID;
         qDebug() << "This: " << *this;
     }
     Q_ASSERT(this == m_leftHandle.parentNode());

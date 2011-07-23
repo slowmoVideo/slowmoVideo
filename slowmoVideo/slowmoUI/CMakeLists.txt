@@ -54,6 +54,7 @@ set(RES
   #res/iconAdd.png
   res/iconSel.png
   res/iconMov.png
+  res/shutterFunction.png
 )
 copy_files("${RES}")
 
