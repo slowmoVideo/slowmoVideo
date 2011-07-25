@@ -3,11 +3,11 @@
 # - Try to find FFMPEG
 # Once done this will define
 #
-#  FFMPEG_FOUND		 - system has FFMPEG
-#  FFMPEG_INCLUDE_DIR	 - the include directories
-#  FFMPEG_LIBRARY_DIR	 - the directory containing the libraries
-#  FFMPEG_LIBRARIES	 - link these to use FFMPEG
-#  FFMPEG_SWSCALE_FOUND	 - FFMPEG also has SWSCALE
+#  FFMPEG_FOUND -         system has FFMPEG
+#  FFMPEG_INCLUDE_DIR -   the include directories
+#  FFMPEG_LIBRARY_DIR -   the directory containing the libraries
+#  FFMPEG_LIBRARIES -     link these to use FFMPEG
+#  FFMPEG_SWSCALE_FOUND - FFMPEG also has SWSCALE
 #
 
 SET( FFMPEG_HEADERS avformat.h avcodec.h avutil.h avdevice.h )
@@ -56,7 +56,7 @@ IF ( SWSCALE_FOUND )
                              ${SWSCALE_LIBRARY_DIRS} )
    SET( FFMPEG_INCLUDE_PATHS ${FFMPEG_INCLUDE_PATHS}
                              ${SWSCALE_INCLUDE_DIRS} )
-   SET( FFMPEG_HEADERS	     ${FFMPEG_HEADERS}
+   SET( FFMPEG_HEADERS       ${FFMPEG_HEADERS}
                              ${FFMPEG_SWS_HEADERS} )
    SET( FFMPEG_PATH_SUFFIXES ${FFMPEG_PATH_SUFFIXES}
                              ${FFMPEG_SWS_PATH_SUFFIXES} )
@@ -82,9 +82,16 @@ FOREACH( INC_ ${FFMPEG_HEADERS} )
    SET( TMP_ TMP-NOTFOUND )
 ENDFOREACH( INC_ )
 
+list(LENGTH FFMPEG_INCLUDE_DIR LENGTH_INCLUDES)
+list(LENGTH FFMPEG_LIBRARY_DIR LENGTH_LIBRARIES)
+
 # clear out duplicates
+if(LENGTH_INCLUDES GREATER 0)
 LIST( REMOVE_DUPLICATES FFMPEG_INCLUDE_DIR )
-#LIST( REMOVE_DUPLICATES FFMPEG_LIBRARY_DIR ) # Error, commented out ...
+endif(LENGTH_INCLUDES GREATER 0)
+if(LENGTH_LIBRARIES GREATER 0)
+LIST( REMOVE_DUPLICATES FFMPEG_LIBRARY_DIR )
+endif(LENGTH_LIBRARIES GREATER 0)
 
 # find the full paths of the libraries
 SET( TMP_ TMP-NOTFOUND )

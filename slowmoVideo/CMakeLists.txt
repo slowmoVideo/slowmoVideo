@@ -13,12 +13,6 @@ set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
 
 
-# Some help text
-message(STATUS "==================================================")
-message(STATUS "Installation prefix can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.")
-message(STATUS "==================================================")
-
-
 ## Compiler options ##
 
 # To compile with clang:
@@ -47,18 +41,6 @@ include_directories(${QT_INCLUDES})
 find_package(FFMPEG)
 
 
-## Include projects ##
-
-add_subdirectory(lib)
-add_subdirectory(project)
-add_subdirectory(slowmoCLI)
-add_subdirectory(slowmoUI)
-add_subdirectory(slowmoInfo)
-add_subdirectory(visualizeFlow)
-add_subdirectory(test)
-add_subdirectory(unittests)
-
-
 set(BUILD_SLOWMO "NO")
 if(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
 set(BUILD_SLOWMO "YES")
@@ -66,6 +48,7 @@ endif(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
 
 message("==================================================")
 message("* slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
+message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.)")
 if(NOT QT_LIBRARIES)
 message("* Qt4 libraries could not be found.")
 endif(NOT QT_LIBRARIES)
@@ -80,5 +63,17 @@ message("==================================================")
 
 
 if(NOT BUILD_SLOWMO)
-message(SEND_ERROR "Cannot build slowmoVideo, please install the missing packages first.")
+message(FATAL_ERROR "Cannot build slowmoVideo, please install the missing packages first.")
 endif(NOT BUILD_SLOWMO)
+
+
+## Include projects to build ##
+
+add_subdirectory(lib)
+add_subdirectory(project)
+add_subdirectory(slowmoCLI)
+add_subdirectory(slowmoUI)
+add_subdirectory(slowmoInfo)
+add_subdirectory(visualizeFlow)
+add_subdirectory(test)
+add_subdirectory(unittests)
