@@ -152,9 +152,11 @@ void NodeList_sV::deleteNode(int index)
     Q_ASSERT(index >= 0);
     Q_ASSERT(index < m_list.size());
     if (m_list.size() > 0) {
+        if (m_list.size() > 1) {
+            m_segments.removeLast();
+        }
         m_list.removeAt(index);
     }
-    m_segments.removeLast();
     if (index > m_list.size() && (index-1) >= 0) {
         if (m_list.at(index-1).rightCurveType() != m_list.at(index).leftCurveType()) {
             m_list[index-1].setRightCurveType(CurveType_Linear);
