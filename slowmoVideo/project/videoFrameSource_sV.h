@@ -25,7 +25,10 @@ extern "C" {
 class QProcess;
 class Project_sV;
 
-/** \brief Uses frames from a video file */
+/**
+  \brief Uses frames from a video file
+  \todo Interlaced videos, convert first?
+ */
 class VideoFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT

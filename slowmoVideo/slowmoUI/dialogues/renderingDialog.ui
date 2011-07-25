@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>697</width>
-    <height>487</height>
+    <height>488</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,13 @@
        </property>
        <property name="checked">
         <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioTagSection">
+       <property name="text">
+        <string>Tag section</string>
        </property>
       </widget>
      </item>
@@ -43,11 +50,14 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>10</width>
+         <width>13</width>
          <height>20</height>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbStartTag"/>
      </item>
      <item>
       <widget class="QLineEdit" name="timeStart">
@@ -63,13 +73,23 @@
          <height>0</height>
         </size>
        </property>
+       <property name="maxLength">
+        <number>16</number>
+       </property>
        <property name="placeholderText">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="lblcUnitStart">
+       <property name="text">
+        <string>s</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblcTo">
        <property name="text">
         <string>to</string>
        </property>
@@ -89,7 +109,20 @@
          <height>0</height>
         </size>
        </property>
+       <property name="maxLength">
+        <number>16</number>
+       </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblcUnitEnd">
+       <property name="text">
+        <string>s</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbEndTag"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -459,9 +492,6 @@
  </widget>
  <tabstops>
   <tabstop>radioFullProject</tabstop>
-  <tabstop>radioSection</tabstop>
-  <tabstop>timeStart</tabstop>
-  <tabstop>timeEnd</tabstop>
   <tabstop>cbFps</tabstop>
   <tabstop>cbSize</tabstop>
   <tabstop>cbInterpolation</tabstop>

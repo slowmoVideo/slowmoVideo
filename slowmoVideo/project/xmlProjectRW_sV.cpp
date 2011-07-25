@@ -40,9 +40,15 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     info.appendChild(appName);
 
 
+    ProjectPreferences_sV *pr = project->preferences();
     // Project Preferences
     QDomElement preferences = doc.createElement("preferences");
     root.appendChild(preferences);
+    QDomElement renderSectionMode = doc.createElement("renderSectionMode");
+    QDomElement renderStartTag = doc.createElement("renderStartTag");
+    QDomElement renderEndTag = doc.createElement("renderEndTag");
+    QDomElement renderStartTime = doc.createElement("renderStartTime");
+    QDomElement renderEndTime = doc.createElement("renderEndTime");
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
     QDomElement renderFPS = doc.createElement("renderFPS");
@@ -54,6 +60,11 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
+    preferences.appendChild(renderSectionMode);
+    renderSectionMode.appendChild(renderStartTag);
+    renderSectionMode.appendChild(renderEndTag);
+    renderSectionMode.appendChild(renderStartTime);
+    renderSectionMode.appendChild(renderEndTime);
     preferences.appendChild(renderFrameSize);
     preferences.appendChild(renderInterpolation);
     preferences.appendChild(renderFPS);
@@ -65,19 +76,24 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
-    renderFrameSize.setAttribute("size", project->preferences()->renderFrameSize());
-    renderInterpolation.setAttribute("type", project->preferences()->renderInterpolationType());
-    renderFPS.setAttribute("fps", project->preferences()->renderFPS());
-    renderTarget.setAttribute("target", project->preferences()->renderTarget());
-    imagesOutputDir.setAttribute("dir", project->preferences()->imagesOutputDir());
-    imagesFilenamePattern.setAttribute("pattern", project->preferences()->imagesFilenamePattern());
-    videoFilename.setAttribute("file", project->preferences()->videoFilename());
-    videoCodec.setAttribute("codec", project->preferences()->videoCodec());
-    prevTagAxis.setAttribute("axis", QVariant(project->preferences()->lastSelectedTagAxis()).toString());
-    viewport_t0.setAttribute("x", project->preferences()->viewport_t0().x());
-    viewport_t0.setAttribute("y", project->preferences()->viewport_t0().y());
-    viewport_secRes.setAttribute("x", project->preferences()->viewport_secRes().x());
-    viewport_secRes.setAttribute("y", project->preferences()->viewport_secRes().y());
+    renderSectionMode.setAttribute("mode", pr->renderSectionMode());
+    renderStartTag.setAttribute("label", pr->renderStartTag());
+    renderEndTag.setAttribute("label", pr->renderEndTag());
+    renderStartTime.setAttribute("time", pr->renderStartTime());
+    renderEndTime.setAttribute("time", pr->renderEndTime());
+    renderFrameSize.setAttribute("size", pr->renderFrameSize());
+    renderInterpolation.setAttribute("type", pr->renderInterpolationType());
+    renderFPS.setAttribute("fps", pr->renderFPS());
+    renderTarget.setAttribute("target", pr->renderTarget());
+    imagesOutputDir.setAttribute("dir", pr->imagesOutputDir());
+    imagesFilenamePattern.setAttribute("pattern", pr->imagesFilenamePattern());
+    videoFilename.setAttribute("file", pr->videoFilename());
+    videoCodec.setAttribute("codec", pr->videoCodec());
+    prevTagAxis.setAttribute("axis", QVariant(pr->lastSelectedTagAxis()).toString());
+    viewport_t0.setAttribute("x", pr->viewport_t0().x());
+    viewport_t0.setAttribute("y", pr->viewport_t0().y());
+    viewport_secRes.setAttribute("x", pr->viewport_secRes().x());
+    viewport_secRes.setAttribute("y", pr->viewport_secRes().y());
 
 
     // Project Resources
@@ -300,6 +316,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                 Project_sV *project = new Project_sV();
                 project->setProjectFilename(filename);
                 project->setProjectDir(QFileInfo(filename).absolutePath());
+                ProjectPreferences_sV *pr = project->preferences();
 
                 while (xml.readNextStartElement()) {
                     if (xml.name() == "info") {
@@ -411,40 +428,62 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                         }
                     } else if (xml.name() == "preferences") {
                         while (xml.readNextStartElement()) {
-                            if (xml.name() == "renderFrameSize") {
-                                project->preferences()->renderFrameSize() = (FrameSize) xml.attributes().value("size").toString().toInt();
+                            if (xml.name() == "renderSectionMode") {
+                                pr->renderSectionMode() = xml.attributes().value("mode").toString();
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "renderStartTag") {
+                                        pr->renderStartTag() = xml.attributes().value("label").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderEndTag") {
+                                        pr->renderEndTag() = xml.attributes().value("label").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderStartTime") {
+                                        pr->renderStartTime() = xml.attributes().value("time").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderEndTime") {
+                                        pr->renderEndTime() = xml.attributes().value("time").toString();
+                                        xml.skipCurrentElement();
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+
+                            } else if (xml.name() == "renderFrameSize") {
+                                pr->renderFrameSize() = (FrameSize) xml.attributes().value("size").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderInterpolationType") {
-                                project->preferences()->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
+                                pr->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderFPS") {
-                                project->preferences()->renderFPS() = xml.attributes().value("fps").toString().toFloat();
+                                pr->renderFPS() = xml.attributes().value("fps").toString().toFloat();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderTarget") {
-                                project->preferences()->renderTarget() = xml.attributes().value("target").toString();
+                                pr->renderTarget() = xml.attributes().value("target").toString();
                                 xml.skipCurrentElement();
+
                             } else if (xml.name() == "imagesOutputDir") {
-                                project->preferences()->imagesOutputDir() = xml.attributes().value("dir").toString();
+                                pr->imagesOutputDir() = xml.attributes().value("dir").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "imagesFilenamePattern") {
-                                project->preferences()->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
+                                pr->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoFilename") {
-                                project->preferences()->videoFilename() = xml.attributes().value("file").toString();
+                                pr->videoFilename() = xml.attributes().value("file").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoCodec") {
-                                project->preferences()->videoCodec() = xml.attributes().value("codec").toString();
+                                pr->videoCodec() = xml.attributes().value("codec").toString();
                                 xml.skipCurrentElement();
+
                             } else if (xml.name() == "prevTagAxis") {
-                                project->preferences()->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();
+                                pr->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "viewport_t0") {
-                                project->preferences()->viewport_t0().rx() = xml.attributes().value("x").toString().toFloat();
-                                project->preferences()->viewport_t0().ry() = xml.attributes().value("y").toString().toFloat();
+                                pr->viewport_t0().rx() = xml.attributes().value("x").toString().toFloat();
+                                pr->viewport_t0().ry() = xml.attributes().value("y").toString().toFloat();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "viewport_secRes") {
-                                project->preferences()->viewport_secRes().rx() = xml.attributes().value("x").toString().toFloat();
-                                project->preferences()->viewport_secRes().ry() = xml.attributes().value("y").toString().toFloat();
+                                pr->viewport_secRes().rx() = xml.attributes().value("x").toString().toFloat();
+                                pr->viewport_secRes().ry() = xml.attributes().value("y").toString().toFloat();
                                 xml.skipCurrentElement();
                             } else {
                                 xml.skipCurrentElement();

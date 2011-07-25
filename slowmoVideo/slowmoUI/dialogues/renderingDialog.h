@@ -43,11 +43,18 @@ private:
 
     Project_sV *m_project;
     QButtonGroup *m_targetGroup;
+    QButtonGroup *m_sectionGroup;
+
+    void fillTagLists();
 
 private slots:
     void slotBrowseImagesDir();
     void slotBrowseVideoFile();
     void slotUpdateRenderTarget();
+
+    void slotSectionModeChanged();
+    void slotTagIndexChanged();
+
 
 };
 

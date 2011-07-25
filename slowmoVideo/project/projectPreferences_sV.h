@@ -15,6 +15,11 @@ public:
     QPointF& viewport_secRes();
 
     // Rendering
+    QString& renderSectionMode();
+    QString& renderStartTag();
+    QString& renderEndTag();
+    QString& renderStartTime();
+    QString& renderEndTime();
     FrameSize& renderFrameSize();
     InterpolationType& renderInterpolationType();
     float& renderFPS();
@@ -29,6 +34,11 @@ private:
     QPointF m_viewport_t0;
     QPointF m_viewport_secRes;
 
+    QString m_renderSectionMode;
+    QString m_renderStartTag;
+    QString m_renderEndTag;
+    QString m_renderStartTime;
+    QString m_renderEndTime;
     FrameSize m_renderFrameSize;
     InterpolationType m_renderInterpolationType;
     float m_renderFPS;

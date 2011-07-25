@@ -5,7 +5,9 @@
 #include "canvasObject_sV.h"
 #include <QString>
 
-/** \brief Tags are used for marking positions in time in the project. */
+/**
+  \brief Tags are used for marking positions in time in the project.
+ */
 class Tag_sV : public CanvasObject_sV
 {
 public:
@@ -19,7 +21,9 @@ public:
 
     void setAxis(TagAxis axis);
     void setTime(qreal time);
-    void setDescription(QString desc);
+    void setDescription(QString desc); // If renaming allowed: Update preferences!
+
+    bool operator <(const Tag_sV& other) const;
 
 private:
     TagAxis m_axis;

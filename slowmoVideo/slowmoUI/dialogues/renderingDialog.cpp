@@ -29,21 +29,26 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->radioSection->setEnabled(false);
-    ui->timeStart->setEnabled(false);
-    ui->timeEnd->setEnabled(false);
-
-    ui->imagesOutputDir->setText(m_project->preferences()->imagesOutputDir());
-    ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
-    ui->videoOutputFile->setText(m_project->preferences()->videoFilename());
-    ui->vcodec->setText(m_project->preferences()->videoCodec());
-
-    QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
-    if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
-        ui->cbFps->addItem(fps);
+    // Render section
+    m_sectionGroup = new QButtonGroup(this);
+    m_sectionGroup->addButton(ui->radioFullProject);
+    m_sectionGroup->addButton(ui->radioSection);
+    m_sectionGroup->addButton(ui->radioTagSection);
+    QString mode(m_project->preferences()->renderSectionMode());
+    if (mode == "full") {
+        ui->radioFullProject->setChecked(true);
+    } else if (mode == "time") {
+        ui->radioSection->setChecked(true);
+    } else if (mode == "tags") {
+        ui->radioTagSection->setChecked(true);
+    } else {
+        qDebug() << "Unknown render section mode: " << mode;
+        Q_ASSERT(false);
     }
-    ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
 
+    fillTagLists();
+
+    // Output target type
     m_targetGroup = new QButtonGroup(this);
     m_targetGroup->addButton(ui->radioImages);
     m_targetGroup->addButton(ui->radioVideo);
@@ -53,10 +58,25 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
         ui->radioVideo->setChecked(true);
     }
 
+    // Output target files
+    ui->imagesOutputDir->setText(m_project->preferences()->imagesOutputDir());
+    ui->imagesFilenamePattern->setText(m_project->preferences()->imagesFilenamePattern());
+    ui->videoOutputFile->setText(m_project->preferences()->videoFilename());
+    ui->vcodec->setText(m_project->preferences()->videoCodec());
+
+    // FPS
+    QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
+    if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
+        ui->cbFps->addItem(fps);
+    }
+    ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
+
+    // Output size
     ui->cbSize->addItem("Original size", QVariant(FrameSize_Orig));
     ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
     ui->cbSize->setCurrentIndex(ui->cbSize->findData(QVariant(m_project->preferences()->renderFrameSize())));
 
+    // Interpolation type
     ui->cbInterpolation->addItem(toString(InterpolationType_Forward), QVariant(InterpolationType_Forward));
     ui->cbInterpolation->addItem(toString(InterpolationType_ForwardNew), QVariant(InterpolationType_ForwardNew));
     ui->cbInterpolation->addItem(toString(InterpolationType_Twoway), QVariant(InterpolationType_Twoway));
@@ -68,22 +88,46 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     bool b = true;
     b &= connect(m_targetGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateRenderTarget()));
+    b &= connect(m_sectionGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotSectionModeChanged()));
+    b &= connect(ui->timeStart, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    b &= connect(ui->timeEnd, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+
+    b &= connect(ui->cbStartTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
+    b &= connect(ui->cbEndTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
 
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
 
     b &= connect(ui->cbFps, SIGNAL(editTextChanged(QString)), this, SLOT(slotValidate()));
-//    b &= connect(ui->cbFps, SIGNAL(currentIndexChanged(int)), this, SLOT(slotValidate())); // necessary?
 
     b &= connect(ui->imagesOutputDir, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
     b &= connect(ui->imagesFilenamePattern, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
     b &= connect(ui->videoOutputFile, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
-
     b &= connect(ui->bImagesBrowseDir, SIGNAL(clicked()), this, SLOT(slotBrowseImagesDir()));
     b &= connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
     Q_ASSERT(b);
 
+    // Restore rendering start/end
+    int index;
+    index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
+    if (index >= 0) {
+        ui->cbStartTag->setCurrentIndex(index);
+    }
+    index = ui->cbEndTag->findText(m_project->preferences()->renderEndTag());
+    if (index >= 0) {
+        ui->cbEndTag->setCurrentIndex(index);
+    }
+    if (m_project->preferences()->renderStartTime().length() > 0) {
+        ui->timeStart->setText(m_project->preferences()->renderStartTime());
+    }
+    if (m_project->preferences()->renderEndTime().length() > 0) {
+        ui->timeEnd->setText(m_project->preferences()->renderEndTime());
+    }
+    ui->timeStart->setPlaceholderText(QVariant(m_project->nodes()->startTime()).toString());
+    ui->timeEnd->setPlaceholderText(QVariant(m_project->nodes()->endTime()).toString());
+
     slotUpdateRenderTarget();
+    slotSectionModeChanged();
 }
 
 RenderingDialog::~RenderingDialog()
@@ -117,9 +161,50 @@ RenderTask_sV* RenderingDialog::buildTask()
             renderTarget->setVcodec(ui->vcodec->text());
             task->setRenderTarget(renderTarget);
         } else {
+            qDebug() << "Render target is neither images nor video. Not implemented?";
             Q_ASSERT(false);
         }
 
+        if (ui->radioTagSection->isChecked()) {
+            bool b;
+            float start = ui->cbStartTag->itemData(ui->cbStartTag->currentIndex()).toFloat(&b);
+            Q_ASSERT(b);
+            float end = ui->cbEndTag->itemData(ui->cbEndTag->currentIndex()).toFloat(&b);
+            Q_ASSERT(b);
+            qDebug() << QString("Rendering tag section from %1 (%2) to %3 (%4)")
+                        .arg(ui->cbStartTag->currentText())
+                        .arg(start).arg(ui->cbEndTag->currentText()).arg(end);
+            Q_ASSERT(start <= end);
+            task->setTimeRange(start, end);
+        } else if (ui->radioSection->isChecked()) {
+            bool b;
+            float start = ui->timeStart->text().toFloat(&b);
+            Q_ASSERT(b);
+            float end = ui->timeEnd->text().toFloat(&b);
+            Q_ASSERT(b);
+            qDebug() << QString("Rendering time section from %1 (%2) to %3 (%4)")
+                        .arg(ui->cbStartTag->currentText())
+                        .arg(start).arg(ui->cbEndTag->currentText()).arg(end);
+            Q_ASSERT(start <= end);
+            task->setTimeRange(start, end);
+        }
+
+        QString mode;
+        if (ui->radioFullProject->isChecked()) {
+            mode = "full";
+        } else if (ui->radioSection->isChecked()) {
+            mode = "time";
+            m_project->preferences()->renderStartTime() = ui->timeStart->text();
+            m_project->preferences()->renderEndTime() = ui->timeEnd->text();
+        } else if (ui->radioTagSection->isChecked()) {
+            mode = "tags";
+            m_project->preferences()->renderStartTag() = ui->cbStartTag->currentText();
+            m_project->preferences()->renderEndTag() = ui->cbEndTag->currentText();
+        } else {
+            qDebug() << "No section mode selected?";
+            Q_ASSERT(false);
+        }
+        m_project->preferences()->renderSectionMode() = mode;
         m_project->preferences()->imagesOutputDir() = imagesOutputDir;
         m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
         m_project->preferences()->videoFilename() = ui->videoOutputFile->text();
@@ -132,6 +217,25 @@ RenderTask_sV* RenderingDialog::buildTask()
     } else {
         return NULL;
     }
+}
+
+void RenderingDialog::fillTagLists()
+{
+    QList<Tag_sV> list;
+    for (int i = 0; i < m_project->tags()->size(); i++) {
+        if (m_project->tags()->at(i).axis() == TagAxis_Output
+                && m_project->tags()->at(i).time() > m_project->nodes()->startTime()
+                && m_project->tags()->at(i).time() < m_project->nodes()->endTime()) {
+            list << m_project->tags()->at(i);
+        }
+    }
+    qSort(list);
+    ui->cbStartTag->addItem("<Start>", QVariant(m_project->nodes()->startTime()));
+    for (int i = 0; i < list.size(); i++) {
+        ui->cbStartTag->addItem(list.at(i).description(), QVariant(list.at(i).time()));
+        ui->cbEndTag->addItem(list.at(i).description(), QVariant(list.at(i).time()));
+    }
+    ui->cbEndTag->addItem("<End>", QVariant(m_project->nodes()->endTime()));
 }
 
 bool RenderingDialog::slotValidate()
@@ -171,6 +275,25 @@ bool RenderingDialog::slotValidate()
         Q_ASSERT(false);
     }
 
+    if (ui->radioSection->isChecked()) {
+        bool startOk;
+        bool endOk;
+        float timeStart = ui->timeStart->text().toFloat(&startOk);
+        float timeEnd = ui->timeEnd->text().toFloat(&endOk);
+        startOk &= timeStart >= m_project->nodes()->startTime();
+        endOk &= timeEnd <= m_project->nodes()->endTime();
+        if (!startOk) {
+            ui->timeStart->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        } else {
+            ui->timeStart->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        }
+        if (!endOk || timeEnd <= timeStart) {
+            ui->timeEnd->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
+        } else {
+            ui->timeEnd->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
+        }
+    }
+
     ok &= dynamic_cast<EmptyFrameSource_sV*>(m_project->frameSource()) == NULL;
 
     ui->bOk->setEnabled(ok);
@@ -207,3 +330,35 @@ void RenderingDialog::slotBrowseVideoFile()
         ui->videoOutputFile->setText(dialog.selectedFiles().at(0));
     }
 }
+
+void RenderingDialog::slotSectionModeChanged()
+{
+    ui->timeStart->setVisible(ui->radioSection->isChecked());
+    ui->lblcUnitStart->setVisible(ui->radioSection->isChecked());
+    ui->timeEnd->setVisible(ui->radioSection->isChecked());
+    ui->lblcUnitEnd->setVisible(ui->radioSection->isChecked());
+    ui->cbStartTag->setVisible(ui->radioTagSection->isChecked());
+    ui->cbEndTag->setVisible(ui->radioTagSection->isChecked());
+    ui->lblcTo->setVisible(ui->radioSection->isChecked() || ui->radioTagSection->isChecked());
+}
+
+void RenderingDialog::slotTagIndexChanged()
+{
+    if (QObject::sender() == ui->cbStartTag) {
+        qDebug() << "Start tag";
+        if (ui->cbEndTag->currentIndex() < ui->cbStartTag->currentIndex()) {
+            ui->cbEndTag->setCurrentIndex(ui->cbStartTag->currentIndex());
+        }
+    } else {
+        qDebug() << "End tag";
+        if (ui->cbStartTag->currentIndex() > ui->cbEndTag->currentIndex()) {
+            ui->cbStartTag->setCurrentIndex(ui->cbEndTag->currentIndex());
+        }
+    }
+}
+
+
+
+
+
+

@@ -39,6 +39,12 @@ namespace Ui {
 }
 
 class Project_sV;
+
+/**
+  \brief Canvas for drawing motion curves.
+
+  \todo Render single frame at mouse position?
+  */
 class Canvas : public QWidget
 {
     Q_OBJECT

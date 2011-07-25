@@ -36,7 +36,7 @@ public:
       */
     /**
       \fn setTimeRange()
-      Sets the time range for rendering. By default, the whole project is rendered.
+      Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
       */
     /**
       \fn setFPS()

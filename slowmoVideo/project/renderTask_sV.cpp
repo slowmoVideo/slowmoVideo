@@ -137,7 +137,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
                 m_renderTarget->slotConsumeFrame(rendered, outputFrame);
                 m_nextFrameTime = time + 1/m_fps.fps();
 
-                emit signalTaskProgress(outputFrame);
+                emit signalTaskProgress( (time-m_timeStart) * m_fps.fps() );
                 emit signalFrameRendered(time, outputFrame);
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;
