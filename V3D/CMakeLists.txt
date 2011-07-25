@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(V3D)
 
+get_filename_component(SV_INST_DIR "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
+
+message(STATUS "==================================================")
+message(STATUS "Installation prefix can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.")
+message(STATUS "==================================================")
+
+# Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
+message(STATUS "Directory is ${SV_INST_DIR}")
+set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
+set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
+
 # export V3D_SHADER_DIR=/data/cworkspace/slowmoGPU/GL/Shaders/
 
 set(CMAKE_CXX_FLAGS
@@ -12,9 +23,6 @@ set(CMAKE_CXX_FLAGS
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
 
-# Should be changed later if required.
-get_filename_component(CMAKE_INSTALL_PREFIX "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
-message("Install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Include OpenGL
 find_package (OpenGL REQUIRED)
@@ -33,6 +41,13 @@ include_directories(${GLEW_INCLUDE_DIR})
 
 find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIRS})
+
+include_directories(${CMAKE_INSTALL_PREFIX}/include)
+set(SVFLOW_PATHS "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
+find_library(SVFLOW_LIB
+    NAMES sVflow sVflow.a libsVflow libsVflow.a
+    PATHS ${SVFLOW_PATHS}
+)
 
 set (V3D_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -132,4 +147,22 @@ add_library(V3D ${ALL_SRC})
 add_subdirectory(Apps)
 target_link_libraries(V3D ${OpenCV_LIBS})
 
+set(BUILD_FLOW_BUILDER "NO")
 
+if(SVFLOW_LIB)
+set(BUILD_FLOW_BUILDER "YES")
+endif(SVFLOW_LIB)
+
+message("==================================================")
+if(NOT SVFLOW_LIB)
+message("* sVflow library not found. Did you make --install it?")
+message("  (Searched in ${SVFLOW_PATHS} for the sVflow library.)")
+endif(NOT SVFLOW_LIB)
+
+message("* Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
+message("* V3D will be built: ${BUILD_FLOW_BUILDER}")
+message("==================================================")
+
+if(NOT BUILD_FLOW_BUILDER)
+message(SEND_ERROR "Cannot build V3D.")
+endif(NOT BUILD_FLOW_BUILDER)
