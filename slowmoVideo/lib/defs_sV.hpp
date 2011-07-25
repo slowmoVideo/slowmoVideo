@@ -30,15 +30,21 @@ the Free Software Foundation, either version 3 of the License, or
 #define OSX
 #endif
 
+#define SLOWMOVIDEO_VERSION_MAJOR 0
+#define SLOWMOVIDEO_VERSION_MINOR 1
+#define SLOWMOVIDEO_VERSION_MICRO 1
+
 
 /// Contains information about this slowmoVideo version
 namespace Version_sV {
     /// Major version number
-    static int major = 0;
+    static int major = SLOWMOVIDEO_VERSION_MAJOR;
     /// Minor version number
-    static int minor = 1;
+    static int minor = SLOWMOVIDEO_VERSION_MINOR;
+    /// Micro version number
+    static int micro = SLOWMOVIDEO_VERSION_MICRO;
     /// Version number as string
-    static QString version(QString("%1.%2").arg(major).arg(minor));
+    static QString version(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
     /// Architecture
     static QString bits(
 #ifdef BITS_64

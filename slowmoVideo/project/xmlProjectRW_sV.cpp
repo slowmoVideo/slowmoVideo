@@ -18,7 +18,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "imagesFrameSource_sV.h"
-#include "../lib/defs_sV.hpp"
 
 #include <QDebug>
 #include <QTextStream>
@@ -29,7 +28,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
-    root.setAttribute("version", "2");
+    root.setAttribute("version", SLOWMOPROJECT_VERSION_MAJOR);
+    root.setAttribute("version_minor", SLOWMOPROJECT_VERSION_MINOR);
     doc.appendChild(root);
 
     // File info
@@ -37,7 +37,12 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     root.appendChild(info);
     QDomElement appName = doc.createElement("appName");
     appName.appendChild(doc.createTextNode("slowmoVideo"));
+    QDomElement version = doc.createElement("version");
+    version.setAttribute("major", SLOWMOVIDEO_VERSION_MAJOR);
+    version.setAttribute("minor", SLOWMOVIDEO_VERSION_MINOR);
+    version.setAttribute("micro", SLOWMOVIDEO_VERSION_MICRO);
     info.appendChild(appName);
+    info.appendChild(version);
 
 
     ProjectPreferences_sV *pr = project->preferences();
@@ -288,7 +293,7 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     }
 }
 
-Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSourceError, Error_sV)
+Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) const throw(FrameSourceError, Error_sV)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -306,12 +311,15 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                 qDebug() << "Invalid project file (incorrect root element): " << filename;
             } else {
 
-                int version = 0;
-                QStringRef sVersion = xml.attributes().value("version");
-                if (!sVersion.isEmpty()) {
-                    version = sVersion.toString().toInt();
+                int projVersionMajor = xml.attributes().value("version").toString().toInt();
+                int projVersionMinor = xml.attributes().value("version_minor").toString().toInt();
+                if (projVersionMajor > 0) {
+                    qDebug() << "Reading project file: version " << projVersionMajor << "." << projVersionMinor;
+                } else {
+                    qDebug() << "Reading project file of unknown version";
                 }
-                qDebug() << "Reading project file: version " << version;
+
+                int version_major = 0, version_minor = 0, version_micro = 0;
 
                 Project_sV *project = new Project_sV();
                 project->setProjectFilename(filename);
@@ -323,13 +331,18 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "appName") {
                                 qDebug() << "App name: " << xml.readElementText();
+                            } else if (xml.name() == "version") {
+                                version_major = xml.attributes().value("major").toString().toInt();
+                                version_minor = xml.attributes().value("minor").toString().toInt();
+                                version_micro = xml.attributes().value("micro").toString().toInt();
+                                xml.skipCurrentElement();
                             } else {
                                 xml.skipCurrentElement();
                             }
                         }
                     } else if (xml.name() == "resources") {
                         while (xml.readNextStartElement()) {
-                            if (version < 2 && xml.name() == "inputFile") {
+                            if (projVersionMajor < 2 && xml.name() == "inputFile") {
                                 QString inFilename = xml.readElementText();
                                 qDebug() << "Input file: " << inFilename;
                                 project->loadFrameSource(new VideoFrameSource_sV(project, inFilename));
@@ -499,6 +512,31 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                     qDebug() << "Did not read the whole project file! Stopped at: " << xml.name();
                 }
                 Q_ASSERT(xml.name().length() == 0);
+
+
+                file.close();
+
+
+                // Handle new project versions
+                if (projVersionMajor > SLOWMOPROJECT_VERSION_MAJOR && projVersionMajor) {
+                    throw Error_sV(QString("This file has been created with slowmoVideo %1.%2.%3 which uses a newer "
+                                           "project file version (%4.%5; supported: %6.%7). File cannot be loaded "
+                                           "(or only partially). Please upgrade to a newer version of slowmoVideo.")
+                                   .arg(version_major).arg(version_minor).arg(version_micro)
+                                   .arg(projVersionMajor).arg(projVersionMinor)
+                                   .arg(SLOWMOPROJECT_VERSION_MAJOR).arg(SLOWMOPROJECT_VERSION_MINOR));
+                } else if (projVersionMinor > SLOWMOPROJECT_VERSION_MINOR) {
+                    QString warningMsg = QString("This file has been created with a slightly newer version of slowmoVideo "
+                                                 "(version %1.%2.%3) which uses project file version %4.%5 (supported: %6.%7). "
+                                                 "When saving this project, some added properties will be lost.")
+                                         .arg(version_major).arg(version_minor).arg(version_micro)
+                                         .arg(projVersionMajor).arg(projVersionMinor)
+                                         .arg(SLOWMOPROJECT_VERSION_MAJOR).arg(SLOWMOPROJECT_VERSION_MINOR);
+                    qDebug() << warningMsg;
+                    if (warning != NULL) {
+                        *warning = warningMsg;
+                    }
+                }
 
                 return project;
 

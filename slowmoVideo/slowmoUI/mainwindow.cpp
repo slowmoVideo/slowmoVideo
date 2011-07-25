@@ -319,7 +319,11 @@ void MainWindow::slotLoadProjectDialog()
         m_settings.setValue("directories/lastOpenedProject", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
         XmlProjectRW_sV reader;
         try {
-            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0));
+            QString warning;
+            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0), &warning);
+            if (warning.length() > 0) {
+                QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
+            }
             loadProject(project);
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();

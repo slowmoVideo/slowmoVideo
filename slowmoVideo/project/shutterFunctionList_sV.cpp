@@ -16,8 +16,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtScript/QScriptValue>
 #include <QtScript/QScriptEngine>
 
-/// \todo Functions must be unique (ID), allow duplication and modification
-
 QRegExp ShutterFunctionList_sV::regexID("^[\\d\\w]+$");
 
 ShutterFunctionList_sV::ShutterFunctionList_sV(NodeList_sV *nodes) :

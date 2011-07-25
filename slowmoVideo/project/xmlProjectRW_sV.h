@@ -20,17 +20,34 @@ the Free Software Foundation, either version 3 of the License, or
 class Node_sV;
 class AbstractFrameSource_sV;
 
+#define SLOWMOPROJECT_VERSION_MAJOR 2
+#define SLOWMOPROJECT_VERSION_MINOR 1
+
+/**
+  \brief Reads and writes project files in XML format
+
+  Additional stored parameters require a minor version change.
+  Big changes in the schema, like elements moved to a different node, require
+  a major version change and a function that loads old project files.
+
+  Version changes (both major and minor) require a micro slowmoVideo version change.
+  */
 class XmlProjectRW_sV// : public AbstractProjectRW_sV
 {
 public:
     /**
+      \fn loadProject()
       Reads an XML project file.
-      @return NULL if an error ocurred.
+      \param filename Project file to load
+      \param warning Information message when trying to load project files with a wrong version number
+      \return NULL if an error ocurred.
       */
-    Project_sV* loadProject(QString filename) const throw(FrameSourceError, Error_sV);
     /**
+      \fn saveProject()
       Saves a project to an XML project file.
       */
+
+    Project_sV* loadProject(QString filename, QString *warning = NULL) const throw(FrameSourceError, Error_sV);
     int saveProject(Project_sV *project, QString filename) const;
 
 private:
