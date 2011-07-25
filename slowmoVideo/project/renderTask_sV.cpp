@@ -21,6 +21,7 @@ the Free Software Foundation, either version 3 of the License, or
 RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
+    m_renderTimeElapsed(0),
     m_fps(24),
     m_initialized(false),
     m_stopRendering(false),
@@ -100,6 +101,7 @@ void RenderTask_sV::slotContinueRendering()
     }
     qDebug() << "Continuing rendering at " << m_nextFrameTime;
 
+    m_stopwatch.start();
     emit signalRenderingContinued();
     emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
     QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
@@ -123,7 +125,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         if (time > m_timeEnd) {
             m_stopRendering = true;
             m_renderTarget->closeRenderTarget();
-            emit signalRenderingFinished();
+            m_renderTimeElapsed += m_stopwatch.elapsed();
+            emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
 
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
@@ -151,7 +154,8 @@ void RenderTask_sV::slotRenderFrom(qreal time)
 
     } else {
         m_renderTarget->closeRenderTarget();
-        emit signalRenderingStopped();
+        m_renderTimeElapsed += m_stopwatch.elapsed();
+        emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
     }
     if (!m_stopRendering) {
         QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));

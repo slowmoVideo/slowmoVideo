@@ -11,7 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef RENDERTASK_SV_H
 #define RENDERTASK_SV_H
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QTime>
 
 #include "../lib/defs_sV.hpp"
 
@@ -67,8 +68,8 @@ signals:
     void signalItemDesc(QString desc);
     void signalTaskProgress(int value);
     void signalRenderingContinued();
-    void signalRenderingStopped();
-    void signalRenderingFinished();
+    void signalRenderingStopped(QString renderTime);
+    void signalRenderingFinished(QString renderTime);
     void signalRenderingAborted(QString reason);
 
     void signalFrameRendered(qreal time, int frameNumber);
@@ -79,6 +80,9 @@ private:
 
     float m_timeStart;
     float m_timeEnd;
+
+    QTime m_stopwatch;
+    int m_renderTimeElapsed;
 
     Fps_sV m_fps;
     QSize m_resolution;

@@ -56,7 +56,7 @@ void Project_sV::init()
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
     m_flowSource = new V3dFlowSource_sV(this);
-    m_motionBlur = new MotionBlur_sV(this, 3); ///< \todo motion blur samples as argument
+    m_motionBlur = new MotionBlur_sV(this);
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();

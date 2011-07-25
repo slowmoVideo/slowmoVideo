@@ -19,7 +19,7 @@ public slots:
     void slotNextTask(const QString taskDescription, int taskSize);
     void slotTaskProgress(int progress);
     void slotTaskItemDescription(const QString desc);
-    void slotAllTasksFinished();
+    void slotAllTasksFinished(const QString& timePassed = "");
     void slotAborted(const QString& message = "");
 
 signals:

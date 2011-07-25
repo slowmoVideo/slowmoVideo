@@ -65,9 +65,14 @@ void ProgressDialog::slotAborted(const QString &message)
     reject();
 }
 
-void ProgressDialog::slotAllTasksFinished()
+void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
 {
     ui->progress->setValue(ui->progress->maximum());
     setWorking(false);
+    if (timePassed.length() > 0) {
+        slotTaskItemDescription(QString("Task finished in %1.").arg(timePassed));
+    } else {
+        slotTaskItemDescription("Task finished.");
+    }
     setWindowTitle("(Finished) " + windowTitle());
 }
