@@ -186,7 +186,8 @@ QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpola
         qDebug() << "Shutter value for output time " << outTime << " is " << shutter;
         if (shutter > 0) {
             try {
-                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter, fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
+                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter*fps.fps(),
+                                          fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
             } catch (RangeTooSmallError_sV &err) {}
         }
     }

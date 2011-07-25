@@ -53,9 +53,6 @@ public:
     Project_sV(QString projectDir);
     ~Project_sV();
 
-    /// \todo generate ID here
-    QString initID();
-
     ProjectPreferences_sV* preferences() { return m_preferences; }
 
     void setProjectDir(QString projectDir);
@@ -100,7 +97,6 @@ public:
 
 private:
     QDir m_projDir;
-    QString m_projectID;
     QString m_projectFilename;
 
     ProjectPreferences_sV *m_preferences;
