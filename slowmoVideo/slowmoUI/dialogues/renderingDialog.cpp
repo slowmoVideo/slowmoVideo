@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "ui_renderingDialog.h"
 
 #include "lib/defs_sV.hpp"
+#include "project/motionBlur_sV.h"
 #include "project/project_sV.h"
 #include "project/projectPreferences_sV.h"
 #include "project/renderTask_sV.h"
@@ -45,6 +46,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
         qDebug() << "Unknown render section mode: " << mode;
         Q_ASSERT(false);
     }
+    ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
+    ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
 
     fillTagLists();
 
@@ -149,6 +152,8 @@ RenderTask_sV* RenderingDialog::buildTask()
         task->setFPS(fps);
         task->setSize(size);
         task->setInterpolationType(interpolation);
+        m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
+        m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
 
         if (ui->radioImages->isChecked()) {
             ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);

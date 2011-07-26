@@ -71,6 +71,7 @@ public:
     NodeList_sV *nodes() const { return m_nodes; }
     QList<Tag_sV> *tags() const { return m_tags; }
     ShutterFunctionList_sV* shutterFunctions() { return m_shutterFunctions; }
+    MotionBlur_sV *motionBlur() { return m_motionBlur; }
 
     RenderTask_sV *renderTask() { return m_renderTask; }
     void replaceRenderTask(RenderTask_sV *task);

@@ -61,6 +61,7 @@ public:
     static QColor nodeCol;
     static QColor gridCol;
     static QColor fatGridCol;
+    static QColor minGridCol;
     static QColor selectedCol;
     static QColor hoverCol;
     static QColor srcTagCol;
@@ -102,8 +103,8 @@ private:
     int m_distTop;
     Node_sV m_t0;
     Node_sV m_tmax;
-    int m_secResX;
-    int m_secResY;
+    float m_secResX;
+    float m_secResY;
 
     bool m_showHelp;
 

@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "interpolate_sV.h"
 #include "flowField_sV.h"
+#include "flowTools_sV.h"
 #include "sourceField_sV.h"
 #include "vector_sV.h"
 #include "bezierTools_sV.h"
@@ -24,6 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define CLAMP(x,min,max) (  ((x) < (min)) ? (min) : ( ((x) > (max)) ? (max) : (x) )  )
 
 #define INTERPOLATE
+//#define FIX_FLOW
 #define DEBUG_I
 
 enum ColorComponent { CC_Red, CC_Green, CC_Blue };
@@ -113,8 +115,8 @@ void Interpolate_sV::blend(ColorMatrix4x4 &c, const QColor &blendCol, float posX
 void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage &output)
 {
 #ifdef INTERPOLATE
-    const int Wmax = left.width()-1;
-    const int Hmax = left.height()-1;
+    const int Wmax = left.width()-2;
+    const int Hmax = left.height()-2;
     float posX, posY;
 #endif
 
@@ -167,12 +169,21 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
     const int W = left.width();
     const int H = left.height();
 
+
     SourceField_sV leftSourcePixel(flowLeftRight, pos);
     leftSourcePixel.inpaint();
     SourceField_sV rightSourcePixel(flowRightLeft, 1-pos);
     rightSourcePixel.inpaint();
 
     float aspect = 1 - (.5 + std::cos(M_PI*pos)/2);
+
+#if defined(FIX_FLOW)
+    FlowField_sV diffField(flowLeftRight->width(), flowLeftRight->height());
+    FlowTools_sV::difference(*flowLeftRight, *flowRightLeft, diffField);
+    float diffSum;
+    float tmpAspect;
+#endif
+
 
     float fx, fy;
     QColor colLeft, colRight;
@@ -184,13 +195,37 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
             fy = CLAMP(fy, 0, H-1.01);
             colLeft = interpolate(left, fx, fy);
 
+#ifdef FIX_FLOW
+            diffSum = diffField.x(fx, fy)+diffField.y(fx, fy);
+            if (diffSum > 5) {
+                tmpAspect = 0;
+            } else if (diffSum < -5) {
+                tmpAspect = 1;
+            } else {
+                tmpAspect = aspect;
+            }
+#endif
+
             fx = rightSourcePixel.at(x,y).fromX;
             fx = CLAMP(fx, 0, W-1.01);
             fy = rightSourcePixel.at(x,y).fromY;
             fy = CLAMP(fy, 0, H-1.01);
             colRight = interpolate(right, fx, fy);
 
+#ifdef FIX_FLOW
+            diffSum = diffField.x(fx, fy)+diffField.y(fx, fy);
+            if (diffSum < 5) {
+                tmpAspect = 0;
+            } else if (diffSum > -5) {
+                tmpAspect = 1;
+            }
+#endif
+
+#ifdef FIX_FLOW
+            output.setPixel(x,y, blend(colLeft, colRight, tmpAspect).rgba());
+#else
             output.setPixel(x,y, blend(colLeft, colRight, aspect).rgba());
+#endif
         }
     }
 }
@@ -267,8 +302,8 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
   */
 void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const FlowField_sV *flowPrevCurr, const FlowField_sV *flowCurrNext, float pos, QImage &output)
 {
-    const int Wmax = prev.width()-1;
-    const int Hmax = prev.height()-1;
+    const int Wmax = prev.width()-2; // Because of interpolation ...
+    const int Hmax = prev.height()-2;
 
     Vector_sV a, b, c;
     Vector_sV Ta, Sa;

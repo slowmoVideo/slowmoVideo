@@ -16,8 +16,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     m_project(project),
-    m_minSamples(4),
-    m_maxSamples(32)
+    m_slowmoSamples(4),
+    m_maxSamples(64)
 {
     createDirectories();
 }
@@ -85,7 +85,7 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
     high = qMin(high, (float)m_project->frameSource()->framesCount());
 
     QStringList frameList;
-    float increment = (high-low)/(m_minSamples-1);
+    float increment = (high-low)/(m_slowmoSamples-1);
     for (float pos = low; pos <= high; pos += increment) {
         frameList << cachedFramePath(pos, size, true);
     }
@@ -132,4 +132,16 @@ void MotionBlur_sV::createDirectories()
 {
     m_dirCacheSmall = m_project->getDirectory("cache/motionBlurSmall");
     m_dirCacheOrig = m_project->getDirectory("cache/motionBlurOrig");
+}
+
+void MotionBlur_sV::setSlowmoSamples(int slowmoSamples)
+{
+    m_slowmoSamples = slowmoSamples;
+    Q_ASSERT(m_slowmoSamples > 0);
+}
+
+void MotionBlur_sV::setMaxSamples(int maxSamples)
+{
+    m_maxSamples = maxSamples;
+    Q_ASSERT(m_maxSamples > 0);
 }

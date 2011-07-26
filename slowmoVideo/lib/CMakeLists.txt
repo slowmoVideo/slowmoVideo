@@ -32,11 +32,13 @@ set(LIB_SRC_FLOW
   defs_sV.cpp
   flowRW_sV.cpp
   flowField_sV.cpp
+  flowTools_sV.cpp
 )
 
 set(HEADERS
   flowRW_sV.h
   flowField_sV.h
+  flowTools_sV.h
 )
 
 

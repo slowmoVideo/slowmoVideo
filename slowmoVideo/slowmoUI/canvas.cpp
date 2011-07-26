@@ -38,8 +38,9 @@ QColor Canvas::selectedCol  (  0, 175, 255, 100);
 QColor Canvas::hoverCol     (255, 175,   0, 200);
 QColor Canvas::lineCol      (255, 255, 255);
 QColor Canvas::nodeCol      (240, 240, 240);
-QColor Canvas::gridCol      (255, 255, 255,  40);
-QColor Canvas::fatGridCol   (255, 255, 255,  80);
+QColor Canvas::gridCol      (255, 255, 255,  30);
+QColor Canvas::fatGridCol   (255, 255, 255,  60);
+QColor Canvas::minGridCol   (200, 200, 255, 150);
 QColor Canvas::handleLineCol(255, 255, 255, 128);
 QColor Canvas::srcTagCol    ( 30, 245,   0, 150);
 QColor Canvas::outTagCol    ( 30, 245,   0, 150);
@@ -205,17 +206,25 @@ void Canvas::paintEvent(QPaintEvent *)
         }
     }
 
-    davinci.setPen(gridCol);
+    bool drawLine;
     // x grid
     for (int tx = ceil(m_t0.x()); true; tx++) {
         QPoint pos = convertTimeToCanvas(Node_sV(tx, m_t0.y()));
         if (insideCanvas(pos)) {
-            if (tx%10 == 0) {
+            drawLine = m_secResX >= 4;
+            if (tx%60 == 0) {
+                davinci.setPen(minGridCol);
+                drawLine = true;
+            } else if (tx%10 == 0) {
                 davinci.setPen(fatGridCol);
+                drawLine = m_secResX >= .7;
             } else {
                 davinci.setPen(gridCol);
             }
-            davinci.drawLine(pos.x(), pos.y(), pos.x(), m_distTop);
+
+            if (drawLine) {
+                davinci.drawLine(pos.x(), pos.y(), pos.x(), m_distTop);
+            }
         } else {
             break;
         }
@@ -224,12 +233,20 @@ void Canvas::paintEvent(QPaintEvent *)
     for (int ty = ceil(m_t0.y()); true; ty++) {
         QPoint pos = convertTimeToCanvas(Node_sV(m_t0.x(), ty));
         if (insideCanvas(pos)) {
-            if (ty%10 == 0) {
+            drawLine = m_secResY >= 4;
+            if (ty%60 == 0) {
+                davinci.setPen(minGridCol);
+                drawLine = true;
+            } else if (ty%10 == 0) {
                 davinci.setPen(fatGridCol);
+                drawLine = m_secResX >= .7;
             } else {
                 davinci.setPen(gridCol);
             }
-            davinci.drawLine(pos.x(), pos.y(), width()-1 - m_distRight, pos.y());
+
+            if (drawLine) {
+                davinci.drawLine(pos.x(), pos.y(), width()-1 - m_distRight, pos.y());
+            }
         } else {
             break;
         }
@@ -247,14 +264,34 @@ void Canvas::paintEvent(QPaintEvent *)
     // Frames/seconds
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_states.prevMousePos)) {
-        davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
+        QString timeText;
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
-        davinci.drawText(m_states.prevMousePos.x() - 20, height()-1 - 20, QString("%1 s").arg(time.x()));
+        int posX;
+
+        davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
+        if (time.x() < 60) {
+            timeText = QString("%1 s").arg(time.x());
+        } else {
+            timeText = QString("%1 min %2 s").arg(int(time.x()/60)).arg(time.x()-60*int(time.x()/60), 0, 'f', 3);
+        }
+        // Ensure that the text does not go over the right border
+        posX = m_states.prevMousePos.x() - 20;
+        if (posX > width()-m_distLeft-40) {
+            posX = width()-m_distLeft-40;
+        }
+        davinci.drawText(posX, height()-1 - 20, timeText);
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
-        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 50, Qt::AlignRight,
-                         QString("f %1\n%2 s")
-                         .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
-                         .arg(time.y()));
+        if (time.y() < 60) {
+            timeText = QString("f %1\n%2 s")
+                    .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
+                    .arg(time.y());
+        } else {
+            timeText = QString("f %1\n%2 min\n+%3 s")
+                    .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
+                    .arg(int(time.y()/60))
+                    .arg(time.y()-60*int(time.y()/60), 0, 'f', 2);
+        }
+        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 50, Qt::AlignRight, timeText);
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -574,13 +611,12 @@ void Canvas::wheelEvent(QWheelEvent *e)
         // Update the line resolution
         if (deg > 0) {
             m_secResX *= ZOOM_FACTOR;
-            m_secResY *= ZOOM_FACTOR;
         } else {
             m_secResX /= ZOOM_FACTOR;
-            m_secResY /= ZOOM_FACTOR;
         }
-        if (m_secResX < 4) { m_secResX = 4; }
-        if (m_secResY < 4) { m_secResY = 4; }
+        if (m_secResX < .05) { m_secResX = .05; }
+        // Y resolution is the same as X resolution (at least at the moment)
+        m_secResY = m_secResX;
 
         // Adjust t0 such that the mouse points to the same time as before
         Node_sV nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
@@ -598,9 +634,12 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }
     }
 
+
     m_project->preferences()->viewport_t0() = m_t0.toQPointF();
     m_project->preferences()->viewport_secRes().rx() = m_secResX;
     m_project->preferences()->viewport_secRes().ry() = m_secResY;
+
+    qDebug() << "Resolution is " << m_secResY;
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);

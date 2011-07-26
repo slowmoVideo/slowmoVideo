@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "imagesFrameSource_sV.h"
+#include "motionBlur_sV.h"
 
 #include <QDebug>
 #include <QTextStream>
@@ -57,6 +58,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
     QDomElement renderFPS = doc.createElement("renderFPS");
+    QDomElement renderSlowmoSamples = doc.createElement("renderSlowmoSamples");
+    QDomElement renderMaxSamples = doc.createElement("renderMaxSamples");
     QDomElement renderTarget = doc.createElement("renderTarget");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
@@ -73,6 +76,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     preferences.appendChild(renderFrameSize);
     preferences.appendChild(renderInterpolation);
     preferences.appendChild(renderFPS);
+    preferences.appendChild(renderSlowmoSamples);
+    preferences.appendChild(renderMaxSamples);
     preferences.appendChild(renderTarget);
     preferences.appendChild(imagesOutputDir);
     preferences.appendChild(imagesFilenamePattern);
@@ -89,6 +94,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     renderFrameSize.setAttribute("size", pr->renderFrameSize());
     renderInterpolation.setAttribute("type", pr->renderInterpolationType());
     renderFPS.setAttribute("fps", pr->renderFPS());
+    renderSlowmoSamples.setAttribute("number", project->motionBlur()->slowmoSamples());
+    renderMaxSamples.setAttribute("number", project->motionBlur()->maxSamples());
     renderTarget.setAttribute("target", pr->renderTarget());
     imagesOutputDir.setAttribute("dir", pr->imagesOutputDir());
     imagesFilenamePattern.setAttribute("pattern", pr->imagesFilenamePattern());
@@ -470,6 +477,14 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) con
                             } else if (xml.name() == "renderFPS") {
                                 pr->renderFPS() = xml.attributes().value("fps").toString().toFloat();
                                 xml.skipCurrentElement();
+
+                            } else if (xml.name() == "renderSlowmoSamples") {
+                                project->motionBlur()->setSlowmoSamples(xml.attributes().value("number").toString().toInt());
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "renderMaxSamples") {
+                                project->motionBlur()->setMaxSamples(xml.attributes().value("number").toString().toInt());
+                                xml.skipCurrentElement();
+
                             } else if (xml.name() == "renderTarget") {
                                 pr->renderTarget() = xml.attributes().value("target").toString();
                                 xml.skipCurrentElement();

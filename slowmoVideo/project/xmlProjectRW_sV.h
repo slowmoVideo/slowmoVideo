@@ -21,7 +21,7 @@ class Node_sV;
 class AbstractFrameSource_sV;
 
 #define SLOWMOPROJECT_VERSION_MAJOR 2
-#define SLOWMOPROJECT_VERSION_MINOR 1
+#define SLOWMOPROJECT_VERSION_MINOR 2
 
 /**
   \brief Reads and writes project files in XML format

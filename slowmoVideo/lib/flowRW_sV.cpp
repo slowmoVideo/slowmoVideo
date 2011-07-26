@@ -80,7 +80,7 @@ FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowRWError)
     file.read((char*) &height, sizeof(int));
     if (file.rdstate() != std::ios::goodbit) {
         file.close();
-        throw FlowRWError("Failed to read width/height from " + filename);
+        throw FlowRWError("Failed to read width/height from file " + filename);
     }
 
     FlowField_sV *field = new FlowField_sV(width, height);
@@ -89,7 +89,7 @@ FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowRWError)
     if (file.rdstate() != std::ios::goodbit) {
         delete field;
         file.close();
-        throw FlowRWError("Failed to read data from " + filename);
+        throw FlowRWError("Failed to read data from file " + filename);
     }
     file.close();
 

@@ -52,7 +52,7 @@ public:
     QImage slowmoBlur(float startFrame, float endFrame, FrameSize size);
 
     /**
-      \fn setMinSamples();
+      \fn setSlowmoSamples();
       Sets the minimum number of samples for motion blur. This is ignored by fastBlur() where the interpolation scale
       is fixed (i.e. at most 1/8 steps between two frames). However slowmoBlur() uses this exact value for interpolating.
       */
@@ -61,8 +61,11 @@ public:
       Sets the maximum number of samples that are used for rendering motion blur.
       \todo Configurable via UI
       */
-    void setMinSamples(int minSamples);
+    void setSlowmoSamples(int slowmoSamples);
     void setMaxSamples(int maxSamples);
+
+    int slowmoSamples() const { return m_slowmoSamples; }
+    int maxSamples() const { return m_maxSamples; }
 
 public slots:
     void slotUpdateProjectDir();
@@ -72,7 +75,7 @@ private:
     QDir m_dirCacheSmall;
     QDir m_dirCacheOrig;
 
-    int m_minSamples;
+    int m_slowmoSamples;
     int m_maxSamples;
 
     QString cachedFramePath(float framePos, FrameSize size, bool highPrecision = false);

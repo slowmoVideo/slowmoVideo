@@ -9,10 +9,9 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 
-
 #include "lib/flowRW_sV.h"
 #include "lib/flowField_sV.h"
-#include "flowErrors_sV.h"
+#include "lib/flowTools_sV.h"
 
 #include <QImage>
 #include <QtCore/QDebug>
@@ -37,7 +36,13 @@ void colourizeFlow(int argc, char *argv[])
     std::string inputFile = argv[1];
     QString outputFile(argv[2]);
 
-    FlowField_sV *flowField = FlowRW_sV::load(inputFile);
+    FlowField_sV *flowField;
+    try {
+        flowField = FlowRW_sV::load(inputFile);
+    } catch (FlowRW_sV::FlowRWError &err) {
+        std::cout << err.message << std::endl;
+        exit(-2);
+    }
 
     std::cout << "Flow file loaded. Width: " << flowField->width() << ", height: " << flowField->height() << std::endl;
 
@@ -68,7 +73,11 @@ void diffFlow(int argc, char *argv[])
     FlowField_sV *rightFlow = FlowRW_sV::load(argv[3]);
     FlowField_sV flowDifference(leftFlow->width(), leftFlow->height());
 
-    FlowErrors_sV::difference(*leftFlow, *rightFlow, flowDifference);
+    if (strcmp("diffSigned", argv[1]) == 0) {
+        FlowTools_sV::signedDifference(*leftFlow, *rightFlow, flowDifference);
+    } else {
+        FlowTools_sV::difference(*leftFlow, *rightFlow, flowDifference);
+    }
 
     int d;
     QImage img(flowDifference.width(), flowDifference.height(), QImage::Format_ARGB32);
@@ -95,7 +104,7 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
-    if (strcmp("diff", argv[1]) == 0) {
+    if (strcmp("diff", argv[1]) == 0 || strcmp("diffSigned", argv[1]) == 0) {
         diffFlow(argc, argv);
     } else {
         colourizeFlow(argc, argv);
