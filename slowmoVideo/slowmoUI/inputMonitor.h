@@ -17,8 +17,11 @@ the Free Software Foundation, either version 3 of the License, or
 namespace Ui {
     class InputMonitor;
 }
-
 class QImage;
+
+/**
+  \brief Used for displaying input frames at the mouse position.
+  */
 class InputMonitor : public QWidget
 {
     Q_OBJECT

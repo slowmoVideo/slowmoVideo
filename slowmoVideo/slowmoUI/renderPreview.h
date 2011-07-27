@@ -21,6 +21,9 @@ namespace Ui {
 class Project_sV;
 class QMainWindow;
 
+/**
+  \brief Renders a preview frame from the project
+  */
 class RenderPreview : public QWidget
 {
     Q_OBJECT
@@ -29,9 +32,11 @@ public:
     explicit RenderPreview(Project_sV *project, QWidget *parent = 0);
     ~RenderPreview();
 
+    /// Uses the given project (and its curve etc.)
     void load(Project_sV *project);
 
 public slots:
+    /// Renders the output frame at the given time (asynchronous)
     void slotRenderAt(float time);
 
 private:

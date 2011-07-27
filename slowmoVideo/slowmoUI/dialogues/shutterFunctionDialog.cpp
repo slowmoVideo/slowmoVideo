@@ -29,9 +29,6 @@ ShutterFunctionDialog::ShutterFunctionDialog(Project_sV *project, QWidget *paren
 
     bool b = true;
     b &= connect(ui->bClose, SIGNAL(clicked()), this, SLOT(accept()));
-//    b &= connect(ui->function, SIGNAL(textChanged()), this,  SLOT(slotUpdateCurve()));
-//    b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotUpdateCurrentFunction(QString)));
-//    b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotUpdateCurve()));
     b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotUpdateNode()));
     b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotLoadSelectedFunction()));
     b &= connect(ui->function, SIGNAL(textChanged()), this, SLOT(slotFunctionTextChanged()));
@@ -43,6 +40,7 @@ ShutterFunctionDialog::ShutterFunctionDialog(Project_sV *project, QWidget *paren
     Q_ASSERT(b);
 
     loadProject(project);
+    slotLoadSelectedFunction();
 }
 
 ShutterFunctionDialog::~ShutterFunctionDialog()
@@ -165,7 +163,13 @@ void ShutterFunctionDialog::slotLoadSelectedFunction()
         m_currentFunction = m_project->shutterFunctions()->function(id);
         ui->function->setPlainText(m_currentFunction->function());
     }
-
+    int count = 0;
+    for (int i = 0; i < m_project->nodes()->size(); i++) {
+        if (m_project->nodes()->at(i).shutterFunctionID() == id) {
+            count++;
+        }
+    }
+    ui->lblUsage->setText(QString("Used: %1 times").arg(count));
 
 }
 
