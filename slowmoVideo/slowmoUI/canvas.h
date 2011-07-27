@@ -44,7 +44,6 @@ class Project_sV;
   \brief Canvas for drawing motion curves.
 
   \todo Render single frame at mouse position?
-  \todo Zoom out more
   */
 class Canvas : public QWidget
 {
@@ -72,6 +71,8 @@ public:
     void load(Project_sV *project);
 
     void toggleHelp();
+
+    const QPointF prevMouseTime() const;
 
 public slots:
     void slotAbort(Canvas::Abort abort);

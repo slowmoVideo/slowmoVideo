@@ -40,10 +40,12 @@ throw(FrameSourceError) :
     QStringList args;
     args << "-version";
     ffmpeg.start("ffmpeg", args);
-    ffmpeg.waitForFinished(1000);
+    ffmpeg.waitForFinished(2000);
     QByteArray output = ffmpeg.readAllStandardOutput();
     if (output.size() == 0) {
-        throw FrameSourceError("ffmpeg executable not found! Cannot load " + filename);
+        throw FrameSourceError(QString("ffmpeg executable not found! Cannot load %1."
+                                       "\n(It is also possible that it took a little long to respond "
+                                       "due to high workload, so you might want to try again.)").arg(filename));
     }
 
     createDirectories();

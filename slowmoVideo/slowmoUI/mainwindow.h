@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "canvas.h"
 #include "inputMonitor.h"
+#include "renderPreview.h"
 #include "project/project_sV.h"
 
 namespace Ui {
@@ -70,7 +71,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QStatusBar *m_statusBar;
     QSettings m_settings;
 
     Project_sV *m_project;
@@ -78,6 +78,8 @@ private:
     Canvas *m_wCanvas;
     InputMonitor *m_wInputMonitor;
     QDockWidget *m_wInputMonitorDock;
+    RenderPreview* m_wRenderPreview;
+    QDockWidget *m_wRenderPreviewDock;
 
     ProgressDialog *m_progressDialog;
     ProgressDialog *m_renderProgressDialog;
@@ -120,6 +122,7 @@ private slots:
 
     void slotToggleHelp();
     void slotShowAboutDialog();
+    void slotUpdateRenderPreview();
 
 
 signals:

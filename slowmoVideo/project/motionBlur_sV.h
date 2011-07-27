@@ -59,7 +59,6 @@ public:
     /**
       \fn setMaxSamples();
       Sets the maximum number of samples that are used for rendering motion blur.
-      \todo Configurable via UI
       */
     void setSlowmoSamples(int slowmoSamples);
     void setMaxSamples(int maxSamples);

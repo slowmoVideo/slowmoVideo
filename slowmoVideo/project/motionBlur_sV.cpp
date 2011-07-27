@@ -73,6 +73,7 @@ QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
 
 }
 
+/// \todo fixed distance as additional option
 QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize size)
 {
     float low, high;
@@ -112,7 +113,6 @@ QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size, bool high
     } else {
         if (!QFileInfo(name).exists()) {
             qDebug() << name << " does not exist yet. Interpolating and saving to cache.";
-            /// \todo
             QImage frm = Interpolator_sV::interpolate(m_project, framePos, InterpolationType_TwowayNew, size);
             frm.save(name);
         }

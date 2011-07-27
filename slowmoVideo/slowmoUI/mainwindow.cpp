@@ -67,18 +67,22 @@ MainWindow::MainWindow(QWidget *parent) :
     m_renderProgressDialog(NULL)
 {
     ui->setupUi(this);
-    m_statusBar = new QStatusBar(this);
-    setStatusBar(m_statusBar);
 
     m_project = new Project_sV();
 
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
 
+
     m_wInputMonitor = new InputMonitor(this);
     m_wInputMonitorDock = new QDockWidget("Input monitor", this);
     m_wInputMonitorDock->setWidget(m_wInputMonitor);
     addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
+
+    m_wRenderPreview = new RenderPreview(m_project, this);
+    m_wRenderPreviewDock = new QDockWidget("Render preview", this);
+    m_wRenderPreviewDock->setWidget(m_wRenderPreview);
+    addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
 
 
     // Set up shortcut bindings
@@ -115,6 +119,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
     ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
     ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
+    ui->actionRenderPreview->setShortcut(QKeySequence("Shift+Ctrl+R"));
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
@@ -149,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
     b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
     b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
+    b &= connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
     b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
     b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
     b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
@@ -163,10 +169,18 @@ MainWindow::~MainWindow()
     delete ui;
     delete m_wInputMonitor;
     delete m_wInputMonitorDock;
-    delete m_statusBar;
+    delete m_wRenderPreview;
+    delete m_wRenderPreviewDock;
 
     if (m_project != NULL) {
         delete m_project;
+    }
+
+    if (m_progressDialog != NULL) {
+        delete m_progressDialog;
+    }
+    if (m_renderProgressDialog != NULL) {
+        delete m_renderProgressDialog;
     }
 
     delete m_signalMapper;
@@ -296,6 +310,7 @@ void MainWindow::loadProject(Project_sV *project)
     }
     m_project = project;
     m_wCanvas->load(m_project);
+    m_wRenderPreview->load(m_project);
 
     QSettings settings;
     m_project->readSettings(settings);
@@ -340,7 +355,7 @@ void MainWindow::slotSaveProject(QString filename)
     }
     if (filename.length() == 0) {
         qDebug() << "No filename given, won't save. (Perhaps an empty project?)";
-        m_statusBar->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
+        statusBar()->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
     } else {
         qDebug() << "Saving project as " << filename;
         XmlProjectRW_sV writer;
@@ -395,6 +410,10 @@ void MainWindow::slotForwardInputPosition(qreal frame)
     if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
         m_wInputMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
     }
+}
+void MainWindow::slotUpdateRenderPreview()
+{
+    m_wRenderPreview->slotRenderAt(m_wCanvas->prevMouseTime().x());
 }
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>718</width>
-    <height>509</height>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -291,6 +291,16 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Motion blur will only be applied for segments on which it is enabled.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label_6">
@@ -410,6 +420,13 @@
       <string>Images</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>The %1 in the filename pattern is mandatory and will be replaced by the frame number.</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">

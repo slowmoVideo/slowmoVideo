@@ -150,6 +150,11 @@ void Canvas::toggleHelp()
     repaint();
 }
 
+const QPointF Canvas::prevMouseTime() const
+{
+    return convertCanvasToTime(m_states.prevMousePos).toQPointF();
+}
+
 
 bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
 {
@@ -543,16 +548,6 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
         qDebug() << "Nearby objects:";
         for (int i = 0; i < nearObjects.size(); i++) {
             qDebug() << typeid(*(nearObjects.at(i).ptr)).name() << " at distance " << nearObjects.at(i).dist;
-//            if (dynamic_cast<const Node_sV*>(nearObjects.at(i).ptr) != NULL) {
-//                qDebug() << "Node.";
-//            } else if (dynamic_cast<const NodeHandle_sV*>(nearObjects.at(i).ptr) != NULL) {
-//                qDebug() << "Node handle.";
-//            } else if (dynamic_cast<const Segment_sV*>(nearObjects.at(i).ptr) != NULL) {
-//                qDebug() << "Segment";
-//            } else if (dynamic_cast<const Tag_sV*>(nearObjects.at(i).ptr) != NULL) {
-//                const Tag_sV *tag = dynamic_cast<const Tag_sV*>(nearObjects.at(i).ptr);
-//                qDebug() << "Tag: " << tag->description();
-//            }
         }
     }
 }
@@ -638,8 +633,6 @@ void Canvas::wheelEvent(QWheelEvent *e)
     m_project->preferences()->viewport_t0() = m_t0.toQPointF();
     m_project->preferences()->viewport_secRes().rx() = m_secResX;
     m_project->preferences()->viewport_secRes().ry() = m_secResY;
-
-    qDebug() << "Resolution is " << m_secResY;
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);

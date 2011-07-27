@@ -115,8 +115,8 @@ void Interpolate_sV::blend(ColorMatrix4x4 &c, const QColor &blendCol, float posX
 void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage &output)
 {
 #ifdef INTERPOLATE
-    const int Wmax = left.width()-2;
-    const int Hmax = left.height()-2;
+    const float Wmax = left.width()-1.0001; // A little less than the maximum pixel to avoid out of bounds when interpolating
+    const float Hmax = left.height()-1.0001;
     float posX, posY;
 #endif
 
@@ -235,8 +235,8 @@ void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, f
     qDebug() << "Interpolating flow at offset " << pos;
 #ifdef INTERPOLATE
     float posX, posY;
-    const int Wmax = left.width()-1;
-    const int Hmax = left.height()-1;
+    const float Wmax = left.width()-1.0001;
+    const float Hmax = left.height()-1.0001;
 #endif
 
     QColor colOut;
@@ -302,8 +302,8 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
   */
 void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const FlowField_sV *flowPrevCurr, const FlowField_sV *flowCurrNext, float pos, QImage &output)
 {
-    const int Wmax = prev.width()-2; // Because of interpolation ...
-    const int Hmax = prev.height()-2;
+    const float Wmax = prev.width()-1.0001;
+    const float Hmax = prev.height()-1.0001;
 
     Vector_sV a, b, c;
     Vector_sV Ta, Sa;

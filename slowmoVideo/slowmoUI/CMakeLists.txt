@@ -11,6 +11,8 @@ set(SRCS
   mainwindow.cpp
   canvas.cpp
   inputMonitor.cpp
+  renderPreview.cpp
+  imageDisplay.cpp
   dialogues/newProjectDialog.cpp
   dialogues/preferencesDialog.cpp
   dialogues/progressDialog.cpp
@@ -25,6 +27,7 @@ set(SRCS_UI
   mainwindow.ui
   canvas.ui
   inputMonitor.ui
+  renderPreview.ui
   dialogues/newProjectDialog.ui
   dialogues/preferencesDialog.ui
   dialogues/progressDialog.ui
@@ -38,6 +41,8 @@ set(SRCS_MOC
   mainwindow.h
   canvas.h
   inputMonitor.h
+  renderPreview.h
+  imageDisplay.h
   dialogues/newProjectDialog.h
   dialogues/preferencesDialog.h
   dialogues/progressDialog.h
@@ -48,7 +53,10 @@ set(SRCS_MOC
   dialogues/aboutDialog.h
 )
 
+# Without these includes the promoted widgets fail to compile
+# since the headers are not found. (For whatever reason.)
 include_directories(dialogues)
+include_directories(.)
 
 set(RES
   #res/iconAdd.png

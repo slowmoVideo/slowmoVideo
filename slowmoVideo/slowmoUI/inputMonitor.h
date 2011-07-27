@@ -1,3 +1,13 @@
+/*
+slowmoUI is a user interface for slowmoVideo.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef INPUTMONITOR_H
 #define INPUTMONITOR_H
 
@@ -26,8 +36,6 @@ public slots:
 
 private:
     Ui::InputMonitor *ui;
-
-    QImage m_currentImage;
 
     QSemaphore m_semaphore;
     QString *m_queue[2];
