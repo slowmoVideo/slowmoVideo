@@ -20,6 +20,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     b &= connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
     Q_ASSERT(b);
 
+    if (!validateFlowBinary(ui->buildFlow->text())) {
+        trySetFlowBinary();
+        if (validateFlowBinary(ui->buildFlow->text())) {
+            m_settings.setValue("binaries/v3dFlowBuilder", ui->buildFlow->text());
+        }
+    }
     slotValidateFlowBinary();
 }
 
@@ -30,36 +36,56 @@ PreferencesDialog::~PreferencesDialog()
 
 void PreferencesDialog::accept()
 {
-    if (slotValidateFlowBinary()) {
+    if (validateFlowBinary(ui->buildFlow->text())) {
         m_settings.setValue("binaries/v3dFlowBuilder", ui->buildFlow->text());
     }
     m_settings.setValue("settings/v3dFlowBuilder/lambda", ui->lambda->value());
     QDialog::accept();
 }
 
-bool PreferencesDialog::slotValidateFlowBinary()
+void PreferencesDialog::trySetFlowBinary()
+{
+    QStringList paths;
+    paths << ui->buildFlow->text();
+    paths << QDir::currentPath() + "/flowBuilder";
+    paths << "/usr/bin/flowBuilder" << "/usr/local/bin/flowBuilder";
+    for (int i = 0; i < paths.size(); i++) {
+        if (validateFlowBinary(paths.at(i))) {
+            ui->buildFlow->setText(paths.at(i));
+            break;
+        }
+    }
+}
+
+bool PreferencesDialog::validateFlowBinary(const QString path) const
 {
     bool valid = false;
-    if (QFile(ui->buildFlow->text()).exists() && QFileInfo(ui->buildFlow->text()).isExecutable()) {
+    qDebug() << "Checking " << path << " ...";
+    if (QFile(path).exists() && QFileInfo(path).isExecutable()) {
         QProcess process;
         QStringList args;
         args << "--identify";
-        process.start(ui->buildFlow->text(), args);
-        process.waitForFinished(1000);
+        process.start(path, args);
+        process.waitForFinished(2000);
         QString output(process.readAllStandardOutput());
         if (output.startsWith("flowBuilder")) {
             valid = true;
+            qDebug() << path << " is valid.";
         } else {
             qDebug() << "Invalid output from flow executable: " << output;
         }
         process.terminate();
     }
-    if (valid) {
+    return valid;
+}
+
+void PreferencesDialog::slotValidateFlowBinary()
+{
+    if (validateFlowBinary(ui->buildFlow->text())) {
         ui->buildFlow->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
     } else {
         ui->buildFlow->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
     }
-    return valid;
 }
 
 void PreferencesDialog::slotBrowseFlow()
