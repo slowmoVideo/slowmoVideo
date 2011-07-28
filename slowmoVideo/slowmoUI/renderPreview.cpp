@@ -64,6 +64,10 @@ void RenderPreview::slotRenderAt(float time)
             m_future = QtConcurrent::run(m_project, &Project_sV::render,
                                                    time, Fps_sV(24, 1), InterpolationType_ForwardNew, FrameSize_Orig);
             m_futureWatcher.setFuture(m_future);
+            if (m_future.isFinished()) {
+                qDebug() << "qFuture has already finished! Manually calling update.";
+                slotUpdateImage();
+            }
         }
     } else {
         notify(QString("Cannot render at output time %1 s; Not within the curve.").arg(time));
@@ -72,6 +76,9 @@ void RenderPreview::slotRenderAt(float time)
 
 void RenderPreview::slotUpdateImage()
 {
+    qDebug() << "Updating preview image now. Saving as /tmp/renderPreview.jpg."; ///< \todo do not save anymore
     ui->imageDisplay->loadImage(m_future.result());
+    ui->imageDisplay->image().save("/tmp/renderPreview.jpg");
     repaint();
+    notify("Preview rendering finished.");
 }

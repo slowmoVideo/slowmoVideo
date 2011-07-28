@@ -76,8 +76,8 @@ public:
     RenderTask_sV *renderTask() { return m_renderTask; }
     void replaceRenderTask(RenderTask_sV *task);
 
-    /// Returns the length of the output video in seconds (distance from the first to the last node).
-    float length() const;
+
+    float snapToFrame(const float time, bool roundUp, int *framesBeforeThere) const;
 
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;

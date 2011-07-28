@@ -19,6 +19,7 @@ set(SRCS
   dialogues/renderingDialog.cpp
   dialogues/shutterFunctionDialog.cpp
   dialogues/shutterFunctionFrame.cpp
+  dialogues/flowExaminer.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
 )
@@ -33,6 +34,7 @@ set(SRCS_UI
   dialogues/progressDialog.ui
   dialogues/renderingDialog.ui
   dialogues/shutterFunctionDialog.ui
+  dialogues/flowExaminer.ui
   dialogues/tagAddDialog.ui
   dialogues/aboutDialog.ui
 )
@@ -49,6 +51,7 @@ set(SRCS_MOC
   dialogues/renderingDialog.h
   dialogues/shutterFunctionDialog.h
   dialogues/shutterFunctionFrame.h
+  dialogues/flowExaminer.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
 )
@@ -74,7 +77,7 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
 add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT})
-target_link_libraries(slowmoUI sVproj ${QT_LIBRARIES})
+target_link_libraries(slowmoUI sVproj sVvis ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
 install(FILES ${RES} DESTINATION bin/res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

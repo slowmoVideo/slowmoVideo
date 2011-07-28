@@ -86,10 +86,10 @@ QColor Interpolate_sV::blend(const QColor &left, const QColor &right, float pos)
     float g = (1-pos)*left.greenF() + pos*right.greenF();
     float b = (1-pos)*left.blueF()  + pos*right.blueF();
     float a = (1-pos)*left.alphaF() + pos*right.alphaF();
-    r = CLAMP(r,0,1);
-    g = CLAMP(g,0,1);
-    b = CLAMP(b,0,1);
-    a = CLAMP(a,0,1);
+    r = CLAMP(r,0.0,1.0);
+    g = CLAMP(g,0.0,1.0);
+    b = CLAMP(b,0.0,1.0);
+    a = CLAMP(a,0.0,1.0);
     return QColor::fromRgbF(r, g, b, a);
 }
 

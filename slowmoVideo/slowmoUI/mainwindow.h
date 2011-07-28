@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "canvas.h"
 #include "inputMonitor.h"
 #include "renderPreview.h"
+#include "dialogues/flowExaminer.h"
 #include "project/project_sV.h"
 
 namespace Ui {
@@ -83,6 +84,7 @@ private:
 
     ProgressDialog *m_progressDialog;
     ProgressDialog *m_renderProgressDialog;
+    FlowExaminer *m_flowExaminer;
 
 
     TimedShortcut m_lastShortcut;
@@ -108,6 +110,7 @@ private slots:
     void shortcutUsed(QString);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
+    void slotShowFlowExaminerDialog();
     void slotForwardInputPosition(qreal frame);
 
     void slotNewFrameSourceTask(const QString taskDescription, int taskSize);

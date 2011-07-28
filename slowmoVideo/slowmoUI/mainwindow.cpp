@@ -64,7 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(NULL),
-    m_renderProgressDialog(NULL)
+    m_renderProgressDialog(NULL),
+    m_flowExaminer(NULL)
 {
     ui->setupUi(this);
 
@@ -120,6 +121,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
     ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
     ui->actionRenderPreview->setShortcut(QKeySequence("Shift+Ctrl+R"));
+    ui->actionExamineFlow->setShortcut(QKeySequence("Shift+Ctrl+X"));
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
@@ -155,6 +157,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
     b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
     b &= connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
+    b &= connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
     b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
     b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
     b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
@@ -181,6 +184,9 @@ MainWindow::~MainWindow()
     }
     if (m_renderProgressDialog != NULL) {
         delete m_renderProgressDialog;
+    }
+    if (m_flowExaminer != NULL) {
+        delete m_flowExaminer;
     }
 
     delete m_signalMapper;
@@ -413,7 +419,7 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 }
 void MainWindow::slotUpdateRenderPreview()
 {
-    m_wRenderPreview->slotRenderAt(m_wCanvas->prevMouseTime().x());
+    m_wRenderPreview->slotRenderAt(m_project->snapToFrame(m_wCanvas->prevMouseTime().x(), false, NULL));
 }
 
 
@@ -432,6 +438,11 @@ void MainWindow::resetDialogs()
         delete m_renderProgressDialog;
         m_renderProgressDialog = NULL;
     }
+    if (m_flowExaminer != NULL) {
+        m_flowExaminer->close();
+        delete m_flowExaminer;
+        m_flowExaminer = NULL;
+    }
 }
 
 void MainWindow::slotShowAboutDialog()
@@ -447,6 +458,16 @@ void MainWindow::slotShowPreferencesDialog()
         QSettings settings;
         m_project->readSettings(settings);
     }
+}
+
+void MainWindow::slotShowFlowExaminerDialog()
+{
+    if (m_flowExaminer == NULL) {
+        m_flowExaminer = new FlowExaminer(m_project, this);
+    }
+
+    m_flowExaminer->show();
+    m_flowExaminer->examine(floor(m_wCanvas->prevMouseInFrame()));
 }
 
 void MainWindow::slotShowRenderDialog()

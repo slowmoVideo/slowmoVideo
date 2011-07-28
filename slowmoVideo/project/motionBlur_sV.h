@@ -62,6 +62,7 @@ public:
       */
     void setSlowmoSamples(int slowmoSamples);
     void setMaxSamples(int maxSamples);
+    void setSlowmoMaxFrameDistance(float distance);
 
     int slowmoSamples() const { return m_slowmoSamples; }
     int maxSamples() const { return m_maxSamples; }
@@ -76,6 +77,7 @@ private:
 
     int m_slowmoSamples;
     int m_maxSamples;
+    float m_slowmoMaxFrameDist;
 
     QString cachedFramePath(float framePos, FrameSize size, bool highPrecision = false);
     void createDirectories();

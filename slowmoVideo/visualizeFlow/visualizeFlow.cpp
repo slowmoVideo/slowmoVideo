@@ -10,14 +10,13 @@ the Free Software Foundation, either version 3 of the License, or
 
 
 #include "lib/flowRW_sV.h"
-#include "lib/flowField_sV.h"
+#include "lib/flowVisualization_sV.h"
 #include "lib/flowTools_sV.h"
 
 #include <QImage>
 #include <QtCore/QDebug>
 
 #include <iostream>
-#include <math.h>
 
 char *myName;
 
@@ -46,16 +45,7 @@ void colourizeFlow(int argc, char *argv[])
 
     std::cout << "Flow file loaded. Width: " << flowField->width() << ", height: " << flowField->height() << std::endl;
 
-    QImage img(flowField->width(), flowField->height(), QImage::Format_RGB32);
-    for (int y = 0; y < flowField->height(); y++) {
-        for (int x = 0; x < flowField->width(); x++) {
-            img.setPixel(x, y, qRgb(
-                             (int) (127 + flowField->x(x,y)),
-                             (int) (127 + flowField->y(x,y)),
-                             (int) sqrt(flowField->x(x,y)*flowField->x(x,y) + flowField->y(x,y)*flowField->y(x,y))
-                         ));
-        }
-    }
+    QImage img = FlowVisualization_sV::colourizeFlow(flowField);
 
     std::cout << "Saving " << outputFile.toStdString() << " ..." << std::endl;
     img.save(outputFile);

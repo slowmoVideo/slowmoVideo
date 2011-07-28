@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 QString ShutterFunctionDialog::emptyFunction("<None>");
 
+/// \todo Icons
 ShutterFunctionDialog::ShutterFunctionDialog(Project_sV *project, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ShutterFunctionDialog),

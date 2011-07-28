@@ -73,6 +73,7 @@ public:
     void toggleHelp();
 
     const QPointF prevMouseTime() const;
+    const float prevMouseInFrame() const;
 
 public slots:
     void slotAbort(Canvas::Abort abort);

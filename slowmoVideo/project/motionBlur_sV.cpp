@@ -16,8 +16,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     m_project(project),
-    m_slowmoSamples(4),
-    m_maxSamples(64)
+    m_slowmoSamples(16),
+    m_maxSamples(64),
+    m_slowmoMaxFrameDist(.5)
 {
     createDirectories();
 }
@@ -87,6 +88,10 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
 
     QStringList frameList;
     float increment = (high-low)/(m_slowmoSamples-1);
+    if (increment > m_slowmoMaxFrameDist) {
+        qDebug() << "Increasing distance from " << increment << " to " << m_slowmoMaxFrameDist;
+        increment = m_slowmoMaxFrameDist;
+    }
     for (float pos = low; pos <= high; pos += increment) {
         frameList << cachedFramePath(pos, size, true);
     }

@@ -12,6 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define IMAGEDISPLAY_H
 
 #include <QFrame>
+#include <QtCore/QRect>
 
 /**
   \brief Simple image display.
@@ -26,22 +27,35 @@ public:
     explicit ImageDisplay(QWidget *parent = 0, Qt::WindowFlags f = 0);
     ~ImageDisplay();
 
+    void trackMouse(bool track);
+
     /// \return The image that is currently displayed
     const QImage& image() const;
 
 public slots:
     /// Loads the given image; does \em not call repaint()!
     void loadImage(const QImage img);
+    /// Loads the overlay that will be painted over the image; does \em not call repaint() either.
+    /// \return \c false if the image sizes do not match
+    bool loadOverlay(const QImage img);
+    void clearOverlay();
+
+signals:
+    void signalMouseMoved(float x, float y);
 
 protected slots:
     virtual void paintEvent(QPaintEvent *e);
     virtual void contextMenuEvent(QContextMenuEvent *e);
+    virtual void mouseMoveEvent(QMouseEvent *e);
 
 private:
     QImage m_image;
+    QImage m_overlay;
 
     QAction *m_aScaling;
     QAction *m_aExportImage;
+
+    QRect m_contentRect;
 
 private slots:
     void slotExportImage();

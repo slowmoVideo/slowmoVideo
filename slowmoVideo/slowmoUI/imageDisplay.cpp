@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "imageDisplay.h"
+#include <QtCore/QDebug>
 #include <QtGui/QPainter>
 #include <QtGui/QMenu>
 #include <QtGui/QFileDialog>
@@ -27,15 +28,39 @@ ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     b &= connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
     b &= connect(m_aExportImage, SIGNAL(triggered()), this, SLOT(slotExportImage()));
     Q_ASSERT(b);
+
+    setContentsMargins(5, 5, 5, 5);
 }
 ImageDisplay::~ImageDisplay()
 {
     delete m_aScaling;
 }
 
+void ImageDisplay::trackMouse(bool track)
+{
+    setMouseTracking(track);
+}
+
 void ImageDisplay::loadImage(const QImage img)
 {
     m_image = img;
+}
+const QImage& ImageDisplay::image() const
+{
+    return m_image;
+}
+
+bool ImageDisplay::loadOverlay(const QImage img)
+{
+    if (img.size() != m_image.size()) {
+        return false;
+    }
+    m_overlay = img;
+    return true;
+}
+void ImageDisplay::clearOverlay()
+{
+    m_overlay = QImage();
 }
 
 void ImageDisplay::contextMenuEvent(QContextMenuEvent *e)
@@ -46,6 +71,25 @@ void ImageDisplay::contextMenuEvent(QContextMenuEvent *e)
     m_aExportImage->setEnabled(!m_image.isNull());
     menu.exec(e->globalPos());
 }
+void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
+{
+    if (hasMouseTracking() && !m_image.isNull()) {
+        int x = e->pos().x() - contentsRect().x();
+        int y = e->pos().y() - contentsRect().y();
+        if (x < 0 || y < 0 || x >= contentsRect().width() || y >= contentsRect().height()) {
+            qDebug() << "Not inside drawing boundaries.";
+            return;
+        }
+        if (!m_aScaling->isChecked()) {
+            emit signalMouseMoved(x, y);
+        } else {
+            // The image has been scaled by this factor
+            float scalingFactor = qMin(float(m_image.width())/width(), float(m_image.height())/height());
+            // To get back the original image coordinates, the mouse coordinates have to unscaled.
+            emit signalMouseMoved(x/scalingFactor, y/scalingFactor);
+        }
+    }
+}
 
 
 void ImageDisplay::paintEvent(QPaintEvent *e)
@@ -54,9 +98,11 @@ void ImageDisplay::paintEvent(QPaintEvent *e)
     if (!m_image.isNull()) {
         QPainter p(this);
         if (m_aScaling->isChecked()) {
-            p.drawImage(5, 5, m_image.scaled(width()-10, height()-10, Qt::KeepAspectRatio));
+            p.drawImage(contentsRect().topLeft(), m_image.scaled(contentsRect().size(), Qt::KeepAspectRatio));
+            p.drawImage(contentsRect().topLeft(), m_image.scaled(contentsRect().size(), Qt::KeepAspectRatio));
         } else {
-            p.drawImage(5, 5, m_image);
+            p.drawImage(contentsRect().topLeft(), m_image);
+            p.drawImage(contentsRect().topLeft(), m_overlay);
         }
     }
 }

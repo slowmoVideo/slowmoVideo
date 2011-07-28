@@ -155,6 +155,11 @@ const QPointF Canvas::prevMouseTime() const
     return convertCanvasToTime(m_states.prevMousePos).toQPointF();
 }
 
+const float Canvas::prevMouseInFrame() const
+{
+    return convertCanvasToTime(m_states.prevMousePos).toQPointF().y() * m_project->frameSource()->fps();
+}
+
 
 bool Canvas::selectAt(const QPoint &pos, bool addToSelection)
 {
@@ -468,6 +473,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                                 m_nodes->select(node, !e->modifiers().testFlag(Qt::ControlModifier));
                             }
                             if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                                /// \todo fix Ctrl key
                                 if (qAbs(diff.x()) < qAbs(diff.y())) {
                                     diff.setX(0);
                                 } else {
