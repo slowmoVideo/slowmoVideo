@@ -470,8 +470,14 @@ void MainWindow::slotShowFlowExaminerDialog()
         m_flowExaminer = new FlowExaminer(m_project, this);
     }
 
+    int frame = floor(m_wCanvas->prevMouseInFrame());
+    if (frame+1 >= m_project->frameSource()->framesCount()) {
+        frame = m_project->frameSource()->framesCount()-2;
+    }
+    if (frame < 0) { frame = 0; }
+
     m_flowExaminer->show();
-    m_flowExaminer->examine(floor(m_wCanvas->prevMouseInFrame()));
+    m_flowExaminer->examine(frame);
 }
 
 void MainWindow::slotShowRenderDialog()

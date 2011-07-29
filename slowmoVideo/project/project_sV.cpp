@@ -198,7 +198,11 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
-    return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
+    if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
+        return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
+    } else {
+        throw FlowBuildingError("Empty frame source; Cannot build flow.");
+    }
 }
 
 inline

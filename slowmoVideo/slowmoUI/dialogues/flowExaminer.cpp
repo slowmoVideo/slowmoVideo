@@ -46,12 +46,15 @@ void FlowExaminer::examine(int leftFrame)
         delete m_flowRL;
         m_flowRL = NULL;
     }
-    m_flowLR = m_project->requestFlow(leftFrame, leftFrame+1, FrameSize_Orig);
-    m_flowRL = m_project->requestFlow(leftFrame+1, leftFrame, FrameSize_Orig);
-    ui->leftFrame->loadImage(m_project->frameSource()->frameAt(leftFrame, FrameSize_Orig));
-    ui->rightFrame->loadImage(m_project->frameSource()->frameAt(leftFrame+1, FrameSize_Orig));
-    ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR));
-    ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL));
+    try {
+        m_flowLR = m_project->requestFlow(leftFrame, leftFrame+1, FrameSize_Orig);
+        m_flowRL = m_project->requestFlow(leftFrame+1, leftFrame, FrameSize_Orig);
+        ui->leftFrame->loadImage(m_project->frameSource()->frameAt(leftFrame, FrameSize_Orig));
+        ui->rightFrame->loadImage(m_project->frameSource()->frameAt(leftFrame+1, FrameSize_Orig));
+        ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR));
+        ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL));
+    } catch (FlowBuildingError &err) { }
+
     repaint();
 }
 
