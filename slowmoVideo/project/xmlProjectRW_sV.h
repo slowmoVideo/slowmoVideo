@@ -12,12 +12,12 @@ the Free Software Foundation, either version 3 of the License, or
 #define XMLPROJECTRW_SV_H
 
 #include "../lib/defs_sV.hpp"
-#include "abstractProjectRW_sV.h"
 #include "tag_sV.h"
 
 #include <QtXml>
 
 class Node_sV;
+class Project_sV;
 class AbstractFrameSource_sV;
 
 #define SLOWMOPROJECT_VERSION_MAJOR 2
@@ -32,7 +32,7 @@ class AbstractFrameSource_sV;
 
   Version changes (both major and minor) require a micro slowmoVideo version change.
   */
-class XmlProjectRW_sV// : public AbstractProjectRW_sV
+class XmlProjectRW_sV
 {
 public:
     /**

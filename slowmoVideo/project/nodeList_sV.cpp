@@ -371,26 +371,6 @@ void NodeList_sV::moveHandle(const NodeHandle_sV *handle, Node_sV relPos)
 
 
 
-////////// Info
-
-//NodeContext NodeList_sV::context(QPointF point, qreal delta) const { return context(point.x(), point.y(), delta); }
-//NodeContext NodeList_sV::context(qreal tx, qreal ty, qreal tdelta) const
-//{
-//    if (findByHandle(tx, ty, tdelta) >= 0) {
-//        return NodeContext_Handle;
-//    }
-//    if (find(QPointF(tx, ty), tdelta) >= 0) {
-//        return NodeContext_Node;
-//    }
-//    if (tx >= startTime()-tdelta && tx <= endTime()+tdelta) {
-//        return NodeContext_Segment;
-//    }
-//    return NodeContext_None;
-//}
-
-
-
-
 ////////// Curve
 
 void NodeList_sV::setCurveType(qreal segmentTime, CurveType type)

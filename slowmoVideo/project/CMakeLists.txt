@@ -7,7 +7,6 @@ set(SRCS_PROJ
   segment_sV.cpp
   nodeHandle_sV.cpp
   renderTask_sV.cpp
-  abstractProjectRW_sV.h
   xmlProjectRW_sV.cpp
   abstractFrameSource_sV.cpp
   imagesFrameSource_sV.cpp
