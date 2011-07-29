@@ -108,8 +108,11 @@ struct Fps_sV {
             }
         }
     }
+    Fps_sV(QString fpsString);
+    QString toString() const;
+
     /// Frames per second as float.
-    float fps() {
+    float fps() const {
         return float(num)/den;
     }
 };

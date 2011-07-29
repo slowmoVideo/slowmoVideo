@@ -77,7 +77,16 @@ public:
     void replaceRenderTask(RenderTask_sV *task);
 
 
-    float snapToFrame(const float time, bool roundUp, int *framesBeforeThere) const;
+    /**
+      \brief Snaps in the given time on a grid given by the number of frames per second.
+      This allows to, for example, render from 0 to 3.2 seconds and then from 3.2 to 5 seconds
+      to images with the same effect as rendering all at once. Always starts from 0!
+      \param time Time to snap in
+      \param roundUp To chose between rounding up or down
+      \param fps Frames per second to use.
+      */
+    static float snapToFrame(const float time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
+    float snapToOutFrame(float time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;
 
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
@@ -86,10 +95,9 @@ public:
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
-    /** \brief Searches for objects near the given \c pos.
-
+    /**
+      \brief Searches for objects near the given \c pos.
       This search includes tags.
-
       \see NodeList_sV::objectsNear() Used by this method. Does not include tags.
       */
     QList<NodeList_sV::PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;

@@ -25,6 +25,7 @@ public:
     bool initialized() const { return true; }
 
     int64_t framesCount() const { return 1000; }
+    const Fps_sV* fps() const { return &m_fps; }
     int frameRateNum() const { return 24; }
     int frameRateDen() const { return 1; }
     QImage frameAt(const uint, const FrameSize = FrameSize_Orig) { return QImage(); }
@@ -33,6 +34,9 @@ public:
 public slots:
     void slotAbortInitialization() {}
     void slotUpdateProjectDir() {}
+
+private:
+    Fps_sV m_fps;
 };
 
 #endif // EMPTYFRAMESOURCE_H

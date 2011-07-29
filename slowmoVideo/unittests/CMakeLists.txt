@@ -7,6 +7,7 @@ set(SRCS
     testXmlProjectRW_sV.cpp
     testDefs_sV.cpp
     testShutterFunction_sV.cpp
+    testProject_sV.cpp
     testAll.cpp
 )
 set(SRCS_MOC
@@ -17,6 +18,7 @@ set(SRCS_MOC
     testDefs_sV.h
     testShutterFunction_sV.h
     testXmlProjectRW_sV.h
+    testProject_sV.h
 )
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})

@@ -88,6 +88,12 @@ void RenderTask_sV::slotContinueRendering()
     m_stopRendering = false;
     if (m_nextFrameTime < m_timeStart) {
         m_nextFrameTime = m_timeStart;
+        int framesBefore;
+        float snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_fps, &framesBefore);
+        qDebug() << "Frame snapping in from " << m_nextFrameTime << " to " << snapped;
+        m_nextFrameTime = snapped;
+
+        Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_fps.fps() + .5) == framesBefore);
     }
     if (!m_initialized) {
         try {
@@ -119,7 +125,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("Empty frame source, cannot be rendered.");
     }
 
-    int outputFrame = (time - m_project->nodes()->startTime()) * m_fps.fps();
+    int outputFrame = (time - m_project->nodes()->startTime()) * m_fps.fps() + .5;
     if (!m_stopRendering) {
 
         if (time > m_timeEnd) {

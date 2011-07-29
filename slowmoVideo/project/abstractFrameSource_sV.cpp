@@ -20,17 +20,7 @@ AbstractFrameSource_sV::~AbstractFrameSource_sV()
 
 }
 
-float AbstractFrameSource_sV::fps() const throw(Div0Exception)
-{
-    int num = frameRateNum();
-    int den = frameRateDen();
-    if (den == 0) {
-        throw Div0Exception();
-    }
-    return float(num)/float(den);
-}
-
 double AbstractFrameSource_sV::maxTime() const throw(Div0Exception)
 {
-    return (framesCount()-1)/fps();
+    return (framesCount()-1)/fps()->fps();
 }

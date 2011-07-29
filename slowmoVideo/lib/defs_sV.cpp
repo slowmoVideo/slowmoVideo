@@ -106,3 +106,16 @@ QString toString(const InterpolationType &interpolation)
         return QString("Unknown interpolation");
     }
 }
+
+Fps_sV::Fps_sV(QString fpsString)
+{
+    QRegExp e("(\\d+)\\/(\\d+)");
+    if (e.exactMatch(fpsString)) {
+        num = e.cap(1).toInt();
+        den = e.cap(2).toInt();
+    }
+}
+QString Fps_sV::toString() const
+{
+    return QString("%1/%2").arg(num).arg(den);
+}

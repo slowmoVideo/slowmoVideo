@@ -93,7 +93,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     renderEndTime.setAttribute("time", pr->renderEndTime());
     renderFrameSize.setAttribute("size", pr->renderFrameSize());
     renderInterpolation.setAttribute("type", pr->renderInterpolationType());
-    renderFPS.setAttribute("fps", pr->renderFPS());
+    renderFPS.setAttribute("fps", pr->renderFPS().toString());
     renderSlowmoSamples.setAttribute("number", project->motionBlur()->slowmoSamples());
     renderMaxSamples.setAttribute("number", project->motionBlur()->maxSamples());
     renderTarget.setAttribute("target", pr->renderTarget());
@@ -475,7 +475,11 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) con
                                 pr->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderFPS") {
-                                pr->renderFPS() = xml.attributes().value("fps").toString().toFloat();
+                                if (projVersionMajor == 2 && projVersionMinor <= 2) {
+                                    pr->renderFPS() = xml.attributes().value("fps").toString().toFloat();
+                                } else {
+                                    pr->renderFPS() = xml.attributes().value("fps").toString();
+                                }
                                 xml.skipCurrentElement();
 
                             } else if (xml.name() == "renderSlowmoSamples") {

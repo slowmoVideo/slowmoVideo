@@ -7,7 +7,7 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_viewport_secRes(50, 50),
     m_renderSectionMode("full"),
     m_renderFrameSize(FrameSize_Orig),
-    m_renderInterpolationType(InterpolationType_Twoway),
+    m_renderInterpolationType(InterpolationType_TwowayNew),
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
@@ -43,7 +43,7 @@ QString& ProjectPreferences_sV::renderEndTag() { return m_renderEndTag; }
 QString& ProjectPreferences_sV::renderStartTime() { return m_renderStartTime; }
 QString& ProjectPreferences_sV::renderEndTime() { return m_renderEndTime; }
 
-float& ProjectPreferences_sV::renderFPS() { return m_renderFPS; }
+Fps_sV& ProjectPreferences_sV::renderFPS() { return m_renderFPS; }
 QString& ProjectPreferences_sV::renderTarget() { return m_renderTarget; }
 
 QString& ProjectPreferences_sV::imagesOutputDir() { return m_imagesOutputDir; }

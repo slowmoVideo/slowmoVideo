@@ -22,7 +22,7 @@ public:
     QString& renderEndTime();
     FrameSize& renderFrameSize();
     InterpolationType& renderInterpolationType();
-    float& renderFPS();
+    Fps_sV& renderFPS();
     QString& renderTarget();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
@@ -41,7 +41,7 @@ private:
     QString m_renderEndTime;
     FrameSize m_renderFrameSize;
     InterpolationType m_renderInterpolationType;
-    float m_renderFPS;
+    Fps_sV m_renderFPS;
     QString m_renderTarget;
 
     QString m_imagesOutputDir;

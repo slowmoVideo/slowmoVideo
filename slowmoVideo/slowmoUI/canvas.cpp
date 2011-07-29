@@ -157,7 +157,7 @@ const QPointF Canvas::prevMouseTime() const
 
 const float Canvas::prevMouseInFrame() const
 {
-    return convertCanvasToTime(m_states.prevMousePos).toQPointF().y() * m_project->frameSource()->fps();
+    return convertCanvasToTime(m_states.prevMousePos).toQPointF().y() * m_project->frameSource()->fps()->fps();
 }
 
 
@@ -293,11 +293,11 @@ void Canvas::paintEvent(QPaintEvent *)
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")
-                    .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
+                    .arg(time.y()*m_project->frameSource()->fps()->fps(), 2, 'f', 2)
                     .arg(time.y());
         } else {
             timeText = QString("f %1\n%2 min\n+%3 s")
-                    .arg(time.y()*m_project->frameSource()->fps(), 2, 'f', 2)
+                    .arg(time.y()*m_project->frameSource()->fps()->fps(), 2, 'f', 2)
                     .arg(int(time.y()/60))
                     .arg(time.y()-60*int(time.y()/60), 0, 'f', 2);
         }
@@ -501,7 +501,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
     emit signalMouseInputTimeChanged(
                   convertCanvasToTime(m_states.prevMousePos).y()
-                * m_project->frameSource()->fps()
+                * m_project->frameSource()->fps()->fps()
                                      );
 
     repaint();

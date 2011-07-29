@@ -30,8 +30,7 @@ public:
     bool initialized() const;
 
     int64_t framesCount() const;
-    int frameRateNum() const;
-    int frameRateDen() const;
+    const Fps_sV* fps() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
     const QString framePath(const uint frame, const FrameSize frameSize) const;
 
@@ -46,6 +45,8 @@ private:
     QStringList m_imagesList;
     QDir m_dirImagesSmall;
     QSize m_sizeSmall;
+
+    Fps_sV m_fps;
 
     bool m_initialized;
     bool m_stopInitialization;

@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList images) throw(FrameSourceError) :
     AbstractFrameSource_sV(project),
+    m_fps(24, 1),
     m_initialized(false),
     m_stopInitialization(false),
     m_nextFrame(0)
@@ -110,14 +111,11 @@ int64_t ImagesFrameSource_sV::framesCount() const
 {
     return m_imagesList.size();
 }
-int ImagesFrameSource_sV::frameRateNum() const
+const Fps_sV* ImagesFrameSource_sV::fps() const
 {
-    return 24;
+    return &m_fps;
 }
-int ImagesFrameSource_sV::frameRateDen() const
-{
-    return 1;
-}
+
 QImage ImagesFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {
     if (int(frame) < m_imagesList.size()) {

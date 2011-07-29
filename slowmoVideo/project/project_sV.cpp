@@ -205,31 +205,44 @@ inline
 float Project_sV::sourceTimeToFrame(float time) const
 {
     Q_ASSERT(time >= 0);
-    return time * m_frameSource->fps();
+    return time * m_frameSource->fps()->fps();
 }
 
-float Project_sV::snapToFrame(const float time, bool roundUp, int *framesBeforeThere) const
+float Project_sV::snapToFrame(const float time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere)
 {
     Q_ASSERT(time >= 0);
     int frameCount = 0;
     double snapTime = 0;
-    double frameLength = 1.0/m_preferences->renderFPS();
+    double frameLength;
+    frameLength = 1.0/fps.fps();
 
     while (snapTime < time) {
         snapTime += frameLength;
         frameCount++;
     }
 
+    // snapTime is now >= time
+
     if (!roundUp && snapTime != time) {
         snapTime -= frameLength;
         frameCount--;
     }
 
-    if (framesBeforeThere != NULL) {
-        *framesBeforeThere = frameCount;
+    if (out_framesBeforeHere != NULL) {
+        *out_framesBeforeHere = frameCount;
     }
 
     return snapTime;
+}
+float Project_sV::snapToOutFrame(float time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere) const
+{
+    if (time > m_nodes->endTime()) {
+        time = m_nodes->endTime();
+    }
+    time -= m_nodes->startTime();
+    if (time < 0) { time = 0; }
+    float snapped = snapToFrame(time, roundUp, fps, out_framesBeforeHere) + m_nodes->startTime();
+    return snapped;
 }
 
 QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qreal tmaxdist) const

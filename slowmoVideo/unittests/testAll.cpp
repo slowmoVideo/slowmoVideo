@@ -5,6 +5,7 @@
 #include "testVector_sV.h"
 #include "testDefs_sV.h"
 #include "testShutterFunction_sV.h"
+#include "testProject_sV.h"
 
 #include <QtTest/QtTest>
 
@@ -30,4 +31,7 @@ int main()
 
     TestShutterFunction_sV shutter;
     QTest::qExec(&shutter);
+
+    TestProject_sV project;
+    QTest::qExec(&project);
 }

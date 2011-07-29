@@ -48,25 +48,8 @@ public:
       \fn framesCount()
       \return Number of frames in this frame source
       */
-    /**
-      \fn frameRateNum()
-      \return Frame rate numinator
-      */
-    /**
-      \fn frameRateDen()
-      \return Frame rate denominator
-      */
-    /**
-      \fn fps()
-      fps as float may be less acurate for video frame rates like 29.97 fps (3000/1001 fps), but
-      is a convenient shorthand (no manual division).
-      \return Frames per second as float value.
-      \throw Div0Exception
-      */
     virtual int64_t framesCount() const = 0;
-    virtual int frameRateNum() const = 0;
-    virtual int frameRateDen() const = 0;
-    float fps() const throw(Div0Exception);
+    virtual const Fps_sV* fps() const = 0;
     double maxTime() const throw(Div0Exception);
 
     /**

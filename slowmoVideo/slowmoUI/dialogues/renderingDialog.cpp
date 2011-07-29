@@ -68,7 +68,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->vcodec->setText(m_project->preferences()->videoCodec());
 
     // FPS
-    QString fps = QVariant(m_project->preferences()->renderFPS()).toString();
+    QString fps = QVariant(m_project->preferences()->renderFPS().fps()).toString();
     if (ui->cbFps->findText(fps) < 0 && fps.toFloat() > 0) {
         ui->cbFps->addItem(fps);
     }
@@ -300,6 +300,8 @@ bool RenderingDialog::slotValidate()
     }
 
     ok &= dynamic_cast<EmptyFrameSource_sV*>(m_project->frameSource()) == NULL;
+
+    ok &= m_project->nodes()->size() >= 2;
 
     ui->bOk->setEnabled(ok);
 

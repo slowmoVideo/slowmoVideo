@@ -11,7 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "emptyFrameSource_sV.h"
 
 EmptyFrameSource_sV::EmptyFrameSource_sV(const Project_sV *project) :
-    AbstractFrameSource_sV(project)
+    AbstractFrameSource_sV(project),
+    m_fps(24,1)
 {
 }
 

@@ -21,6 +21,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/renderTask_sV.h"
 #include "project/xmlProjectRW_sV.h"
 #include "project/abstractFrameSource_sV.h"
+#include "project/projectPreferences_sV.h"
 
 #include <QtCore>
 #include <QObject>
@@ -419,7 +420,10 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 }
 void MainWindow::slotUpdateRenderPreview()
 {
-    m_wRenderPreview->slotRenderAt(m_project->snapToFrame(m_wCanvas->prevMouseTime().x(), false, NULL));
+    m_wRenderPreview->slotRenderAt(m_project->snapToOutFrame(
+                                       m_wCanvas->prevMouseTime().x(), false,
+                                       m_project->preferences()->renderFPS(), NULL)
+                                   );
 }
 
 
