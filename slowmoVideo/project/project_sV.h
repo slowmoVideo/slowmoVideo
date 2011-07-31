@@ -47,8 +47,8 @@ public:
     Project_sV();
     /**
       Creates a new project.
-      @param filename Input video file
-      @param projectDir Project directory; All cached files will be put in there.
+      \param filename Input video file
+      \param projectDir Project directory; All cached files will be put in there.
       */
     Project_sV(QString projectDir);
     ~Project_sV();
@@ -60,8 +60,6 @@ public:
     void setProjectFilename(QString filename);
     /** \return The filename this project was last saved as. */
     QString projectFilename() const;
-
-    void readSettings(const QSettings &settings);
 
     /** \param frameSource will be managed (deleted) by the project. If \c NULL, an empty frame source will be used. */
     void loadFrameSource(AbstractFrameSource_sV *frameSource);

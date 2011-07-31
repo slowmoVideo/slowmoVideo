@@ -97,15 +97,6 @@ QString Project_sV::projectFilename() const {
     return m_projectFilename;
 }
 
-void Project_sV::readSettings(const QSettings &settings)
-{
-    if (dynamic_cast<V3dFlowSource_sV *>(m_flowSource) != NULL) {
-        V3dFlowSource_sV *flowSource = dynamic_cast<V3dFlowSource_sV *>(m_flowSource);
-        flowSource->setLambda(settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble());
-        qDebug() << "Lambda set to " << settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble();
-    }
-}
-
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
 {
     if (m_frameSource != NULL) {
@@ -199,6 +190,10 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
     if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
+        V3dFlowSource_sV *v3d;
+        if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_flowSource)) != NULL) {
+            v3d->setLambda(m_preferences->flowV3DLambda());
+        }
         return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
     } else {
         throw FlowBuildingError("Empty frame source; Cannot build flow.");

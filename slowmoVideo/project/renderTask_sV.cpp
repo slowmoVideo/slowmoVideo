@@ -61,10 +61,10 @@ void RenderTask_sV::setTimeRange(float start, float end)
     m_timeEnd = end;
 }
 
-void RenderTask_sV::setFPS(float fps)
+void RenderTask_sV::setFPS(const Fps_sV fps)
 {
-    Q_ASSERT(fps > 0);
-    m_fps = Fps_sV(fps);
+    Q_ASSERT(fps.num > 0);
+    m_fps = fps;
 }
 
 void RenderTask_sV::setSize(FrameSize size)

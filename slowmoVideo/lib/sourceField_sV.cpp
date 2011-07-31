@@ -12,6 +12,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "flowField_sV.h"
 #include <cmath>
 
+#define FIX_FLOW
+
 SourceField_sV::SourceField_sV(int width, int height) :
     m_width(width),
     m_height(height)

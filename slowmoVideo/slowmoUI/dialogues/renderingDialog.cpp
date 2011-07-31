@@ -46,6 +46,11 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
         qDebug() << "Unknown render section mode: " << mode;
         Q_ASSERT(false);
     }
+
+    // Optical flow
+    ui->lambda->setValue(m_project->preferences()->flowV3DLambda());
+
+    // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
     ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
 
@@ -100,6 +105,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+    b &= connect(ui->bSave, SIGNAL(clicked()), this, SLOT(slotSaveSettings()));
 
     b &= connect(ui->cbFps, SIGNAL(editTextChanged(QString)), this, SLOT(slotValidate()));
 
@@ -142,18 +148,17 @@ RenderingDialog::~RenderingDialog()
 RenderTask_sV* RenderingDialog::buildTask()
 {
     if (slotValidate()) {
-        const InterpolationType interpolation = (InterpolationType)ui->cbInterpolation->itemData(ui->cbInterpolation->currentIndex()).toInt();
-        const FrameSize size = (FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt();
+        slotSaveSettings();
+
+        ProjectPreferences_sV *prefs = m_project->preferences();
+
         const QString imagesOutputDir = ui->imagesOutputDir->text();
         const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
-        const float fps = ui->cbFps->currentText().toFloat();
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
-        task->setFPS(fps);
-        task->setSize(size);
-        task->setInterpolationType(interpolation);
-        m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
-        m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
+        task->setFPS(prefs->renderFPS());
+        task->setSize(prefs->renderFrameSize());
+        task->setInterpolationType(prefs->renderInterpolationType());
 
         if (ui->radioImages->isChecked()) {
             ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);
@@ -209,15 +214,6 @@ RenderTask_sV* RenderingDialog::buildTask()
             qDebug() << "No section mode selected?";
             Q_ASSERT(false);
         }
-        m_project->preferences()->renderSectionMode() = mode;
-        m_project->preferences()->imagesOutputDir() = imagesOutputDir;
-        m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
-        m_project->preferences()->videoFilename() = ui->videoOutputFile->text();
-        m_project->preferences()->videoCodec() = ui->vcodec->text();
-        m_project->preferences()->renderInterpolationType() = interpolation;
-        m_project->preferences()->renderFrameSize() = size;
-        m_project->preferences()->renderFPS() = fps;
-        m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
         return task;
     } else {
         return NULL;
@@ -241,6 +237,45 @@ void RenderingDialog::fillTagLists()
         ui->cbEndTag->addItem(list.at(i).description(), QVariant(list.at(i).time()));
     }
     ui->cbEndTag->addItem("<End>", QVariant(m_project->nodes()->endTime()));
+}
+
+void RenderingDialog::slotSaveSettings()
+{
+
+    const InterpolationType interpolation = (InterpolationType)ui->cbInterpolation->itemData(ui->cbInterpolation->currentIndex()).toInt();
+    const FrameSize size = (FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt();
+    const QString imagesOutputDir = ui->imagesOutputDir->text();
+    const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
+    const float fps = ui->cbFps->currentText().toFloat();
+
+    m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
+    m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
+    m_project->preferences()->flowV3DLambda() = ui->lambda->value();
+
+    QString mode;
+    if (ui->radioFullProject->isChecked()) {
+        mode = "full";
+    } else if (ui->radioSection->isChecked()) {
+        mode = "time";
+        m_project->preferences()->renderStartTime() = ui->timeStart->text();
+        m_project->preferences()->renderEndTime() = ui->timeEnd->text();
+    } else if (ui->radioTagSection->isChecked()) {
+        mode = "tags";
+        m_project->preferences()->renderStartTag() = ui->cbStartTag->currentText();
+        m_project->preferences()->renderEndTag() = ui->cbEndTag->currentText();
+    } else {
+        qDebug() << "No section mode selected?";
+        Q_ASSERT(false);
+    }
+    m_project->preferences()->renderSectionMode() = mode;
+    m_project->preferences()->imagesOutputDir() = imagesOutputDir;
+    m_project->preferences()->imagesFilenamePattern() = imagesFilenamePattern;
+    m_project->preferences()->videoFilename() = ui->videoOutputFile->text();
+    m_project->preferences()->videoCodec() = ui->vcodec->text();
+    m_project->preferences()->renderInterpolationType() = interpolation;
+    m_project->preferences()->renderFrameSize() = size;
+    m_project->preferences()->renderFPS() = fps;
+    m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
 }
 
 bool RenderingDialog::slotValidate()

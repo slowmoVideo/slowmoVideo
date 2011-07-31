@@ -65,6 +65,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
     QDomElement videoFilename = doc.createElement("videoFilename");
     QDomElement videoCodec = doc.createElement("videoCodec");
+    QDomElement flowV3dLambda = doc.createElement("flowV3dLambda");
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
@@ -83,6 +84,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     preferences.appendChild(imagesFilenamePattern);
     preferences.appendChild(videoFilename);
     preferences.appendChild(videoCodec);
+    preferences.appendChild(flowV3dLambda);
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
@@ -101,6 +103,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     imagesFilenamePattern.setAttribute("pattern", pr->imagesFilenamePattern());
     videoFilename.setAttribute("file", pr->videoFilename());
     videoCodec.setAttribute("codec", pr->videoCodec());
+    flowV3dLambda.setAttribute("lambda", pr->flowV3DLambda());
     prevTagAxis.setAttribute("axis", QVariant(pr->lastSelectedTagAxis()).toString());
     viewport_t0.setAttribute("x", pr->viewport_t0().x());
     viewport_t0.setAttribute("y", pr->viewport_t0().y());
@@ -504,6 +507,10 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) con
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoCodec") {
                                 pr->videoCodec() = xml.attributes().value("codec").toString();
+                                xml.skipCurrentElement();
+
+                            } else if (xml.name() == "flowV3dLambda") {
+                                pr->flowV3DLambda() = xml.attributes().value("lambda").toString().toFloat();
                                 xml.skipCurrentElement();
 
                             } else if (xml.name() == "prevTagAxis") {

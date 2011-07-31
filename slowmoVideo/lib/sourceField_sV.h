@@ -86,6 +86,7 @@ public:
     }
 
     void inpaint();
+    void fixFlow(const FlowField_sV *flowOtherDirection);
 
 private:
     int m_width;

@@ -11,7 +11,8 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
-    m_videoFilename("/tmp/rendered.mpg")
+    m_videoFilename("/tmp/rendered.mpg"),
+    m_flowV3DLambda(20.0)
 {
 }
 
@@ -51,3 +52,5 @@ QString& ProjectPreferences_sV::imagesFilenamePattern() { return m_imagesFilenam
 
 QString& ProjectPreferences_sV::videoFilename() { return m_videoFilename; }
 QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }
+
+float& ProjectPreferences_sV::flowV3DLambda() { return m_flowV3DLambda; }

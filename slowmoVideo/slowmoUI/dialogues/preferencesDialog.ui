@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>208</height>
+    <height>141</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,64 +47,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Configuration</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>buildFlow lambda</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="lambda">
-        <property name="locale">
-         <locale language="English" country="UnitedStates"/>
-        </property>
-        <property name="minimum">
-         <double>0.010000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>50.990000000000002</double>
-        </property>
-        <property name="singleStep">
-         <double>0.500000000000000</double>
-        </property>
-        <property name="value">
-         <double>10.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Use a higher value for high-quality footage and larger images.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -155,7 +97,6 @@
  <tabstops>
   <tabstop>buildFlow</tabstop>
   <tabstop>bBuildFlow</tabstop>
-  <tabstop>lambda</tabstop>
   <tabstop>bCancel</tabstop>
   <tabstop>bOk</tabstop>
  </tabstops>

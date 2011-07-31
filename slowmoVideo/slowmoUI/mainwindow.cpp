@@ -319,9 +319,6 @@ void MainWindow::loadProject(Project_sV *project)
     m_wCanvas->load(m_project);
     m_wRenderPreview->load(m_project);
 
-    QSettings settings;
-    m_project->readSettings(settings);
-
     bool b = true;
     b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
     b &= connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
@@ -458,10 +455,7 @@ void MainWindow::slotShowAboutDialog()
 void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
-    if (dialog.exec() == QDialog::Accepted) {
-        QSettings settings;
-        m_project->readSettings(settings);
-    }
+    dialog.exec();
 }
 
 void MainWindow::slotShowFlowExaminerDialog()

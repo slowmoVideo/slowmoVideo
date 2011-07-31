@@ -55,6 +55,8 @@ private slots:
     void slotSectionModeChanged();
     void slotTagIndexChanged();
 
+    void slotSaveSettings();
+
 
 };
 

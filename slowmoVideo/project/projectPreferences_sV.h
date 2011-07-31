@@ -29,6 +29,8 @@ public:
     QString& videoFilename();
     QString& videoCodec();
 
+    float& flowV3DLambda();
+
 private:
     TagAxis m_tagAxis;
     QPointF m_viewport_t0;
@@ -48,6 +50,8 @@ private:
     QString m_imagesFilenamePattern;
     QString m_videoFilename;
     QString m_vcodec;
+
+    float m_flowV3DLambda;
 
 };
 

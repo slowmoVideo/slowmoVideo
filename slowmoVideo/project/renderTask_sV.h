@@ -50,7 +50,7 @@ public:
       */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(float start, float end);
-    void setFPS(float fps);
+    void setFPS(const Fps_sV fps);
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
 

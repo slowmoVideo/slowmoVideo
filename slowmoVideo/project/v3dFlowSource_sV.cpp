@@ -100,5 +100,5 @@ const QString V3dFlowSource_sV::flowPath(const uint leftFrame, const uint rightF
         direction = "backward";
     }
 
-    return dir.absoluteFilePath(QString("%1_%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
+    return dir.absoluteFilePath(QString("%1-lambda%4_%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame).arg(m_lambda, 0, 'f', 2));
 }
