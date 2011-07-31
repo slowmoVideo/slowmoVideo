@@ -14,17 +14,17 @@
    <string>New slowmo Project</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLineEdit" name="projectDir"/>
    </item>
-   <item row="1" column="1" colspan="5">
+   <item row="2" column="1" colspan="5">
     <widget class="QPushButton" name="browseProjectDir">
      <property name="text">
       <string>Browse</string>
      </property>
     </widget>
    </item>
-   <item row="14" column="0" colspan="7">
+   <item row="16" column="0" colspan="7">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -61,7 +61,7 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="6">
+   <item row="3" column="0" colspan="6">
     <widget class="QCheckBox" name="cbDirectoryCreated">
      <property name="enabled">
       <bool>false</bool>
@@ -77,7 +77,7 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="0" rowspan="2" colspan="7">
+   <item row="11" column="0" rowspan="2" colspan="7">
     <widget class="QGroupBox" name="groupVideo">
      <property name="title">
       <string>Video source</string>
@@ -132,7 +132,7 @@
      </layout>
     </widget>
    </item>
-   <item row="11" column="0" colspan="7">
+   <item row="13" column="0" colspan="7">
     <widget class="QGroupBox" name="groupImages">
      <property name="title">
       <string>Image source</string>
@@ -178,7 +178,7 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="0" colspan="7">
+   <item row="8" column="0" colspan="7">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QRadioButton" name="radioVideo">
@@ -209,7 +209,7 @@
      </item>
     </layout>
    </item>
-   <item row="13" column="0" colspan="7">
+   <item row="15" column="0" colspan="7">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -235,7 +235,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="lblcProjectFilename">
      <property name="font">
       <font>
@@ -248,13 +248,33 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QLineEdit" name="projectFilename"/>
    </item>
-   <item row="4" column="1" colspan="5">
+   <item row="6" column="1" colspan="5">
     <widget class="QLabel" name="lblcFilenameExtension">
      <property name="text">
       <string>.sVproj</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="6">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>You should preferredly use an empty directory here. Each project needs its own project directory.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="6">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>The project will be saved to this file right after confirming this dialog.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

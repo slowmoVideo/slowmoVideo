@@ -15,6 +15,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QFileDialog>
 #include <QtGui/QContextMenuEvent>
 
+#include <QtCore/QSettings>
+#include <QtCore/QFileInfo>
+
 ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     QFrame(parent, f)
 {
@@ -111,10 +114,14 @@ void ImageDisplay::slotExportImage()
 {
     Q_ASSERT(!m_image.isNull());
 
+    QSettings settings;
+
     QFileDialog dialog(this, "Export render preview to image");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setDirectory(settings.value("directories/imageDisplay", QDir::homePath()).toString());
     if (dialog.exec() == QDialog::Accepted) {
         m_image.save(dialog.selectedFiles().at(0));
+        settings.setValue("directories/imageDisplay", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
     }
 }

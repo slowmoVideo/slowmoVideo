@@ -290,6 +290,8 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
 
 
 /**
+  \todo fix bézier interpolation
+  \code
       C prev
      /   /
     /   /
@@ -298,7 +300,7 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
    \
     \
      B next (can be NULL)
-
+  \endcode
   */
 void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const FlowField_sV *flowPrevCurr, const FlowField_sV *flowCurrNext, float pos, QImage &output)
 {

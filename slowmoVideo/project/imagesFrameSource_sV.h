@@ -18,6 +18,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 class Project_sV;
 
+/**
+  \todo Allow re-ordering of images
+  */
 class ImagesFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT

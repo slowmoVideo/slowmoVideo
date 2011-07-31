@@ -15,6 +15,8 @@ class FlowField_sV;
 
 /**
   \brief Counterpart to an Optical Flow field, says where a pixel came from.
+
+  \todo Reversing vectors: Take smallest one?
   */
 class SourceField_sV
 {
