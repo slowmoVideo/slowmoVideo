@@ -47,6 +47,7 @@ QColor Canvas::outTagCol    ( 30, 245,   0, 150);
 QColor Canvas::backgroundCol( 34,  34,  34);
 
 /// \todo move with MMB
+/// \todo replay curve
 
 Canvas::Canvas(Project_sV *project, QWidget *parent) :
     QWidget(parent),
@@ -604,7 +605,6 @@ void Canvas::wheelEvent(QWheelEvent *e)
 {
     // Mouse wheel movement in degrees
     int deg = e->delta()/8;
-    qDebug() << "Wheel degrees: " << deg;
 
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
         Node_sV n0 = convertCanvasToTime(e->pos());

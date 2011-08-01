@@ -327,7 +327,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
         setErrorMessage(video, s);
         return ret;
     }
-    printf("Added frame %d.\n", video->frameNr);
+    printf("Added frame %d to %s.\n", video->frameNr, video->filename);
     video->frameNr++;
 
     return ret;

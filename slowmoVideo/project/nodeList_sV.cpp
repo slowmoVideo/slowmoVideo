@@ -16,6 +16,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 
+//#define DEBUG_NL
+
 NodeList_sV::NodeList_sV(float minDist) :
     m_maxY(10),
     m_list(),
@@ -88,7 +90,9 @@ bool NodeList_sV::add(Node_sV node)
 {
     bool add = true;
 
+#ifdef DEBUG_NL
     qDebug() << "Before adding: " << *this;
+#endif
 
     node.setX(qMax(.0, node.x()));
     node.setY(qMax(.0, qMin(m_maxY, node.y())));
@@ -102,7 +106,9 @@ bool NodeList_sV::add(Node_sV node)
             qDebug() << "Right distance is " << fabs(node.x()-m_list.at(pos+1).x());
         }
     }
+#ifdef DEBUG_NL
     qDebug() << "Adding? " << add;
+#endif
     if (add) {
         m_list.append(node);
         qSort(m_list);
@@ -123,8 +129,9 @@ bool NodeList_sV::add(Node_sV node)
         fixHandles(index-1);
         fixHandles(index);
     }
-
+#ifdef DEBUG_NL
     qDebug() << "After adding: " << *this;
+#endif
 
     validate();
     return add;

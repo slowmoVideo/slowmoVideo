@@ -11,6 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "node_sV.h"
 #include <QDebug>
 
+//#define DEBUG_N
+
 Node_sV::Node_sV() :
     m_x(0),
     m_y(0)
@@ -36,7 +38,6 @@ Node_sV::Node_sV(const Node_sV &other) :
     m_rightHandle(other.m_rightHandle),
     m_shutterFunctionID(other.m_shutterFunctionID)
 {
-    qDebug() << "Node_sV(const Node_sV &other) called";
     init();
     m_leftCurveType = other.m_leftCurveType;
     m_rightCurveType = other.m_rightCurveType;
@@ -153,9 +154,10 @@ void Node_sV::operator -=(const Node_sV& other)
 }
 void Node_sV::operator =(const Node_sV& other)
 {
-    qDebug() << "Operator= called with other = " << &other << "; this: " << this;
     if (this != &other) {
+#ifdef DEBUG_N
         qDebug() << "Other: " << other;
+#endif
         m_x = other.m_x;
         m_y = other.m_y;
         m_leftHandle.setX(other.leftNodeHandle().x());
@@ -163,7 +165,9 @@ void Node_sV::operator =(const Node_sV& other)
         m_rightHandle.setX(other.rightNodeHandle().x());
         m_rightHandle.setY(other.rightNodeHandle().y());
         m_shutterFunctionID = other.m_shutterFunctionID;
+#ifdef DEBUG_N
         qDebug() << "This: " << *this;
+#endif
     }
     Q_ASSERT(this == m_leftHandle.parentNode());
     Q_ASSERT(this == m_rightHandle.parentNode());

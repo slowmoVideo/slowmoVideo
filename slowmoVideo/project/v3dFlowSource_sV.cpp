@@ -51,7 +51,6 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
     QString program(programLocation);
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
 
-    qDebug() << "Flow target file: " << flowFileName;
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
         qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
@@ -75,7 +74,7 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
             qDebug() << proc.readAllStandardError() << proc.readAllStandardOutput();
         }
     } else {
-        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame;
+        qDebug().nospace() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame << ": " << flowFileName;
     }
 
     try {

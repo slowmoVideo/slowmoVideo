@@ -21,7 +21,7 @@ void FlowRW_sV::save(std::string filename, FlowField_sV *flowField)
 {
     int width = flowField->width();
     int height = flowField->height();
-    std::cout << "Writing flow file: " << width << "x" << height
+    std::cout << "Writing flow file " << filename << ": " << width << "x" << height
               << ", version " << (int)m_version << ", magic number " << m_magicNumber << std::endl;
 
     float *data = flowField->data();
@@ -47,7 +47,6 @@ FlowRW_sV::FlowInfo_sV FlowRW_sV::readInfo(std::string filename)
     info.magic = std::string(magic);
     delete[] magic;
 
-    std::cout << "Magic number: " << info.magic << ", version: " << (int)info.version << std::endl;
 
     file.read((char*) &info.width, sizeof(int));
     file.read((char*) &info.height, sizeof(int));
@@ -55,6 +54,8 @@ FlowRW_sV::FlowInfo_sV FlowRW_sV::readInfo(std::string filename)
         if (info.magic.compare(m_magicNumber) == 0) {
             info.valid = true;
         }
+        std::cout << "Magic number: " << info.magic << ", version: " << (int)info.version
+                  << ", size: " << info.width << "x" << info.height << std::endl;
     } else {
         std::cerr << "Failed to read width/height from " << filename << "." << std::endl;
     }
@@ -69,11 +70,9 @@ FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowRWError)
 
     char *magic = new char[m_magicNumber.size()];
     char version;
+
     file.read(magic, sizeof(char)*m_magicNumber.size());
     file.read((char*) &version, sizeof(char));
-
-    std::cout << "Magic number: " << magic << ", version: " << (int)version << std::endl;
-    delete[] magic;
 
     int width, height;
     file.read((char*) &width, sizeof(int));
@@ -94,6 +93,10 @@ FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowRWError)
     file.close();
 
     std::cout << "Read flow file of size " << field->width()
-              << "×" << field->height() << "." << std::endl;
+              << "×" << field->height()
+              << ". Magic number: " << magic
+              << ", version: " << (int)version << std::endl;
+
+    delete[] magic;
     return field;
 }

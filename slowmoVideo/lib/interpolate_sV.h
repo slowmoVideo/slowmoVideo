@@ -15,6 +15,7 @@ class FlowField_sV;
 
 /**
   \short Provides interpolation methods between frames
+  \todo Half resolution for optical flow
   */
 class Interpolate_sV {
 

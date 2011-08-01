@@ -44,6 +44,8 @@ class Project_sV;
   \brief Canvas for drawing motion curves.
 
   \todo Render single frame at mouse position?
+  \todo Check bézier curve consistency (with internal bézier calculator)
+  \todo Frame lines on high zoom
   */
 class Canvas : public QWidget
 {
