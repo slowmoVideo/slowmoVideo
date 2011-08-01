@@ -14,8 +14,6 @@ set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
 
 
-# export V3D_SHADER_DIR=/data/cworkspace/slowmoGPU/GL/Shaders/
-
 set(CMAKE_CXX_FLAGS
     ${CMAKE_CXX_FLAGS}
     -Wall
@@ -23,8 +21,6 @@ set(CMAKE_CXX_FLAGS
 
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
-
-
 find_package(OpenGL)
 find_package(GLUT)
 find_package(GLEW)
@@ -40,10 +36,15 @@ find_library(SVFLOW_LIB
 )
 
 set(BUILD_FLOW_BUILDER "NO")
-
 if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
 set(BUILD_FLOW_BUILDER "YES")
 endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
+
+set(INCLUDE_SOURCE "YES")
+if(DISABLE_INCLUDE_SOURCE)
+set(INCLUDE_SOURCE "NO")
+add_definitions(-DDISABLE_INCLUDE_SOURCE)
+endif(DISABLE_INCLUDE_SOURCE)
 
 
 
@@ -77,6 +78,10 @@ endif(NOT CG_FOUND)
 message("* Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
 message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.)")
 message("* V3D will be built: ${BUILD_FLOW_BUILDER}")
+message("* Shaders will be included in the binary: ${INCLUDE_SOURCE}")
+if(INCLUDE_SOURCE)
+message("  (Can be disabled with the cmake flag -DDISABLE_INCLUDE_SOURCE)")
+endif(INCLUDE_SOURCE)
 message("==================================================")
 
 if(NOT BUILD_FLOW_BUILDER)
