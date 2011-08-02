@@ -49,7 +49,7 @@ public:
       */
 
     Project_sV* loadProject(QString filename, QString *warning = NULL) const throw(FrameSourceError, Error_sV);
-    int saveProject(Project_sV *project, QString filename) const;
+    int saveProject(Project_sV *project, QString filename) const throw(Error_sV);
 
 private:
     static const QDomElement nodeToDom(QDomDocument *doc, const Node_sV *node);

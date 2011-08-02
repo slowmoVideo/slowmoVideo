@@ -362,8 +362,12 @@ void MainWindow::slotSaveProject(QString filename)
         statusBar()->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
     } else {
         qDebug() << "Saving project as " << filename;
-        XmlProjectRW_sV writer;
-        writer.saveProject(m_project, m_project->projectFilename());
+        try {
+            XmlProjectRW_sV writer;
+            writer.saveProject(m_project, filename);
+        } catch (Error_sV &err) {
+            QMessageBox(QMessageBox::Warning, "Error writing project file", err.message()).exec();
+        }
     }
 }
 void MainWindow::slotSaveProjectDialog()

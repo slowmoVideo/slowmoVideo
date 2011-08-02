@@ -25,7 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QXmlQuery>
 
 
-int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
+int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const throw(Error_sV)
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
@@ -148,12 +148,9 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
         tags.appendChild(tagToDom(&doc, project->tags()->at(i)));
     }
 
-//    qDebug() << doc.toString(2);
-
     QFile outFile(filename);
     if (!outFile.open(QIODevice::WriteOnly)) {
-        qDebug() << "Cannot write file " << filename;
-        Q_ASSERT(false);
+        throw Error_sV(QString("Cannot write to %1; please check if you have write permissions.").arg(filename));
     }
     QTextStream output(&outFile);
     doc.save(output, 4);
