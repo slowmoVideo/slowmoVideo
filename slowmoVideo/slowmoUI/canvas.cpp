@@ -34,6 +34,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainterPath>
 #include <QtGui/QMenu>
 
+//#define DEBUG_C
+
 QColor Canvas::selectedCol  (  0, 175, 255, 100);
 QColor Canvas::hoverCol     (255, 175,   0, 200);
 QColor Canvas::lineCol      (255, 255, 255);
@@ -437,9 +439,10 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
     if (e->buttons().testFlag(Qt::LeftButton)) {
 
-        qDebug() << m_states.initialMousePos << "to" << e->pos();
         Node_sV diff = convertCanvasToTime(e->pos()) - convertCanvasToTime(m_states.initialMousePos);
-        qDebug() << "Diff: " << diff;
+#ifdef DEBUG_C
+        qDebug() << m_states.initialMousePos << "to" << e->pos() << "; Diff: " << diff;
+#endif
 
         if (m_mode == ToolMode_Select) {
             if (dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject) != NULL) {
@@ -465,7 +468,10 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 }
             } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
                 const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
-                qDebug() << "Moving node " << node;
+
+                if (!m_states.nodesMoved) {
+                    qDebug() << "Moving node " << node;
+                }
                 if (!m_states.moveAborted) {
                     if (m_states.countsAsMove()) {
                         if (!node->selected()) {
@@ -473,13 +479,12 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                                 m_states.selectAttempted = true;
                                 m_nodes->select(node, !e->modifiers().testFlag(Qt::ControlModifier));
                             }
-                            if (e->modifiers().testFlag(Qt::ControlModifier)) {
-                                /// \todo fix Ctrl key
-                                if (qAbs(diff.x()) < qAbs(diff.y())) {
-                                    diff.setX(0);
-                                } else {
-                                    diff.setY(0);
-                                }
+                        }
+                        if (e->modifiers().testFlag(Qt::ControlModifier)) {
+                            if (qAbs(diff.x()) < qAbs(diff.y())) {
+                                diff.setX(0);
+                            } else {
+                                diff.setY(0);
                             }
                         }
                         m_nodes->moveSelected(diff);
@@ -537,7 +542,6 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                         }
                         repaint();
 
-                        qDebug() << "Node list: " << m_nodes;
                     } else {
                         qDebug() << "Not inside bounds.";
                     }

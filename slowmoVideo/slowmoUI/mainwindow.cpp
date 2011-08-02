@@ -209,7 +209,7 @@ void MainWindow::shortcutUsed(QString which)
     ts.shortcut = which;
     ts.start = QTime::currentTime();
 
-    qDebug() << which << " pressed. Last shortcut: " << m_lastShortcut.start.elapsed();
+    qDebug() << which << " pressed. Last shortcut: " << m_lastShortcut.start.elapsed() << " ms ago.";
 
 //    QString at = QString(" @ %1.%2::%3")
 //            .arg(ts.start.minute())

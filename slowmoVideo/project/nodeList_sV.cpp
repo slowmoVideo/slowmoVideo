@@ -284,7 +284,9 @@ void NodeList_sV::moveSelected(const Node_sV &time)
         // Do not allow to move nodes to x < 0
         maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
     }
+#ifdef DEBUG_NL
     qDebug() << "Max move: left " << maxLMove << ", right: " << maxRMove;
+#endif
     Node_sV newTime(
                 qMax(maxLMove, qMin(maxRMove, time.x())),
                 qMax(maxDMove, qMin(maxUMove, time.y()))
