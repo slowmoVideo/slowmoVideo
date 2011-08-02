@@ -76,15 +76,44 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_wCanvas);
 
 
-    m_wInputMonitor = new InputMonitor(this);
+    m_wInputMonitor = new FrameMonitor(this);
     m_wInputMonitorDock = new QDockWidget("Input monitor", this);
     m_wInputMonitorDock->setWidget(m_wInputMonitor);
+    m_wInputMonitorDock->setObjectName("inputMonitor");
     addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
+
+    m_wCurveMonitor = new FrameMonitor(this);
+    m_wCurveMonitorDock = new QDockWidget("Curve monitor", this);
+    m_wCurveMonitorDock->setWidget(m_wCurveMonitor);
+    m_wCurveMonitorDock->setObjectName("curveMonitor");
+    addDockWidget(Qt::TopDockWidgetArea, m_wCurveMonitorDock);
 
     m_wRenderPreview = new RenderPreview(m_project, this);
     m_wRenderPreviewDock = new QDockWidget("Render preview", this);
     m_wRenderPreviewDock->setWidget(m_wRenderPreview);
+    m_wRenderPreviewDock->setObjectName("renderPreview");
     addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
+
+    // Fill the view menu that allows (de)activating widgets
+    QObjectList windowChildren = children();
+    QDockWidget *w;
+    for (int i = 0; i < windowChildren.size(); i++) {
+        if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
+            qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
+
+            QAction *a = new QAction(w->objectName(), this);
+            a->setCheckable(true);
+            a->setChecked(w->isVisible());
+            bool b = true;
+            b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
+            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
+            Q_ASSERT(b);
+
+            ui->menuView->addAction(a);
+            m_widgetActions << a;
+
+        }
+    }
 
 
     // Set up shortcut bindings
@@ -152,6 +181,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
+    b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
+                 this, SLOT(slotForwardCurveSrcPosition(qreal)));
 
     b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
     b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
@@ -172,7 +203,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_wInputMonitor;
+    delete m_wCurveMonitor;
     delete m_wInputMonitorDock;
+    delete m_wCurveMonitorDock;
     delete m_wRenderPreview;
     delete m_wRenderPreviewDock;
 
@@ -193,6 +226,10 @@ MainWindow::~MainWindow()
     delete m_signalMapper;
     for (int i = 0; i < m_shortcutList.length(); i++) {
         delete m_shortcutList[i];
+    }
+
+    for (int i = 0; i < m_widgetActions.size(); i++) {
+        delete m_widgetActions[i];
     }
 }
 
@@ -417,6 +454,12 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 {
     if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
         m_wInputMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
+    }
+}
+void MainWindow::slotForwardCurveSrcPosition(qreal frame)
+{
+    if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
+        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
     }
 }
 void MainWindow::slotUpdateRenderPreview()

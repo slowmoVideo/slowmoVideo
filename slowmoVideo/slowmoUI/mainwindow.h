@@ -12,7 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define MAINWINDOW_H
 
 #include "canvas.h"
-#include "inputMonitor.h"
+#include "frameMonitor.h"
 #include "renderPreview.h"
 #include "dialogues/flowExaminer.h"
 #include "project/project_sV.h"
@@ -77,10 +77,13 @@ private:
     Project_sV *m_project;
 
     Canvas *m_wCanvas;
-    InputMonitor *m_wInputMonitor;
+    FrameMonitor *m_wInputMonitor;
+    FrameMonitor *m_wCurveMonitor;
     QDockWidget *m_wInputMonitorDock;
+    QDockWidget *m_wCurveMonitorDock;
     RenderPreview* m_wRenderPreview;
     QDockWidget *m_wRenderPreviewDock;
+    QList<QAction*> m_widgetActions;
 
     ProgressDialog *m_progressDialog;
     ProgressDialog *m_renderProgressDialog;
@@ -112,6 +115,7 @@ private slots:
     void slotShowPreferencesDialog();
     void slotShowFlowExaminerDialog();
     void slotForwardInputPosition(qreal frame);
+    void slotForwardCurveSrcPosition(qreal frame);
 
     void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
     void slotFrameSourceTasksFinished();

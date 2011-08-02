@@ -10,7 +10,7 @@ set(SRCS
   main.cpp
   mainwindow.cpp
   canvas.cpp
-  inputMonitor.cpp
+  frameMonitor.cpp
   renderPreview.cpp
   imageDisplay.cpp
   dialogues/newProjectDialog.cpp
@@ -27,7 +27,7 @@ set(SRCS
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
-  inputMonitor.ui
+  frameMonitor.ui
   renderPreview.ui
   dialogues/newProjectDialog.ui
   dialogues/preferencesDialog.ui
@@ -42,7 +42,7 @@ set(SRCS_UI
 set(SRCS_MOC
   mainwindow.h
   canvas.h
-  inputMonitor.h
+  frameMonitor.h
   renderPreview.h
   imageDisplay.h
   dialogues/newProjectDialog.h

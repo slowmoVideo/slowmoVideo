@@ -85,6 +85,7 @@ public slots:
 
 signals:
     void signalMouseInputTimeChanged(qreal frame);
+    void signalMouseCurveSrcTimeChanged(qreal frame);
     void nodesChanged();
 
 protected:

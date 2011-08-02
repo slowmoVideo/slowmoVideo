@@ -37,7 +37,7 @@ qreal NodeList_sV::startTime() const
     if (m_list.length() > 0) {
         return m_list[0].xUnmoved();
     } else {
-        qDebug() << "No start time available (no nodes)";
+//        qDebug() << "No start time available (no nodes)";
         return 0;
     }
 }
@@ -47,7 +47,7 @@ qreal NodeList_sV::endTime() const
     if (m_list.length() > 0) {
         return m_list[m_list.length()-1].xUnmoved();
     } else {
-        qDebug() << "No end time available (no nodes)";
+//        qDebug() << "No end time available (no nodes)";
         return 0;
     }
 }

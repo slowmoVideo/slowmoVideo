@@ -505,10 +505,21 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
         }
     }
 
+    // Emit the source time at the mouse position
     emit signalMouseInputTimeChanged(
                   convertCanvasToTime(m_states.prevMousePos).y()
                 * m_project->frameSource()->fps()->fps()
                                      );
+
+
+    // Emit the source time at the intersection of the out time and the curve
+    qreal timeOut = convertCanvasToTime(m_states.prevMousePos).x();
+    if (m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
+
+        emit signalMouseCurveSrcTimeChanged(
+                    m_nodes->sourceTime(timeOut)
+                  * m_project->frameSource()->fps()->fps());
+    }
 
     repaint();
 }

@@ -15,20 +15,20 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QSemaphore>
 
 namespace Ui {
-    class InputMonitor;
+    class FrameMonitor;
 }
 class QImage;
 
 /**
   \brief Used for displaying input frames at the mouse position.
   */
-class InputMonitor : public QWidget
+class FrameMonitor : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit InputMonitor(QWidget *parent = 0);
-    ~InputMonitor();
+    explicit FrameMonitor(QWidget *parent = 0);
+    ~FrameMonitor();
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
@@ -38,7 +38,7 @@ public slots:
     void slotLoadImage(const QString &filename);
 
 private:
-    Ui::InputMonitor *ui;
+    Ui::FrameMonitor *ui;
 
     QSemaphore m_semaphore;
     QString *m_queue[2];
