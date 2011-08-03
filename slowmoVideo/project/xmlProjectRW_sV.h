@@ -48,8 +48,8 @@ public:
       Saves a project to an XML project file.
       */
 
-    Project_sV* loadProject(QString filename, QString *warning = NULL) const throw(FrameSourceError, Error_sV);
-    int saveProject(Project_sV *project, QString filename) const throw(Error_sV);
+    static Project_sV* loadProject(QString filename, QString *warning = NULL) throw(FrameSourceError, Error_sV);
+    static int saveProject(Project_sV *project, QString filename) throw(Error_sV);
 
 private:
     static const QDomElement nodeToDom(QDomDocument *doc, const Node_sV *node);

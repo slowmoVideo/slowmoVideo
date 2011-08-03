@@ -71,6 +71,7 @@ public:
     ShutterFunctionList_sV* shutterFunctions() { return m_shutterFunctions; }
     MotionBlur_sV *motionBlur() { return m_motionBlur; }
 
+    /** \see replaceRenderTask() */
     RenderTask_sV *renderTask() { return m_renderTask; }
     void replaceRenderTask(RenderTask_sV *task);
 

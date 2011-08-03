@@ -110,7 +110,10 @@ void RenderTask_sV::slotContinueRendering()
     m_stopwatch.start();
     emit signalRenderingContinued();
     emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
-    QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
+    bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::AutoConnection, Q_ARG(qreal, m_nextFrameTime));
+    if (!b) {
+        qDebug() << "invokeMethod returned false.";
+    }
 }
 
 void RenderTask_sV::slotRenderFrom(qreal time)
@@ -164,7 +167,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
     }
     if (!m_stopRendering) {
-        QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
+        QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::AutoConnection, Q_ARG(qreal, m_nextFrameTime));
     }
 }
 

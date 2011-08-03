@@ -25,7 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QXmlQuery>
 
 
-int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const throw(Error_sV)
+int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Error_sV)
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
@@ -300,7 +300,7 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     }
 }
 
-Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) const throw(FrameSourceError, Error_sV)
+Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) throw(FrameSourceError, Error_sV)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {

@@ -32,7 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 1
-#define SLOWMOVIDEO_VERSION_MICRO 4
+#define SLOWMOVIDEO_VERSION_MICRO 5
 
 
 /// Contains information about this slowmoVideo version
@@ -112,8 +112,8 @@ struct Fps_sV {
     QString toString() const;
 
     /// Frames per second as float.
-    float fps() const {
-        return float(num)/den;
+    double fps() const {
+        return double(num)/den;
     }
 };
 
