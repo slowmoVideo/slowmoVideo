@@ -459,7 +459,7 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 void MainWindow::slotForwardCurveSrcPosition(qreal frame)
 {
     if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
-        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
+        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Orig));
     }
 }
 void MainWindow::slotUpdateRenderPreview()

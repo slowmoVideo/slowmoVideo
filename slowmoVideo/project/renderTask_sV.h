@@ -22,8 +22,6 @@ class AbstractRenderTarget_sV;
 /**
   \brief Renders a project when started.
   \todo Changes in the project affect the rendering as well. Copy the project? Additional executable?
-  \todo Rendering sections: Do not start numbering from 0 again
-  \todo Rendering sections: Snap in time to a frame position relative to the start node
   */
 class RenderTask_sV : public QObject
 {

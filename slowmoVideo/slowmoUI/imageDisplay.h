@@ -46,7 +46,9 @@ signals:
 protected slots:
     virtual void paintEvent(QPaintEvent *e);
     virtual void contextMenuEvent(QContextMenuEvent *e);
+    virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void wheelEvent(QWheelEvent *e);
 
 private:
     QImage m_image;
@@ -55,7 +57,15 @@ private:
     QAction *m_aScaling;
     QAction *m_aExportImage;
 
-    QRect m_contentRect;
+    float m_scale;
+    QPointF m_imageOffset;
+
+    struct {
+        QPointF mouseInitialImagePos;
+    } m_states;
+
+    QPointF convertCanvasToImage(QPoint p) const;
+    QPointF convertCanvasToPixel(QPoint p) const;
 
 private slots:
     void slotExportImage();
