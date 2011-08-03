@@ -35,6 +35,12 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QMenu>
 
 
+
+//#define VALIDATE_BEZIER
+#ifdef VALIDATE_BEZIER
+#include "lib/bezierTools_sV.h"
+#endif
+
 //#define DEBUG_C
 #ifdef DEBUG_C
 #include <iostream>
@@ -364,6 +370,16 @@ void Canvas::paintEvent(QPaintEvent *)
                             convertTimeToCanvas(curr->toQPointF() + curr->leftNodeHandle()),
                             convertTimeToCanvas(*curr));
                 davinci.drawPath(path);
+#ifdef VALIDATE_BEZIER
+                for (int x = convertTimeToCanvas(*prev).x(); x < p.x(); x++) {
+                    QPointF py = BezierTools_sV::interpolateAtX(convertCanvasToTime(QPoint(x, 0)).x(),
+                                                   prev->toQPointF(), prev->toQPointF()+prev->rightNodeHandle(),
+                                                   curr->toQPointF()+curr->leftNodeHandle(), curr->toQPointF());
+                    qreal y = convertTimeToCanvas(py).y();
+//                    qDebug() << convertCanvasToTime(QPoint(x, 0)).x() << ": " << x << y;
+                    davinci.drawPoint(x, y);
+                }
+#endif
             } else {
                 davinci.drawLine(convertTimeToCanvas(*prev), p);
             }
@@ -455,10 +471,12 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 if (index < 0) {
                     qDebug () << "FAIL!";
                 }
+#ifdef DEBUG_C
                 qDebug() << "Moving handle" << handle << " of node " << handle->parentNode()
                          << QString(" (%1)").arg(index);
                 qDebug() << "Parent node x: " << handle->parentNode()->x();
                 qDebug() << "Handle x: " << handle->x();
+#endif
 
                 if (index >= 0) {
                     m_nodes->moveHandle(

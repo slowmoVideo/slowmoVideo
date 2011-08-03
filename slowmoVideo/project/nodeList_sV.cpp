@@ -76,8 +76,12 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
                 srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
             }
         } else {
-            Q_ASSERT(false);
-            srcTime = m_list[index].y();
+            if (index >= m_list.size()) {
+                qDebug() << "index " << index << " is > list size: " << m_list.size();
+                Q_ASSERT(false);
+            } else {
+                srcTime = m_list[index].y();
+            }
         }
     } else {
         qDebug() << "No node before " << targetTime;
