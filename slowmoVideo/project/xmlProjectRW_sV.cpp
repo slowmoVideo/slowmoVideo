@@ -321,7 +321,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
                 int projVersionMajor = xml.attributes().value("version").toString().toInt();
                 int projVersionMinor = xml.attributes().value("version_minor").toString().toInt();
                 if (projVersionMajor > 0) {
-                    qDebug() << "Reading project file: version " << projVersionMajor << "." << projVersionMinor;
+                    qDebug().nospace() << "Reading project file: version " << projVersionMajor << "." << projVersionMinor;
                 } else {
                     qDebug() << "Reading project file of unknown version";
                 }

@@ -54,7 +54,7 @@ void printHelp()
 
 void require(int nArgs, int index, int size)
 {
-    if (size <= index+1 + nArgs) {
+    if (size <= index + nArgs) {
         std::cout << "Not enough arguments delivered (" << nArgs << " required)." << std::endl;
         printHelp();
         exit(-1);
@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
             }
 
         } else if ("-size" == args.at(next)) {
+            require(1, next, n);
             next++;
             if ("small" == args.at(next)) {
                 renderer.setSize(false);
@@ -127,6 +128,7 @@ int main(int argc, char *argv[])
             next++;
 
         } else if ("-fps" == args.at(next)) {
+            require(1, next, n);
             next++;
             bool b;
             double fps = args.at(next).toDouble(&b);
@@ -138,6 +140,7 @@ int main(int argc, char *argv[])
             next++;
 
         } else if ("-start" == args.at(next)) {
+            require(1, next, n);
             next++;
             bool b;
             qreal start = args.at(next).toDouble(&b);
@@ -149,6 +152,7 @@ int main(int argc, char *argv[])
             next++;
 
         } else if ("-end" == args.at(next)) {
+            require(1, next, n);
             next++;
             bool b;
             qreal end = args.at(next).toDouble(&b);
@@ -160,6 +164,7 @@ int main(int argc, char *argv[])
             next++;
 
         } else if ("-interpolation" == args.at(next)) {
+            require(1, next, n);
             next++;
             if ("forward" == args.at(next)) {
                 renderer.setInterpolation(InterpolationType_Forward);
@@ -176,6 +181,7 @@ int main(int argc, char *argv[])
             next++;
 
         } else if ("-v3dLambda" == args.at(next)) {
+            require(1, next, n);
             next++;
             bool b;
             float lambda = args.at(next).toFloat(&b);
@@ -192,6 +198,14 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
+
+    QString msg;
+    if (!renderer.isComplete(msg)) {
+        std::cout << msg.toStdString() << std::endl;
+        std::cout << "Project will not be rendered." << std::endl;
+        return 42;
+    }
+
     renderer.start();
 
 }

@@ -27,7 +27,8 @@ SlowmoRenderer_sV::SlowmoRenderer_sV() :
     m_taskSize(0),
     m_lastProgress(0),
     m_start(0),
-    m_end(0)
+    m_end(0),
+    m_renderTargetSet(false)
 {
 }
 
@@ -54,6 +55,9 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
         m_project->replaceRenderTask(task);
+        m_start = m_project->nodes()->startTime();
+        m_end = m_project->nodes()->endTime();
+        task->setTimeRange(m_start, m_end);
 
         bool b = true;
         b &= connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
@@ -97,6 +101,7 @@ void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
     vrt->setTargetFile(QString(filename));
     vrt->setVcodec(QString(codec));
     m_project->renderTask()->setRenderTarget(vrt);
+    m_renderTargetSet = true;
 }
 
 void SlowmoRenderer_sV::setImagesRenderTarget(QString filenamePattern, QString directory)
@@ -105,6 +110,7 @@ void SlowmoRenderer_sV::setImagesRenderTarget(QString filenamePattern, QString d
     irt->setFilenamePattern(QString(filenamePattern));
     irt->setTargetDir(QString(directory));
     m_project->renderTask()->setRenderTarget(irt);
+    m_renderTargetSet = true;
 }
 
 void SlowmoRenderer_sV::setInterpolation(InterpolationType interpolation)
@@ -160,6 +166,16 @@ void SlowmoRenderer_sV::slotFinished()
 void SlowmoRenderer_sV::printProgress()
 {
     std::cout << m_lastProgress << "/" << m_taskSize << std::endl;
+}
+
+bool SlowmoRenderer_sV::isComplete(QString &message) const
+{
+    bool b = true;
+    if (!m_renderTargetSet) {
+        b = false;
+        message.append("No render target set.\n");
+    }
+    return b;
 }
 
 

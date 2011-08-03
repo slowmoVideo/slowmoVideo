@@ -24,6 +24,9 @@ public:
     std::string message;
 };
 
+/**
+  \brief Just for rendering.
+  */
 class SlowmoRenderer_sV : public QObject
 {
     Q_OBJECT
@@ -45,7 +48,12 @@ public:
     void setSize(bool original);
     void setV3dLambda(float lambda);
 
+
     void printProgress();
+
+    /// Checks if all necessary parameters (e.g. paths) are set
+    /// \param message Will contain an error message if the function returned \c false
+    bool isComplete(QString &message) const;
 
 
 private:
@@ -56,6 +64,8 @@ private:
 
     double m_start;
     double m_end;
+
+    bool m_renderTargetSet;
 
 
 private slots:
