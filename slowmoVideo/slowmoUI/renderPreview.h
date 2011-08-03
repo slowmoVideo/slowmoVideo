@@ -37,7 +37,7 @@ public:
 
 public slots:
     /// Renders the output frame at the given time (asynchronous)
-    void slotRenderAt(float time);
+    void slotRenderAt(qreal time);
 
 private:
     Ui::RenderPreview *ui;

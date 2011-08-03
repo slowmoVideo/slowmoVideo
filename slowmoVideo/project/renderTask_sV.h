@@ -47,7 +47,7 @@ public:
       Sets the size to use for rendering.
       */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
-    void setTimeRange(float start, float end);
+    void setTimeRange(qreal start, qreal end);
     void setFPS(const Fps_sV fps);
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
@@ -78,8 +78,8 @@ private:
     Project_sV *m_project;
     AbstractRenderTarget_sV *m_renderTarget;
 
-    float m_timeStart;
-    float m_timeEnd;
+    qreal m_timeStart;
+    qreal m_timeEnd;
 
     QTime m_stopwatch;
     int m_renderTimeElapsed;

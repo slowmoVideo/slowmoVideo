@@ -34,7 +34,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainterPath>
 #include <QtGui/QMenu>
 
+
 //#define DEBUG_C
+#ifdef DEBUG_C
+#include <iostream>
+#endif
 
 QColor Canvas::selectedCol  (  0, 175, 255, 100);
 QColor Canvas::hoverCol     (255, 175,   0, 200);
@@ -514,11 +518,18 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 
     // Emit the source time at the intersection of the out time and the curve
     qreal timeOut = convertCanvasToTime(m_states.prevMousePos).x();
-    if (m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
+    if (m_nodes->size() > 1 && m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
 
-        emit signalMouseCurveSrcTimeChanged(
-                    m_nodes->sourceTime(timeOut)
-                  * m_project->frameSource()->fps()->fps());
+#ifdef DEBUG_C
+        std::cout.precision(32);
+        std::cout << "start: " << m_nodes->startTime() << ", out: " << timeOut << ", end: " << m_nodes->endTime() << std::endl;
+#endif
+
+        if (m_nodes->find(timeOut) >= 0) {
+            emit signalMouseCurveSrcTimeChanged(
+                        m_nodes->sourceTime(timeOut)
+                      * m_project->frameSource()->fps()->fps());
+        }
     }
 
     repaint();

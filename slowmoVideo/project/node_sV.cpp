@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "node_sV.h"
 #include <QDebug>
 
+
 //#define DEBUG_N
 
 Node_sV::Node_sV() :
@@ -164,6 +165,8 @@ void Node_sV::operator =(const Node_sV& other)
         m_leftHandle.setY(other.leftNodeHandle().y());
         m_rightHandle.setX(other.rightNodeHandle().x());
         m_rightHandle.setY(other.rightNodeHandle().y());
+        m_leftCurveType = other.m_leftCurveType;
+        m_rightCurveType = other.m_rightCurveType;
         m_shutterFunctionID = other.m_shutterFunctionID;
 #ifdef DEBUG_N
         qDebug() << "This: " << *this;
@@ -187,6 +190,7 @@ QDebug operator<<(QDebug qd, const Node_sV& n)
     qd.nospace() << "(";
     qd.nospace() << n.x() << "|" << n.y();
     if (n.selected()) { qd.nospace() << "|s"; }
-    qd.nospace() << ")@" << &n << " l: " << n.leftNodeHandle() << ", r: " << n.rightNodeHandle() << "\n";
+    qd.nospace() << ")@" << &n << " l: " << n.leftNodeHandle() << " " << toString(n.leftCurveType())
+                 << ", r: " << n.rightNodeHandle() << " " << toString(n.rightCurveType()) << "\n";
     return qd.maybeSpace();
 }

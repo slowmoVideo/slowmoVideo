@@ -8,6 +8,7 @@ set(SRCS
     testDefs_sV.cpp
     testShutterFunction_sV.cpp
     testProject_sV.cpp
+    testNodeList_sV.cpp
     testAll.cpp
 )
 set(SRCS_MOC
@@ -18,6 +19,7 @@ set(SRCS_MOC
     testDefs_sV.h
     testShutterFunction_sV.h
     testXmlProjectRW_sV.h
+    testNodeList_sV.h
     testProject_sV.h
 )
 

@@ -17,6 +17,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDebug>
 
 //#define DEBUG_NL
+#ifdef DEBUG_NL
+#include <iostream>
+#endif
 
 NodeList_sV::NodeList_sV(float minDist) :
     m_maxY(10),
@@ -91,7 +94,7 @@ bool NodeList_sV::add(Node_sV node)
     bool add = true;
 
 #ifdef DEBUG_NL
-    qDebug() << "Before adding: " << *this;
+    qDebug() << "Before adding: \n" << *this;
 #endif
 
     node.setX(qMax(.0, node.x()));
@@ -100,10 +103,14 @@ bool NodeList_sV::add(Node_sV node)
     int pos = find(node.x());
     if (pos >= 0 && m_list.size() > pos) {
         add = fabs(node.x()-m_list.at(pos).x()) > m_minDist;
+#ifdef DEBUG_NL
         qDebug() << "Left distance is " << fabs(node.x()-m_list.at(pos).x());
+#endif
         if (add && m_list.size() > pos+1) {
             add = fabs(node.x()-m_list.at(pos+1).x()) > m_minDist;
+#ifdef DEBUG_NL
             qDebug() << "Right distance is " << fabs(node.x()-m_list.at(pos+1).x());
+#endif
         }
     }
 #ifdef DEBUG_NL
@@ -130,7 +137,7 @@ bool NodeList_sV::add(Node_sV node)
         fixHandles(index);
     }
 #ifdef DEBUG_NL
-    qDebug() << "After adding: " << *this;
+    qDebug() << "After adding: \n" << *this;
 #endif
 
     validate();
@@ -386,6 +393,9 @@ void NodeList_sV::setCurveType(qreal segmentTime, CurveType type)
 {
     int left, right;
     findBySegment(segmentTime, left, right);
+#ifdef DEBUG_NL
+    qDebug() << "Setting curve type for nodes " << left << " and " << right;
+#endif
     if (left != -1) {
         m_list[left].setRightCurveType(type);
     }
@@ -458,7 +468,15 @@ int NodeList_sV::find(qreal time) const
          m_list.size() > (pos+1) && m_list.at(pos+1).x() <= time;
          pos++
          ) {}
-    if (m_list.size() == 0 || (pos == 0 && m_list[pos].x() > time)) {
+    if (m_list.size() == 0 || (pos == 0 && time < m_list[0].x())) {
+#ifdef DEBUG_NL
+        if (m_list.size() > 0) {
+            std::cout.precision(30);
+            std::cout << "find(): time: " << time << ", left boundary: " << m_list[0].x()
+                      << ", unmoved: " << m_list[0].xUnmoved()
+                      << ", diff: " << m_list[pos].x()-time << std::endl;
+        }
+#endif
         pos = -1;
     }
     return pos;
@@ -558,7 +576,7 @@ int NodeList_sV::size() const { return m_list.size(); }
 QDebug operator<<(QDebug dbg, const NodeList_sV &list)
 {
     for (int i = 0; i < list.size(); i++) {
-        dbg.nospace() << list.at(i) << " ";
+        dbg.nospace() << i << ": " << list.at(i) << " ";
     }
     return dbg.maybeSpace();
 }

@@ -83,13 +83,13 @@ public:
       \param roundUp To chose between rounding up or down
       \param fps Frames per second to use.
       */
-    static float snapToFrame(const float time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
-    float snapToOutFrame(float time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;
+    static qreal snapToFrame(const qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
+    qreal snapToOutFrame(qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;
 
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
-    QImage render(float outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size);
+    QImage render(qreal outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size);
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 
@@ -117,7 +117,7 @@ private:
     RenderTask_sV *m_renderTask;
     ShutterFunctionList_sV *m_shutterFunctions;
 
-    float sourceTimeToFrame(float time) const;
+    qreal sourceTimeToFrame(qreal time) const;
 
     void init();
 

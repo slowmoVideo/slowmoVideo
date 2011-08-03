@@ -30,6 +30,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 #include <QFileInfo>
 
+#define DEBUG_P
+#ifdef DEBUG_P
+#include <iostream>
+#endif
+
 
 #define MIN_FRAME_DIST .001
 
@@ -129,9 +134,14 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::render(float outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
+QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
 {
     if (outTime < m_nodes->startTime() || outTime > m_nodes->endTime()) {
+#ifdef DEBUG_P
+        std::cout.precision(30);
+        std::cout << m_nodes->startTime() << " -- " << outTime << " -- " << m_nodes->endTime() << std::endl;
+        std::cout.flush();
+#endif
         qDebug() << "Output time out of bounds";
         Q_ASSERT(false);
     }
@@ -201,13 +211,13 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
 }
 
 inline
-float Project_sV::sourceTimeToFrame(float time) const
+qreal Project_sV::sourceTimeToFrame(qreal time) const
 {
     Q_ASSERT(time >= 0);
     return time * m_frameSource->fps()->fps();
 }
 
-float Project_sV::snapToFrame(const float time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere)
+qreal Project_sV::snapToFrame(const qreal time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere)
 {
     Q_ASSERT(time >= 0);
     int frameCount = 0;
@@ -233,7 +243,7 @@ float Project_sV::snapToFrame(const float time, bool roundUp, const Fps_sV &fps,
 
     return snapTime;
 }
-float Project_sV::snapToOutFrame(float time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere) const
+qreal Project_sV::snapToOutFrame(qreal time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere) const
 {
     if (time > m_nodes->endTime()) {
         time = m_nodes->endTime();

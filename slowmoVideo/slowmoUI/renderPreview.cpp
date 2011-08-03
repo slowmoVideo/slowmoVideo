@@ -53,7 +53,7 @@ void RenderPreview::notify(const QString message)
     }
 }
 
-void RenderPreview::slotRenderAt(float time)
+void RenderPreview::slotRenderAt(qreal time)
 {
     if (time >= m_project->nodes()->startTime() && time <= m_project->nodes()->endTime()) {
         notify(QString("Rendering preview at output time %1 s (might take some time) ...").arg(time));

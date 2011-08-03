@@ -51,7 +51,7 @@ void RenderTask_sV::setRenderTarget(AbstractRenderTarget_sV *renderTarget)
     m_renderTarget = renderTarget;
 }
 
-void RenderTask_sV::setTimeRange(float start, float end)
+void RenderTask_sV::setTimeRange(qreal start, qreal end)
 {
     Q_ASSERT(start <= end);
     Q_ASSERT(start >= m_project->nodes()->startTime());
@@ -89,7 +89,7 @@ void RenderTask_sV::slotContinueRendering()
     if (m_nextFrameTime < m_timeStart) {
         m_nextFrameTime = m_timeStart;
         int framesBefore;
-        float snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_fps, &framesBefore);
+        qreal snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_fps, &framesBefore);
         qDebug() << "Frame snapping in from " << m_nextFrameTime << " to " << snapped;
         m_nextFrameTime = snapped;
 

@@ -177,9 +177,9 @@ RenderTask_sV* RenderingDialog::buildTask()
 
         if (ui->radioTagSection->isChecked()) {
             bool b;
-            float start = ui->cbStartTag->itemData(ui->cbStartTag->currentIndex()).toFloat(&b);
+            qreal start = ui->cbStartTag->itemData(ui->cbStartTag->currentIndex()).toFloat(&b);
             Q_ASSERT(b);
-            float end = ui->cbEndTag->itemData(ui->cbEndTag->currentIndex()).toFloat(&b);
+            qreal end = ui->cbEndTag->itemData(ui->cbEndTag->currentIndex()).toFloat(&b);
             Q_ASSERT(b);
             qDebug() << QString("Rendering tag section from %1 (%2) to %3 (%4)")
                         .arg(ui->cbStartTag->currentText())
@@ -188,9 +188,9 @@ RenderTask_sV* RenderingDialog::buildTask()
             task->setTimeRange(start, end);
         } else if (ui->radioSection->isChecked()) {
             bool b;
-            float start = ui->timeStart->text().toFloat(&b);
+            qreal start = ui->timeStart->text().toFloat(&b);
             Q_ASSERT(b);
-            float end = ui->timeEnd->text().toFloat(&b);
+            qreal end = ui->timeEnd->text().toFloat(&b);
             Q_ASSERT(b);
             qDebug() << QString("Rendering time section from %1 (%2) to %3 (%4)")
                         .arg(ui->cbStartTag->currentText())
@@ -318,8 +318,8 @@ bool RenderingDialog::slotValidate()
     if (ui->radioSection->isChecked()) {
         bool startOk;
         bool endOk;
-        float timeStart = ui->timeStart->text().toFloat(&startOk);
-        float timeEnd = ui->timeEnd->text().toFloat(&endOk);
+        qreal timeStart = ui->timeStart->text().toDouble(&startOk);
+        qreal timeEnd = ui->timeEnd->text().toDouble(&endOk);
         startOk &= timeStart >= m_project->nodes()->startTime();
         endOk &= timeEnd <= m_project->nodes()->endTime();
         if (!startOk) {

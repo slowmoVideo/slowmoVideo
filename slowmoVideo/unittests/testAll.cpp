@@ -6,6 +6,7 @@
 #include "testDefs_sV.h"
 #include "testShutterFunction_sV.h"
 #include "testProject_sV.h"
+#include "testNodeList_sV.h"
 
 #include <QtTest/QtTest>
 
@@ -34,4 +35,7 @@ int main()
 
     TestProject_sV project;
     QTest::qExec(&project);
+
+    TestNodeList_sV nodes;
+    QTest::qExec(&nodes);
 }
