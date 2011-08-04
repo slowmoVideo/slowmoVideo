@@ -41,9 +41,8 @@ void printProgress(int)
 
 void printHelp()
 {
-    std::cout << "slowmoRenderer v" << Version_sV::version.toStdString() << std::endl
-              << "Usage:" << std::endl
-              << "" << myName.toStdString() << " <project>" << std::endl
+    std::cout << "slowmoRenderer for slowmoVideo " << Version_sV::version.toStdString() << std::endl
+              << myName.toStdString() << " <project>" << std::endl
               << "\t-target [video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
               << "\t-size [small|orig] " << std::endl
               << "\t-fps <fps> " << std::endl
@@ -79,13 +78,13 @@ int main(int argc, char *argv[])
 
     QStringList args = app.arguments();
     myName = args.at(0);
-    if (argc <= 1) {
+    if (argc <= 1
+            || "--help" == args.at(1) || "-h" == args.at(1)) {
         printHelp();
+        return 0;
     }
 
-    for (int i = 0; i < args.size(); i++) {
-        std::cout << i << ": " << args.at(i).toStdString() << std::endl;
-    }
+
 
     renderer.load(args.at(1));
 
