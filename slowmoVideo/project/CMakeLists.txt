@@ -5,6 +5,7 @@ set(SRCS_PROJ
   node_sV.cpp
   nodeList_sV.cpp
   segment_sV.cpp
+  segmentList_sV.cpp
   nodeHandle_sV.cpp
   renderTask_sV.cpp
   xmlProjectRW_sV.cpp

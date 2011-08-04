@@ -10,8 +10,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "segment_sV.h"
 
-Segment_sV::Segment_sV(int index) :
-    m_leftNodeIndex(index),
+Segment_sV::Segment_sV(int leftNodeIndex) :
+    m_leftNodeIndex(leftNodeIndex),
     m_selected(false)
 {
 }
@@ -29,4 +29,14 @@ bool Segment_sV::selected() const
 void Segment_sV::select(bool select)
 {
     m_selected = select;
+}
+
+bool Segment_sV::operator <(const Segment_sV& other) const
+{
+    return m_leftNodeIndex < other.m_leftNodeIndex;
+}
+
+QString toString(const Segment_sV &segment)
+{
+    return QString("Left node: %1; selected: %2").arg(segment.leftNodeIndex()).arg(segment.selected());
 }

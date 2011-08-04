@@ -102,7 +102,7 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
 QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size, bool highPrecision)
 {
     int precision = 2;
-    if (highPrecision) { precision = 6; }
+    if (highPrecision) { precision = 3; }
     int width = 5+1 + precision;
     QString name = QString("%2/cached%1.png").arg(framePos, width, 'f', precision, '0');
     if (size == FrameSize_Small) {

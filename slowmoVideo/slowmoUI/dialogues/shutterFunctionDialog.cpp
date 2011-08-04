@@ -71,6 +71,13 @@ void ShutterFunctionDialog::paintEvent(QPaintEvent *e)
     p.drawImage(ui->verticalLayout_code->contentsRect().topRight() - QPoint(img.width()+10, -10), img);
 }
 
+void ShutterFunctionDialog::closeEvent(QCloseEvent *e)
+{
+    m_project->nodes()->segments()->unselectAll();
+    parentWidget()->repaint();
+    QDialog::closeEvent(e);
+}
+
 void ShutterFunctionDialog::slotNodesUpdated()
 {
     qDebug() << "slotNodesUpdated();";
@@ -120,6 +127,10 @@ void ShutterFunctionDialog::setSegment(int segment)
             ui->cbFunction->setCurrentIndex(pos);
         }
     }
+
+    m_project->nodes()->segments()->unselectAll();
+    (*m_project->nodes()->segments())[m_segment].select();
+    parentWidget()->repaint();
 
     Q_ASSERT(m_segment >= 0);
 }

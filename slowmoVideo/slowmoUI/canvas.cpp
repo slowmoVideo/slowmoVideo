@@ -49,6 +49,7 @@ the Free Software Foundation, either version 3 of the License, or
 QColor Canvas::selectedCol  (  0, 175, 255, 100);
 QColor Canvas::hoverCol     (255, 175,   0, 200);
 QColor Canvas::lineCol      (255, 255, 255);
+QColor Canvas::selectedLineCol(255, 175,   0, 200);
 QColor Canvas::nodeCol      (240, 240, 240);
 QColor Canvas::gridCol      (255, 255, 255,  30);
 QColor Canvas::fatGridCol   (255, 255, 255,  60);
@@ -88,6 +89,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     setContextMenuPolicy(Qt::DefaultContextMenu);
 
     m_states.prevMousePos = QPoint(0,0);
+    m_states.contextmenuMouseTime = QPointF(0,0);
     m_states.initialContextObject = NULL;
 
     Q_ASSERT(m_secResX > 0);
@@ -234,13 +236,13 @@ void Canvas::paintEvent(QPaintEvent *)
     for (int tx = ceil(m_t0.x()); true; tx++) {
         QPoint pos = convertTimeToCanvas(Node_sV(tx, m_t0.y()));
         if (insideCanvas(pos)) {
-            drawLine = m_secResX >= 4;
+            drawLine = m_secResX >= 7.5;
             if (tx%60 == 0) {
                 davinci.setPen(minGridCol);
                 drawLine = true;
             } else if (tx%10 == 0) {
                 davinci.setPen(fatGridCol);
-                drawLine = m_secResX >= .7;
+                drawLine = m_secResX >= .75;
             } else {
                 davinci.setPen(gridCol);
             }
@@ -256,13 +258,13 @@ void Canvas::paintEvent(QPaintEvent *)
     for (int ty = ceil(m_t0.y()); true; ty++) {
         QPoint pos = convertTimeToCanvas(Node_sV(m_t0.x(), ty));
         if (insideCanvas(pos)) {
-            drawLine = m_secResY >= 4;
+            drawLine = m_secResY >= 7.5;
             if (ty%60 == 0) {
                 davinci.setPen(minGridCol);
                 drawLine = true;
             } else if (ty%10 == 0) {
                 davinci.setPen(fatGridCol);
-                drawLine = m_secResX >= .7;
+                drawLine = m_secResX >= .75;
             } else {
                 davinci.setPen(gridCol);
             }
@@ -361,7 +363,11 @@ void Canvas::paintEvent(QPaintEvent *)
         }
         davinci.drawRect(p.x()-NODE_RADIUS, p.y()-NODE_RADIUS, 2*NODE_RADIUS+1, 2*NODE_RADIUS+1);
         if (prev != NULL) {
-            davinci.setPen(lineCol);
+            if (m_project->nodes()->segments()->at(i-1).selected()) {
+                davinci.setPen(selectedLineCol);
+            } else {
+                davinci.setPen(lineCol);
+            }
             if (prev->rightCurveType() == CurveType_Bezier && curr->leftCurveType() == CurveType_Bezier) {
                 QPainterPath path;
                 path.moveTo(convertTimeToCanvas(*prev));
@@ -606,6 +612,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
 void Canvas::contextMenuEvent(QContextMenuEvent *e)
 {
     qDebug() << "Context menu requested";
+    m_states.contextmenuMouseTime = convertCanvasToTime(e->pos()).toQPointF();
+
     QMenu menu;
 
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
@@ -662,6 +670,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_secResX < .05) { m_secResX = .05; }
         // Y resolution is the same as X resolution (at least at the moment)
         m_secResY = m_secResX;
+        qDebug() << "Resolution: " << m_secResX;
 
         // Adjust t0 such that the mouse points to the same time as before
         Node_sV nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
@@ -868,7 +877,7 @@ void Canvas::slotSet1xSpeed()
 }
 void Canvas::slotSetShutterFunction()
 {
-    int left = m_nodes->find(convertDistanceToTime(QPoint(m_states.prevMousePos.x(), 0)).x());
+    int left = m_nodes->find(m_states.contextmenuMouseTime.x());
     if (left == m_nodes->size()-1) {
         left = m_nodes->size()-2;
     }

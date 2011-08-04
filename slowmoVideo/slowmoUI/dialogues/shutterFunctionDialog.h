@@ -38,6 +38,7 @@ public slots:
 
 protected slots:
     virtual void paintEvent(QPaintEvent *e);
+    virtual void closeEvent(QCloseEvent *e);
 
 private:
     static QString emptyFunction;

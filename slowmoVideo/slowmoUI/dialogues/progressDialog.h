@@ -7,6 +7,7 @@ namespace Ui {
     class ProgressDialog;
 }
 
+/// \todo Close when finished (checkbox)
 class ProgressDialog : public QDialog
 {
     Q_OBJECT

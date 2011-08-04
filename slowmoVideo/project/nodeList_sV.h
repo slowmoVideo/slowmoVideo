@@ -12,7 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define NODELIST_SV_H
 
 #include "node_sV.h"
-#include "segment_sV.h"
+#include "segmentList_sV.h"
 #include "canvasObject_sV.h"
 #include "../lib/defs_sV.hpp"
 
@@ -39,7 +39,7 @@ public:
     struct PointerWithDistance {
 
         /// Defines the order on object types. Nodes will come first in a sorted list.
-        enum ObjectType { Node = 1, Handle = 2, Tag = 3, Segment = 4 };
+        enum ObjectType { Node = 1, Handle = 2, Segment = 3, Tag = 4 };
         /// Pointer to the object
         const CanvasObject_sV* ptr;
         /// Distance to the object from the search position (e.g. mouse position)
@@ -152,10 +152,12 @@ public:
       */
     bool validate() const;
 
+    SegmentList_sV* segments();
+
 private:
     qreal m_maxY;
     QList<Node_sV> m_list;
-    QList<Segment_sV> m_segments;
+    SegmentList_sV m_segments;
     const float m_minDist;
 
     qreal bezierSourceTime(qreal targetTime, QPointF p0, QPointF p1, QPointF p2, QPointF p3) const;

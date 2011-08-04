@@ -125,7 +125,7 @@ bool NodeList_sV::add(Node_sV node)
         qSort(m_list);
 
         if (m_list.size() > 1) {
-            m_segments.append(Segment_sV(m_list.size()-2));
+            m_segments.grow();
         }
 
         // Reset curve type of neighbours if this is a linear node
@@ -155,7 +155,7 @@ uint NodeList_sV::deleteSelected()
         if (m_list.at(i).selected()) {
             m_list.removeOne(m_list.at(i));
             if (m_list.size() > 0) {
-                m_segments.removeLast();
+                m_segments.shrink();
             }
             counter++;
         } else {
@@ -171,7 +171,7 @@ void NodeList_sV::deleteNode(int index)
     Q_ASSERT(index < m_list.size());
     if (m_list.size() > 0) {
         if (m_list.size() > 1) {
-            m_segments.removeLast();
+            m_segments.shrink();
         }
         m_list.removeAt(index);
     }
@@ -538,7 +538,7 @@ QList<NodeList_sV::PointerWithDistance> NodeList_sV::objectsNear(QPointF pos, qr
         }
         if (i > 0) {
             if (m_list.at(i-1).x() < pos.x() && m_list.at(i).x() > pos.x()) {
-                objects << PointerWithDistance(&m_segments[i-1], std::pow(sourceTime(pos.x()) - pos.y(), 2), PointerWithDistance::Segment);
+                objects << PointerWithDistance(&m_segments.at(i-1), std::pow(sourceTime(pos.x()) - pos.y(), 2), PointerWithDistance::Segment);
             }
         }
     }
@@ -570,6 +570,11 @@ int NodeList_sV::nodeAfter(qreal time) const
 const Node_sV& NodeList_sV::at(int i) const { return m_list.at(i); }
 Node_sV& NodeList_sV::operator[](int i) { return m_list[i]; }
 int NodeList_sV::size() const { return m_list.size(); }
+
+SegmentList_sV* NodeList_sV::segments()
+{
+    return &m_segments;
+}
 
 
 

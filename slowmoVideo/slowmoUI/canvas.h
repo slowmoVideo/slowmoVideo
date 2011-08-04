@@ -45,6 +45,7 @@ class Project_sV;
 
   \todo Check bézier curve consistency (with internal bézier calculator)
   \todo Frame lines on high zoom
+  \todo Custom speed factor to next node
   */
 class Canvas : public QWidget
 {
@@ -58,6 +59,7 @@ public:
     enum Abort { Abort_General, Abort_Selection };
 
     static QColor lineCol;
+    static QColor selectedLineCol;
     static QColor nodeCol;
     static QColor gridCol;
     static QColor fatGridCol;
@@ -128,6 +130,7 @@ private:
 
         QPoint prevMousePos;
         QPoint initialMousePos;
+        QPointF contextmenuMouseTime;
 
         Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;

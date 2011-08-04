@@ -526,6 +526,12 @@ void MainWindow::slotShowRenderDialog()
     RenderingDialog renderingDialog(m_project, this);
     if (renderingDialog.exec() == QDialog::Accepted) {
         RenderTask_sV *task = renderingDialog.buildTask();
+
+        if (m_project->renderTask() != NULL) {
+            bool b = true;
+            b &= disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
+            Q_ASSERT(b);
+        }
         m_project->replaceRenderTask(task);
 
         if (m_renderProgressDialog == NULL) {
@@ -544,12 +550,13 @@ void MainWindow::slotShowRenderDialog()
         b &= connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
         b &= connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
         b &= connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
+        b &= connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
         // TODO continue/abort
         Q_ASSERT(b);
 
         m_renderProgressDialog->show();
 
-        task->slotContinueRendering();
+        emit signalRendererContinue();
 
     }
 }

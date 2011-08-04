@@ -137,6 +137,7 @@ signals:
     void setMode(const Canvas::ToolMode mode);
     void abort(const Canvas::Abort abort);
     void addTag();
+    void signalRendererContinue();
 
 };
 

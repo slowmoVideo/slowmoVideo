@@ -26,6 +26,7 @@ public:
 
 /**
   \brief Renders motion blur
+  \todo Force fast/slow blurring for a segment?
   */
 class MotionBlur_sV
 {
