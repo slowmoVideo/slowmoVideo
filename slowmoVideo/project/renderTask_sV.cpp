@@ -25,7 +25,8 @@ RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_fps(24),
     m_initialized(false),
     m_stopRendering(false),
-    m_prevTime(-1)
+    m_prevTime(-1),
+    m_connectionType(Qt::QueuedConnection)
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
@@ -78,6 +79,11 @@ void RenderTask_sV::setInterpolationType(const InterpolationType interpolation)
     m_interpolationType = interpolation;
 }
 
+void RenderTask_sV::setQtConnectionType(Qt::ConnectionType type)
+{
+    m_connectionType = type;
+}
+
 void RenderTask_sV::slotStopRendering()
 {
     m_stopRendering = true;
@@ -110,7 +116,7 @@ void RenderTask_sV::slotContinueRendering()
     m_stopwatch.start();
     emit signalRenderingContinued();
     emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
-    bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::AutoConnection, Q_ARG(qreal, m_nextFrameTime));
+    bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     if (!b) {
         qDebug() << "invokeMethod returned false.";
     }
@@ -167,7 +173,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
     }
     if (!m_stopRendering) {
-        QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::AutoConnection, Q_ARG(qreal, m_nextFrameTime));
+        QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     }
 }
 

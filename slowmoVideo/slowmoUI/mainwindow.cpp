@@ -525,7 +525,9 @@ void MainWindow::slotShowRenderDialog()
 {
     RenderingDialog renderingDialog(m_project, this);
     if (renderingDialog.exec() == QDialog::Accepted) {
+
         RenderTask_sV *task = renderingDialog.buildTask();
+        task->moveToThread(&m_rendererThread);
 
         if (m_project->renderTask() != NULL) {
             bool b = true;
@@ -533,6 +535,7 @@ void MainWindow::slotShowRenderDialog()
             Q_ASSERT(b);
         }
         m_project->replaceRenderTask(task);
+
 
         if (m_renderProgressDialog == NULL) {
             m_renderProgressDialog = new ProgressDialog(this);
@@ -557,6 +560,7 @@ void MainWindow::slotShowRenderDialog()
         m_renderProgressDialog->show();
 
         emit signalRendererContinue();
+        m_rendererThread.start();
 
     }
 }

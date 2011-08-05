@@ -21,7 +21,6 @@ class AbstractRenderTarget_sV;
 
 /**
   \brief Renders a project when started.
-  \todo Changes in the project affect the rendering as well. Copy the project? Additional executable?
   */
 class RenderTask_sV : public QObject
 {
@@ -37,6 +36,7 @@ public:
     /**
       \fn setTimeRange()
       Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
+      \todo Accept other formats: f:123 for frames, t:Tag for tags
       */
     /**
       \fn setFPS()
@@ -51,6 +51,8 @@ public:
     void setFPS(const Fps_sV fps);
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
+
+    void setQtConnectionType(Qt::ConnectionType type);
 
     /// Rendered frames per second
     Fps_sV fps() { return m_fps; }
@@ -94,6 +96,8 @@ private:
     qreal m_nextFrameTime;
 
     qreal m_prevTime;
+
+    Qt::ConnectionType m_connectionType;
 
 private slots:
     void slotRenderFrom(qreal time);

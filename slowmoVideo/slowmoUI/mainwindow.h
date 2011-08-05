@@ -21,10 +21,11 @@ namespace Ui {
     class MainWindow;
 }
 
-#include <QMainWindow>
-#include <QMap>
-#include <QList>
-#include <QTime>
+#include <QtGui/QMainWindow>
+#include <QtCore/QMap>
+#include <QtCore/QList>
+#include <QtCore/QTime>
+#include <QtCore/QThread>
 
 class Canvas;
 class ProgressDialog;
@@ -95,6 +96,8 @@ private:
     QSignalMapper *m_signalMapper;
     QList<QShortcut *> m_shortcutList;
     QMap<int, QString> m_keyList;
+
+    QThread m_rendererThread;
 
 
 
