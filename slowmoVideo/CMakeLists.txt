@@ -70,9 +70,11 @@ endif(NOT BUILD_SLOWMO)
 ## Include projects to build ##
 
 add_subdirectory(lib)
+add_subdirectory(libgui)
 add_subdirectory(project)
 add_subdirectory(slowmoCLI)
 add_subdirectory(slowmoUI)
+add_subdirectory(slowmoFlowEdit)
 add_subdirectory(slowmoInfo)
 add_subdirectory(slowmoRenderer)
 add_subdirectory(visualizeFlow)

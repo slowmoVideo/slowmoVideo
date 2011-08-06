@@ -97,10 +97,17 @@ QPointF ImageDisplay::convertCanvasToImage(QPoint p) const
 void ImageDisplay::mousePressEvent(QMouseEvent *e)
 {
     m_states.mouseInitialImagePos = convertCanvasToImage(e->pos());
+    m_states.mousePrevPos = e->pos();
+    m_states.manhattan = 0;
 }
 
 void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
 {
+    if (e->buttons().testFlag(Qt::LeftButton)) {
+        m_states.manhattan += (e->pos()-m_states.mousePrevPos).manhattanLength();
+    }
+    m_states.mousePrevPos = e->pos();
+
     if (!m_aScaling->isChecked()) {
         if (e->buttons().testFlag(Qt::MiddleButton)) {
             // Move the viewport
@@ -125,6 +132,22 @@ void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
             // To get back the original image coordinates, the mouse coordinates have to unscaled.
             emit signalMouseMoved(x/scalingFactor, y/scalingFactor);
         }
+    }
+}
+void ImageDisplay::mouseReleaseEvent(QMouseEvent *e)
+{
+    QPointF p0 = m_states.mouseInitialImagePos;
+    QPointF releasePos = convertCanvasToImage(e->pos());
+
+    QPointF minPoint = min(p0, releasePos, true);
+    QPointF maxPoint = max(p0, releasePos, true);
+
+    qDebug() << p0 << releasePos << minPoint << maxPoint;
+    QRectF mouseRect(minPoint, maxPoint);
+
+
+    if (m_states.countsAsMove()) {
+        emit signalRectDrawn(mouseRect);
     }
 }
 
@@ -190,4 +213,31 @@ void ImageDisplay::slotExportImage()
         m_image.save(dialog.selectedFiles().at(0));
         settings.setValue("directories/imageDisplay", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
     }
+}
+
+
+
+
+qreal ImageDisplay::clamp(qreal val, qreal min, qreal max) const
+{
+    return (val < min) ? min :  ( (val > max) ? max : val );
+}
+QPointF ImageDisplay::max(QPointF p1, QPointF p2, bool limitToImage) const
+{
+    QPointF p(qMax(p1.x(), p2.x()), qMax(p1.y(), p2.y()));
+    if (limitToImage) {
+        p.rx() = clamp(p.x(), 0, m_image.width()-1);
+        p.ry() = clamp(p.y(), 0, m_image.height()-1);
+    }
+    return p;
+}
+
+QPointF ImageDisplay::min(QPointF p1, QPointF p2, bool limitToImage) const
+{
+    QPointF p(qMin(p1.x(), p2.x()), qMin(p1.y(), p2.y()));
+    if (limitToImage) {
+        p.rx() = clamp(p.x(), 0, m_image.width()-1);
+        p.ry() = clamp(p.y(), 0, m_image.height()-1);
+    }
+    return p;
 }

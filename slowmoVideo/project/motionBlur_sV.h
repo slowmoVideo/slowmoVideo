@@ -22,11 +22,13 @@ public:
     RangeTooSmallError_sV(QString msg) : Error_sV(msg) {}
 };
 
-#define MOTIONBLUR_PRECISION_LIMIT .001
+/// If a frame is closer than this to a full frame, the full frame will be used instead.
+#define MOTIONBLUR_PRECISION_LIMIT .01
 
 /**
   \brief Renders motion blur
-  \todo Force fast/slow blurring for a segment?
+  \todo Force fast blurring for a segment?
+  \todo Use .jpg for cached frames?
   */
 class MotionBlur_sV
 {

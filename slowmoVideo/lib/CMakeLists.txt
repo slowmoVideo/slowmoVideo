@@ -47,18 +47,18 @@ set(HEADERS
 
 
 
-add_library(sV STATIC ${LIB_SRC_BASE})
+add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
 
-add_library(sVinfo STATIC ${LIB_SRC_VIDEO})
+add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode STATIC ffmpegEncode_sV.c)
+add_library(sVencode  STATIC ffmpegEncode_sV.c)
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 
 add_library(sVflow  STATIC ${LIB_SRC_FLOW})
 
-add_library(sVvis STATIC ${LIB_SRC_FLOWVIS})
+add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
 target_link_libraries(sVvis  sVflow ${QT_LIBRARIES})
 
 

@@ -88,8 +88,12 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
 
     QStringList frameList;
     float increment = (high-low)/(m_slowmoSamples-1);
+    if (increment < .1) {
+        qDebug() << "slowmoBlur(): Increasing distance from " << increment << " to .1";
+        increment = .1;
+    }
     if (increment > m_slowmoMaxFrameDist) {
-        qDebug() << "Increasing distance from " << increment << " to " << m_slowmoMaxFrameDist;
+        qDebug() << "slowmoBlur(): Decreasing distance from " << increment << " to " << m_slowmoMaxFrameDist;
         increment = m_slowmoMaxFrameDist;
     }
     for (float pos = low; pos <= high; pos += increment) {
@@ -102,7 +106,7 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
 QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size, bool highPrecision)
 {
     int precision = 2;
-    if (highPrecision) { precision = 3; }
+    if (highPrecision) { precision = 2; } /// \todo check precision
     int width = 5+1 + precision;
     QString name = QString("%2/cached%1.png").arg(framePos, width, 'f', precision, '0');
     if (size == FrameSize_Small) {

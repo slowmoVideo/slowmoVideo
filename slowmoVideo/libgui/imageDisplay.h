@@ -42,12 +42,14 @@ public slots:
 
 signals:
     void signalMouseMoved(float x, float y);
+    void signalRectDrawn(QRectF imageRect);
 
 protected slots:
     virtual void paintEvent(QPaintEvent *e);
     virtual void contextMenuEvent(QContextMenuEvent *e);
     virtual void mousePressEvent(QMouseEvent *e);
     virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void mouseReleaseEvent(QMouseEvent *e);
     virtual void wheelEvent(QWheelEvent *e);
 
 private:
@@ -62,10 +64,21 @@ private:
 
     struct {
         QPointF mouseInitialImagePos;
+
+        QPoint mousePrevPos;
+
+        int manhattan;
+
+        bool countsAsMove() { return manhattan > 4; }
+
     } m_states;
 
     QPointF convertCanvasToImage(QPoint p) const;
     QPointF convertCanvasToPixel(QPoint p) const;
+
+    qreal clamp(qreal val, qreal min, qreal max) const;
+    QPointF max(QPointF p1, QPointF p2, bool limitToImage) const;
+    QPointF min(QPointF p1, QPointF p2, bool limitToImage) const;
 
 private slots:
     void slotExportImage();

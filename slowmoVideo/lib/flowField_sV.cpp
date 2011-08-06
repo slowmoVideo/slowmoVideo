@@ -51,6 +51,15 @@ float FlowField_sV::y(int x, int y) const
     return m_data[2*(y*m_width+x)+1];
 }
 
+float& FlowField_sV::rx(int x, int y)
+{
+    return m_data[2*(y*m_width+x)+0];
+}
+float& FlowField_sV::ry(int x, int y)
+{
+    return m_data[2*(y*m_width+x)+1];
+}
+
 void FlowField_sV::setX(int x, int y, float value)
 {
     m_data[2*(y*m_width+x)+0] = value;

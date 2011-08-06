@@ -43,7 +43,6 @@ class Project_sV;
 /**
   \brief Canvas for drawing motion curves.
 
-  \todo Check bézier curve consistency (with internal bézier calculator)
   \todo Frame lines on high zoom
   \todo Custom speed factor to next node
   */

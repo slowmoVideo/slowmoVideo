@@ -12,7 +12,6 @@ set(SRCS
   canvas.cpp
   frameMonitor.cpp
   renderPreview.cpp
-  imageDisplay.cpp
   dialogues/newProjectDialog.cpp
   dialogues/preferencesDialog.cpp
   dialogues/progressDialog.cpp
@@ -44,7 +43,6 @@ set(SRCS_MOC
   canvas.h
   frameMonitor.h
   renderPreview.h
-  imageDisplay.h
   dialogues/newProjectDialog.h
   dialogues/preferencesDialog.h
   dialogues/progressDialog.h
@@ -60,9 +58,9 @@ set(SRCS_MOC
 # since the headers are not found. (For whatever reason.)
 include_directories(dialogues)
 include_directories(.)
+include_directories(${slowmoVideo_SOURCE_DIR}/libgui)
 
 set(RES
-  #res/iconAdd.png
   res/iconSel.png
   res/iconMov.png
   res/shutterFunction.png
@@ -77,7 +75,7 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
 add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT})
-target_link_libraries(slowmoUI sVproj sVvis ${QT_LIBRARIES})
+target_link_libraries(slowmoUI sVproj sVvis sVgui ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
 install(FILES ${RES} DESTINATION bin/res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

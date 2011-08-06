@@ -78,7 +78,34 @@ void testQtScript()
     qDebug() << fx.call(QScriptValue(), args).toString();
 }
 
+void testRegex()
+{
+    QStringList parts;
+    QRegExp e("(\\d+)");
+    QString str("forward-lambda20.0_1234_2345.sVflow");
+    int min = str.indexOf("_");
+    int pos = 0;
+    int prevPos = 0;
+    while ((pos = e.indexIn(str, pos)) != -1) {
+        qDebug() << str.mid(prevPos, pos-prevPos);
+        parts << str.mid(prevPos, pos-prevPos);
+
+        if (pos > min) {
+            parts << QVariant(e.cap(1).toInt()+1).toString();
+        } else {
+            parts << e.cap(1);
+        }
+        qDebug() << e.cap(1) << " at " << pos;
+
+        pos += e.matchedLength();
+        prevPos = pos;
+    }
+    qDebug() << str.mid(prevPos);
+    parts << str.mid(prevPos);
+    qDebug() << "Next: " << parts.join("");
+}
+
 int main()
 {
-    testQtScript();
+    testRegex();
 }
