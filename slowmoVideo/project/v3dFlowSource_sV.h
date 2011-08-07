@@ -24,7 +24,6 @@ public:
 
 
     FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
-    /// \todo Make path based on project name and creation date and lambda
     const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
 
 public slots:
@@ -35,6 +34,8 @@ private:
     QDir m_dirFlowOrig;
 
     float m_lambda;
+
+    void createDirectories();
 
 };
 

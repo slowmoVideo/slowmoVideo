@@ -15,6 +15,8 @@ class FlowField_sV;
 
 /**
   \brief Counterpart to an Optical Flow field, says where a pixel came from.
+
+  \todo Reversing vectors: Take smallest one?
   */
 class SourceField_sV
 {
@@ -55,7 +57,7 @@ public:
 
     /**
       Represents a source flow pixel.
-      For a Source at <pre>(x|y)</pre>, the pixel at <pre>(x|y)</pre> originated at <pre>(fromX|fromY)</pre>.
+      For a Source at <code>(x|y)</code>, the pixel at <code>(x|y)</code> originated at <code>(fromX|fromY)</code>.
       This value usually is a float and the colour at its location should therefore be interpolated to avoid aliasing artifacts.
       */
     struct Source {
@@ -79,13 +81,14 @@ public:
     Source *m_field;
 
 
-    /// Returns the Source at the given coordinates, for calculating the colour at <pre>(x|y)</pre>.
+    /// Returns the Source at the given coordinates, for calculating the colour at <code>(x|y)</code>.
     inline Source& at(int x, int y)
     {
         return m_field[m_width*y + x];
     }
 
     void inpaint();
+    void fixFlow(const FlowField_sV *flowOtherDirection);
 
 private:
     int m_width;

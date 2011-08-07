@@ -21,6 +21,7 @@ VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QStrin
 throw(FrameSourceError) :
     AbstractFrameSource_sV(project),
     m_inFile(filename),
+    m_fps(1,1),
     m_ffmpegSemaphore(1),
     m_initialized(false)
 {
@@ -35,19 +36,21 @@ throw(FrameSourceError) :
         qDebug() << "Video info is invalid: " << filename;
         throw FrameSourceError("Video is invalid, no streams found: " + filename);
     }
+    m_fps = Fps_sV(m_videoInfo->frameRateNum, m_videoInfo->frameRateDen);
 
     QProcess ffmpeg(this);
     QStringList args;
     args << "-version";
     ffmpeg.start("ffmpeg", args);
-    ffmpeg.waitForFinished(1000);
+    ffmpeg.waitForFinished(2000);
     QByteArray output = ffmpeg.readAllStandardOutput();
     if (output.size() == 0) {
-        throw FrameSourceError("ffmpeg executable not found! Cannot load " + filename);
+        throw FrameSourceError(QString("ffmpeg executable not found! Cannot load %1."
+                                       "\n(It is also possible that it took a little long to respond "
+                                       "due to high workload, so you might want to try again.)").arg(filename));
     }
 
-    m_dirFramesSmall = project->getDirectory("framesSmall");
-    m_dirFramesOrig = project->getDirectory("framesOrig");
+    createDirectories();
 
     m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
@@ -68,9 +71,13 @@ void VideoFrameSource_sV::slotUpdateProjectDir()
     // Delete old directories if they are empty
     m_dirFramesSmall.rmdir(".");
     m_dirFramesOrig.rmdir(".");
+    createDirectories();
+}
 
-    m_dirFramesSmall = project()->getDirectory("framesSmall");
-    m_dirFramesOrig = project()->getDirectory("framesOrig");
+void VideoFrameSource_sV::createDirectories()
+{
+    m_dirFramesSmall = project()->getDirectory("frames/small");
+    m_dirFramesOrig = project()->getDirectory("frames/orig");
 }
 
 void VideoFrameSource_sV::initialize()
@@ -89,13 +96,9 @@ int64_t VideoFrameSource_sV::framesCount() const
 {
     return m_videoInfo->framesCount;
 }
-int VideoFrameSource_sV::frameRateNum() const
+const Fps_sV* VideoFrameSource_sV::fps() const
 {
-    return m_videoInfo->frameRateNum;
-}
-int VideoFrameSource_sV::frameRateDen() const
-{
-    return m_videoInfo->frameRateDen;
+    return &m_fps;
 }
 QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {

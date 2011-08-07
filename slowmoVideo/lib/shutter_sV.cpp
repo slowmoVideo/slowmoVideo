@@ -13,6 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QStringList>
 
+#include <algorithm>
+
 QImage Shutter_sV::combine(QStringList images)
 {
     Q_ASSERT(images.size() > 0);
@@ -26,7 +28,8 @@ QImage Shutter_sV::combine(QStringList images)
     matrix /= images.size();
 
     unsigned char *bytes = matrix.toBytesArray();
-    QImage result(bytes, matrix.width(), matrix.height(), QImage::Format_ARGB32);
+    QImage result(matrix.width(), matrix.height(), QImage::Format_ARGB32);
+    std::copy(bytes, bytes+matrix.width()*matrix.height()*matrix.channels()+1, result.bits());
     delete bytes;
 
     return result;

@@ -11,7 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef RENDERTASK_SV_H
 #define RENDERTASK_SV_H
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QTime>
 
 #include "../lib/defs_sV.hpp"
 
@@ -20,14 +21,12 @@ class AbstractRenderTarget_sV;
 
 /**
   \brief Renders a project when started.
-  \todo Changes in the project affect the rendering as well. Copy the project?
-  \todo Time range for rendering (markers?)
   */
 class RenderTask_sV : public QObject
 {
     Q_OBJECT
 public:
-    RenderTask_sV(const Project_sV *project);
+    RenderTask_sV(Project_sV *project);
     ~RenderTask_sV();
 
     /**
@@ -36,7 +35,8 @@ public:
       */
     /**
       \fn setTimeRange()
-      Sets the time range for rendering. By default, the whole project is rendered.
+      Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
+      \todo Accept other formats: f:123 for frames, t:Tag for tags
       */
     /**
       \fn setFPS()
@@ -47,13 +47,15 @@ public:
       Sets the size to use for rendering.
       */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
-    void setTimeRange(float start, float end);
-    void setFPS(float fps);
+    void setTimeRange(qreal start, qreal end);
+    void setFPS(const Fps_sV fps);
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
 
+    void setQtConnectionType(Qt::ConnectionType type);
+
     /// Rendered frames per second
-    float fps() { return m_fps; }
+    Fps_sV fps() { return m_fps; }
     /// Output frame resolution
     QSize resolution() { return m_resolution; }
 
@@ -68,20 +70,23 @@ signals:
     void signalItemDesc(QString desc);
     void signalTaskProgress(int value);
     void signalRenderingContinued();
-    void signalRenderingStopped();
-    void signalRenderingFinished();
+    void signalRenderingStopped(QString renderTime);
+    void signalRenderingFinished(QString renderTime);
     void signalRenderingAborted(QString reason);
 
     void signalFrameRendered(qreal time, int frameNumber);
 
 private:
-    const Project_sV *m_project;
+    Project_sV *m_project;
     AbstractRenderTarget_sV *m_renderTarget;
 
-    float m_timeStart;
-    float m_timeEnd;
+    qreal m_timeStart;
+    qreal m_timeEnd;
 
-    float m_fps;
+    QTime m_stopwatch;
+    int m_renderTimeElapsed;
+
+    Fps_sV m_fps;
     QSize m_resolution;
     FrameSize m_frameSize;
     InterpolationType m_interpolationType;
@@ -91,6 +96,8 @@ private:
     qreal m_nextFrameTime;
 
     qreal m_prevTime;
+
+    Qt::ConnectionType m_connectionType;
 
 private slots:
     void slotRenderFrom(qreal time);

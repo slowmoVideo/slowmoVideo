@@ -12,22 +12,25 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "project_sV.h"
 #include "projectPreferences_sV.h"
-#include "nodelist_sV.h"
+#include "shutterFunctionList_sV.h"
+#include "shutterFunction_sV.h"
+#include "nodeList_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "imagesFrameSource_sV.h"
-#include "../lib/defs_sV.hpp"
+#include "motionBlur_sV.h"
 
 #include <QDebug>
 #include <QTextStream>
 #include <QXmlQuery>
 
 
-int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
+int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Error_sV)
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
-    root.setAttribute("version", "2");
+    root.setAttribute("version", SLOWMOPROJECT_VERSION_MAJOR);
+    root.setAttribute("version_minor", SLOWMOPROJECT_VERSION_MINOR);
     doc.appendChild(root);
 
     // File info
@@ -35,41 +38,77 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     root.appendChild(info);
     QDomElement appName = doc.createElement("appName");
     appName.appendChild(doc.createTextNode("slowmoVideo"));
+    QDomElement version = doc.createElement("version");
+    version.setAttribute("major", SLOWMOVIDEO_VERSION_MAJOR);
+    version.setAttribute("minor", SLOWMOVIDEO_VERSION_MINOR);
+    version.setAttribute("micro", SLOWMOVIDEO_VERSION_MICRO);
     info.appendChild(appName);
+    info.appendChild(version);
 
 
+    ProjectPreferences_sV *pr = project->preferences();
     // Project Preferences
     QDomElement preferences = doc.createElement("preferences");
     root.appendChild(preferences);
+    QDomElement renderSectionMode = doc.createElement("renderSectionMode");
+    QDomElement renderStartTag = doc.createElement("renderStartTag");
+    QDomElement renderEndTag = doc.createElement("renderEndTag");
+    QDomElement renderStartTime = doc.createElement("renderStartTime");
+    QDomElement renderEndTime = doc.createElement("renderEndTime");
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
     QDomElement renderFPS = doc.createElement("renderFPS");
+    QDomElement renderSlowmoSamples = doc.createElement("renderSlowmoSamples");
+    QDomElement renderMaxSamples = doc.createElement("renderMaxSamples");
+    QDomElement renderTarget = doc.createElement("renderTarget");
     QDomElement imagesOutputDir = doc.createElement("imagesOutputDir");
     QDomElement imagesFilenamePattern = doc.createElement("imagesFilenamePattern");
     QDomElement videoFilename = doc.createElement("videoFilename");
+    QDomElement videoCodec = doc.createElement("videoCodec");
+    QDomElement flowV3dLambda = doc.createElement("flowV3dLambda");
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
+    preferences.appendChild(renderSectionMode);
+    renderSectionMode.appendChild(renderStartTag);
+    renderSectionMode.appendChild(renderEndTag);
+    renderSectionMode.appendChild(renderStartTime);
+    renderSectionMode.appendChild(renderEndTime);
     preferences.appendChild(renderFrameSize);
     preferences.appendChild(renderInterpolation);
     preferences.appendChild(renderFPS);
+    preferences.appendChild(renderSlowmoSamples);
+    preferences.appendChild(renderMaxSamples);
+    preferences.appendChild(renderTarget);
     preferences.appendChild(imagesOutputDir);
     preferences.appendChild(imagesFilenamePattern);
     preferences.appendChild(videoFilename);
+    preferences.appendChild(videoCodec);
+    preferences.appendChild(flowV3dLambda);
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
-    renderFrameSize.setAttribute("size", project->preferences()->renderFrameSize());
-    renderInterpolation.setAttribute("type", project->preferences()->renderInterpolationType());
-    renderFPS.setAttribute("fps", project->preferences()->renderFPS());
-    imagesOutputDir.setAttribute("dir", project->preferences()->imagesOutputDir());
-    imagesFilenamePattern.setAttribute("pattern", project->preferences()->imagesFilenamePattern());
-    videoFilename.setAttribute("file", project->preferences()->videoFilename());
-    prevTagAxis.setAttribute("axis", QVariant(project->preferences()->lastSelectedTagAxis()).toString());
-    viewport_t0.setAttribute("x", project->preferences()->viewport_t0().x());
-    viewport_t0.setAttribute("y", project->preferences()->viewport_t0().y());
-    viewport_secRes.setAttribute("x", project->preferences()->viewport_secRes().x());
-    viewport_secRes.setAttribute("y", project->preferences()->viewport_secRes().y());
+    renderSectionMode.setAttribute("mode", pr->renderSectionMode());
+    renderStartTag.setAttribute("label", pr->renderStartTag());
+    renderEndTag.setAttribute("label", pr->renderEndTag());
+    renderStartTime.setAttribute("time", pr->renderStartTime());
+    renderEndTime.setAttribute("time", pr->renderEndTime());
+    renderFrameSize.setAttribute("size", pr->renderFrameSize());
+    renderInterpolation.setAttribute("type", pr->renderInterpolationType());
+    renderFPS.setAttribute("fps", pr->renderFPS().toString());
+    renderSlowmoSamples.setAttribute("number", project->motionBlur()->slowmoSamples());
+    renderMaxSamples.setAttribute("number", project->motionBlur()->maxSamples());
+    renderTarget.setAttribute("target", pr->renderTarget());
+    imagesOutputDir.setAttribute("dir", pr->imagesOutputDir());
+    imagesFilenamePattern.setAttribute("pattern", pr->imagesFilenamePattern());
+    videoFilename.setAttribute("file", pr->videoFilename());
+    videoCodec.setAttribute("codec", pr->videoCodec());
+    flowV3dLambda.setAttribute("lambda", pr->flowV3DLambda());
+    prevTagAxis.setAttribute("axis", QVariant(pr->lastSelectedTagAxis()).toString());
+    viewport_t0.setAttribute("x", pr->viewport_t0().x());
+    viewport_t0.setAttribute("y", pr->viewport_t0().y());
+    viewport_secRes.setAttribute("x", pr->viewport_secRes().x());
+    viewport_secRes.setAttribute("y", pr->viewport_secRes().y());
 
 
     // Project Resources
@@ -79,6 +118,19 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
     projectDir.appendChild(doc.createTextNode(project->getDirectory(".", false).absolutePath()));
     resources.appendChild(projectDir);
     resources.appendChild(frameSource(&doc, project->frameSource()));
+
+
+    // Shutter functions
+    QDomElement shutterFunctions = doc.createElement("shutterFunctions");
+    root.appendChild(shutterFunctions);
+    for (int i = 0; i < project->shutterFunctions()->size(); i++) {
+        QDomElement func = doc.createElement("function");
+        func.setAttribute("id", project->shutterFunctions()->at(i)->id());
+        QDomElement code = doc.createElement("code");
+        func.appendChild(code);
+        code.appendChild(doc.createTextNode(project->shutterFunctions()->at(i)->function()));
+        shutterFunctions.appendChild(func);
+    }
 
 
     // Nodes
@@ -96,12 +148,9 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) const
         tags.appendChild(tagToDom(&doc, project->tags()->at(i)));
     }
 
-//    qDebug() << doc.toString(2);
-
     QFile outFile(filename);
     if (!outFile.open(QIODevice::WriteOnly)) {
-        qDebug() << "Cannot write file " << filename;
-        Q_ASSERT(false);
+        throw Error_sV(QString("Cannot write to %1; please check if you have write permissions.").arg(filename));
     }
     QTextStream output(&outFile);
     doc.save(output, 4);
@@ -121,6 +170,7 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     QDomElement selected = doc->createElement("selected");
     QDomElement leftHandle = doc->createElement("leftHandle");
     QDomElement rightHandle = doc->createElement("rightHandle");
+    QDomElement shutterFunc = doc->createElement("shutterFunction");
     QDomElement leftCurveType = doc->createElement("type");
     QDomElement rightCurveType = doc->createElement("type");
     QDomElement leftX = doc->createElement("x");
@@ -132,9 +182,13 @@ const QDomElement XmlProjectRW_sV::nodeToDom(QDomDocument *doc, const Node_sV *n
     el.appendChild(selected);
     el.appendChild(leftHandle);
     el.appendChild(rightHandle);
+    if (node->shutterFunctionID().length() > 0) {
+        el.appendChild(shutterFunc);
+    }
     x.appendChild(doc->createTextNode(QString("%1").arg(node->xUnmoved())));
     y.appendChild(doc->createTextNode(QString("%1").arg(node->yUnmoved())));
     selected.appendChild(doc->createTextNode(QString("%1").arg(node->selected())));
+    shutterFunc.appendChild(doc->createTextNode(node->shutterFunctionID()));
 
     leftHandle.appendChild(leftX);
     leftHandle.appendChild(leftY);
@@ -246,7 +300,7 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     }
 }
 
-Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSourceError, Error_sV)
+Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) throw(FrameSourceError, Error_sV)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -264,29 +318,38 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                 qDebug() << "Invalid project file (incorrect root element): " << filename;
             } else {
 
-                int version = 0;
-                QStringRef sVersion = xml.attributes().value("version");
-                if (!sVersion.isEmpty()) {
-                    version = sVersion.toString().toInt();
+                int projVersionMajor = xml.attributes().value("version").toString().toInt();
+                int projVersionMinor = xml.attributes().value("version_minor").toString().toInt();
+                if (projVersionMajor > 0) {
+                    qDebug().nospace() << "Reading project file: version " << projVersionMajor << "." << projVersionMinor;
+                } else {
+                    qDebug() << "Reading project file of unknown version";
                 }
-                qDebug() << "Reading project file: version " << version;
+
+                int version_major = 0, version_minor = 0, version_micro = 0;
 
                 Project_sV *project = new Project_sV();
                 project->setProjectFilename(filename);
                 project->setProjectDir(QFileInfo(filename).absolutePath());
+                ProjectPreferences_sV *pr = project->preferences();
 
                 while (xml.readNextStartElement()) {
                     if (xml.name() == "info") {
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "appName") {
                                 qDebug() << "App name: " << xml.readElementText();
+                            } else if (xml.name() == "version") {
+                                version_major = xml.attributes().value("major").toString().toInt();
+                                version_minor = xml.attributes().value("minor").toString().toInt();
+                                version_micro = xml.attributes().value("micro").toString().toInt();
+                                xml.skipCurrentElement();
                             } else {
                                 xml.skipCurrentElement();
                             }
                         }
                     } else if (xml.name() == "resources") {
                         while (xml.readNextStartElement()) {
-                            if (version < 2 && xml.name() == "inputFile") {
+                            if (projVersionMajor < 2 && xml.name() == "inputFile") {
                                 QString inFilename = xml.readElementText();
                                 qDebug() << "Input file: " << inFilename;
                                 project->loadFrameSource(new VideoFrameSource_sV(project, inFilename));
@@ -294,6 +357,23 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                 loadFrameSource(&xml, project);
                             } else if (xml.name() == "projectDir") {
                                 xml.skipCurrentElement();
+                            } else {
+                                xml.skipCurrentElement();
+                            }
+                        }
+                    } else if (xml.name() == "shutterFunctions") {
+                        ShutterFunction_sV func;
+                        while (xml.readNextStartElement()) {
+                            if (xml.name() == "function") {
+                                func.setID(xml.attributes().value("id").toString());
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "code") {
+                                        func.updateFunction(xml.readElementText());
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+                                project->shutterFunctions()->addFunction(func, false);
                             } else {
                                 xml.skipCurrentElement();
                             }
@@ -309,6 +389,8 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                                         node.setY(QVariant(xml.readElementText()).toFloat());
                                     } else if (xml.name() == "selected") {
                                         node.select(QVariant(xml.readElementText()).toBool());
+                                    } else if (xml.name() == "shutterFunction") {
+                                        node.setShutterFunctionID(xml.readElementText());
                                     } else if (xml.name() == "leftHandle") {
                                         while (xml.readNextStartElement()) {
                                             QString text = xml.readElementText();
@@ -366,34 +448,78 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                         }
                     } else if (xml.name() == "preferences") {
                         while (xml.readNextStartElement()) {
-                            if (xml.name() == "renderFrameSize") {
-                                project->preferences()->renderFrameSize() = (FrameSize) xml.attributes().value("size").toString().toInt();
+                            if (xml.name() == "renderSectionMode") {
+                                pr->renderSectionMode() = xml.attributes().value("mode").toString();
+                                while (xml.readNextStartElement()) {
+                                    if (xml.name() == "renderStartTag") {
+                                        pr->renderStartTag() = xml.attributes().value("label").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderEndTag") {
+                                        pr->renderEndTag() = xml.attributes().value("label").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderStartTime") {
+                                        pr->renderStartTime() = xml.attributes().value("time").toString();
+                                        xml.skipCurrentElement();
+                                    } else if (xml.name() == "renderEndTime") {
+                                        pr->renderEndTime() = xml.attributes().value("time").toString();
+                                        xml.skipCurrentElement();
+                                    } else {
+                                        xml.skipCurrentElement();
+                                    }
+                                }
+
+                            } else if (xml.name() == "renderFrameSize") {
+                                pr->renderFrameSize() = (FrameSize) xml.attributes().value("size").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderInterpolationType") {
-                                project->preferences()->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
+                                pr->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderFPS") {
-                                project->preferences()->renderFPS() = xml.attributes().value("fps").toString().toFloat();
+                                if (projVersionMajor == 2 && projVersionMinor <= 2) {
+                                    pr->renderFPS() = xml.attributes().value("fps").toString().toFloat();
+                                } else {
+                                    pr->renderFPS() = xml.attributes().value("fps").toString();
+                                }
                                 xml.skipCurrentElement();
+
+                            } else if (xml.name() == "renderSlowmoSamples") {
+                                project->motionBlur()->setSlowmoSamples(xml.attributes().value("number").toString().toInt());
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "renderMaxSamples") {
+                                project->motionBlur()->setMaxSamples(xml.attributes().value("number").toString().toInt());
+                                xml.skipCurrentElement();
+
+                            } else if (xml.name() == "renderTarget") {
+                                pr->renderTarget() = xml.attributes().value("target").toString();
+                                xml.skipCurrentElement();
+
                             } else if (xml.name() == "imagesOutputDir") {
-                                project->preferences()->imagesOutputDir() = xml.attributes().value("dir").toString();
+                                pr->imagesOutputDir() = xml.attributes().value("dir").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "imagesFilenamePattern") {
-                                project->preferences()->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
+                                pr->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoFilename") {
-                                project->preferences()->videoFilename() = xml.attributes().value("file").toString();
+                                pr->videoFilename() = xml.attributes().value("file").toString();
                                 xml.skipCurrentElement();
+                            } else if (xml.name() == "videoCodec") {
+                                pr->videoCodec() = xml.attributes().value("codec").toString();
+                                xml.skipCurrentElement();
+
+                            } else if (xml.name() == "flowV3dLambda") {
+                                pr->flowV3DLambda() = xml.attributes().value("lambda").toString().toFloat();
+                                xml.skipCurrentElement();
+
                             } else if (xml.name() == "prevTagAxis") {
-                                project->preferences()->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();
+                                pr->lastSelectedTagAxis() = (TagAxis)xml.attributes().value("axis").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "viewport_t0") {
-                                project->preferences()->viewport_t0().rx() = xml.attributes().value("x").toString().toFloat();
-                                project->preferences()->viewport_t0().ry() = xml.attributes().value("y").toString().toFloat();
+                                pr->viewport_t0().rx() = xml.attributes().value("x").toString().toFloat();
+                                pr->viewport_t0().ry() = xml.attributes().value("y").toString().toFloat();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "viewport_secRes") {
-                                project->preferences()->viewport_secRes().rx() = xml.attributes().value("x").toString().toFloat();
-                                project->preferences()->viewport_secRes().ry() = xml.attributes().value("y").toString().toFloat();
+                                pr->viewport_secRes().rx() = xml.attributes().value("x").toString().toFloat();
+                                pr->viewport_secRes().ry() = xml.attributes().value("y").toString().toFloat();
                                 xml.skipCurrentElement();
                             } else {
                                 xml.skipCurrentElement();
@@ -409,6 +535,31 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename) const throw(FrameSour
                     qDebug() << "Did not read the whole project file! Stopped at: " << xml.name();
                 }
                 Q_ASSERT(xml.name().length() == 0);
+
+
+                file.close();
+
+
+                // Handle new project versions
+                if (projVersionMajor > SLOWMOPROJECT_VERSION_MAJOR && projVersionMajor) {
+                    throw Error_sV(QString("This file has been created with slowmoVideo %1.%2.%3 which uses a newer "
+                                           "project file version (%4.%5; supported: %6.%7). File cannot be loaded "
+                                           "(or only partially). Please upgrade to a newer version of slowmoVideo.")
+                                   .arg(version_major).arg(version_minor).arg(version_micro)
+                                   .arg(projVersionMajor).arg(projVersionMinor)
+                                   .arg(SLOWMOPROJECT_VERSION_MAJOR).arg(SLOWMOPROJECT_VERSION_MINOR));
+                } else if (projVersionMinor > SLOWMOPROJECT_VERSION_MINOR) {
+                    QString warningMsg = QString("This file has been created with a slightly newer version of slowmoVideo "
+                                                 "(version %1.%2.%3) which uses project file version %4.%5 (supported: %6.%7). "
+                                                 "When saving this project, some added properties will be lost.")
+                                         .arg(version_major).arg(version_minor).arg(version_micro)
+                                         .arg(projVersionMajor).arg(projVersionMinor)
+                                         .arg(SLOWMOPROJECT_VERSION_MAJOR).arg(SLOWMOPROJECT_VERSION_MINOR);
+                    qDebug() << warningMsg;
+                    if (warning != NULL) {
+                        *warning = warningMsg;
+                    }
+                }
 
                 return project;
 

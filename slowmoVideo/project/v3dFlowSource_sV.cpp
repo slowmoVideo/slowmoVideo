@@ -20,23 +20,20 @@ V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project, float lambda) :
     AbstractFlowSource_sV(project),
     m_lambda(lambda)
 {
-    m_dirFlowSmall = project->getDirectory("oFlowSmall");
-    m_dirFlowOrig = project->getDirectory("oFlowOrig");
-
-    m_dirFlowSmall.mkpath(".");
-    m_dirFlowOrig.mkpath(".");
+    createDirectories();
 }
 
 void V3dFlowSource_sV::slotUpdateProjectDir()
 {
     m_dirFlowSmall.rmdir(".");
     m_dirFlowOrig.rmdir(".");
+    createDirectories();
+}
 
-    m_dirFlowSmall = project()->getDirectory("oFlowSmall");
-    m_dirFlowOrig = project()->getDirectory("oFlowOrig");
-
-    m_dirFlowSmall.mkpath(".");
-    m_dirFlowOrig.mkpath(".");
+void V3dFlowSource_sV::createDirectories()
+{
+    m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
+    m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
 void V3dFlowSource_sV::setLambda(float lambda)
@@ -54,7 +51,6 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
     QString program(programLocation);
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
 
-    qDebug() << "Flow target file: " << flowFileName;
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
         qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
@@ -78,7 +74,7 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
             qDebug() << proc.readAllStandardError() << proc.readAllStandardOutput();
         }
     } else {
-        qDebug() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame;
+        qDebug().nospace() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame << ": " << flowFileName;
     }
 
     try {
@@ -103,5 +99,5 @@ const QString V3dFlowSource_sV::flowPath(const uint leftFrame, const uint rightF
         direction = "backward";
     }
 
-    return dir.absoluteFilePath(QString("%1_%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
+    return dir.absoluteFilePath(QString("%1-lambda%4_%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame).arg(m_lambda, 0, 'f', 2));
 }

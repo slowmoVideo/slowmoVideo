@@ -1,3 +1,13 @@
+/*
+slowmoVideo creates slow-motion videos from normal-speed videos.
+Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+*/
+
 #ifndef DEFS_SV_HPP
 #define DEFS_SV_HPP
 
@@ -6,20 +16,53 @@
 #include <QtCore/QSize>
 #include <QtCore/QPoint>
 #include <QtGui/QColor>
+#include <cmath>
 
 #if _WIN64 || __amd64__
 #define BITS_64
 #endif
 
-namespace Version_sV {
-    static int major = 0;
-    static int minor = 1;
-    static QString version(QString("%1.%2").arg(major).arg(minor));
-#ifdef BITS_64
-    static QString bits("64-bit");
-#else
-    static QString bits("32-bit");
+#if defined WIN32 || defined WIN64
+#define WINDOWS
+#elif defined __linux__
+#define LINUX
+#elif defined TARGET_OS_MAC
+#define OSX
 #endif
+
+#define SLOWMOVIDEO_VERSION_MAJOR 0
+#define SLOWMOVIDEO_VERSION_MINOR 2
+#define SLOWMOVIDEO_VERSION_MICRO 0
+
+
+/// Contains information about this slowmoVideo version
+namespace Version_sV {
+    /// Major version number
+    static int major = SLOWMOVIDEO_VERSION_MAJOR;
+    /// Minor version number
+    static int minor = SLOWMOVIDEO_VERSION_MINOR;
+    /// Micro version number
+    static int micro = SLOWMOVIDEO_VERSION_MICRO;
+    /// Version number as string
+    static QString version(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
+    /// Architecture
+    static QString bits(
+#ifdef BITS_64
+            "64-bit"
+#else
+            "32-bit"
+#endif
+                        );
+    /// Platform
+    static QString platform(
+#if defined LINUX
+            "Linux"
+#elif defined OSX
+            "OSX"
+#elif defined WINDOWS
+            "Windows"
+#endif
+            );
 }
 
 enum FlowDirection { FlowDirection_Forward, FlowDirection_Backward };
@@ -32,9 +75,47 @@ enum InterpolationType { InterpolationType_Forward = 0, InterpolationType_Forwar
 
 /// Default colours used in slowmoVideo (e.g. in the user interface)
 namespace Colours_sV {
-    static QColor colOk(158, 245, 94);
-    static QColor colBad(247, 122, 48);
+    static QColor colOk(158, 245, 94); ///< For checked text fields that are OK
+    static QColor colBad(247, 122, 48); ///< For checked text fields that are invalid
 }
+
+/// FPS representation, can guess numerator/denominator from a float value.
+struct Fps_sV {
+    /// numerator
+    int num;
+    /// denominator
+    int den;
+    /// den is assumed to be > 0.
+    Fps_sV(int num, int den) :
+        num(num), den(den) {}
+    /// Converts a float fps number to a fractional.
+    /// 23.97 and 29.97 are detected.
+    Fps_sV(float fps)
+    {
+        // Check for 23.976 and similar numbers (24*1000/1001)
+        if (fabs(1000*ceil(fps)-1001*fps) < 7) {
+            num = 1000*ceil(fps);
+            den = 1001;
+        } else {
+            num = 100000*fps;
+            den = 100000;
+            // Prettify
+            for (int i = 10; i > 1; i--) {
+                while (num % i == 0 && den % i == 0) {
+                    num /= i;
+                    den /= i;
+                }
+            }
+        }
+    }
+    Fps_sV(QString fpsString);
+    QString toString() const;
+
+    /// Frames per second as float.
+    double fps() const {
+        return double(num)/den;
+    }
+};
 
 /// For general errors.
 class Error_sV {

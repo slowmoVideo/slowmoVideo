@@ -13,6 +13,12 @@ the Free Software Foundation, either version 3 of the License, or
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "v3dFlowSource_sV.h"
+#include "interpolator_sV.h"
+#include "motionBlur_sV.h"
+#include "nodeList_sV.h"
+#include "renderTask_sV.h"
+#include "shutterFunction_sV.h"
+#include "shutterFunctionList_sV.h"
 #include "../lib/shutter_sV.h"
 #include "../lib/interpolate_sV.h"
 #include "../lib/flowRW_sV.h"
@@ -24,8 +30,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 #include <QFileInfo>
 
-#include "renderTask_sV.h"
-#include "nodelist_sV.h"
+#define DEBUG_P
+#ifdef DEBUG_P
+#include <iostream>
+#endif
+
 
 #define MIN_FRAME_DIST .001
 
@@ -52,9 +61,11 @@ void Project_sV::init()
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
     m_flowSource = new V3dFlowSource_sV(this);
+    m_motionBlur = new MotionBlur_sV(this);
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
+    m_shutterFunctions = new ShutterFunctionList_sV(m_nodes);
     m_renderTask = NULL;
 }
 
@@ -63,9 +74,11 @@ Project_sV::~Project_sV()
     delete m_preferences;
     delete m_frameSource;
     delete m_flowSource;
+    delete m_motionBlur;
     delete m_tags;
     delete m_nodes;
     delete m_renderTask;
+    delete m_shutterFunctions;
 }
 
 void Project_sV::setProjectDir(QString projectDir)
@@ -78,6 +91,7 @@ void Project_sV::setProjectDir(QString projectDir)
     }
     m_frameSource->slotUpdateProjectDir();
     m_flowSource->slotUpdateProjectDir();
+    m_motionBlur->slotUpdateProjectDir();
 }
 
 void Project_sV::setProjectFilename(QString filename)
@@ -86,15 +100,6 @@ void Project_sV::setProjectFilename(QString filename)
 }
 QString Project_sV::projectFilename() const {
     return m_projectFilename;
-}
-
-void Project_sV::readSettings(const QSettings &settings)
-{
-    if (dynamic_cast<V3dFlowSource_sV *>(m_flowSource) != NULL) {
-        V3dFlowSource_sV *flowSource = dynamic_cast<V3dFlowSource_sV *>(m_flowSource);
-        flowSource->setLambda(settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble());
-        qDebug() << "Lambda set to " << settings.value("settings/v3dFlowBuilder/lambda", "5.0").toDouble();
-    }
 }
 
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
@@ -129,132 +134,124 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::interpolateFrameAt(float time, const FrameSize frameSize, const InterpolationType interpolation,
-                                      float previousTime) const throw(FlowBuildingError, InterpolationError)
+QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
 {
-    float framePos = timeToFrame(time);
-    float prevFramePos = -1;
-    if (framePos > m_frameSource->framesCount()) {
-        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
-                                 .arg(framePos).arg(m_frameSource->framesCount()));
-    } else {
-        qDebug() << "Source frame @" << time << " is " << framePos;
-    }
-    if (previousTime >= 0) {
-        prevFramePos = timeToFrame(previousTime);
+    if (outTime < m_nodes->startTime() || outTime > m_nodes->endTime()) {
+#ifdef DEBUG_P
+        std::cout.precision(30);
+        std::cout << m_nodes->startTime() << " -- " << outTime << " -- " << m_nodes->endTime() << std::endl;
+        std::cout.flush();
+#endif
+        qDebug() << "Output time out of bounds";
+        Q_ASSERT(false);
     }
 
-    if (prevFramePos >= 0 && fabs(framePos-prevFramePos) > 1.2) {
-        QStringList frames;
-        int left = std::min(floor(prevFramePos), floor(framePos));
-        int right = std::max(ceil(prevFramePos), ceil(framePos));
-        for (int f = left; f <= right; f++) {
-            frames << m_frameSource->framePath(f, frameSize);
+    float sourceTime = m_nodes->sourceTime(outTime);
+    if (sourceTime < 0) {
+        sourceTime = 0;
+    }
+    if (sourceTime > m_frameSource->maxTime()) {
+        sourceTime = m_frameSource->maxTime();
+    }
+
+    float sourceFrame = sourceTimeToFrame(sourceTime);
+
+    int leftIndex = m_nodes->find(outTime);
+    if (leftIndex < 0) {
+        qDebug() << "left node is not here!";
+        Q_ASSERT(false);
+    }
+    if (leftIndex == m_nodes->size()-1) {
+        // outTime is at the very end of the node.
+        // Take next to last node to still have a right node.
+        leftIndex--;
+    }
+
+    const Node_sV *leftNode = &(*m_nodes)[leftIndex];
+    const Node_sV *rightNode = &(*m_nodes)[leftIndex+1];
+
+    ShutterFunction_sV *shutterFunction = m_shutterFunctions->function(leftNode->shutterFunctionID());
+
+    if (shutterFunction != NULL) {
+        float dy = 0;
+        if (outTime+1/fps.fps() <= m_nodes->endTime()) {
+            dy = m_nodes->sourceTime(outTime+1/fps.fps())-sourceTime;
         }
-        qDebug() << "Simulating shutter between frames " << floor(prevFramePos) << " and " << ceil(framePos);
-        return Shutter_sV::combine(frames);
-
-    } else if (framePos-floor(framePos) > MIN_FRAME_DIST) {
-
-        QImage left = m_frameSource->frameAt(floor(framePos), frameSize);
-        QImage right = m_frameSource->frameAt(floor(framePos)+1, frameSize);
-        QImage out(left.size(), QImage::Format_ARGB32);
-
-        /// Position between two frames, on [0 1]
-        const float pos = framePos-floor(framePos);
-
-        if (interpolation == InterpolationType_Twoway) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-            Q_ASSERT(backwardFlow != NULL);
-
-            if (forwardFlow == NULL || backwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::twowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
-            delete forwardFlow;
-            delete backwardFlow;
-
-        } else if (interpolation == InterpolationType_TwowayNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-            FlowField_sV *backwardFlow = requestFlow(floor(framePos)+1, floor(framePos), frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-            Q_ASSERT(backwardFlow != NULL);
-
-            if (forwardFlow == NULL || backwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::newTwowayFlow(left, right, forwardFlow, backwardFlow, pos, out);
-            delete forwardFlow;
-            delete backwardFlow;
-
-        } else if (interpolation == InterpolationType_Forward) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-
-            if (forwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::forwardFlow(left, forwardFlow, pos, out);
-            delete forwardFlow;
-
-        } else if (interpolation == InterpolationType_ForwardNew) {
-            FlowField_sV *forwardFlow = requestFlow(floor(framePos), floor(framePos)+1, frameSize);
-
-            Q_ASSERT(forwardFlow != NULL);
-
-            if (forwardFlow == NULL) {
-                qDebug() << "No flow received!";
-                Q_ASSERT(false);
-            }
-
-            Interpolate_sV::newForwardFlow(left, forwardFlow, pos, out);
-            delete forwardFlow;
-
-        } else if (interpolation == InterpolationType_Bezier) {
-            FlowField_sV *currNext = requestFlow(floor(framePos)+2, floor(framePos)+1, frameSize); // Allowed to be NULL
-            FlowField_sV *currPrev = requestFlow(floor(framePos)+0, floor(framePos)+1, frameSize);
-
-            Q_ASSERT(currPrev != NULL);
-
-            Interpolate_sV::bezierFlow(left, right, currPrev, currNext, pos, out);
-
-            delete currNext;
-            delete currPrev;
-
-        } else {
-            qDebug() << "Unsupported interpolation type!";
-            Q_ASSERT(false);
+        float shutter = shutterFunction->evaluate(
+                    (outTime-leftNode->x())/(rightNode->x()-leftNode->x()), // x on [0,1]
+                    outTime, // t
+                    fps.fps(), // FPS
+                    sourceFrame, // y
+                    dy // dy to next frame
+                    );
+        qDebug() << "Shutter value for output time " << outTime << " is " << shutter;
+        if (shutter > 0) {
+            try {
+                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter*fps.fps(),
+                                          fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
+            } catch (RangeTooSmallError_sV &err) {}
         }
-        return out;
-    } else {
-        qDebug() << "No interpolation necessary.";
-        return m_frameSource->frameAt(floor(framePos), frameSize);
     }
+    return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);
 }
 
 FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError)
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
-    return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
+    if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
+        V3dFlowSource_sV *v3d;
+        if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_flowSource)) != NULL) {
+            v3d->setLambda(m_preferences->flowV3DLambda());
+        }
+        return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
+    } else {
+        throw FlowBuildingError("Empty frame source; Cannot build flow.");
+    }
 }
 
 inline
-float Project_sV::timeToFrame(float time) const
+qreal Project_sV::sourceTimeToFrame(qreal time) const
 {
     Q_ASSERT(time >= 0);
-    return time * m_frameSource->fps();
+    return time * m_frameSource->fps()->fps();
+}
+
+qreal Project_sV::snapToFrame(const qreal time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere)
+{
+    Q_ASSERT(time >= 0);
+    int frameCount = 0;
+    double snapTime = 0;
+    double frameLength;
+    frameLength = 1.0/fps.fps();
+
+    while (snapTime < time) {
+        snapTime += frameLength;
+        frameCount++;
+    }
+
+    // snapTime is now >= time
+
+    if (!roundUp && snapTime != time) {
+        snapTime -= frameLength;
+        frameCount--;
+    }
+
+    if (out_framesBeforeHere != NULL) {
+        *out_framesBeforeHere = frameCount;
+    }
+
+    return snapTime;
+}
+qreal Project_sV::snapToOutFrame(qreal time, bool roundUp, const Fps_sV &fps, int *out_framesBeforeHere) const
+{
+    if (time > m_nodes->endTime()) {
+        time = m_nodes->endTime();
+    }
+    time -= m_nodes->startTime();
+    if (time < 0) { time = 0; }
+    float snapped = snapToFrame(time, roundUp, fps, out_framesBeforeHere) + m_nodes->startTime();
+    return snapped;
 }
 
 QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qreal tmaxdist) const

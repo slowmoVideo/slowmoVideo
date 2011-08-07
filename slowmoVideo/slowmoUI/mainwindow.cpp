@@ -11,16 +11,17 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "newprojectdialog.h"
+#include "newProjectDialog.h"
 #include "progressDialog.h"
 #include "renderingDialog.h"
 #include "preferencesDialog.h"
 #include "aboutDialog.h"
 
-#include "../lib/defs_sV.hpp"
-#include "../project/renderTask_sV.h"
-#include "../project/xmlProjectRW_sV.h"
-#include "../project/abstractFrameSource_sV.h"
+#include "lib/defs_sV.hpp"
+#include "project/renderTask_sV.h"
+#include "project/xmlProjectRW_sV.h"
+#include "project/abstractFrameSource_sV.h"
+#include "project/projectPreferences_sV.h"
 
 #include <QtCore>
 #include <QObject>
@@ -64,21 +65,58 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(NULL),
-    m_renderProgressDialog(NULL)
+    m_renderProgressDialog(NULL),
+    m_flowExaminer(NULL)
 {
     ui->setupUi(this);
-    m_statusBar = new QStatusBar(this);
-    setStatusBar(m_statusBar);
+
+    restoreGeometry(m_settings.value("geometry").toByteArray());
+    restoreState(m_settings.value("windowState").toByteArray());
 
     m_project = new Project_sV();
 
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
 
-    m_wInputMonitor = new InputMonitor(this);
+
+    m_wInputMonitor = new FrameMonitor(this);
     m_wInputMonitorDock = new QDockWidget("Input monitor", this);
     m_wInputMonitorDock->setWidget(m_wInputMonitor);
+    m_wInputMonitorDock->setObjectName("inputMonitor");
     addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
+
+    m_wCurveMonitor = new FrameMonitor(this);
+    m_wCurveMonitorDock = new QDockWidget("Curve monitor", this);
+    m_wCurveMonitorDock->setWidget(m_wCurveMonitor);
+    m_wCurveMonitorDock->setObjectName("curveMonitor");
+    addDockWidget(Qt::TopDockWidgetArea, m_wCurveMonitorDock);
+
+    m_wRenderPreview = new RenderPreview(m_project, this);
+    m_wRenderPreviewDock = new QDockWidget("Render preview", this);
+    m_wRenderPreviewDock->setWidget(m_wRenderPreview);
+    m_wRenderPreviewDock->setObjectName("renderPreview");
+    addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
+
+    // Fill the view menu that allows (de)activating widgets
+    QObjectList windowChildren = children();
+    QDockWidget *w;
+    for (int i = 0; i < windowChildren.size(); i++) {
+        if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
+            qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
+
+            QAction *a = new QAction(w->objectName(), this);
+            a->setCheckable(true);
+            a->setChecked(w->isVisible());
+            bool b = true;
+            b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
+            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
+            Q_ASSERT(b);
+
+            ui->menuView->addAction(a);
+            m_widgetActions << a;
+
+        }
+    }
 
 
     // Set up shortcut bindings
@@ -115,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
     ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
     ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
+    ui->actionRenderPreview->setShortcut(QKeySequence("Shift+Ctrl+R"));
+    ui->actionExamineFlow->setShortcut(QKeySequence("Shift+Ctrl+X"));
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
@@ -144,11 +184,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
+    b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
+                 this, SLOT(slotForwardCurveSrcPosition(qreal)));
 
     b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
     b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
     b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
     b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
+    b &= connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
+    b &= connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
     b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
     b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
     b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
@@ -156,23 +200,48 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Q_ASSERT(b);
 
+    updateWindowTitle();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     delete m_wInputMonitor;
+    delete m_wCurveMonitor;
     delete m_wInputMonitorDock;
-    delete m_statusBar;
+    delete m_wCurveMonitorDock;
+    delete m_wRenderPreview;
+    delete m_wRenderPreviewDock;
 
     if (m_project != NULL) {
         delete m_project;
+    }
+
+    if (m_progressDialog != NULL) {
+        delete m_progressDialog;
+    }
+    if (m_renderProgressDialog != NULL) {
+        delete m_renderProgressDialog;
+    }
+    if (m_flowExaminer != NULL) {
+        delete m_flowExaminer;
     }
 
     delete m_signalMapper;
     for (int i = 0; i < m_shortcutList.length(); i++) {
         delete m_shortcutList[i];
     }
+
+    for (int i = 0; i < m_widgetActions.size(); i++) {
+        delete m_widgetActions[i];
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    m_settings.setValue("geometry", saveGeometry());
+    m_settings.setValue("windowState", saveState());
+    QMainWindow::closeEvent(e);
 }
 
 
@@ -188,7 +257,7 @@ void MainWindow::shortcutUsed(QString which)
     ts.shortcut = which;
     ts.start = QTime::currentTime();
 
-    qDebug() << which << " pressed. Last shortcut: " << m_lastShortcut.start.elapsed();
+    qDebug() << which << " pressed. Last shortcut: " << m_lastShortcut.start.elapsed() << " ms ago.";
 
 //    QString at = QString(" @ %1.%2::%3")
 //            .arg(ts.start.minute())
@@ -279,6 +348,7 @@ void MainWindow::newProject()
             // Save project
             XmlProjectRW_sV writer;
             writer.saveProject(project, npd.projectFilename());
+            m_projectPath = npd.projectFilename();
 
             loadProject(project);
         } catch (FrameSourceError &err) {
@@ -296,9 +366,8 @@ void MainWindow::loadProject(Project_sV *project)
     }
     m_project = project;
     m_wCanvas->load(m_project);
-
-    QSettings settings;
-    m_project->readSettings(settings);
+    m_wRenderPreview->load(m_project);
+    updateWindowTitle();
 
     bool b = true;
     b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
@@ -319,7 +388,12 @@ void MainWindow::slotLoadProjectDialog()
         m_settings.setValue("directories/lastOpenedProject", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
         XmlProjectRW_sV reader;
         try {
-            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0));
+            QString warning;
+            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0), &warning);
+            if (warning.length() > 0) {
+                QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
+            }
+            m_projectPath = dialog.selectedFiles().at(0);
             loadProject(project);
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
@@ -336,11 +410,15 @@ void MainWindow::slotSaveProject(QString filename)
     }
     if (filename.length() == 0) {
         qDebug() << "No filename given, won't save. (Perhaps an empty project?)";
-        m_statusBar->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
+        statusBar()->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
     } else {
         qDebug() << "Saving project as " << filename;
-        XmlProjectRW_sV writer;
-        writer.saveProject(m_project, m_project->projectFilename());
+        try {
+            XmlProjectRW_sV writer;
+            writer.saveProject(m_project, filename);
+        } catch (Error_sV &err) {
+            QMessageBox(QMessageBox::Warning, "Error writing project file", err.message()).exec();
+        }
     }
 }
 void MainWindow::slotSaveProjectDialog()
@@ -392,6 +470,27 @@ void MainWindow::slotForwardInputPosition(qreal frame)
         m_wInputMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
     }
 }
+void MainWindow::slotForwardCurveSrcPosition(qreal frame)
+{
+    if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
+        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Orig));
+    }
+}
+void MainWindow::slotUpdateRenderPreview()
+{
+    m_wRenderPreview->slotRenderAt(m_project->snapToOutFrame(
+                                       m_wCanvas->prevMouseTime().x(), false,
+                                       m_project->preferences()->renderFPS(), NULL)
+                                   );
+}
+void MainWindow::updateWindowTitle()
+{
+    QString project("empty project");
+    if (m_projectPath.length() > 0) {
+        project = m_projectPath;
+    }
+    setWindowTitle(QString("slowmo UI (%1)").arg(project));
+}
 
 
 
@@ -409,6 +508,11 @@ void MainWindow::resetDialogs()
         delete m_renderProgressDialog;
         m_renderProgressDialog = NULL;
     }
+    if (m_flowExaminer != NULL) {
+        m_flowExaminer->close();
+        delete m_flowExaminer;
+        m_flowExaminer = NULL;
+    }
 }
 
 void MainWindow::slotShowAboutDialog()
@@ -420,18 +524,40 @@ void MainWindow::slotShowAboutDialog()
 void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
-    if (dialog.exec() == QDialog::Accepted) {
-        QSettings settings;
-        m_project->readSettings(settings);
+    dialog.exec();
+}
+
+void MainWindow::slotShowFlowExaminerDialog()
+{
+    if (m_flowExaminer == NULL) {
+        m_flowExaminer = new FlowExaminer(m_project, this);
     }
+
+    int frame = floor(m_wCanvas->prevMouseInFrame());
+    if (frame+1 >= m_project->frameSource()->framesCount()) {
+        frame = m_project->frameSource()->framesCount()-2;
+    }
+    if (frame < 0) { frame = 0; }
+
+    m_flowExaminer->show();
+    m_flowExaminer->examine(frame);
 }
 
 void MainWindow::slotShowRenderDialog()
 {
     RenderingDialog renderingDialog(m_project, this);
     if (renderingDialog.exec() == QDialog::Accepted) {
+
         RenderTask_sV *task = renderingDialog.buildTask();
+        task->moveToThread(&m_rendererThread);
+
+        if (m_project->renderTask() != NULL) {
+            bool b = true;
+            b &= disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
+            Q_ASSERT(b);
+        }
         m_project->replaceRenderTask(task);
+
 
         if (m_renderProgressDialog == NULL) {
             m_renderProgressDialog = new ProgressDialog(this);
@@ -444,17 +570,19 @@ void MainWindow::slotShowRenderDialog()
         b &= connect(task, SIGNAL(signalNewTask(QString,int)), m_renderProgressDialog, SLOT(slotNextTask(QString,int)));
         b &= connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
         b &= connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
-        b &= connect(task, SIGNAL(signalRenderingFinished()), m_renderProgressDialog, SLOT(slotAllTasksFinished()));
+        b &= connect(task, SIGNAL(signalRenderingFinished(QString)), m_renderProgressDialog, SLOT(slotAllTasksFinished(QString)));
         b &= connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
         b &= connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
-        b &= connect(task, SIGNAL(signalRenderingStopped()), m_renderProgressDialog, SLOT(slotAborted()));
+        b &= connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
         b &= connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
+        b &= connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
         // TODO continue/abort
         Q_ASSERT(b);
 
         m_renderProgressDialog->show();
 
-        task->slotContinueRendering();
+        emit signalRendererContinue();
+        m_rendererThread.start();
 
     }
 }

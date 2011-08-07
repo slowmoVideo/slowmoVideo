@@ -2,7 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(V3D)
 
-# export V3D_SHADER_DIR=/data/cworkspace/slowmoGPU/GL/Shaders/
+#set (CMAKE_BUILD_TYPE Release)
+set (CMAKE_BUILD_TYPE Debug)
+
+
+
+# Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
+get_filename_component(SV_INST_DIR "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
+message(STATUS "Directory is ${SV_INST_DIR}")
+set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
+set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
+
 
 set(CMAKE_CXX_FLAGS
     ${CMAKE_CXX_FLAGS}
@@ -11,27 +21,77 @@ set(CMAKE_CXX_FLAGS
 
 
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
+find_package(OpenGL)
+find_package(GLUT)
+find_package(GLEW)
+find_package(SDL)
+find_package(Cg)
+find_package(OpenCV)
 
-# Should be changed later if required.
-get_filename_component(CMAKE_INSTALL_PREFIX "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
-message("Install prefix: ${CMAKE_INSTALL_PREFIX}")
+include_directories(${CMAKE_INSTALL_PREFIX}/include)
+set(SVFLOW_PATHS "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
+find_library(SVFLOW_LIB
+    NAMES sVflow sVflow.a libsVflow libsVflow.a
+    PATHS ${SVFLOW_PATHS}
+)
 
-# Include OpenGL
-find_package (OpenGL REQUIRED)
-include_directories (${OPENGL_INCLUDE_DIR})
+set(BUILD_FLOW_BUILDER "NO")
+if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
+set(BUILD_FLOW_BUILDER "YES")
+endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
 
-find_package(SDL REQUIRED)
+set(INCLUDE_SOURCE "YES")
+if(DISABLE_INCLUDE_SOURCE)
+set(INCLUDE_SOURCE "NO")
+add_definitions(-DDISABLE_INCLUDE_SOURCE)
+endif(DISABLE_INCLUDE_SOURCE)
+
+
+
+
+message("==================================================")
+if(NOT SVFLOW_LIB)
+message("* sVflow library not found. Did you make --install it?")
+message("  (Searched in ${SVFLOW_PATHS} for the sVflow library.)")
+endif(NOT SVFLOW_LIB)
+if(NOT OPENGL_FOUND)
+message("* OpenGL could not be found.")
+endif(NOT OPENGL_FOUND)
+if(NOT GLUT_FOUND)
+message("* GLUT could not be found.")
+endif(NOT GLUT_FOUND)
+if(NOT GLEW_FOUND)
+message("* GLEW could not be found.")
+endif(NOT GLEW_FOUND)
+if(NOT SDL_FOUND)
+message("* SDL could not be found.")
+endif(NOT SDL_FOUND)
+if(NOT OpenCV_LIBS)
+message("* OpenCV could not be found.")
+endif(NOT OpenCV_LIBS)
+if(NOT CG_FOUND)
+message("* Cg toolkit could not be found.")
+message("  Download from: http://developer.nvidia.com/cg-toolkit-download")
+endif(NOT CG_FOUND)
+
+
+message("* Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
+message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.)")
+message("* V3D will be built: ${BUILD_FLOW_BUILDER}")
+message("* Shaders will be included in the binary: ${INCLUDE_SOURCE}")
+if(INCLUDE_SOURCE)
+message("  (Can be disabled with the cmake flag -DDISABLE_INCLUDE_SOURCE)")
+endif(INCLUDE_SOURCE)
+message("==================================================")
+
+if(NOT BUILD_FLOW_BUILDER)
+message(FATAL_ERROR "Cannot build V3D.")
+endif(NOT BUILD_FLOW_BUILDER)
+
+include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
-
-#Include GLUT (libglut3-dev)
-find_package(GLUT REQUIRED)
 include_directories(${GLUT_INCLUDE_DIR})
-
-#Include GLEW
-find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIR})
-
-find_package(OpenCV REQUIRED)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
 set (V3D_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -57,8 +117,6 @@ enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG Cg CgGL pthread)
 enable_feature_libraries (V3DLIB_ENABLE_OPENCV highgui cvaux cv)
 #--------------------------------------------------
 
-#set (CMAKE_BUILD_TYPE Release)
-set (CMAKE_BUILD_TYPE Debug)
 
 include_directories(Config)
 
@@ -131,5 +189,3 @@ message(STATUS "Shader files copied")
 add_library(V3D ${ALL_SRC})
 add_subdirectory(Apps)
 target_link_libraries(V3D ${OpenCV_LIBS})
-
-

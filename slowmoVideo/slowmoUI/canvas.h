@@ -11,10 +11,10 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "../project/node_sV.h"
-#include "../project/nodelist_sV.h"
-#include "../project/project_sV.h"
-#include "../project/tag_sV.h"
+#include "project/node_sV.h"
+#include "project/nodeList_sV.h"
+#include "project/project_sV.h"
+#include "project/tag_sV.h"
 
 #include <QWidget>
 #include <QList>
@@ -32,12 +32,20 @@ the Free Software Foundation, either version 3 of the License, or
 
 class QColor;
 class QPoint;
+class ShutterFunctionDialog;
 
 namespace Ui {
     class Canvas;
 }
 
 class Project_sV;
+
+/**
+  \brief Canvas for drawing motion curves.
+
+  \todo Frame lines on high zoom
+  \todo Custom speed factor to next node
+  */
 class Canvas : public QWidget
 {
     Q_OBJECT
@@ -50,9 +58,11 @@ public:
     enum Abort { Abort_General, Abort_Selection };
 
     static QColor lineCol;
+    static QColor selectedLineCol;
     static QColor nodeCol;
     static QColor gridCol;
     static QColor fatGridCol;
+    static QColor minGridCol;
     static QColor selectedCol;
     static QColor hoverCol;
     static QColor srcTagCol;
@@ -64,6 +74,9 @@ public:
 
     void toggleHelp();
 
+    const QPointF prevMouseTime() const;
+    const float prevMouseInFrame() const;
+
 public slots:
     void slotAbort(Canvas::Abort abort);
     void slotAddTag();
@@ -72,6 +85,8 @@ public slots:
 
 signals:
     void signalMouseInputTimeChanged(qreal frame);
+    void signalMouseCurveSrcTimeChanged(qreal frame);
+    void nodesChanged();
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -85,6 +100,7 @@ protected:
 private:
     Ui::Canvas *ui;
     Project_sV *m_project;
+    ShutterFunctionDialog *m_shutterFunctionDialog;
     bool m_mouseWithinWidget;
     int m_distLeft;
     int m_distBottom;
@@ -92,8 +108,8 @@ private:
     int m_distTop;
     Node_sV m_t0;
     Node_sV m_tmax;
-    int m_secResX;
-    int m_secResY;
+    float m_secResX;
+    float m_secResY;
 
     bool m_showHelp;
 
@@ -113,6 +129,7 @@ private:
 
         QPoint prevMousePos;
         QPoint initialMousePos;
+        QPointF contextmenuMouseTime;
 
         Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;
@@ -145,6 +162,7 @@ private:
     QAction *m_aResetLeftHandle;
     QAction *m_aResetRightHandle;
     QAction *m_a1xSpeed;
+    QAction *m_aShutterFunction;
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
@@ -169,6 +187,7 @@ private slots:
     void slotChangeCurveType(int curveType);
     void slotResetHandle(const QString &position);
     void slotSet1xSpeed();
+    void slotSetShutterFunction();
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);

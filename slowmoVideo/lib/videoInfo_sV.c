@@ -29,14 +29,18 @@ VideoInfoSV getInfo(const char filename[])
     if (pFormatContext == NULL) {
         printf("Format context is NULL.");
     } else {
-        printf("Format context is %d.", pFormatContext);
+        printf("Format context is %p.", (void*)pFormatContext);
     }
 
     printf("Reading info for file %s.\n", filename);
     fflush(stdout);
  
     int ret;
+#if LIBAVFORMAT_VERSION_MAJOR < 53
+    if ((ret = av_open_input_file(&pFormatContext, filename, NULL, 0, NULL)) != 0) {
+#else
     if ((ret = avformat_open_input(&pFormatContext, filename, NULL, NULL)) != 0) {
+#endif
 	printf("Could not open file %s.\n", filename);
 	return info;
     }
@@ -44,7 +48,11 @@ VideoInfoSV getInfo(const char filename[])
 	printf("No stream information found.\n");
 	return info;
     }
+#if LIBAVFORMAT_VERSION_MAJOR < 53
+    dump_format(pFormatContext, 0, filename, 0);
+#else
     av_dump_format(pFormatContext, 0, filename, 0);
+#endif
 
     AVCodecContext *pCodecContext;
     int videoStream = -1;
@@ -60,7 +68,7 @@ VideoInfoSV getInfo(const char filename[])
             info.height = pCodecContext->height;
             info.framesCount = pFormatContext->streams[i]->nb_frames;
             info.streamsCount++;
-            printf("Total frames: %d (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
+            printf("Total frames: %ld (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
 	}
     }
 

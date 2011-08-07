@@ -21,7 +21,9 @@
 #define V3DLIB_GPGPU_ENABLE_CG
 #endif
 
+#ifndef DISABLE_INCLUDE_SOURCE
 #define INCLUDE_SOURCE
+#endif
 
 #ifdef INCLUDE_SOURCE
 #define STRINGIFY(A) #A

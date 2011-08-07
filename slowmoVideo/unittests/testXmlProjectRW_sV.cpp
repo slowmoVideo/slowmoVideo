@@ -1,6 +1,16 @@
 #include "testXmlProjectRW_sV.h"
 #include "../project/xmlProjectRW_sV.h"
-#include "../project/nodelist_sV.h"
+#include "../project/nodeList_sV.h"
+
+void TestXmlProjectRW_sV::initTestCase()
+{
+    int i = 0;
+    app = new QCoreApplication(i, NULL);
+}
+void TestXmlProjectRW_sV::cleanupTestCase()
+{
+    delete app;
+}
 
 void TestXmlProjectRW_sV::init()
 {

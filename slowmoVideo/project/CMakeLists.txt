@@ -3,11 +3,11 @@ set(SRCS_PROJ
   projectPreferences_sV.cpp
   tag_sV.cpp
   node_sV.cpp
-  nodelist_sV.cpp
+  nodeList_sV.cpp
   segment_sV.cpp
+  segmentList_sV.cpp
   nodeHandle_sV.cpp
   renderTask_sV.cpp
-  abstractProjectRW_sV.h
   xmlProjectRW_sV.cpp
   abstractFrameSource_sV.cpp
   imagesFrameSource_sV.cpp
@@ -18,6 +18,10 @@ set(SRCS_PROJ
   videoRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
   v3dFlowSource_sV.cpp
+  interpolator_sV.cpp
+  shutterFunction_sV.cpp
+  shutterFunctionList_sV.cpp
+  motionBlur_sV.cpp
   canvasObject_sV.h
 )
 

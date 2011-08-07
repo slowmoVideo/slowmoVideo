@@ -23,13 +23,17 @@
 
 
 #include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 
 /// This struct can eat frames and produces videos!
+/// Variables should not be changed from the outside.
 typedef struct VideoOut_sV {
-    /// Used codec
-    AVCodec *codec;
-    AVCodecContext *cc;
-    AVFrame *picture;
+
+    AVFrame *picture; ///< Temporary picture for the incoming frame
+    AVFormatContext *fc; ///< Video's format context
+    AVOutputFormat *format; ///< Just a shortcut to fc->format
+    AVStream *streamV; ///< Video output stream
+
     /// Current frame number that is encoded
     int frameNr;
 
@@ -38,13 +42,12 @@ typedef struct VideoOut_sV {
     /// Required for converting RGB images
     int rgbLinesize[4];
 
-    /// Video file
-    FILE *file;
     /// Video filename
     char *filename;
 
-    int outbufSize, outSize;
-    uint8_t *outbuf;
+    int outSize;
+    int outbufSizeV;
+    uint8_t *outbufV;
 
     /// Set if an error occurs (file does not exist, for example), for more accurate information.
     char *errorMessage;
@@ -53,12 +56,23 @@ typedef struct VideoOut_sV {
 
 /// Prepares a default VideoOut_sV struct, mainly for testing purposes with eatSample().
 void prepareDefault(VideoOut_sV *video);
-/// Prepares a VideoOut_sV struct. After preparation it is ready to eat RGB images.
-int prepare(VideoOut_sV *video, const char *filename, const int width, const int height, const int bitrate,
+/**
+  Prepares a VideoOut_sV struct. After preparation it is ready to eat RGB images.
+  \param video VideoOut_sV struct to prepare.
+  \param filename Target filename
+  \param vcodec Video codec to use (see <tt>ffmpeg -codecs</tt>). May be \c NULL,
+         in this case a default codec for the format will be chosen.
+  \param width Video width
+  \param height Video height
+  \param bitrate Bit rate. <tt>width*height*fps</tt> seems to be a good choice for high quality.
+  \param numerator A frame is shown for <tt>numerator/denominator s</tt>; i.e. the fps number is <tt>denominator/numerator</tt>.
+  \param denominator See numerator.
+  */
+int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const int width, const int height, const int bitrate,
              const unsigned int numerator, const unsigned int denominator);
 
 /// Eats an RGB image and deposits it in the output frame.
-void eatARGB(VideoOut_sV *video, const unsigned char *data);
+int eatARGB(VideoOut_sV *video, const unsigned char *data);
 /// Eats a sample image. For testing.
 void eatSample(VideoOut_sV *video);
 

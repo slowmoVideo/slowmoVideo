@@ -5,8 +5,10 @@
 #include "../project/videoFrameSource_sV.h"
 #include "../lib/bezierTools_sV.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
+#include <QtScript/QScriptEngine>
 
 
 void testSave()
@@ -58,7 +60,52 @@ void testBezier()
 
 }
 
+void testFloatArg()
+{
+    qDebug() << QString("%2").arg(24.249, 8, 'f', 2, '0');
+}
+
+void testQtScript()
+{
+    int argc = 0;
+    QCoreApplication app(argc, NULL);
+    QScriptEngine engine;
+    QScriptValue val = engine.evaluate("1+2");
+
+    QScriptValue fx = engine.evaluate("(function(x, dy) { return Math.PI; })");
+    QScriptValueList args;
+    args << .5 << 0;
+    qDebug() << fx.call(QScriptValue(), args).toString();
+}
+
+void testRegex()
+{
+    QStringList parts;
+    QRegExp e("(\\d+)");
+    QString str("forward-lambda20.0_1234_2345.sVflow");
+    int min = str.indexOf("_");
+    int pos = 0;
+    int prevPos = 0;
+    while ((pos = e.indexIn(str, pos)) != -1) {
+        qDebug() << str.mid(prevPos, pos-prevPos);
+        parts << str.mid(prevPos, pos-prevPos);
+
+        if (pos > min) {
+            parts << QVariant(e.cap(1).toInt()+1).toString();
+        } else {
+            parts << e.cap(1);
+        }
+        qDebug() << e.cap(1) << " at " << pos;
+
+        pos += e.matchedLength();
+        prevPos = pos;
+    }
+    qDebug() << str.mid(prevPos);
+    parts << str.mid(prevPos);
+    qDebug() << "Next: " << parts.join("");
+}
+
 int main()
 {
-    testBezier();
+    testRegex();
 }

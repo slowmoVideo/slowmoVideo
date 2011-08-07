@@ -25,7 +25,9 @@ extern "C" {
 class QProcess;
 class Project_sV;
 
-/** \brief Uses frames from a video file */
+/**
+  \brief Uses frames from a video file
+ */
 class VideoFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT
@@ -40,8 +42,7 @@ public:
     bool initialized() const;
 
     int64_t framesCount() const;
-    int frameRateNum() const;
-    int frameRateDen() const;
+    const Fps_sV* fps() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
     const QString framePath(const uint frame, const FrameSize frameSize) const;
 
@@ -61,6 +62,7 @@ private:
     QDir m_dirFramesOrig;
 
     VideoInfoSV *m_videoInfo;
+    Fps_sV m_fps;
 
     QTimer *m_timer;
     QProcess *m_ffmpeg;
@@ -68,7 +70,7 @@ private:
     bool m_initialized;
 
 
-    const QString framesDirStr(FrameSize frameSize) const;
+    void createDirectories();
     /**
       Extracts the frames from the video file into single images
       */

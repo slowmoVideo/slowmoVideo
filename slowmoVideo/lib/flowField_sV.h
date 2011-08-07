@@ -53,10 +53,14 @@ public:
     /// Height of the flow field
     int height() const { return m_height; }
 
-    /// Flow in x direction at position \c (x|y)
+    /// Flow in x direction at position <code>(x|y)</code>
     float x(int x, int y) const;
-    /// Flow in y direction at position \c (x|y)
+    /// Flow in y direction at position <code>(x|y)</code>
     float y(int x, int y) const;
+    /// Reference to the value x(x, y)
+    float& rx(int x, int y);
+    /// Reference to the value y(x, y)
+    float& ry(int x, int y);
     /// Sets the flow in x direction for the position <code>(x|y)</code>
     void setX(int x, int y, float value);
     /// Sets the flow in y direction for the position <code>(x|y)</code>

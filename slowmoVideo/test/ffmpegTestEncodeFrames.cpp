@@ -27,11 +27,15 @@ int main()
     davinci.setPen(QColor(40, 80, 255, 20));
 
     VideoOut_sV video;
-    prepare(&video, "/tmp/ffmpegEncodedFrames.avi", width, height, 1000000, 1, 25);
+    int ret = prepare(&video, "/tmp/ffmpegEncodedFrames.mov", "ffv1", width, height, 1000000, 1, 25);
+    if (ret != 0) {
+        qDebug() << "Preparing the video failed: " << video.errorMessage << "(" << ret << ")";
+        return ret;
+    }
 
 
     eatSample(&video);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 100; i++) {
 
         img.fill(QColor(100, 100, 100).rgb());
         davinci.drawLine(0, 2*i, width-1, 2*i);

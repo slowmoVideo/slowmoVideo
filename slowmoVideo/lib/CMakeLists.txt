@@ -7,7 +7,7 @@ set(CMAKE_C_FLAGS
   -std=c99
 )
 
-set(LIB_SRC
+set(LIB_SRC_BASE
   defs_sV.cpp
   defs_sV.hpp
   vector_sV.cpp
@@ -18,7 +18,7 @@ set(LIB_SRC
   sourceField_sV.cpp
 )
 
-set(LIB_SRC_VI
+set(LIB_SRC_VIDEO
   defs_sV.h
   videoInfo_sV.c
 )
@@ -32,24 +32,35 @@ set(LIB_SRC_FLOW
   defs_sV.cpp
   flowRW_sV.cpp
   flowField_sV.cpp
+  flowTools_sV.cpp
+)
+
+set(LIB_SRC_FLOWVIS
+  flowVisualization_sV.cpp
 )
 
 set(HEADERS
   flowRW_sV.h
   flowField_sV.h
+  flowTools_sV.h
 )
 
 
 
-add_library(sV STATIC ${LIB_SRC})
-target_link_libraries(sV ${QT_LIBRARIES})
+add_library(sV  STATIC ${LIB_SRC_BASE})
+target_link_libraries(sV  ${QT_LIBRARIES})
 
-add_library(sVinfo STATIC ${LIB_SRC_VI})
-target_link_libraries(sVinfo ${FFMPEG_LIBRARIES})
+add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
+target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode STATIC ffmpegEncode_sV.c)
-target_link_libraries(sVencode ${FFMPEG_LIBRARIES})
+add_library(sVencode  STATIC ffmpegEncode_sV.c)
+target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 
-add_library(sVflow STATIC ${LIB_SRC_FLOW})
+add_library(sVflow  STATIC ${LIB_SRC_FLOW})
+
+add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
+target_link_libraries(sVvis  sVflow ${QT_LIBRARIES})
+
+
 install(TARGETS sVflow DESTINATION "lib")
 install(FILES ${HEADERS} DESTINATION "include")

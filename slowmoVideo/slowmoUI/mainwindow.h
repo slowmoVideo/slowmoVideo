@@ -12,17 +12,20 @@ the Free Software Foundation, either version 3 of the License, or
 #define MAINWINDOW_H
 
 #include "canvas.h"
-#include "inputMonitor.h"
-#include "../project/project_sV.h"
+#include "frameMonitor.h"
+#include "renderPreview.h"
+#include "dialogues/flowExaminer.h"
+#include "project/project_sV.h"
 
 namespace Ui {
     class MainWindow;
 }
 
-#include <QMainWindow>
-#include <QMap>
-#include <QList>
-#include <QTime>
+#include <QtGui/QMainWindow>
+#include <QtCore/QMap>
+#include <QtCore/QList>
+#include <QtCore/QTime>
+#include <QtCore/QThread>
 
 class Canvas;
 class ProgressDialog;
@@ -68,19 +71,28 @@ public:
     static void displayHelp(QPainter &davinci);
     static QStringList m_commands;
 
+protected slots:
+    virtual void closeEvent(QCloseEvent *e);
+
 private:
     Ui::MainWindow *ui;
-    QStatusBar *m_statusBar;
     QSettings m_settings;
 
     Project_sV *m_project;
+    QString m_projectPath;
 
     Canvas *m_wCanvas;
-    InputMonitor *m_wInputMonitor;
+    FrameMonitor *m_wInputMonitor;
+    FrameMonitor *m_wCurveMonitor;
     QDockWidget *m_wInputMonitorDock;
+    QDockWidget *m_wCurveMonitorDock;
+    RenderPreview* m_wRenderPreview;
+    QDockWidget *m_wRenderPreviewDock;
+    QList<QAction*> m_widgetActions;
 
     ProgressDialog *m_progressDialog;
     ProgressDialog *m_renderProgressDialog;
+    FlowExaminer *m_flowExaminer;
 
 
     TimedShortcut m_lastShortcut;
@@ -89,6 +101,8 @@ private:
     QList<QShortcut *> m_shortcutList;
     QMap<int, QString> m_keyList;
 
+    QThread m_rendererThread;
+
 
 
     static void fillCommandList();
@@ -96,6 +110,7 @@ private:
     void newProject();
     void loadProject(Project_sV *project);
     void resetDialogs();
+    void updateWindowTitle();
 
 private slots:
     /**
@@ -106,7 +121,9 @@ private slots:
     void shortcutUsed(QString);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
+    void slotShowFlowExaminerDialog();
     void slotForwardInputPosition(qreal frame);
+    void slotForwardCurveSrcPosition(qreal frame);
 
     void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
     void slotFrameSourceTasksFinished();
@@ -120,6 +137,7 @@ private slots:
 
     void slotToggleHelp();
     void slotShowAboutDialog();
+    void slotUpdateRenderPreview();
 
 
 signals:
@@ -127,6 +145,7 @@ signals:
     void setMode(const Canvas::ToolMode mode);
     void abort(const Canvas::Abort abort);
     void addTag();
+    void signalRendererContinue();
 
 };
 

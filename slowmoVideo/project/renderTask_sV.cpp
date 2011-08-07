@@ -15,23 +15,24 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QImage>
 #include <QMetaObject>
 #include "project_sV.h"
-#include "nodelist_sV.h"
+#include "nodeList_sV.h"
 #include "../lib/defs_sV.hpp"
 
-RenderTask_sV::RenderTask_sV(const Project_sV *project) :
+RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
+    m_renderTimeElapsed(0),
+    m_fps(24),
     m_initialized(false),
     m_stopRendering(false),
-    m_prevTime(-1)
+    m_prevTime(-1),
+    m_connectionType(Qt::QueuedConnection)
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
-    m_fps = 24;
-    m_frameSize = FrameSize_Small;
     m_interpolationType = InterpolationType_Forward;
 
-    m_resolution = const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_frameSize).size();
+    setSize(FrameSize_Small);
 
     m_nextFrameTime = m_project->nodes()->startTime();
 }
@@ -51,7 +52,7 @@ void RenderTask_sV::setRenderTarget(AbstractRenderTarget_sV *renderTarget)
     m_renderTarget = renderTarget;
 }
 
-void RenderTask_sV::setTimeRange(float start, float end)
+void RenderTask_sV::setTimeRange(qreal start, qreal end)
 {
     Q_ASSERT(start <= end);
     Q_ASSERT(start >= m_project->nodes()->startTime());
@@ -61,20 +62,26 @@ void RenderTask_sV::setTimeRange(float start, float end)
     m_timeEnd = end;
 }
 
-void RenderTask_sV::setFPS(float fps)
+void RenderTask_sV::setFPS(const Fps_sV fps)
 {
-    Q_ASSERT(fps > 0);
+    Q_ASSERT(fps.num > 0);
     m_fps = fps;
 }
 
 void RenderTask_sV::setSize(FrameSize size)
 {
     m_frameSize = size;
+    m_resolution = const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_frameSize).size();
 }
 
 void RenderTask_sV::setInterpolationType(const InterpolationType interpolation)
 {
     m_interpolationType = interpolation;
+}
+
+void RenderTask_sV::setQtConnectionType(Qt::ConnectionType type)
+{
+    m_connectionType = type;
 }
 
 void RenderTask_sV::slotStopRendering()
@@ -87,6 +94,12 @@ void RenderTask_sV::slotContinueRendering()
     m_stopRendering = false;
     if (m_nextFrameTime < m_timeStart) {
         m_nextFrameTime = m_timeStart;
+        int framesBefore;
+        qreal snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_fps, &framesBefore);
+        qDebug() << "Frame snapping in from " << m_nextFrameTime << " to " << snapped;
+        m_nextFrameTime = snapped;
+
+        Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_fps.fps() + .5) == framesBefore);
     }
     if (!m_initialized) {
         try {
@@ -100,9 +113,13 @@ void RenderTask_sV::slotContinueRendering()
     }
     qDebug() << "Continuing rendering at " << m_nextFrameTime;
 
+    m_stopwatch.start();
     emit signalRenderingContinued();
-    emit signalNewTask("Rendering slowmo ...", int(m_fps * (m_timeEnd-m_timeStart)));
-    QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
+    emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
+    bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
+    if (!b) {
+        qDebug() << "invokeMethod returned false.";
+    }
 }
 
 void RenderTask_sV::slotRenderFrom(qreal time)
@@ -117,28 +134,29 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("Empty frame source, cannot be rendered.");
     }
 
-    int frameNumber = (time - m_project->nodes()->startTime()) * m_fps;
+    int outputFrame = (time - m_project->nodes()->startTime()) * m_fps.fps() + .5;
     if (!m_stopRendering) {
 
         if (time > m_timeEnd) {
             m_stopRendering = true;
             m_renderTarget->closeRenderTarget();
-            emit signalRenderingFinished();
+            m_renderTimeElapsed += m_stopwatch.elapsed();
+            emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
 
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
 
-            qDebug() << "Rendering frame number " << frameNumber << " @" << time << " from source time " << srcTime;
+            qDebug() << "Rendering frame number " << outputFrame << " @" << time << " from source time " << srcTime;
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
-                                .arg(frameNumber).arg(time).arg(srcTime).arg(frameNumber));
+                                .arg(outputFrame).arg(time).arg(srcTime).arg(srcTime*m_project->frameSource()->fps()->fps()));
             try {
-                QImage rendered = m_project->interpolateFrameAt(srcTime, m_frameSize, m_interpolationType, m_prevTime);
+                QImage rendered = m_project->render(time, m_fps, m_interpolationType, m_frameSize);
 
-                m_renderTarget->slotConsumeFrame(rendered, frameNumber);
-                m_nextFrameTime = time + 1/m_fps;
+                m_renderTarget->slotConsumeFrame(rendered, outputFrame);
+                m_nextFrameTime = time + 1/m_fps.fps();
 
-                emit signalTaskProgress(frameNumber);
-                emit signalFrameRendered(time, frameNumber);
+                emit signalTaskProgress( (time-m_timeStart) * m_fps.fps() );
+                emit signalFrameRendered(time, outputFrame);
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;
                 emit signalRenderingAborted(err.message());
@@ -151,10 +169,11 @@ void RenderTask_sV::slotRenderFrom(qreal time)
 
     } else {
         m_renderTarget->closeRenderTarget();
-        emit signalRenderingStopped();
+        m_renderTimeElapsed += m_stopwatch.elapsed();
+        emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
     }
     if (!m_stopRendering) {
-        QMetaObject::invokeMethod(this, "slotRenderFrom", Qt::QueuedConnection, Q_ARG(qreal, m_nextFrameTime));
+        QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     }
 }
 

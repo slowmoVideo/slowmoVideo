@@ -18,7 +18,7 @@
 using namespace V3D;
 using namespace V3D_GPU;
 
-#define VERSION "1.0"
+#define VERSION "1.01"
 
 //#define USE_LAB_COLORSPACE 1
 #define USE_NEW_TVL1_FLOW 1
@@ -85,7 +85,7 @@ void drawscene()
       int const w = leftImage.width();
       int const h = leftImage.height();
 
-     std::cout << "Start initialization..." << std::endl;
+//     std::cout << "Start initialization..." << std::endl;
      glewInit();
      Cg_ProgramBase::initializeCg();
 
@@ -104,7 +104,7 @@ void drawscene()
      rightPyrG.allocate(w, h, nLevels);
      leftPyrB.allocate(w, h, nLevels);
      rightPyrB.allocate(w, h, nLevels);
-     std::cout << "done." << std::endl;
+//     std::cout << "done." << std::endl;
 
 #if !defined(USE_LAB_COLORSPACE)
       if (leftImage.numChannels() == 3) {
@@ -163,7 +163,6 @@ void drawscene()
 
       FlowField_sV field(leftImage.width(), leftImage.height(), data, FlowField_sV::GLFormat_RGB);
       FlowRW_sV::save(outputFile, &field);
-      std::cout << "Flow data written to " << outputFile << "." << std::endl;
 
       delete[] data;
 
@@ -172,6 +171,12 @@ void drawscene()
 
 int main( int argc, char** argv)
 {
+#ifndef INCLUDE_SOURCE
+   if (getenv("V3D_SHADER_DIR") == NULL) {
+       std::cout << "V3D_SHADER_DIR environment variable needs to be set!" << std::endl;
+       return -2;
+   }
+#endif
 
     if ((argc-1) == 1) {
         if (strcmp(argv[1], "--identify") == 0) {
@@ -185,14 +190,6 @@ int main( int argc, char** argv)
                "[ <lambda=" << lambda << "> [<nIterations=" << nIterations << ">] ]" << std::endl;
        return -1;
    }
-#ifdef INCLUDE_SOURCE
-   std::cout << "Using internal shader files." << std::endl;
-#else
-   if (getenv("V3D_SHADER_DIR") == NULL) {
-       std::cout << "V3D_SHADER_DIR environment variable needs to be set!";
-       return -2;
-   }
-#endif
 
    loadImageFile(argv[1], leftImage);
    loadImageFile(argv[2], rightImage);
@@ -205,8 +202,10 @@ int main( int argc, char** argv)
        }
    }
 
-   std::cout << "leftImage.numChannels() = " << leftImage.numChannels() << std::endl;
-   std::cout << "rightImage.numChannels() = " << rightImage.numChannels() << std::endl;
+   if (leftImage.numChannels() != 3 || rightImage.numChannels() != 3) {
+        std::cout << "leftImage.numChannels() = " << leftImage.numChannels() << std::endl;
+        std::cout << "rightImage.numChannels() = " << rightImage.numChannels() << std::endl;
+   }
 
    glutInitWindowPosition(0, 0);
    glutInitWindowSize(100, 100);

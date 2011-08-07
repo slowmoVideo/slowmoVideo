@@ -30,11 +30,15 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
+    <addaction name="separator"/>
     <addaction name="actionRender"/>
+    <addaction name="actionRenderPreview"/>
+    <addaction name="actionExamineFlow"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -43,7 +47,13 @@
     <addaction name="actionAbout"/>
     <addaction name="actionShortcuts"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
    <addaction name="menuSlowmoVideo_UI"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -93,6 +103,19 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionRenderPreview">
+   <property name="text">
+    <string>Render preview</string>
+   </property>
+  </action>
+  <action name="actionExamineFlow">
+   <property name="text">
+    <string>Examine flow</string>
+   </property>
+   <property name="toolTip">
+    <string>Examine flow at input frame</string>
    </property>
   </action>
  </widget>

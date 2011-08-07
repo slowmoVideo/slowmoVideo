@@ -22,7 +22,7 @@ public:
     /**
       \brief Creates a new image matrix.
 
-      \b channels should match the number of channels of the images that will be added.
+      \c channels should match the number of channels of the images that will be added.
       */
     IntMatrix_sV(int width, int height, int channels);
     ~IntMatrix_sV();

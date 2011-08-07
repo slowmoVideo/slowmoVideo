@@ -11,6 +11,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "node_sV.h"
 #include <QDebug>
 
+
+//#define DEBUG_N
+
 Node_sV::Node_sV() :
     m_x(0),
     m_y(0)
@@ -33,9 +36,9 @@ Node_sV::Node_sV(const Node_sV &other) :
     m_x(other.x()),
     m_y(other.y()),
     m_leftHandle(other.m_leftHandle),
-    m_rightHandle(other.m_rightHandle)
+    m_rightHandle(other.m_rightHandle),
+    m_shutterFunctionID(other.m_shutterFunctionID)
 {
-    qDebug() << "Node_sV(const Node_sV &other) called";
     init();
     m_leftCurveType = other.m_leftCurveType;
     m_rightCurveType = other.m_rightCurveType;
@@ -79,6 +82,7 @@ const NodeHandle_sV& Node_sV::leftNodeHandle() const { return m_leftHandle; }
 const NodeHandle_sV& Node_sV::rightNodeHandle() const { return m_rightHandle; }
 CurveType Node_sV::leftCurveType() const { return m_leftCurveType; }
 CurveType Node_sV::rightCurveType() const { return m_rightCurveType; }
+const QString Node_sV::shutterFunctionID() const { return m_shutterFunctionID; }
 
 void Node_sV::setLeftCurveType(CurveType type) { m_leftCurveType = type; }
 void Node_sV::setRightCurveType(CurveType type) { m_rightCurveType = type; }
@@ -89,6 +93,10 @@ void Node_sV::setLeftNodeHandle(qreal x, qreal y) {
 void Node_sV::setRightNodeHandle(qreal x, qreal y) {
     Q_ASSERT(x >= 0);
     m_rightHandle.rx() = x; m_rightHandle.ry() = y;
+}
+void Node_sV::setShutterFunctionID(QString id)
+{
+    m_shutterFunctionID = id;
 }
 
 
@@ -147,16 +155,22 @@ void Node_sV::operator -=(const Node_sV& other)
 }
 void Node_sV::operator =(const Node_sV& other)
 {
-    qDebug() << "Operator= called with other = " << &other << "; this: " << this;
     if (this != &other) {
+#ifdef DEBUG_N
         qDebug() << "Other: " << other;
+#endif
         m_x = other.m_x;
         m_y = other.m_y;
         m_leftHandle.setX(other.leftNodeHandle().x());
         m_leftHandle.setY(other.leftNodeHandle().y());
         m_rightHandle.setX(other.rightNodeHandle().x());
         m_rightHandle.setY(other.rightNodeHandle().y());
+        m_leftCurveType = other.m_leftCurveType;
+        m_rightCurveType = other.m_rightCurveType;
+        m_shutterFunctionID = other.m_shutterFunctionID;
+#ifdef DEBUG_N
         qDebug() << "This: " << *this;
+#endif
     }
     Q_ASSERT(this == m_leftHandle.parentNode());
     Q_ASSERT(this == m_rightHandle.parentNode());
@@ -176,6 +190,7 @@ QDebug operator<<(QDebug qd, const Node_sV& n)
     qd.nospace() << "(";
     qd.nospace() << n.x() << "|" << n.y();
     if (n.selected()) { qd.nospace() << "|s"; }
-    qd.nospace() << ")@" << &n << " l: " << n.leftNodeHandle() << ", r: " << n.rightNodeHandle() << "\n";
+    qd.nospace() << ")@" << &n << " l: " << n.leftNodeHandle() << " " << toString(n.leftCurveType())
+                 << ", r: " << n.rightNodeHandle() << " " << toString(n.rightCurveType()) << "\n";
     return qd.maybeSpace();
 }

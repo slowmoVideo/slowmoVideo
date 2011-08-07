@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "interpolate_sV.h"
 #include "flowField_sV.h"
+#include "flowTools_sV.h"
 #include "sourceField_sV.h"
 #include "vector_sV.h"
 #include "bezierTools_sV.h"
@@ -24,6 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define CLAMP(x,min,max) (  ((x) < (min)) ? (min) : ( ((x) > (max)) ? (max) : (x) )  )
 
 #define INTERPOLATE
+//#define FIX_FLOW
 #define DEBUG_I
 
 enum ColorComponent { CC_Red, CC_Green, CC_Blue };
@@ -84,10 +86,10 @@ QColor Interpolate_sV::blend(const QColor &left, const QColor &right, float pos)
     float g = (1-pos)*left.greenF() + pos*right.greenF();
     float b = (1-pos)*left.blueF()  + pos*right.blueF();
     float a = (1-pos)*left.alphaF() + pos*right.alphaF();
-    r = CLAMP(r,0,1);
-    g = CLAMP(g,0,1);
-    b = CLAMP(b,0,1);
-    a = CLAMP(a,0,1);
+    r = CLAMP(r,0.0,1.0);
+    g = CLAMP(g,0.0,1.0);
+    b = CLAMP(b,0.0,1.0);
+    a = CLAMP(a,0.0,1.0);
     return QColor::fromRgbF(r, g, b, a);
 }
 
@@ -113,8 +115,8 @@ void Interpolate_sV::blend(ColorMatrix4x4 &c, const QColor &blendCol, float posX
 void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage &output)
 {
 #ifdef INTERPOLATE
-    const int Wmax = left.width()-1;
-    const int Hmax = left.height()-1;
+    const float Wmax = left.width()-1.0001; // A little less than the maximum pixel to avoid out of bounds when interpolating
+    const float Hmax = left.height()-1.0001;
     float posX, posY;
 #endif
 
@@ -167,12 +169,21 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
     const int W = left.width();
     const int H = left.height();
 
+
     SourceField_sV leftSourcePixel(flowLeftRight, pos);
     leftSourcePixel.inpaint();
     SourceField_sV rightSourcePixel(flowRightLeft, 1-pos);
     rightSourcePixel.inpaint();
 
     float aspect = 1 - (.5 + std::cos(M_PI*pos)/2);
+
+#if defined(FIX_FLOW)
+    FlowField_sV diffField(flowLeftRight->width(), flowLeftRight->height());
+    FlowTools_sV::difference(*flowLeftRight, *flowRightLeft, diffField);
+    float diffSum;
+    float tmpAspect;
+#endif
+
 
     float fx, fy;
     QColor colLeft, colRight;
@@ -184,13 +195,37 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
             fy = CLAMP(fy, 0, H-1.01);
             colLeft = interpolate(left, fx, fy);
 
+#ifdef FIX_FLOW
+            diffSum = diffField.x(fx, fy)+diffField.y(fx, fy);
+            if (diffSum > 5) {
+                tmpAspect = 0;
+            } else if (diffSum < -5) {
+                tmpAspect = 1;
+            } else {
+                tmpAspect = aspect;
+            }
+#endif
+
             fx = rightSourcePixel.at(x,y).fromX;
             fx = CLAMP(fx, 0, W-1.01);
             fy = rightSourcePixel.at(x,y).fromY;
             fy = CLAMP(fy, 0, H-1.01);
             colRight = interpolate(right, fx, fy);
 
+#ifdef FIX_FLOW
+            diffSum = diffField.x(fx, fy)+diffField.y(fx, fy);
+            if (diffSum < 5) {
+                tmpAspect = 0;
+            } else if (diffSum > -5) {
+                tmpAspect = 1;
+            }
+#endif
+
+#ifdef FIX_FLOW
+            output.setPixel(x,y, blend(colLeft, colRight, tmpAspect).rgba());
+#else
             output.setPixel(x,y, blend(colLeft, colRight, aspect).rgba());
+#endif
         }
     }
 }
@@ -200,8 +235,8 @@ void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, f
     qDebug() << "Interpolating flow at offset " << pos;
 #ifdef INTERPOLATE
     float posX, posY;
-    const int Wmax = left.width()-1;
-    const int Hmax = left.height()-1;
+    const float Wmax = left.width()-1.0001;
+    const float Hmax = left.height()-1.0001;
 #endif
 
     QColor colOut;
@@ -255,6 +290,8 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
 
 
 /**
+  \todo fix bézier interpolation
+  \code
       C prev
      /   /
     /   /
@@ -263,12 +300,12 @@ void Interpolate_sV::newForwardFlow(const QImage &left, const FlowField_sV *flow
    \
     \
      B next (can be NULL)
-
+  \endcode
   */
 void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const FlowField_sV *flowPrevCurr, const FlowField_sV *flowCurrNext, float pos, QImage &output)
 {
-    const int Wmax = prev.width()-1;
-    const int Hmax = prev.height()-1;
+    const float Wmax = prev.width()-1.0001;
+    const float Hmax = prev.height()-1.0001;
 
     Vector_sV a, b, c;
     Vector_sV Ta, Sa;

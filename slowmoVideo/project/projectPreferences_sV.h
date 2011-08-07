@@ -15,25 +15,43 @@ public:
     QPointF& viewport_secRes();
 
     // Rendering
+    QString& renderSectionMode();
+    QString& renderStartTag();
+    QString& renderEndTag();
+    QString& renderStartTime();
+    QString& renderEndTime();
     FrameSize& renderFrameSize();
     InterpolationType& renderInterpolationType();
-    float& renderFPS();
+    Fps_sV& renderFPS();
+    QString& renderTarget();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
     QString& videoFilename();
+    QString& videoCodec();
+
+    float& flowV3DLambda();
 
 private:
     TagAxis m_tagAxis;
     QPointF m_viewport_t0;
     QPointF m_viewport_secRes;
 
+    QString m_renderSectionMode;
+    QString m_renderStartTag;
+    QString m_renderEndTag;
+    QString m_renderStartTime;
+    QString m_renderEndTime;
     FrameSize m_renderFrameSize;
     InterpolationType m_renderInterpolationType;
-    float m_renderFPS;
+    Fps_sV m_renderFPS;
+    QString m_renderTarget;
 
     QString m_imagesOutputDir;
     QString m_imagesFilenamePattern;
     QString m_videoFilename;
+    QString m_vcodec;
+
+    float m_flowV3DLambda;
 
 };
 
