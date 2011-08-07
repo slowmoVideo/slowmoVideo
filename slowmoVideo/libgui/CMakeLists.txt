@@ -1,9 +1,11 @@
 set(SRCS
     imageDisplay.cpp
+    combinedShortcuts.cpp
 )
 
 set(SRCS_MOC
     imageDisplay.h
+    combinedShortcuts.h
 )
 
 

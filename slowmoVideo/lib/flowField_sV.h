@@ -53,9 +53,9 @@ public:
     /// Height of the flow field
     int height() const { return m_height; }
 
-    /// Flow in x direction at position <pre>(x|y)</pre>
+    /// Flow in x direction at position <code>(x|y)</code>
     float x(int x, int y) const;
-    /// Flow in y direction at position <pre>(x|y)</pre>
+    /// Flow in y direction at position <code>(x|y)</code>
     float y(int x, int y) const;
     /// Reference to the value x(x, y)
     float& rx(int x, int y);

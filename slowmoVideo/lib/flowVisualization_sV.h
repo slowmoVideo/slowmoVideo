@@ -7,7 +7,7 @@
 class FlowVisualization_sV
 {
 public:
-    static QImage colourizeFlow(const FlowField_sV *flowField);
+    static QImage colourizeFlow(const FlowField_sV *flowField, float boost = 1.0);
 };
 
 #endif // FLOWVISUALIZATION_SV_H

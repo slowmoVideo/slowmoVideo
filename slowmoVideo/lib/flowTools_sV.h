@@ -14,10 +14,15 @@ public:
     static void difference(const FlowField_sV &left, const FlowField_sV &right, FlowField_sV &out);
     static void signedDifference(const FlowField_sV &left, const FlowField_sV &right, FlowField_sV &out);
 
-    /// 0 point is at top left.
-    /// (top|left) and (bottom|right) are inclusive.
+    /**
+      \brief Clears the content of the given rectangle and fills it with the surrounding pixels.
+
+      The coordinates are inclusive, so filling <code>(0,0,1,1)</code> fills four pixels. The axis origin <code>(0|0)</code>
+      is at top left.
+      */
     static void refill(FlowField_sV &field, int top, int left, int bottom, int right);
 
+private:
     static void refillLine(FlowField_sV &field, int startTop, int startLeft, int length, LineFillMode fillMode);
     static void refillCorner(FlowField_sV &field, int top, int left, CornerPosition pos);
 };

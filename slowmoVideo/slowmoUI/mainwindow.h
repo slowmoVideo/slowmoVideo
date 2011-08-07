@@ -71,11 +71,15 @@ public:
     static void displayHelp(QPainter &davinci);
     static QStringList m_commands;
 
+protected slots:
+    virtual void closeEvent(QCloseEvent *e);
+
 private:
     Ui::MainWindow *ui;
     QSettings m_settings;
 
     Project_sV *m_project;
+    QString m_projectPath;
 
     Canvas *m_wCanvas;
     FrameMonitor *m_wInputMonitor;
@@ -106,6 +110,7 @@ private:
     void newProject();
     void loadProject(Project_sV *project);
     void resetDialogs();
+    void updateWindowTitle();
 
 private slots:
     /**

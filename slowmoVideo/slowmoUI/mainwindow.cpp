@@ -70,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    restoreGeometry(m_settings.value("geometry").toByteArray());
+    restoreState(m_settings.value("windowState").toByteArray());
+
     m_project = new Project_sV();
 
     m_wCanvas = new Canvas(m_project, this);
@@ -197,6 +200,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Q_ASSERT(b);
 
+    updateWindowTitle();
 }
 
 MainWindow::~MainWindow()
@@ -231,6 +235,13 @@ MainWindow::~MainWindow()
     for (int i = 0; i < m_widgetActions.size(); i++) {
         delete m_widgetActions[i];
     }
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    m_settings.setValue("geometry", saveGeometry());
+    m_settings.setValue("windowState", saveState());
+    QMainWindow::closeEvent(e);
 }
 
 
@@ -337,6 +348,7 @@ void MainWindow::newProject()
             // Save project
             XmlProjectRW_sV writer;
             writer.saveProject(project, npd.projectFilename());
+            m_projectPath = npd.projectFilename();
 
             loadProject(project);
         } catch (FrameSourceError &err) {
@@ -355,6 +367,7 @@ void MainWindow::loadProject(Project_sV *project)
     m_project = project;
     m_wCanvas->load(m_project);
     m_wRenderPreview->load(m_project);
+    updateWindowTitle();
 
     bool b = true;
     b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
@@ -380,6 +393,7 @@ void MainWindow::slotLoadProjectDialog()
             if (warning.length() > 0) {
                 QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
             }
+            m_projectPath = dialog.selectedFiles().at(0);
             loadProject(project);
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
@@ -468,6 +482,14 @@ void MainWindow::slotUpdateRenderPreview()
                                        m_wCanvas->prevMouseTime().x(), false,
                                        m_project->preferences()->renderFPS(), NULL)
                                    );
+}
+void MainWindow::updateWindowTitle()
+{
+    QString project("empty project");
+    if (m_projectPath.length() > 0) {
+        project = m_projectPath;
+    }
+    setWindowTitle(QString("slowmo UI (%1)").arg(project));
 }
 
 

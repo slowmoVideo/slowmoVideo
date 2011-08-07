@@ -5,17 +5,20 @@ set(SRCS
     main.cpp
     mainwindow.cpp
     flowEditCanvas.cpp
+    shortcutListDialog.cpp
 )
 
 set(SRCS_UI
     mainwindow.ui
     flowEditCanvas.ui
+    shortcutListDialog.ui
 )
 
 
 set(SRCS_MOC
     mainwindow.h
     flowEditCanvas.h
+    shortcutListDialog.h
 )
 
 qt4_wrap_ui(UI_H_OUT ${SRCS_UI})

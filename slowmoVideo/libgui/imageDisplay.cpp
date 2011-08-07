@@ -1,5 +1,5 @@
 /*
-slowmoUI is a user interface for slowmoVideo.
+This file is part of slowmoVideo.
 Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
