@@ -86,6 +86,7 @@ public:
       */
     static qreal snapToFrame(const qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
     qreal snapToOutFrame(qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;
+    qreal toOutTime(QString timeExpression, const Fps_sV& fps) const throw(Error_sV);
 
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
@@ -100,6 +101,7 @@ public:
       \see NodeList_sV::objectsNear() Used by this method. Does not include tags.
       */
     QList<NodeList_sV::PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;
+
 
 
 

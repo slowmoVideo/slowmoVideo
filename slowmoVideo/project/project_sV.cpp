@@ -253,6 +253,84 @@ qreal Project_sV::snapToOutFrame(qreal time, bool roundUp, const Fps_sV &fps, in
     float snapped = snapToFrame(time, roundUp, fps, out_framesBeforeHere) + m_nodes->startTime();
     return snapped;
 }
+qreal Project_sV::toOutTime(QString timeExpression, const Fps_sV &fps) const throw(Error_sV)
+{
+    if (m_nodes->size() < 2) {
+        throw Error_sV("Not enough nodes available in the project.");
+    }
+
+    // t:time l:label f:frame p:percent :start :end time
+    bool ok = false;
+    qreal time = 0;
+    if (timeExpression.startsWith("t:")) {
+        time = timeExpression.mid(2).toDouble(&ok);
+        if (!ok) {
+            throw Error_sV(QString("%1 is not a valid time. Format: t:123.45").arg(timeExpression));
+        }
+    } else if (timeExpression.startsWith("l:")) {
+        QString label = timeExpression.mid(2);
+        bool inputAxisFound = false;
+        for (int i = 0; i < m_tags->size(); i++) {
+            if (m_tags->at(i).description() == label) {
+                if (m_tags->at(i).axis() == TagAxis_Output) {
+                    time = m_tags->at(i).time();
+                    ok = true;
+                    break;
+                } else {
+                    inputAxisFound = true;
+                }
+            }
+        }
+        if (!ok) {
+            if (inputAxisFound) {
+                throw Error_sV(QString("%1 is an input label and not an output label and cannot be used for rendering.").arg(label));
+            } else {
+                throw Error_sV(QString("No label found for %1").arg(timeExpression));
+            }
+        }
+    } else if (timeExpression.startsWith("f:")) {
+        int frame = timeExpression.mid(2).toInt(&ok);
+        if (ok) {
+            time = frame / fps.fps();
+        } else {
+            throw Error_sV(QString("%1 is not a valid frame number. Format: f:1234").arg(timeExpression));
+        }
+    } else if (timeExpression.startsWith("p:")) {
+        QString sPercent = timeExpression.mid(2).trimmed();
+        if (sPercent.endsWith("%")) {
+            sPercent.chop(1);
+        }
+        float percent = sPercent.toFloat(&ok);
+        if (ok) {
+            if (percent >= 0 && percent <= 100) {
+                time = m_nodes->startTime() + m_nodes->totalTime()*percent/100;
+            } else {
+                throw Error_sV(QString("%1 is not a valid percentage number; must be between 0 and 100.").arg(percent));
+            }
+        } else {
+            throw Error_sV(QString("%1 is not a valid percentage expression. Format: p:0% until p:100.0%").arg(timeExpression));
+        }
+    } else if (timeExpression.startsWith(":")) {
+        if (":start" == timeExpression) {
+            time = m_nodes->startTime();
+        } else if (":end" == timeExpression) {
+            time = m_nodes->endTime();
+        } else {
+            throw Error_sV(QString("%1 is not a valid position. Valid: :start and :end").arg(timeExpression));
+        }
+    } else {
+        time = timeExpression.toDouble(&ok);
+        if (!ok) {
+            throw Error_sV("Not a valid time format. Options:  t:1.25 or 1.25 (time),  f:1234 (frame),  "
+                                   "l:slowdown (label),  p:42.42% (percentage),  :start and :end (project start/end).");
+        }
+    }
+
+    time = qMax(time, m_nodes->startTime());
+    time = qMin(time, m_nodes->endTime());
+
+    return time;
+}
 
 QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qreal tmaxdist) const
 {

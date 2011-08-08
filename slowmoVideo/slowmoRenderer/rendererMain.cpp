@@ -88,6 +88,9 @@ int main(int argc, char *argv[])
 
     renderer.load(args.at(1));
 
+    QString start = ":start";
+    QString end = ":end";
+
     const int n = args.size();
     int next = 2;
     while (next < n) {
@@ -141,26 +144,12 @@ int main(int argc, char *argv[])
         } else if ("-start" == args.at(next)) {
             require(1, next, n);
             next++;
-            bool b;
-            qreal start = args.at(next).toDouble(&b);
-            if (!b) {
-                std::cerr << "Not a number: " << args.at(next).toStdString() << std::endl;
-                return -1;
-            }
-            renderer.setStart(start);
-            next++;
+            start = args.at(next++);
 
         } else if ("-end" == args.at(next)) {
             require(1, next, n);
             next++;
-            bool b;
-            qreal end = args.at(next).toDouble(&b);
-            if (!b) {
-                std::cerr << "Not a number: " << args.at(next).toStdString() << std::endl;
-                return -1;
-            }
-            renderer.setEnd(end);
-            next++;
+            end = args.at(next++);
 
         } else if ("-interpolation" == args.at(next)) {
             require(1, next, n);
@@ -197,6 +186,8 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
+
+    renderer.setTimeRange(start, end);
 
     QString msg;
     if (!renderer.isComplete(msg)) {

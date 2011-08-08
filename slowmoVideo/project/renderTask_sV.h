@@ -31,12 +31,25 @@ public:
 
     /**
       \fn setRenderTarget()
-      Manages the \c renderTarget pointer (includes destruction).
+      \brief Manages the \c renderTarget pointer (includes destruction).
       */
     /**
-      \fn setTimeRange()
-      Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
-      \todo Accept other formats: f:123 for frames, t:Tag for tags
+      \fn setTimeRange(qreal, qreal)
+      \brief Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
+      \todo Accept other formats: f:123 for frames, t:Tag for tags, :start/:end for project start/end
+      */
+    /**
+      \fn setTimeRange(QString, QString)
+      \brief Sets the time range for rendering.
+
+      Note that setFPS() has to be called \i before this function is called.
+
+      Accepted input format:
+      \li \c 24.3 or \c t:24.3 for 24.3 seconds
+      \li \c f:123 for frame 123
+      \li \c p:25% for 25 %
+      \li \c l:slowdown for the slowdown label (tag)
+      \li \c :start and \c :end for project start/end
       */
     /**
       \fn setFPS()
@@ -48,6 +61,7 @@ public:
       */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(qreal start, qreal end);
+    void setTimeRange(QString start, QString end);
     void setFPS(const Fps_sV fps);
     void setSize(FrameSize size);
     void setInterpolationType(const InterpolationType interpolation);
@@ -91,6 +105,7 @@ private:
     FrameSize m_frameSize;
     InterpolationType m_interpolationType;
 
+    bool m_fpsSet;
     bool m_initialized;
     bool m_stopRendering;
     qreal m_nextFrameTime;

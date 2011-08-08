@@ -38,7 +38,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QString mode(m_project->preferences()->renderSectionMode());
     if (mode == "full") {
         ui->radioFullProject->setChecked(true);
-    } else if (mode == "time") {
+    } else if (mode == "expr") {
         ui->radioSection->setChecked(true);
     } else if (mode == "tags") {
         ui->radioTagSection->setChecked(true);
@@ -187,16 +187,10 @@ RenderTask_sV* RenderingDialog::buildTask()
             Q_ASSERT(start <= end);
             task->setTimeRange(start, end);
         } else if (ui->radioSection->isChecked()) {
-            bool b;
-            qreal start = ui->timeStart->text().toFloat(&b);
-            Q_ASSERT(b);
-            qreal end = ui->timeEnd->text().toFloat(&b);
-            Q_ASSERT(b);
-            qDebug() << QString("Rendering time section from %1 (%2) to %3 (%4)")
+            qDebug() << QString("Rendering time section from %1 to %3")
                         .arg(ui->cbStartTag->currentText())
-                        .arg(start).arg(ui->cbEndTag->currentText()).arg(end);
-            Q_ASSERT(start <= end);
-            task->setTimeRange(start, end);
+                        .arg(ui->cbEndTag->currentText());
+            task->setTimeRange(ui->timeStart->text(), ui->timeEnd->text());
         }
 
         QString mode;
@@ -256,7 +250,7 @@ void RenderingDialog::slotSaveSettings()
     if (ui->radioFullProject->isChecked()) {
         mode = "full";
     } else if (ui->radioSection->isChecked()) {
-        mode = "time";
+        mode = "expr";
         m_project->preferences()->renderStartTime() = ui->timeStart->text();
         m_project->preferences()->renderEndTime() = ui->timeEnd->text();
     } else if (ui->radioTagSection->isChecked()) {
@@ -316,18 +310,41 @@ bool RenderingDialog::slotValidate()
     }
 
     if (ui->radioSection->isChecked()) {
-        bool startOk;
-        bool endOk;
-        qreal timeStart = ui->timeStart->text().toDouble(&startOk);
-        qreal timeEnd = ui->timeEnd->text().toDouble(&endOk);
-        startOk &= timeStart >= m_project->nodes()->startTime();
-        endOk &= timeEnd <= m_project->nodes()->endTime();
+        bool startOk = false;
+        bool endOk = false;
+        qreal timeStart = 0;
+        qreal timeEnd = 0;
+        QStringList messages;
+
+        Fps_sV currentFps(ui->cbFps->currentText().toFloat());
+        try {
+            timeStart = m_project->toOutTime(ui->timeStart->text(), currentFps);
+            startOk = true;
+        } catch (Error_sV &err) {
+            messages << err.message();
+        }
+        try {
+            timeEnd = m_project->toOutTime(ui->timeEnd->text(), currentFps);
+            endOk = true;
+        } catch (Error_sV &err) {
+            messages << err.message();
+        }
+        if (timeEnd <= timeStart) {
+            endOk = false;
+            messages << "Start time must be < end time!";
+        }
+
+        messages << QString("Rendering from %1 s to %2 s.").arg(timeStart).arg(timeEnd);
+        ui->sectionMessage->setText(messages.join("\n"));
+
+        ok &= startOk && endOk;
+
         if (!startOk) {
             ui->timeStart->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
         } else {
             ui->timeStart->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
         }
-        if (!endOk || timeEnd <= timeStart) {
+        if (!endOk) {
             ui->timeEnd->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
         } else {
             ui->timeEnd->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
@@ -376,12 +393,12 @@ void RenderingDialog::slotBrowseVideoFile()
 void RenderingDialog::slotSectionModeChanged()
 {
     ui->timeStart->setVisible(ui->radioSection->isChecked());
-    ui->lblcUnitStart->setVisible(ui->radioSection->isChecked());
     ui->timeEnd->setVisible(ui->radioSection->isChecked());
-    ui->lblcUnitEnd->setVisible(ui->radioSection->isChecked());
+    ui->sectionMessage->setVisible(ui->radioSection->isChecked());
     ui->cbStartTag->setVisible(ui->radioTagSection->isChecked());
     ui->cbEndTag->setVisible(ui->radioTagSection->isChecked());
     ui->lblcTo->setVisible(ui->radioSection->isChecked() || ui->radioTagSection->isChecked());
+    slotValidate();
 }
 
 void RenderingDialog::slotTagIndexChanged()

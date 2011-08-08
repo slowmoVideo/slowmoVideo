@@ -23,6 +23,7 @@ RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_renderTarget(NULL),
     m_renderTimeElapsed(0),
     m_fps(24),
+    m_fpsSet(false),
     m_initialized(false),
     m_stopRendering(false),
     m_prevTime(-1),
@@ -62,10 +63,19 @@ void RenderTask_sV::setTimeRange(qreal start, qreal end)
     m_timeEnd = end;
 }
 
+void RenderTask_sV::setTimeRange(QString start, QString end)
+{
+    Q_ASSERT(m_fpsSet);
+    m_timeStart = m_project->toOutTime(start, m_fps);
+    m_timeEnd = m_project->toOutTime(end, m_fps);
+    Q_ASSERT(m_timeStart < m_timeEnd);
+}
+
 void RenderTask_sV::setFPS(const Fps_sV fps)
 {
     Q_ASSERT(fps.num > 0);
     m_fps = fps;
+    m_fpsSet = true;
 }
 
 void RenderTask_sV::setSize(FrameSize size)
