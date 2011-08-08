@@ -32,7 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 2
-#define SLOWMOVIDEO_VERSION_MICRO 0
+#define SLOWMOVIDEO_VERSION_MICRO 1
 
 
 /// Contains information about this slowmoVideo version

@@ -450,6 +450,11 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
                         while (xml.readNextStartElement()) {
                             if (xml.name() == "renderSectionMode") {
                                 pr->renderSectionMode() = xml.attributes().value("mode").toString();
+                                if (projVersionMajor == 2 && projVersionMinor < 4) {
+                                    if (pr->renderSectionMode() == "time") {
+                                        pr->renderSectionMode() = "expr";
+                                    }
+                                }
                                 while (xml.readNextStartElement()) {
                                     if (xml.name() == "renderStartTag") {
                                         pr->renderStartTag() = xml.attributes().value("label").toString();

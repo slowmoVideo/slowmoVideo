@@ -26,8 +26,8 @@ SlowmoRenderer_sV::SlowmoRenderer_sV() :
     m_project(NULL),
     m_taskSize(0),
     m_lastProgress(0),
-    m_start(0),
-    m_end(0),
+    m_start(":start"),
+    m_end(":end"),
     m_renderTargetSet(false)
 {
 }
@@ -55,8 +55,7 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
         m_project->replaceRenderTask(task);
-        m_start = m_project->nodes()->startTime();
-        m_end = m_project->nodes()->endTime();
+        task->setFPS(24);
         task->setTimeRange(m_start, m_end);
         task->setQtConnectionType(Qt::AutoConnection);
 
@@ -73,20 +72,9 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
     }
 }
 
-void SlowmoRenderer_sV::setTimeRange(double start, double end)
+void SlowmoRenderer_sV::setTimeRange(QString start, QString end)
 {
     m_start = start;
-    m_end = end;
-    m_project->renderTask()->setTimeRange(m_start, m_end);
-}
-void SlowmoRenderer_sV::setStart(double start)
-{
-    m_start = start;
-    m_end = qMax(m_end, m_start);
-    m_project->renderTask()->setTimeRange(m_start, m_end);
-}
-void SlowmoRenderer_sV::setEnd(double end)
-{
     m_end = end;
     m_project->renderTask()->setTimeRange(m_start, m_end);
 }

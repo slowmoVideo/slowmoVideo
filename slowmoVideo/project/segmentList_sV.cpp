@@ -19,13 +19,10 @@ SegmentList_sV::SegmentList_sV()
 
 void SegmentList_sV::unselectAll()
 {
-    qDebug() << "Unselecting all nodes.";
     for (int i = 0; i < m_list.size(); i++) {
         m_list[i].select(false);
-        std::cerr << i << " ...";
         Q_ASSERT(!m_list.at(i).selected());
     }
-    std::cerr << " done. " << std::endl;
 }
 
 void SegmentList_sV::grow()

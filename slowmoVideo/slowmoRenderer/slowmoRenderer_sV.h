@@ -38,9 +38,7 @@ public:
     void start();
     void abort();
 
-    void setTimeRange(double start, double end);
-    void setStart(double start);
-    void setEnd(double end);
+    void setTimeRange(QString start, QString end);
     void setFps(double fps);
     void setVideoRenderTarget(QString filename, QString codec);
     void setImagesRenderTarget(QString filenamePattern, QString directory);
@@ -62,8 +60,8 @@ private:
     int m_taskSize;
     int m_lastProgress;
 
-    double m_start;
-    double m_end;
+    QString m_start;
+    QString m_end;
 
     bool m_renderTargetSet;
 
