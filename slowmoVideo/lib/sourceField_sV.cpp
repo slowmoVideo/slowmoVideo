@@ -69,6 +69,7 @@ SourceField_sV::~SourceField_sV()
 
 void SourceField_sV::inpaint()
 {
+    Source pos;
     SourceSum sum;
     int dist;
     bool xm, xp, ym, yp;
@@ -78,6 +79,7 @@ void SourceField_sV::inpaint()
     for (int y = 0; y < m_height; y++) {
         for (int x = 0; x < m_width; x++) {
             if (!clone.at(x,y).isSet) {
+                pos = Source(x,y);
                 sum.reset();
                 dist = 1;
                 while (sum.count <= 2) {
@@ -87,38 +89,38 @@ void SourceField_sV::inpaint()
                     yp = (y+dist) < m_height;
 
                     if (xm) {
-                        sum += clone.at(x-dist, y);
+                        sum += clone.at(x-dist, y) - pos;
                     }
                     if (ym) {
-                        sum += clone.at(x, y-dist);
+                        sum += clone.at(x, y-dist) - pos;
                     }
                     if (xp) {
-                        sum += clone.at(x+dist, y);
+                        sum += clone.at(x+dist, y) - pos;
                     }
                     if (yp) {
-                        sum += clone.at(x, y+dist);
+                        sum += clone.at(x, y+dist) - pos;
                     }
                     if (sum.count > 2) break;
 
                     if (xm) {
                         if (ym) {
-                            sum += clone.at(x-dist, y-dist);
+                            sum += clone.at(x-dist, y-dist) - pos;
                         }
                         if (yp) {
-                            sum += clone.at(x-dist, y+dist);
+                            sum += clone.at(x-dist, y+dist) - pos;
                         }
                     }
                     if (xp) {
                         if (ym) {
-                            sum += clone.at(x+dist, y-dist);
+                            sum += clone.at(x+dist, y-dist) - pos;
                         }
                         if (yp) {
-                            sum += clone.at(x+dist, y+dist);
+                            sum += clone.at(x+dist, y+dist) - pos;
                         }
                     }
                     dist++;
                 }
-                at(x,y) = sum.norm();
+                at(x,y) = sum.norm() + pos;
             }
         }
     }

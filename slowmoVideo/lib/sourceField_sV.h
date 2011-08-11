@@ -76,6 +76,18 @@ public:
         void set(float x, float y) {
             fromX = x; fromY = y; isSet = true;
         }
+        Source operator -(const Source &other) const {
+            if (other.isSet && isSet) {
+                return Source(fromX - other.fromX, fromY - other.fromY);
+            }
+            return Source();
+        }
+        Source operator +(const Source &other) const {
+            if (other.isSet && isSet) {
+                return Source(fromX + other.fromX, fromY + other.fromY);
+            }
+            return Source();
+        }
     };
 
     /// Source array. Only public for the inline function at().
