@@ -37,7 +37,10 @@ class QProcess;
 class QRegExp;
 class QTimer;
 
-/** \brief slowmoVideo project holding all important information. */
+/**
+  \brief slowmoVideo project holding all important information.
+  \todo Check if width%4 == 0 for V3D
+  */
 class Project_sV : public QObject
 {
     Q_OBJECT
@@ -77,12 +80,24 @@ public:
 
 
     /**
+      \fn snapToFrame()
       \brief Snaps in the given time on a grid given by the number of frames per second.
       This allows to, for example, render from 0 to 3.2 seconds and then from 3.2 to 5 seconds
       to images with the same effect as rendering all at once. Always starts from 0!
       \param time Time to snap in
       \param roundUp To chose between rounding up or down
       \param fps Frames per second to use.
+      */
+    /**
+      \fn toOutTime()
+      \brief Converts a time expression like \c f:123 or \c :start to an output time \c float.
+
+      Accepted input format:
+      \li \c 24.3 or \c t:24.3 for 24.3 seconds
+      \li \c f:123 for frame 123
+      \li \c p:25% for 25 %
+      \li \c l:slowdown for the slowdown label (tag)
+      \li \c :start and \c :end for project start/end
       */
     static qreal snapToFrame(const qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
     qreal snapToOutFrame(qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;

@@ -26,6 +26,23 @@ void printUsage() {
     std::cout << "\t" << myName << " diff <flow1> <flow2> <output image>" << std::endl;
 }
 
+QImage reference() {
+    const int width = 512, height = 512;
+    float cX = width/2.0;
+    float cY = height/2.0;
+
+    FlowField_sV field(width, height);
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            field.setX(x,y, x-cX);
+            field.setY(x,y, y-cY);
+        }
+    }
+
+    return FlowVisualization_sV::colourizeFlow(&field, FlowVisualization_sV::HSV, 1.0);
+}
+
 void colourizeFlow(int argc, char *argv[])
 {
     if (argc <= 2) {
@@ -45,7 +62,8 @@ void colourizeFlow(int argc, char *argv[])
 
     std::cout << "Flow file loaded. Width: " << flowField->width() << ", height: " << flowField->height() << std::endl;
 
-    QImage img = FlowVisualization_sV::colourizeFlow(flowField);
+    /// \todo make visualization type configurable
+    QImage img = FlowVisualization_sV::colourizeFlow(flowField, FlowVisualization_sV::WXY);
 
     std::cout << "Saving " << outputFile.toStdString() << " ..." << std::endl;
     img.save(outputFile);
@@ -96,6 +114,8 @@ int main(int argc, char *argv[])
 
     if (strcmp("diff", argv[1]) == 0 || strcmp("diffSigned", argv[1]) == 0) {
         diffFlow(argc, argv);
+    } else if (strcmp("ref", argv[1]) == 0) {
+        reference().save("reference.png");
     } else {
         colourizeFlow(argc, argv);
     }

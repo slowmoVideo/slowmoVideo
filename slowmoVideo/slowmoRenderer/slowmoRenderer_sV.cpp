@@ -62,9 +62,9 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
         bool b = true;
         b &= connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
         b &= connect(m_project->renderTask(), SIGNAL(signalTaskProgress(int)), this, SLOT(slotProgressInfo(int)));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotFinished()));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished(QString)), this, SLOT(slotFinished()));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingStopped(QString)), this, SLOT(slotFinished()));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotFinished(QString)));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished(QString)), this, SLOT(slotFinished(QString)));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingStopped(QString)), this, SLOT(slotFinished(QString)));
         Q_ASSERT(b);
 
     } catch (Error_sV &err) {
@@ -146,9 +146,9 @@ void SlowmoRenderer_sV::slotTaskSize(QString desc, int size)
     m_taskSize = size;
 }
 
-void SlowmoRenderer_sV::slotFinished()
+void SlowmoRenderer_sV::slotFinished(QString time)
 {
-    std::cout << std::endl << "Rendering finished." << std::endl;
+    std::cout << std::endl << "Rendering finished.  Time taken: " << time.toStdString() << std::endl;
 }
 
 

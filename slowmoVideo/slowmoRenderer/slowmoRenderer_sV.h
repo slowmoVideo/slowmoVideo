@@ -69,7 +69,7 @@ private:
 private slots:
     void slotProgressInfo(int progress);
     void slotTaskSize(QString desc, int size);
-    void slotFinished();
+    void slotFinished(QString time);
 };
 
 

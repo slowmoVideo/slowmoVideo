@@ -44,12 +44,7 @@ public:
 
       Note that setFPS() has to be called \i before this function is called.
 
-      Accepted input format:
-      \li \c 24.3 or \c t:24.3 for 24.3 seconds
-      \li \c f:123 for frame 123
-      \li \c p:25% for 25 %
-      \li \c l:slowdown for the slowdown label (tag)
-      \li \c :start and \c :end for project start/end
+      Accepted input format is described in Project_sV::toOutTime().
       */
     /**
       \fn setFPS()

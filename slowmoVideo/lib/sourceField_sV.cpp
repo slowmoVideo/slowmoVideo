@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "sourceField_sV.h"
 #include "flowField_sV.h"
+#include <algorithm>
 #include <cmath>
 
 #define FIX_FLOW
@@ -20,6 +21,17 @@ SourceField_sV::SourceField_sV(int width, int height) :
 {
     m_field = new Source[width*height];
 }
+
+
+SourceField_sV::SourceField_sV(const SourceField_sV &other) :
+    m_width(other.m_width),
+    m_height(other.m_height)
+{
+    m_field = new Source[m_width*m_height];
+    std::copy(other.m_field, other.m_field+m_width*m_height, m_field);
+}
+
+
 
 SourceField_sV::SourceField_sV(const FlowField_sV *flow, float pos) :
     m_width(flow->width()),
@@ -61,9 +73,11 @@ void SourceField_sV::inpaint()
     int dist;
     bool xm, xp, ym, yp;
 
+    SourceField_sV clone = *this;
+
     for (int y = 0; y < m_height; y++) {
         for (int x = 0; x < m_width; x++) {
-            if (!at(x,y).isSet) {
+            if (!clone.at(x,y).isSet) {
                 sum.reset();
                 dist = 1;
                 while (sum.count <= 2) {
@@ -73,33 +87,33 @@ void SourceField_sV::inpaint()
                     yp = (y+dist) < m_height;
 
                     if (xm) {
-                        sum += at(x-dist, y);
+                        sum += clone.at(x-dist, y);
                     }
                     if (ym) {
-                        sum += at(x, y-dist);
+                        sum += clone.at(x, y-dist);
                     }
                     if (xp) {
-                        sum += at(x+dist, y);
+                        sum += clone.at(x+dist, y);
                     }
                     if (yp) {
-                        sum += at(x, y+dist);
+                        sum += clone.at(x, y+dist);
                     }
                     if (sum.count > 2) break;
 
                     if (xm) {
                         if (ym) {
-                            sum += at(x-dist, y-dist);
+                            sum += clone.at(x-dist, y-dist);
                         }
                         if (yp) {
-                            sum += at(x-dist, y+dist);
+                            sum += clone.at(x-dist, y+dist);
                         }
                     }
                     if (xp) {
                         if (ym) {
-                            sum += at(x+dist, y-dist);
+                            sum += clone.at(x+dist, y-dist);
                         }
                         if (yp) {
-                            sum += at(x+dist, y+dist);
+                            sum += clone.at(x+dist, y+dist);
                         }
                     }
                     dist++;
@@ -108,4 +122,18 @@ void SourceField_sV::inpaint()
             }
         }
     }
+}
+
+SourceField_sV& SourceField_sV::operator =(const SourceField_sV &other)
+{
+    if (this != &other) {
+        if (other.m_width != m_width || other.m_height != m_height) {
+            m_width = other.m_width;
+            m_height = other.m_height;
+            delete m_field;
+            m_field = new Source[m_width*m_height];
+        }
+        std::copy(other.m_field, other.m_field+m_width*m_height, m_field);
+    }
+    return *this;
 }

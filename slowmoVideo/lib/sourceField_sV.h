@@ -51,6 +51,7 @@ public:
       «went to» the part in the middle. This function interpolates those from nearby members
       whose source location is known.
       */
+    SourceField_sV(const SourceField_sV &other);
     SourceField_sV(int width, int height);
     SourceField_sV(const FlowField_sV *flow, float pos);
     ~SourceField_sV();
@@ -89,6 +90,8 @@ public:
 
     void inpaint();
     void fixFlow(const FlowField_sV *flowOtherDirection);
+
+    SourceField_sV& operator =(const SourceField_sV &other);
 
 private:
     int m_width;

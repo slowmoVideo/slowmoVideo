@@ -36,6 +36,7 @@ FlowExaminer::~FlowExaminer()
     }
 }
 
+/// \todo Make flow visualization configurable
 void FlowExaminer::examine(int leftFrame)
 {
     if (m_flowLR != NULL) {
@@ -51,8 +52,8 @@ void FlowExaminer::examine(int leftFrame)
         m_flowRL = m_project->requestFlow(leftFrame+1, leftFrame, FrameSize_Orig);
         ui->leftFrame->loadImage(m_project->frameSource()->frameAt(leftFrame, FrameSize_Orig));
         ui->rightFrame->loadImage(m_project->frameSource()->frameAt(leftFrame+1, FrameSize_Orig));
-        ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR));
-        ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL));
+        ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR, FlowVisualization_sV::HSV));
+        ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL, FlowVisualization_sV::HSV));
     } catch (FlowBuildingError &err) { }
 
     repaint();

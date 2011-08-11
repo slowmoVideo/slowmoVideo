@@ -46,10 +46,11 @@ void FlowEditCanvas::setAmplification(float val)
     repaintFlow();
 }
 
+/// \todo Make flow visualization configurable
 void FlowEditCanvas::repaintFlow()
 {
     if (m_flowField != NULL) {
-        ui->flow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowField, m_boost));
+        ui->flow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowField, FlowVisualization_sV::HSV, m_boost));
         repaint();
     }
 }
