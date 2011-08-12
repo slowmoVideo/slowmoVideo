@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "slowmoRenderer_sV.h"
 
 #include "project/project_sV.h"
+#include "project/projectPreferences_sV.h"
 #include "project/xmlProjectRW_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
@@ -118,12 +119,7 @@ void SlowmoRenderer_sV::setSize(bool original)
 
 void SlowmoRenderer_sV::setV3dLambda(float lambda)
 {
-    V3dFlowSource_sV *v3d;
-    if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_project->flowSource())) != NULL) {
-        v3d->setLambda(lambda);
-    } else {
-        std::cout << "Could not set v3d lambda; Not a v3d flow source." << std::endl;
-    }
+    m_project->preferences()->flowV3DLambda() = lambda;
 }
 
 void SlowmoRenderer_sV::start()

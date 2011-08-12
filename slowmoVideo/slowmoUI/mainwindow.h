@@ -49,6 +49,7 @@ public:
 
 protected slots:
     virtual void closeEvent(QCloseEvent *e);
+    virtual bool eventFilter(QObject *obj, QEvent *e);
 
 private:
     enum ShortcutCommands {

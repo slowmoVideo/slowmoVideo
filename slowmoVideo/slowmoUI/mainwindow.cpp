@@ -88,11 +88,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
             QAction *a = new QAction(w->objectName(), this);
             a->setCheckable(true);
-            a->setChecked(w->isVisible());
             bool b = true;
             b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
-            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
+            // This does not work since it is also emitted e.g. when the window is minimized
+            // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
+            // Thanks ArGGu^^ for the tip!
+//            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
             Q_ASSERT(b);
+            a->setChecked(true);
+
+            // To uncheck the menu entry when the widget is closed via the (x)
+            w->installEventFilter(this);
 
             ui->menuView->addAction(a);
             m_widgetActions << a;
@@ -190,6 +196,28 @@ void MainWindow::closeEvent(QCloseEvent *e)
     m_settings.setValue("geometry", saveGeometry());
     m_settings.setValue("windowState", saveState());
     QMainWindow::closeEvent(e);
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *e)
+{
+    QObjectList windowChildren = children();
+    QDockWidget *w;
+
+    if (e->type() == QEvent::Close && windowChildren.contains(obj)) {
+        if ((w = dynamic_cast<QDockWidget *>(obj)) != NULL) {
+
+            QList<QAction*> actions = findChildren<QAction *>();
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.at(i)->text() == w->objectName()) {
+                    actions.at(i)->setChecked(false);
+                    return true;
+                }
+            }
+
+        }
+    }
+
+    return false;
 }
 
 
