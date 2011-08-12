@@ -46,8 +46,9 @@ QImage FlowVisualization_sV::colourizeFlowHSV(const FlowField_sV *flowField, flo
             dx = boost*flowField->x(x,y);
             dy = boost*flowField->y(x,y);
 
+            r = std::sqrt(dx*dx + dy*dy);
+
 //            // Variant a
-//            r = std::sqrt(dx*dx + dy*dy);
 //            if (r == 0) {
 //                phi = 0;
 //            } else if (y >= 0) {

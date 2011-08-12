@@ -91,7 +91,11 @@ QPointF ImageDisplay::convertCanvasToPixel(QPoint p) const
 }
 QPointF ImageDisplay::convertCanvasToImage(QPoint p) const
 {
-    return m_imageOffset + convertCanvasToPixel(p);
+    if (!m_aScaling->isChecked()) {
+        return m_imageOffset + convertCanvasToPixel(p);
+    } else {
+        return convertCanvasToPixel(p);
+    }
 }
 
 void ImageDisplay::mousePressEvent(QMouseEvent *e)

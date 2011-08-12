@@ -24,10 +24,11 @@ void printUsage() {
     std::cout << "Usage: " << std::endl;
     std::cout << "\t" << myName << " <flow data> <output image>" << std::endl;
     std::cout << "\t" << myName << " diff <flow1> <flow2> <output image>" << std::endl;
+    std::cout << "\t" << myName << " ref (writes an HSV reference image)" << std::endl;
 }
 
 QImage reference() {
-    const int width = 512, height = 512;
+    const int width = 1024, height = 1024;
     float cX = width/2.0;
     float cY = height/2.0;
 
