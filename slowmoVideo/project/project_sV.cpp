@@ -175,8 +175,11 @@ QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpola
     if (shutterFunction != NULL) {
         float dy = 0;
         if (outTime+1/fps.fps() <= m_nodes->endTime()) {
-            dy = m_nodes->sourceTime(outTime+1/fps.fps())-sourceTime;
+            dy = m_nodes->sourceTime(outTime+1/fps.fps()) - sourceTime;
+        } else {
+            dy = sourceTime - m_nodes->sourceTime(outTime-1/fps.fps());
         }
+        float replaySpeed = fabs(dy)*fps.fps();
         float shutter = shutterFunction->evaluate(
                     (outTime-leftNode->x())/(rightNode->x()-leftNode->x()), // x on [0,1]
                     outTime, // t
@@ -188,7 +191,8 @@ QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpola
         if (shutter > 0) {
             try {
                 return m_motionBlur->blur(sourceFrame, sourceFrame+shutter*fps.fps(),
-                                          fabs((rightNode->y()-leftNode->y())/fps.fps()), size);
+                                          replaySpeed,
+                                          size);
             } catch (RangeTooSmallError_sV &err) {}
         }
     }

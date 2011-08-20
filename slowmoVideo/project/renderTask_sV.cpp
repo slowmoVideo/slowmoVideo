@@ -152,6 +152,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             m_renderTarget->closeRenderTarget();
             m_renderTimeElapsed += m_stopwatch.elapsed();
             emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+            qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
 
         } else {
             qreal srcTime = m_project->nodes()->sourceTime(time);
@@ -181,6 +182,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         m_renderTarget->closeRenderTarget();
         m_renderTimeElapsed += m_stopwatch.elapsed();
         emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+        qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
     }
     if (!m_stopRendering) {
         QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));

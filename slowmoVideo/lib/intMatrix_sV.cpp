@@ -23,7 +23,7 @@ IntMatrix_sV::IntMatrix_sV(int width, int height, int channels) :
 
 IntMatrix_sV::~IntMatrix_sV()
 {
-    delete m_data;
+    delete[] m_data;
 }
 
 int IntMatrix_sV::width() const { return m_width; }

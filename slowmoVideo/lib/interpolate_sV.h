@@ -39,11 +39,19 @@ class Interpolate_sV {
     /** \fn newTwowayFlow()
       Like twowayFlow(), but uses forward and backward flow correctly. See also newForwardFlow().
       */
+    /**
+      \fn interpolate(const QImage &in, float x, float y)
+      \brief Interpolates the colour at position <code>(x|y)</code>.
+
+      \c x should fulfil \f$ 0 \leq x < width-1 \f$, same with y, to avoid reading outside the image.
+      Not tested inside the function for efficiency reasons.
+      */
     static void forwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void newForwardFlow(const QImage& left, const FlowField_sV *flow, float pos, QImage& output);
     static void twowayFlow(const QImage& left, const QImage& right, const FlowField_sV *flowForward, const FlowField_sV *flowBackward, float pos, QImage& output);
     static void newTwowayFlow(const QImage &left, const QImage &right, const FlowField_sV *flowLeftRight, const FlowField_sV *flowRightLeft, float pos, QImage &output);
     static void bezierFlow(const QImage& left, const QImage& right, const FlowField_sV *flowCurrPrev, const FlowField_sV *flowCurrNext, float pos, QImage &output);
+    static QColor interpolate(const QImage& in, float x, float y);
 
 
 private:

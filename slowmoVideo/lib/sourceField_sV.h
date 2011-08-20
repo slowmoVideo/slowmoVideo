@@ -101,7 +101,6 @@ public:
     }
 
     void inpaint();
-    void fixFlow(const FlowField_sV *flowOtherDirection);
 
     SourceField_sV& operator =(const SourceField_sV &other);
 

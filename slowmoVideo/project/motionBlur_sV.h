@@ -54,6 +54,8 @@ public:
       */
     QImage slowmoBlur(float startFrame, float endFrame, FrameSize size);
 
+    QImage convolutionBlur(float startFrame, float endFrame, float replaySpeed, FrameSize size);
+
     /**
       \fn setSlowmoSamples();
       Sets the minimum number of samples for motion blur. This is ignored by fastBlur() where the interpolation scale

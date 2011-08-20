@@ -27,7 +27,7 @@ the Free Software Foundation, either version 3 of the License, or
 #define INTERPOLATE
 //#define FIX_FLOW
 #define FIX_BORDERS
-#define DEBUG_I
+//#define DEBUG_I
 
 enum ColorComponent { CC_Red, CC_Green, CC_Blue };
 
@@ -59,8 +59,13 @@ float interpB(const QColor cols[2][2], float x, float y)
         + x*y * cols[1][1].blueF();
 }
 
-QColor interpolate(const QImage& in, float x, float y)
+QColor Interpolate_sV::interpolate(const QImage& in, float x, float y)
 {
+#ifdef DEBUG_I
+    if (x >= in.width()-1 || y >= in.height()-1) {
+        Q_ASSERT(false);
+    }
+#endif
     QColor carr[2][2];
     int floorX = floor(x);
     int floorY = floor(y);
