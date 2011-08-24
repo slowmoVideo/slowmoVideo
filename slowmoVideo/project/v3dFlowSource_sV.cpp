@@ -46,6 +46,9 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
     QSettings settings;
     QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
     if (!QFile(programLocation).exists()) {
+        programLocation = correctFlowBinaryLocation();
+    }
+    if (!QFile(programLocation).exists()) {
         throw FlowBuildingError("Program\n" + programLocation + "\ndoes not exist, cannot build flow!");
     }
     QString program(programLocation);
@@ -83,6 +86,49 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
         throw FlowBuildingError(err.message.c_str());
     }
 }
+
+
+
+QString V3dFlowSource_sV::correctFlowBinaryLocation()
+{
+    QSettings settings;
+    QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
+
+    QStringList paths;
+    paths << programLocation;
+    paths << QDir::currentPath() + "/flowBuilder";
+    paths << "/usr/bin/flowBuilder" << "/usr/local/bin/flowBuilder";
+    for (int i = 0; i < paths.size(); i++) {
+        if (validateFlowBinary(paths.at(i))) {
+            settings.setValue("binaries/v3dFlowBuilder", paths.at(i));
+            return paths.at(i);
+        }
+    }
+    return QString();
+}
+
+bool V3dFlowSource_sV::validateFlowBinary(const QString path)
+{
+    bool valid = false;
+    qDebug() << "Checking " << path << " ...";
+    if (QFile(path).exists() && QFileInfo(path).isExecutable()) {
+        QProcess process;
+        QStringList args;
+        args << "--identify";
+        process.start(path, args);
+        process.waitForFinished(2000);
+        QString output(process.readAllStandardOutput());
+        if (output.startsWith("flowBuilder")) {
+            valid = true;
+            qDebug() << path << " is valid.";
+        } else {
+            qDebug() << "Invalid output from flow executable: " << output;
+        }
+        process.terminate();
+    }
+    return valid;
+}
+
 
 const QString V3dFlowSource_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
 {

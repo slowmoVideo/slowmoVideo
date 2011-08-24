@@ -26,6 +26,9 @@ public:
     FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
     const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
 
+    static bool validateFlowBinary(const QString path);
+    static QString correctFlowBinaryLocation();
+
 public slots:
     void slotUpdateProjectDir();
 

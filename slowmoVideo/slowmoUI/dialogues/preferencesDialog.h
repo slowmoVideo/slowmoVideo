@@ -23,9 +23,6 @@ private:
     Ui::PreferencesDialog *ui;
     QSettings m_settings;
 
-    bool validateFlowBinary(const QString path) const;
-    void trySetFlowBinary();
-
 private slots:
     void slotValidateFlowBinary();
     void slotBrowseFlow();
