@@ -39,6 +39,7 @@ include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
 find_package(FFMPEG)
+include_directories(${FFMPEG_INCLUDE_DIR})
 
 
 set(BUILD_SLOWMO "NO")
