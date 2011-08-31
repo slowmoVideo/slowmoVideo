@@ -136,7 +136,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         AVCodecContext *cc = video->streamV->codec;
 
         cc->codec_id = video->format->video_codec;
+#if LIBAVCODEC_VERSION_INT < (52<<16 | 64<<8 | 0)
+        cc->codec_type = CODEC_TYPE_VIDEO;
+#else
         cc->codec_type = AVMEDIA_TYPE_VIDEO;
+#endif
 
         cc->bit_rate = bitrate;
 
@@ -290,7 +294,11 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
         AVPacket pkt;
         av_init_packet(&pkt);
 
+#if LIBAVCODEC_VERSION_INT < ( 52<<16 | 30<<8 | 2 )
+        pkt.flags |= PKT_FLAG_KEY;
+#else
         pkt.flags |= AV_PKT_FLAG_KEY;
+#endif
         pkt.stream_index = video->streamV->index;
         pkt.data = (uint8_t *)video->picture;
         pkt.size = sizeof(AVPicture);
@@ -366,7 +374,11 @@ void eatSample(VideoOut_sV *video)
             printf("pkt.pts is %ld.\n", pkt.pts);
         }
         if(cc->coded_frame->key_frame) {
+#if LIBAVCODEC_VERSION_INT < ( 52<<16 | 30<<8 | 2 )
+            pkt.flags |= PKT_FLAG_KEY;
+#else
             pkt.flags |= AV_PKT_FLAG_KEY;
+#endif
         }
         pkt.stream_index = video->streamV->index;
         pkt.data = video->outbufV;
