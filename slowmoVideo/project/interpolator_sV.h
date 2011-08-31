@@ -1,13 +1,13 @@
 #ifndef INTERPOLATOR_SV_H
 #define INTERPOLATOR_SV_H
 
-#include "../lib/defs_sV.hpp"
+#include "renderPreferences_sV.h"
 #include "project_sV.h"
 
 class Interpolator_sV
 {
 public:
-    static QImage interpolate(Project_sV *project, float frame, InterpolationType interpolation, FrameSize size)
+    static QImage interpolate(Project_sV *project, float frame, const RenderPreferences_sV& prefs)
                              throw(FlowBuildingError, InterpolationError);
 };
 

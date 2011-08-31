@@ -53,6 +53,14 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
     ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
+    m_blurGroup = new QButtonGroup(this);
+    m_blurGroup->addButton(ui->radioBlurConvolution);
+    m_blurGroup->addButton(ui->radioBlurStacking);
+    if (m_project->preferences()->renderMotionblurType() == MotionblurType_Convolving) {
+        ui->radioBlurConvolution->setChecked(true);
+    } else {
+        ui->radioBlurStacking->setChecked(true);
+    }
 
     fillTagLists();
 
@@ -156,9 +164,11 @@ RenderTask_sV* RenderingDialog::buildTask()
         const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
-        task->setFPS(prefs->renderFPS());
-        task->setSize(prefs->renderFrameSize());
-        task->setInterpolationType(prefs->renderInterpolationType());
+        task->renderPreferences().setFps(prefs->renderFPS());
+        task->renderPreferences().size = prefs->renderFrameSize();
+        task->renderPreferences().interpolation = prefs->renderInterpolationType();
+        task->renderPreferences().motionblur = prefs->renderMotionblurType();
+
 
         if (ui->radioImages->isChecked()) {
             ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);
@@ -245,6 +255,12 @@ void RenderingDialog::slotSaveSettings()
     m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
     m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
     m_project->preferences()->flowV3DLambda() = ui->lambda->value();
+
+    if (ui->radioBlurConvolution->isChecked()) {
+        m_project->preferences()->renderMotionblurType() = MotionblurType_Convolving;
+    } else {
+        m_project->preferences()->renderMotionblurType() = MotionblurType_Stacking;
+    }
 
     QString mode;
     if (ui->radioFullProject->isChecked()) {

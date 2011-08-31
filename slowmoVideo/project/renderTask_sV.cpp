@@ -22,8 +22,6 @@ RenderTask_sV::RenderTask_sV(Project_sV *project) :
     m_project(project),
     m_renderTarget(NULL),
     m_renderTimeElapsed(0),
-    m_fps(24),
-    m_fpsSet(false),
     m_initialized(false),
     m_stopRendering(false),
     m_prevTime(-1),
@@ -31,9 +29,6 @@ RenderTask_sV::RenderTask_sV(Project_sV *project) :
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
-    m_interpolationType = InterpolationType_Forward;
-
-    setSize(FrameSize_Small);
 
     m_nextFrameTime = m_project->nodes()->startTime();
 }
@@ -65,28 +60,15 @@ void RenderTask_sV::setTimeRange(qreal start, qreal end)
 
 void RenderTask_sV::setTimeRange(QString start, QString end)
 {
-    Q_ASSERT(m_fpsSet);
-    m_timeStart = m_project->toOutTime(start, m_fps);
-    m_timeEnd = m_project->toOutTime(end, m_fps);
+    Q_ASSERT(m_prefs.fpsSetByUser());
+    m_timeStart = m_project->toOutTime(start, m_prefs.fps());
+    m_timeEnd = m_project->toOutTime(end, m_prefs.fps());
     Q_ASSERT(m_timeStart < m_timeEnd);
 }
 
-void RenderTask_sV::setFPS(const Fps_sV fps)
+QSize RenderTask_sV::resolution()
 {
-    Q_ASSERT(fps.num > 0);
-    m_fps = fps;
-    m_fpsSet = true;
-}
-
-void RenderTask_sV::setSize(FrameSize size)
-{
-    m_frameSize = size;
-    m_resolution = const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_frameSize).size();
-}
-
-void RenderTask_sV::setInterpolationType(const InterpolationType interpolation)
-{
-    m_interpolationType = interpolation;
+    return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
 void RenderTask_sV::setQtConnectionType(Qt::ConnectionType type)
@@ -105,11 +87,11 @@ void RenderTask_sV::slotContinueRendering()
     if (m_nextFrameTime < m_timeStart) {
         m_nextFrameTime = m_timeStart;
         int framesBefore;
-        qreal snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_fps, &framesBefore);
+        qreal snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_prefs.fps(), &framesBefore);
         qDebug() << "Frame snapping in from " << m_nextFrameTime << " to " << snapped;
         m_nextFrameTime = snapped;
 
-        Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_fps.fps() + .5) == framesBefore);
+        Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5) == framesBefore);
     }
     if (!m_initialized) {
         try {
@@ -125,7 +107,7 @@ void RenderTask_sV::slotContinueRendering()
 
     m_stopwatch.start();
     emit signalRenderingContinued();
-    emit signalNewTask("Rendering slowmo ...", int(m_fps.fps() * (m_timeEnd-m_timeStart)));
+    emit signalNewTask("Rendering slowmo ...", int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
     bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     if (!b) {
         qDebug() << "invokeMethod returned false.";
@@ -144,7 +126,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         emit signalRenderingAborted("Empty frame source, cannot be rendered.");
     }
 
-    int outputFrame = (time - m_project->nodes()->startTime()) * m_fps.fps() + .5;
+    int outputFrame = (time - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5;
     if (!m_stopRendering) {
 
         if (time > m_timeEnd) {
@@ -161,12 +143,12 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
                                 .arg(outputFrame).arg(time).arg(srcTime).arg(srcTime*m_project->frameSource()->fps()->fps()));
             try {
-                QImage rendered = m_project->render(time, m_fps, m_interpolationType, m_frameSize);
+                QImage rendered = m_project->render(time, m_prefs);
 
                 m_renderTarget->slotConsumeFrame(rendered, outputFrame);
-                m_nextFrameTime = time + 1/m_fps.fps();
+                m_nextFrameTime = time + 1/m_prefs.fps().fps();
 
-                emit signalTaskProgress( (time-m_timeStart) * m_fps.fps() );
+                emit signalTaskProgress( (time-m_timeStart) * m_prefs.fps().fps() );
                 emit signalFrameRendered(time, outputFrame);
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;

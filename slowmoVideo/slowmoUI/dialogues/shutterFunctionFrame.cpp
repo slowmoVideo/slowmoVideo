@@ -85,7 +85,7 @@ void ShutterFunctionFrame::slotDisplayFunction(const QString &function)
     if (max > 50) {
         max = 50;
     }
-    if (max > 0) {
+    if (max > .1) {
         while (m_frameHeight*max > height()) {
             m_frameHeight /= 1.4;
         }
@@ -95,6 +95,8 @@ void ShutterFunctionFrame::slotDisplayFunction(const QString &function)
         while (m_frameHeight > height()) {
             m_frameHeight /= 1.4;
         }
+    } else {
+        max = .5;
     }
     repaint();
 }

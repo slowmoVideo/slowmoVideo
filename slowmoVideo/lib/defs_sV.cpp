@@ -107,6 +107,19 @@ QString toString(const InterpolationType &interpolation)
     }
 }
 
+QString toString(const MotionblurType &type)
+{
+    switch (type) {
+    case MotionblurType_Stacking:
+        return QString("Stacking");
+    case MotionblurType_Convolving:
+        return QString("Convolution");
+    default:
+        Q_ASSERT(false);
+        return QString("Unknown motion blur type");
+    }
+}
+
 Fps_sV::Fps_sV(QString fpsString)
 {
     QRegExp e("(\\d+)\\/(\\d+)");

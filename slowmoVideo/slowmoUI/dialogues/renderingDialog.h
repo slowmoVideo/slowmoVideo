@@ -44,6 +44,7 @@ private:
     Project_sV *m_project;
     QButtonGroup *m_targetGroup;
     QButtonGroup *m_sectionGroup;
+    QButtonGroup *m_blurGroup;
 
     void fillTagLists();
 

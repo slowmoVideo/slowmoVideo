@@ -48,6 +48,7 @@ void printHelp()
               << "\t-fps <fps> " << std::endl
               << "\t-start <startTime> -end <endTime> " << std::endl
               << "\t-interpolation [forward[2]|twoway[2]] " << std::endl
+              << "\t -motionblur [stack|convolve] " << std::endl
               << "\t-v3dLambda <lambda> " << std::endl;
 }
 
@@ -164,6 +165,19 @@ int main(int argc, char *argv[])
                 renderer.setInterpolation(InterpolationType_TwowayNew);
             } else {
                 std::cerr << "Not a valid interpolation type: " << args.at(next).toStdString() << std::endl;
+                return -1;
+            }
+            next++;
+
+        } else if ("-motionblur" == args.at(next)) {
+            require(1, next, n);
+            next++;
+            if ("stack" == args.at(next)) {
+                renderer.setMotionblur(MotionblurType_Stacking);
+            } else if ("convolve" == args.at(next)) {
+                renderer.setMotionblur(MotionblurType_Convolving);
+            } else {
+                std::cerr << "Not a valid motion blur type: " << args.at(next).toStdString() << std::endl;
                 return -1;
             }
             next++;

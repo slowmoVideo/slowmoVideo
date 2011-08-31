@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "tag_sV.h"
 #include "nodeList_sV.h"
+#include "renderPreferences_sV.h"
 #include "../lib/defs_sV.hpp"
 extern "C" {
 #include "../lib/videoInfo_sV.h"
@@ -106,7 +107,7 @@ public:
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
-    QImage render(qreal outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size);
+    QImage render(qreal outTime, RenderPreferences_sV prefs);
 
     FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
 

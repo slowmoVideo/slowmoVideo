@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "renderPreview.h"
 #include "ui_renderPreview.h"
 #include "project/project_sV.h"
+#include "project/projectPreferences_sV.h"
 
 #include <QtCore>
 #include <QtGui/QPainter>
@@ -61,8 +62,13 @@ void RenderPreview::slotRenderAt(qreal time)
         if (m_future.isRunning()) {
             notify("Preview is still being rendered.");
         } else {
-            m_future = QtConcurrent::run(m_project, &Project_sV::render,
-                                                   time, Fps_sV(24, 1), InterpolationType_ForwardNew, FrameSize_Orig);
+
+            RenderPreferences_sV prefs;
+            prefs.fps() = m_project->preferences()->renderFPS();
+            prefs.interpolation = m_project->preferences()->renderInterpolationType();
+            prefs.size = FrameSize_Orig;
+
+            m_future = QtConcurrent::run(m_project, &Project_sV::render, time, prefs);
             m_futureWatcher.setFuture(m_future);
             if (m_future.isFinished()) {
                 qDebug() << "qFuture has already finished! Manually calling update.";

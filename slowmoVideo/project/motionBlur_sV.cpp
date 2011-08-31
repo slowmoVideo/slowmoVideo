@@ -18,7 +18,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/shutter_sV.h"
 
 #define MAX_CONV_FRAMES 5
-//#define CONVOLUTION_BLUR
 
 MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     m_project(project),
@@ -29,20 +28,21 @@ MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     createDirectories();
 }
 
-QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, FrameSize size) throw(RangeTooSmallError_sV)
+QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs)
+throw(RangeTooSmallError_sV)
 {
-#ifdef CONVOLUTION_BLUR
-    return convolutionBlur(startFrame, endFrame, replaySpeed, size);
-#else
-    if (replaySpeed > 0.5) {
-        return fastBlur(startFrame, endFrame, size);
+    if (prefs.motionblur == MotionblurType_Convolving) {
+        return convolutionBlur(startFrame, endFrame, replaySpeed, prefs);
     } else {
-        return slowmoBlur(startFrame, endFrame, size);
+        if (replaySpeed > 0.5) {
+            return fastBlur(startFrame, endFrame, prefs);
+        } else {
+            return slowmoBlur(startFrame, endFrame, prefs);
+        }
     }
-#endif
 }
 
-QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size) throw(RangeTooSmallError_sV)
+QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) throw(RangeTooSmallError_sV)
 {
     float low, high;
     if (startFrame < endFrame) {
@@ -69,7 +69,7 @@ QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
     QStringList frameList;
 
     while (pos < high) {
-        frameList << cachedFramePath(pos, size);
+        frameList << cachedFramePath(pos, prefs);
         pos += dist;
     }
     qDebug() << "Fast blurring " << frameList.size() << " frames from " << startFrame << " to " << endFrame << ", low: " << low
@@ -85,7 +85,7 @@ QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, FrameSize size)
 }
 
 /// \todo fixed distance as additional option
-QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize size)
+QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs)
 {
     float low, high;
     if (startFrame < endFrame) {
@@ -107,13 +107,13 @@ QImage MotionBlur_sV::slowmoBlur(float startFrame, float endFrame, FrameSize siz
         increment = m_slowmoMaxFrameDist;
     }
     for (float pos = low; pos <= high; pos += increment) {
-        frameList << cachedFramePath(pos, size, true);
+        frameList << cachedFramePath(pos, prefs, true);
     }
 
     return Shutter_sV::combine(frameList);
 }
 
-QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float replaySpeed, FrameSize size)
+QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float replaySpeed, const RenderPreferences_sV &prefs)
 {
     float low, high;
     if (startFrame < endFrame) {
@@ -126,8 +126,8 @@ QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float re
 
     if (floor(low) == floor(high) && low > .01) {
         qDebug() << "Small shutter." << startFrame << endFrame;
-        FlowField_sV *field = m_project->requestFlow(floor(low), floor(low)+1, size);
-        QImage blur = Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, InterpolationType_TwowayNew, size),
+        FlowField_sV *field = m_project->requestFlow(floor(low), floor(low)+1, prefs.size);
+        QImage blur = Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, prefs),
                                                   field,
                                                   high-low,
                                                   low-floor(low));
@@ -143,27 +143,25 @@ QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float re
     qDebug() << "Large shutter." << startFrame << endFrame << " -- replay speed is " << replaySpeed;
     qDebug() << "Additional parts: " << start << end;
     if (replaySpeed < 2) {
+        // \todo Lower weight for those frames when combining
         if (low-start > .1) {
             qDebug() << "First part: " << start << low;
-            field = m_project->requestFlow(start, start+1, size);
-            images << Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, InterpolationType_TwowayNew, size),
+            field = m_project->requestFlow(start, start+1, prefs.size);
+            images << Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, prefs),
                                                   field,
-                                                  high-low,
+                                                  floor(low)+1 - low,
                                                   low-floor(low));
             delete field;
             start++;
         }
         if (end-high > .1) {
             qDebug() << "Last part: " << end-1 << high;
-            field = m_project->requestFlow(end-1, end, size);
-            images << Shutter_sV::convolutionBlur(m_project->frameSource()->frameAt(end-1, size),
+            field = m_project->requestFlow(end-1, end, prefs.size);
+            images << Shutter_sV::convolutionBlur(m_project->frameSource()->frameAt(end-1, prefs.size),
                                                   field,
                                                   1 + high-end);
             delete field;
             end--;
-        }
-        if (end-start > MAX_CONV_FRAMES) {
-            inc = 2;
         }
     } else {
         // \todo Check increment value
@@ -179,35 +177,62 @@ QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float re
         qDebug() << "Parts scaled to " << start << end << " with increment " << inc;
     }
     for (int f = start; f <= end; f += inc) {
-        field = m_project->requestFlow(f, f+1, size);
-        images << Shutter_sV::convolutionBlur(m_project->frameSource()->frameAt(f, size),
+        QString name = QString("%1/convolved-%2+%3.png").arg(cacheDir(prefs.size).absolutePath()).arg(f).arg(inc);
+        if (replaySpeed < 2) {
+            if (QFileInfo(name).exists()) {
+                qDebug() << "Using convolved image from cache: " << name;
+                images << QImage(name);
+                continue;
+            }
+        }
+        field = m_project->requestFlow(f, f+1, prefs.size);
+        images << Shutter_sV::convolutionBlur(m_project->frameSource()->frameAt(f, prefs.size),
                                               field,
                                               inc);
+        if (replaySpeed < 2) {
+            qDebug() << "Caching convolved image: " << name;
+            images.last().save(name);
+        }
+
         delete field;
     }
     return Shutter_sV::combine(images);
 }
 
-QString MotionBlur_sV::cachedFramePath(float framePos, FrameSize size, bool highPrecision)
+QDir MotionBlur_sV::cacheDir(FrameSize size) const
+{
+    switch (size) {
+    case FrameSize_Small:
+        return m_dirCacheSmall;
+    case FrameSize_Orig:
+        return m_dirCacheOrig;
+    default:
+        qDebug() << "Unknown frame size in MotionBlur_sV: " << toString(size);
+        Q_ASSERT(false);
+        return QDir();
+    }
+}
+
+QString MotionBlur_sV::cachedFramePath(float framePos, const RenderPreferences_sV &prefs, bool highPrecision)
 {
     int precision = 2;
     if (highPrecision) { precision = 2; } /// \todo check precision
     int width = 5+1 + precision;
     QString name = QString("%2/cached%1.png").arg(framePos, width, 'f', precision, '0');
-    if (size == FrameSize_Small) {
+    if (prefs.size == FrameSize_Small) {
         name = name.arg(m_dirCacheSmall.absolutePath());
-    } else if (size == FrameSize_Orig) {
+    } else if (prefs.size == FrameSize_Orig) {
         name = name.arg(m_dirCacheOrig.absolutePath());
     } else {
-        qDebug() << "MotionBlur: Frame size " << toString(size) << " given, not supported!";
+        qDebug() << "MotionBlur: Frame size " << toString(prefs.size) << " given, not supported!";
         Q_ASSERT(false);
     }
     if (fabs(framePos-int(framePos)) < MOTIONBLUR_PRECISION_LIMIT) {
-        name = m_project->frameSource()->framePath(uint(framePos), size);
+        name = m_project->frameSource()->framePath(uint(framePos), prefs.size);
     } else {
         if (!QFileInfo(name).exists()) {
             qDebug() << name << " does not exist yet. Interpolating and saving to cache.";
-            QImage frm = Interpolator_sV::interpolate(m_project, framePos, InterpolationType_TwowayNew, size);
+            QImage frm = Interpolator_sV::interpolate(m_project, framePos, prefs);
             frm.save(name);
         }
     }

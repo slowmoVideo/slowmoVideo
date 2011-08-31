@@ -61,6 +61,7 @@ private:
 
     float m_scale;
     QPointF m_imageOffset;
+    QSize m_scaledImageSize;
 
     struct {
         QPointF mouseInitialImagePos;

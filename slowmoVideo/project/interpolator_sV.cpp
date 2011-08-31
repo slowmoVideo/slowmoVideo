@@ -5,7 +5,7 @@
 
 #define MIN_FRAME_DIST .001
 
-QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationType interpolation, FrameSize size)
+QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPreferences_sV &prefs)
                             throw(FlowBuildingError, InterpolationError)
 {
     if (frame > pr->frameSource()->framesCount()) {
@@ -14,16 +14,16 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
     }
     if (frame-floor(frame) > MIN_FRAME_DIST) {
 
-        QImage left = pr->frameSource()->frameAt(floor(frame), size);
-        QImage right = pr->frameSource()->frameAt(floor(frame)+1, size);
+        QImage left = pr->frameSource()->frameAt(floor(frame), prefs.size);
+        QImage right = pr->frameSource()->frameAt(floor(frame)+1, prefs.size);
         QImage out(left.size(), QImage::Format_ARGB32);
 
         /// Position between two frames, on [0 1]
         const float pos = frame-floor(frame);
 
-        if (interpolation == InterpolationType_Twoway) {
-            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, size);
-            FlowField_sV *backwardFlow = pr->requestFlow(floor(frame)+1, floor(frame), size);
+        if (prefs.interpolation == InterpolationType_Twoway) {
+            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, prefs.size);
+            FlowField_sV *backwardFlow = pr->requestFlow(floor(frame)+1, floor(frame), prefs.size);
 
             Q_ASSERT(forwardFlow != NULL);
             Q_ASSERT(backwardFlow != NULL);
@@ -37,9 +37,9 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
             delete forwardFlow;
             delete backwardFlow;
 
-        } else if (interpolation == InterpolationType_TwowayNew) {
-            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, size);
-            FlowField_sV *backwardFlow = pr->requestFlow(floor(frame)+1, floor(frame), size);
+        } else if (prefs.interpolation == InterpolationType_TwowayNew) {
+            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, prefs.size);
+            FlowField_sV *backwardFlow = pr->requestFlow(floor(frame)+1, floor(frame), prefs.size);
 
             Q_ASSERT(forwardFlow != NULL);
             Q_ASSERT(backwardFlow != NULL);
@@ -53,8 +53,8 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
             delete forwardFlow;
             delete backwardFlow;
 
-        } else if (interpolation == InterpolationType_Forward) {
-            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, size);
+        } else if (prefs.interpolation == InterpolationType_Forward) {
+            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, prefs.size);
 
             Q_ASSERT(forwardFlow != NULL);
 
@@ -66,8 +66,8 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
             Interpolate_sV::forwardFlow(left, forwardFlow, pos, out);
             delete forwardFlow;
 
-        } else if (interpolation == InterpolationType_ForwardNew) {
-            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, size);
+        } else if (prefs.interpolation == InterpolationType_ForwardNew) {
+            FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, prefs.size);
 
             Q_ASSERT(forwardFlow != NULL);
 
@@ -79,9 +79,9 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
             Interpolate_sV::newForwardFlow(left, forwardFlow, pos, out);
             delete forwardFlow;
 
-        } else if (interpolation == InterpolationType_Bezier) {
-            FlowField_sV *currNext = pr->requestFlow(floor(frame)+2, floor(frame)+1, size); // Allowed to be NULL
-            FlowField_sV *currPrev = pr->requestFlow(floor(frame)+0, floor(frame)+1, size);
+        } else if (prefs.interpolation == InterpolationType_Bezier) {
+            FlowField_sV *currNext = pr->requestFlow(floor(frame)+2, floor(frame)+1, prefs.size); // Allowed to be NULL
+            FlowField_sV *currPrev = pr->requestFlow(floor(frame)+0, floor(frame)+1, prefs.size);
 
             Q_ASSERT(currPrev != NULL);
 
@@ -97,6 +97,6 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, InterpolationTy
         return out;
     } else {
         qDebug() << "No interpolation necessary.";
-        return pr->frameSource()->frameAt(floor(frame), size);
+        return pr->frameSource()->frameAt(floor(frame), prefs.size);
     }
 }

@@ -25,8 +25,11 @@ FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->flow->trackMouse(true);
+
     bool b = true;
     b &= connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
+    b &= connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
     Q_ASSERT(b);
 }
 
@@ -83,5 +86,18 @@ void FlowEditCanvas::slotSaveFlow(QString filename)
         FlowRW_sV::save(filename.toStdString(), m_flowField);
     } else {
         qDebug() << "No flow file loaded, cannot save.";
+    }
+}
+
+void FlowEditCanvas::slotExamineValues(float x, float y)
+{
+    if (m_flowField != NULL) {
+        if (x >= 0 && y >= 0
+                && x <= m_flowField->width()-1 && y <= m_flowField->height()-1) {
+            float dx = m_flowField->x(x,y);
+            float dy = m_flowField->y(x,y);
+            ui->lblValues->setText(QString("dx/dy: (%1|%2)").arg(dx, 0, 'f', 2).arg(dy, 0, 'f', 2));
+            ui->lblPos->setText(QString("(%1|%2)").arg(x).arg(y));
+        }
     }
 }

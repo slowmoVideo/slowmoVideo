@@ -45,6 +45,7 @@ private:
 
 private slots:
     void slotRectDrawn(QRectF imageRect);
+    void slotExamineValues(float x, float y);
 };
 
 #endif // FLOWEDITCANVAS_H

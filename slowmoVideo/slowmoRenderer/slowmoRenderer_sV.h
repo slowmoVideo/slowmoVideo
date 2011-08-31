@@ -43,6 +43,7 @@ public:
     void setVideoRenderTarget(QString filename, QString codec);
     void setImagesRenderTarget(QString filenamePattern, QString directory);
     void setInterpolation(InterpolationType interpolation);
+    void setMotionblur(MotionblurType motionblur);
     void setSize(bool original);
     void setV3dLambda(float lambda);
 

@@ -56,7 +56,7 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
         m_project->replaceRenderTask(task);
-        task->setFPS(24);
+        task->renderPreferences().setFps(24);
         task->setTimeRange(m_start, m_end);
         task->setQtConnectionType(Qt::AutoConnection);
 
@@ -82,7 +82,7 @@ void SlowmoRenderer_sV::setTimeRange(QString start, QString end)
 
 void SlowmoRenderer_sV::setFps(double fps)
 {
-    m_project->renderTask()->setFPS(fps);
+    m_project->renderTask()->renderPreferences().setFps(fps);
 }
 
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
@@ -105,15 +105,20 @@ void SlowmoRenderer_sV::setImagesRenderTarget(QString filenamePattern, QString d
 
 void SlowmoRenderer_sV::setInterpolation(InterpolationType interpolation)
 {
-    m_project->renderTask()->setInterpolationType(interpolation);
+    m_project->renderTask()->renderPreferences().interpolation = interpolation;
+}
+
+void SlowmoRenderer_sV::setMotionblur(MotionblurType motionblur)
+{
+    m_project->renderTask()->renderPreferences().motionblur = motionblur;
 }
 
 void SlowmoRenderer_sV::setSize(bool original)
 {
     if (original) {
-        m_project->renderTask()->setSize(FrameSize_Orig);
+        m_project->renderTask()->renderPreferences().size = FrameSize_Orig;
     } else {
-        m_project->renderTask()->setSize(FrameSize_Small);
+        m_project->renderTask()->renderPreferences().size = FrameSize_Small;
     }
 }
 

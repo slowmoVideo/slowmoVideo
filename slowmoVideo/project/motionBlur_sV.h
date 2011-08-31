@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QDir>
 #include <QtGui/QImage>
-#include "../lib/defs_sV.hpp"
+#include "renderPreferences_sV.h"
 class Project_sV;
 
 /// Thrown if the frame range is too small for motion blur to still make sense
@@ -37,24 +37,25 @@ public:
 
     /**
       Selects either fastBlur() or slowmoBlur(), depending on the replay speed.
+      \param replaySpeed Must be >= 0
       */
-    QImage blur(float startFrame, float endFrame, float replaySpeed, FrameSize size) throw(RangeTooSmallError_sV);
+    QImage blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs) throw(RangeTooSmallError_sV);
 
     /**
       Blurs frames using cached frames on fixed, coarse-grained intervals.
       If the replay speed is high enough, it does not matter if frame 1.424242 or frame 1.5 is used
       together with other frames for rendering motion blur. That way calculation can be sped up a little bit.
       */
-    QImage fastBlur(float startFrame, float endFrame, FrameSize size) throw(RangeTooSmallError_sV);
+    QImage fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) throw(RangeTooSmallError_sV);
 
     /**
       Blurs frames that are re-played at very low speed, such that fastBlur() cannot be used.
       The blurred parts of the image still need to move slowly, rounding frames to interpolate to 0.5
       would not work therefore.
       */
-    QImage slowmoBlur(float startFrame, float endFrame, FrameSize size);
+    QImage slowmoBlur(float startFrame, float endFrame, const RenderPreferences_sV& prefs);
 
-    QImage convolutionBlur(float startFrame, float endFrame, float replaySpeed, FrameSize size);
+    QImage convolutionBlur(float startFrame, float endFrame, float replaySpeed, const RenderPreferences_sV& prefs);
 
     /**
       \fn setSlowmoSamples();
@@ -84,8 +85,10 @@ private:
     int m_maxSamples;
     float m_slowmoMaxFrameDist;
 
-    QString cachedFramePath(float framePos, FrameSize size, bool highPrecision = false);
+    QString cachedFramePath(float framePos, const RenderPreferences_sV &prefs, bool highPrecision = false);
     void createDirectories();
+
+    QDir cacheDir(FrameSize size) const;
 };
 
 #endif // MOTIONBLUR_SV_H

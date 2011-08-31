@@ -8,6 +8,7 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderSectionMode("full"),
     m_renderFrameSize(FrameSize_Orig),
     m_renderInterpolationType(InterpolationType_TwowayNew),
+    m_motionblurType(MotionblurType_Convolving),
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
@@ -37,6 +38,10 @@ InterpolationType& ProjectPreferences_sV::renderInterpolationType()
 {
     return m_renderInterpolationType;
 }
+MotionblurType& ProjectPreferences_sV::renderMotionblurType()
+{
+    return m_motionblurType;
+}
 
 QString& ProjectPreferences_sV::renderSectionMode() { return m_renderSectionMode; }
 QString& ProjectPreferences_sV::renderStartTag() { return m_renderStartTag; }
@@ -54,3 +59,4 @@ QString& ProjectPreferences_sV::videoFilename() { return m_videoFilename; }
 QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }
 
 float& ProjectPreferences_sV::flowV3DLambda() { return m_flowV3DLambda; }
+

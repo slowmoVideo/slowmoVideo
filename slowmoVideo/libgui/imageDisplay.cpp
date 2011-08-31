@@ -85,7 +85,7 @@ QPointF ImageDisplay::convertCanvasToPixel(QPoint p) const
 {
     float scale = m_scale;
     if (m_aScaling->isChecked()) {
-        scale = contentsRect().width()/float(m_image.width());
+        scale = m_scaledImageSize.width()/float(m_image.width());
     }
     return (p - contentsRect().topLeft())/scale;
 }
@@ -128,14 +128,8 @@ void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
 //            qDebug() << "Not inside drawing boundaries.";
             return;
         }
-        if (!m_aScaling->isChecked()) {
-            emit signalMouseMoved(x, y);
-        } else {
-            // The image has been scaled by this factor
-            float scalingFactor = qMin(float(m_image.width())/width(), float(m_image.height())/height());
-            // To get back the original image coordinates, the mouse coordinates have to unscaled.
-            emit signalMouseMoved(x/scalingFactor, y/scalingFactor);
-        }
+        QPointF pos = convertCanvasToImage(e->pos());
+        emit signalMouseMoved(pos.x(), pos.y());
     }
 }
 void ImageDisplay::mouseReleaseEvent(QMouseEvent *e)
@@ -185,6 +179,7 @@ void ImageDisplay::paintEvent(QPaintEvent *e)
 
             // Scale to frame size
             subImg = m_image.scaled(contentsRect().size(), Qt::KeepAspectRatio);
+            m_scaledImageSize = subImg.size();
 
         } else {
 

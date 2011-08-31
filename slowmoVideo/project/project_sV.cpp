@@ -30,7 +30,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFile>
 #include <QFileInfo>
 
-#define DEBUG_P
+//#define DEBUG_P
 #ifdef DEBUG_P
 #include <iostream>
 #endif
@@ -134,7 +134,7 @@ const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists)
     return dir;
 }
 
-QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpolation, FrameSize size)
+QImage Project_sV::render(qreal outTime, RenderPreferences_sV prefs)
 {
     if (outTime < m_nodes->startTime() || outTime > m_nodes->endTime()) {
 #ifdef DEBUG_P
@@ -174,29 +174,29 @@ QImage Project_sV::render(qreal outTime, Fps_sV fps, InterpolationType interpola
 
     if (shutterFunction != NULL) {
         float dy = 0;
-        if (outTime+1/fps.fps() <= m_nodes->endTime()) {
-            dy = m_nodes->sourceTime(outTime+1/fps.fps()) - sourceTime;
+        if (outTime+1/prefs.fps().fps() <= m_nodes->endTime()) {
+            dy = m_nodes->sourceTime(outTime+1/prefs.fps().fps()) - sourceTime;
         } else {
-            dy = sourceTime - m_nodes->sourceTime(outTime-1/fps.fps());
+            dy = sourceTime - m_nodes->sourceTime(outTime-1/prefs.fps().fps());
         }
-        float replaySpeed = fabs(dy)*fps.fps();
+        float replaySpeed = fabs(dy)*prefs.fps().fps();
         float shutter = shutterFunction->evaluate(
                     (outTime-leftNode->x())/(rightNode->x()-leftNode->x()), // x on [0,1]
                     outTime, // t
-                    fps.fps(), // FPS
+                    prefs.fps().fps(), // FPS
                     sourceFrame, // y
                     dy // dy to next frame
                     );
         qDebug() << "Shutter value for output time " << outTime << " is " << shutter;
         if (shutter > 0) {
             try {
-                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter*fps.fps(),
+                return m_motionBlur->blur(sourceFrame, sourceFrame+shutter*prefs.fps().fps(),
                                           replaySpeed,
-                                          size);
+                                          prefs);
             } catch (RangeTooSmallError_sV &err) {}
         }
     }
-    return Interpolator_sV::interpolate(this, sourceFrame, interpolation, size);
+    return Interpolator_sV::interpolate(this, sourceFrame, prefs);
 }
 
 FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError)
