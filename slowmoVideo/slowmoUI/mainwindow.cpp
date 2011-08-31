@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    ui->actionNew->setShortcut(QKeySequence("Ctrl+N"));
     ui->actionOpen->setShortcut(QKeySequence("Ctrl+O"));
     ui->actionSave->setShortcut(QKeySequence("Ctrl+S"));
     ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
@@ -146,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
                  this, SLOT(slotForwardCurveSrcPosition(qreal)));
 
+    b &= connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
     b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
     b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
     b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
@@ -250,7 +252,7 @@ void MainWindow::slotShortcutUsed(int id)
     } else if (id == Help) {
         slotToggleHelp();
     } else if (id == New) {
-        newProject();
+        slotNewProject();
     } else if (id == Open) {
         slotLoadProjectDialog();
     }
@@ -259,7 +261,7 @@ void MainWindow::slotShortcutUsed(int id)
 
 ////////// Project R/W
 
-void MainWindow::newProject()
+void MainWindow::slotNewProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {

@@ -20,13 +20,14 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSlowmoVideo_UI">
     <property name="title">
      <string>slowmoVideo UI</string>
     </property>
+    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
@@ -116,6 +117,11 @@
    </property>
    <property name="toolTip">
     <string>Examine flow at input frame</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New …</string>
    </property>
   </action>
  </widget>
