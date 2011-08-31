@@ -26,7 +26,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define INTERPOLATE
 //#define FIX_FLOW
-#define DEBUG_I
+#define FIX_BORDERS
+//#define DEBUG_I
 
 enum ColorComponent { CC_Red, CC_Green, CC_Blue };
 
@@ -58,8 +59,13 @@ float interpB(const QColor cols[2][2], float x, float y)
         + x*y * cols[1][1].blueF();
 }
 
-QColor interpolate(const QImage& in, float x, float y)
+QColor Interpolate_sV::interpolate(const QImage& in, float x, float y)
 {
+#ifdef DEBUG_I
+    if (x >= in.width()-1 || y >= in.height()-1) {
+        Q_ASSERT(false);
+    }
+#endif
     QColor carr[2][2];
     int floorX = floor(x);
     int floorY = floor(y);
@@ -74,10 +80,11 @@ QColor interpolate(const QImage& in, float x, float y)
                                   interpR(carr, dx, dy),
                                   interpG(carr, dx, dy),
                                   interpB(carr, dx, dy)
-				  );
+                                 );
     return out;
 }
 
+/// validated. correct.
 QColor Interpolate_sV::blend(const QColor &left, const QColor &right, float pos)
 {
     Q_ASSERT(pos >= 0 && pos <= 1);
@@ -184,14 +191,59 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
     float tmpAspect;
 #endif
 
+#ifdef FIX_BORDERS
+    bool leftOk;
+    bool rightOk;
+#endif
+
 
     float fx, fy;
     QColor colLeft, colRight;
     for (int y = 0; y < H; y++) {
         for (int x = 0; x < W; x++) {
+
+#ifdef FIX_BORDERS
             fx = leftSourcePixel.at(x,y).fromX;
-            fx = CLAMP(fx, 0, W-1.01);
             fy = leftSourcePixel.at(x,y).fromY;
+            if (fx >= 0 && fx < W-1
+                    && fy >= 0 && fy < H-1) {
+                colLeft = interpolate(left, fx, fy);
+                leftOk = true;
+            } else {
+                fx = leftSourcePixel.at(x,y).fromX;
+                fy = leftSourcePixel.at(x,y).fromY;
+                fx = CLAMP(fx, 0, W-1.01);
+                fy = CLAMP(fy, 0, H-1.01);
+                colLeft = interpolate(left, fx, fy);
+                leftOk = false;
+            }
+
+            fx = rightSourcePixel.at(x,y).fromX;
+            fy = rightSourcePixel.at(x,y).fromY;
+            if (fx >= 0 && fx < W-1
+                    && fy >= 0 && fy < H-1) {
+                colRight = interpolate(right, fx, fy);
+                rightOk = true;
+            } else {
+                colRight = qRgb(0,255,0);
+                rightOk = false;
+            }
+
+            if (leftOk && rightOk) {
+                output.setPixel(x,y, blend(colLeft, colRight, aspect).rgba());
+            } else if (rightOk) {
+                output.setPixel(x,y, colRight.rgba());
+//                output.setPixel(x,y, qRgb(255, 0, 0));
+            } else if (leftOk) {
+                output.setPixel(x,y, colLeft.rgba());
+//                output.setPixel(x,y, qRgb(0, 255, 0));
+            } else {
+                output.setPixel(x,y, colLeft.rgba());
+            }
+#else
+            fx = leftSourcePixel.at(x,y).fromX;
+            fy = leftSourcePixel.at(x,y).fromY;
+            fx = CLAMP(fx, 0, W-1.01);
             fy = CLAMP(fy, 0, H-1.01);
             colLeft = interpolate(left, fx, fy);
 
@@ -207,8 +259,8 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
 #endif
 
             fx = rightSourcePixel.at(x,y).fromX;
-            fx = CLAMP(fx, 0, W-1.01);
             fy = rightSourcePixel.at(x,y).fromY;
+            fx = CLAMP(fx, 0, W-1.01);
             fy = CLAMP(fy, 0, H-1.01);
             colRight = interpolate(right, fx, fy);
 
@@ -225,6 +277,8 @@ void Interpolate_sV::newTwowayFlow(const QImage &left, const QImage &right,
             output.setPixel(x,y, blend(colLeft, colRight, tmpAspect).rgba());
 #else
             output.setPixel(x,y, blend(colLeft, colRight, aspect).rgba());
+#endif
+
 #endif
         }
     }

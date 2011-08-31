@@ -10,8 +10,10 @@
 #  FFMPEG_SWSCALE_FOUND - FFMPEG also has SWSCALE
 #
 
-SET( FFMPEG_HEADERS avformat.h avcodec.h avutil.h avdevice.h )
-SET( FFMPEG_PATH_SUFFIXES libavformat libavcodec libavutil libavdevice )
+#SET( FFMPEG_HEADERS avformat.h avcodec.h avutil.h avdevice.h )
+#SET( FFMPEG_PATH_SUFFIXES libavformat libavcodec libavutil libavdevice )
+SET( FFMPEG_HEADERS avformat.h avcodec.h avutil.h )
+SET( FFMPEG_PATH_SUFFIXES libavformat libavcodec libavutil )
 SET( FFMPEG_SWS_HEADERS swscale.h )
 SET( FFMPEG_SWS_PATH_SUFFIXES libswscale )
 
@@ -29,25 +31,28 @@ if( WIN32 )
       SET( SWSCALE_FOUND TRUE )
    ENDIF( TMP_ )
 else( WIN32 )
-   SET( FFMPEG_LIBRARIES avformat avcodec avutil avdevice )
+   #SET( FFMPEG_LIBRARIES avformat avcodec avutil avdevice )
+   SET( FFMPEG_LIBRARIES avformat avcodec avutil )
    SET( FFMPEG_SWS_LIBRARIES swscale )
    INCLUDE(FindPkgConfig)
    if ( PKG_CONFIG_FOUND )
       pkg_check_modules( AVFORMAT libavformat )
       pkg_check_modules( AVCODEC libavcodec )
       pkg_check_modules( AVUTIL libavutil )
-      pkg_check_modules( AVDEVICE libavdevice )
+      #pkg_check_modules( AVDEVICE libavdevice )
       pkg_check_modules( SWSCALE libswscale )
    endif ( PKG_CONFIG_FOUND )
 
    SET( FFMPEG_LIBRARY_DIR   ${AVFORMAT_LIBRARY_DIRS}
                              ${AVCODEC_LIBRARY_DIRS}
                              ${AVUTIL_LIBRARY_DIRS}
-                             ${AVDEVICE_LIBRARY_DIRS} )
+                             #${AVDEVICE_LIBRARY_DIRS}
+                             )
    SET( FFMPEG_INCLUDE_PATHS ${AVFORMAT_INCLUDE_DIRS}
                              ${AVCODEC_INCLUDE_DIRS}
                              ${AVUTIL_INCLUDE_DIRS}
-                             ${AVDEVICE_INCLUDE_DIRS} )
+                             #${AVDEVICE_INCLUDE_DIRS}
+                             )
 endif( WIN32 )
 
 # add in swscale if found

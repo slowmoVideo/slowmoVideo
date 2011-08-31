@@ -57,6 +57,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     QDomElement renderEndTime = doc.createElement("renderEndTime");
     QDomElement renderFrameSize = doc.createElement("renderFrameSize");
     QDomElement renderInterpolation = doc.createElement("renderInterpolationType");
+    QDomElement renderMotionblur = doc.createElement("renderMotionblurType");
     QDomElement renderFPS = doc.createElement("renderFPS");
     QDomElement renderSlowmoSamples = doc.createElement("renderSlowmoSamples");
     QDomElement renderMaxSamples = doc.createElement("renderMaxSamples");
@@ -76,6 +77,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     renderSectionMode.appendChild(renderEndTime);
     preferences.appendChild(renderFrameSize);
     preferences.appendChild(renderInterpolation);
+    preferences.appendChild(renderMotionblur);
     preferences.appendChild(renderFPS);
     preferences.appendChild(renderSlowmoSamples);
     preferences.appendChild(renderMaxSamples);
@@ -95,6 +97,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     renderEndTime.setAttribute("time", pr->renderEndTime());
     renderFrameSize.setAttribute("size", pr->renderFrameSize());
     renderInterpolation.setAttribute("type", pr->renderInterpolationType());
+    renderMotionblur.setAttribute("type", pr->renderMotionblurType());
     renderFPS.setAttribute("fps", pr->renderFPS().toString());
     renderSlowmoSamples.setAttribute("number", project->motionBlur()->slowmoSamples());
     renderMaxSamples.setAttribute("number", project->motionBlur()->maxSamples());
@@ -478,6 +481,9 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderInterpolationType") {
                                 pr->renderInterpolationType() = (InterpolationType) xml.attributes().value("type").toString().toInt();
+                                xml.skipCurrentElement();
+                            } else if (xml.name() == "renderMotionblurType") {
+                                pr->renderMotionblurType() = (MotionblurType) xml.attributes().value("type").toString().toInt();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "renderFPS") {
                                 if (projVersionMajor == 2 && projVersionMinor <= 2) {

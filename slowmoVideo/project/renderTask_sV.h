@@ -14,7 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QObject>
 #include <QtCore/QTime>
 
-#include "../lib/defs_sV.hpp"
+#include "renderPreferences_sV.h"
 
 class Project_sV;
 class AbstractRenderTarget_sV;
@@ -44,12 +44,7 @@ public:
 
       Note that setFPS() has to be called \i before this function is called.
 
-      Accepted input format:
-      \li \c 24.3 or \c t:24.3 for 24.3 seconds
-      \li \c f:123 for frame 123
-      \li \c p:25% for 25 %
-      \li \c l:slowdown for the slowdown label (tag)
-      \li \c :start and \c :end for project start/end
+      Accepted input format is described in Project_sV::toOutTime().
       */
     /**
       \fn setFPS()
@@ -62,16 +57,15 @@ public:
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(qreal start, qreal end);
     void setTimeRange(QString start, QString end);
-    void setFPS(const Fps_sV fps);
-    void setSize(FrameSize size);
-    void setInterpolationType(const InterpolationType interpolation);
 
     void setQtConnectionType(Qt::ConnectionType type);
 
     /// Rendered frames per second
-    Fps_sV fps() { return m_fps; }
+    Fps_sV fps() { return m_prefs.fps(); }
     /// Output frame resolution
-    QSize resolution() { return m_resolution; }
+    QSize resolution();
+
+    RenderPreferences_sV& renderPreferences() { return m_prefs; }
 
 
 public slots:
@@ -92,6 +86,8 @@ signals:
 
 private:
     Project_sV *m_project;
+    RenderPreferences_sV m_prefs; ///< \todo Set preferences
+
     AbstractRenderTarget_sV *m_renderTarget;
 
     qreal m_timeStart;
@@ -100,12 +96,6 @@ private:
     QTime m_stopwatch;
     int m_renderTimeElapsed;
 
-    Fps_sV m_fps;
-    QSize m_resolution;
-    FrameSize m_frameSize;
-    InterpolationType m_interpolationType;
-
-    bool m_fpsSet;
     bool m_initialized;
     bool m_stopRendering;
     qreal m_nextFrameTime;

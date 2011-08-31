@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "renderPreview.h"
 #include "dialogues/flowExaminer.h"
 #include "project/project_sV.h"
+#include "libgui/combinedShortcuts.h"
 
 namespace Ui {
     class MainWindow;
@@ -40,41 +41,32 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    struct TimedShortcut {
-        QTime start;
-        QString shortcut;
-    };
-
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void displayHelp(QPainter &davinci) const;
+
+protected slots:
+    virtual void closeEvent(QCloseEvent *e);
+    virtual bool eventFilter(QObject *obj, QEvent *e);
+
+private:
     enum ShortcutCommands {
         Quit,
-        Quit_Quit,
         Abort,
         Abort_Selection,
-        Delete,
         Delete_Node,
-        Tool,
         Tool_Select,
         Tool_Move,
-        Tool_Tag,
+        Tag,
         Help,
         New,
         Open,
-        Save,
         Save_Same,
         Save_As
     };
 
-    static void displayHelp(QPainter &davinci);
-    static QStringList m_commands;
-
-protected slots:
-    virtual void closeEvent(QCloseEvent *e);
-
-private:
     Ui::MainWindow *ui;
     QSettings m_settings;
 
@@ -95,17 +87,10 @@ private:
     FlowExaminer *m_flowExaminer;
 
 
-    TimedShortcut m_lastShortcut;
-
-    QSignalMapper *m_signalMapper;
-    QList<QShortcut *> m_shortcutList;
-    QMap<int, QString> m_keyList;
+    CombinedShortcuts m_cs;
 
     QThread m_rendererThread;
 
-
-
-    static void fillCommandList();
 
     void newProject();
     void loadProject(Project_sV *project);
@@ -113,12 +98,7 @@ private:
     void updateWindowTitle();
 
 private slots:
-    /**
-      Handles timed shortcuts.
-      Example: Pressing q twice quits the application iff the elapsed time
-      between the two key strokes is small enough.
-     */
-    void shortcutUsed(QString);
+    void slotShortcutUsed(int id);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
     void slotShowFlowExaminerDialog();

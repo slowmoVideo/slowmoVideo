@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "slowmoRenderer_sV.h"
 
 #include "project/project_sV.h"
+#include "project/projectPreferences_sV.h"
 #include "project/xmlProjectRW_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
@@ -55,16 +56,16 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
 
         RenderTask_sV *task = new RenderTask_sV(m_project);
         m_project->replaceRenderTask(task);
-        task->setFPS(24);
+        task->renderPreferences().setFps(24);
         task->setTimeRange(m_start, m_end);
         task->setQtConnectionType(Qt::AutoConnection);
 
         bool b = true;
         b &= connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
         b &= connect(m_project->renderTask(), SIGNAL(signalTaskProgress(int)), this, SLOT(slotProgressInfo(int)));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotFinished()));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished(QString)), this, SLOT(slotFinished()));
-        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingStopped(QString)), this, SLOT(slotFinished()));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotFinished(QString)));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingFinished(QString)), this, SLOT(slotFinished(QString)));
+        b &= connect(m_project->renderTask(), SIGNAL(signalRenderingStopped(QString)), this, SLOT(slotFinished(QString)));
         Q_ASSERT(b);
 
     } catch (Error_sV &err) {
@@ -81,7 +82,7 @@ void SlowmoRenderer_sV::setTimeRange(QString start, QString end)
 
 void SlowmoRenderer_sV::setFps(double fps)
 {
-    m_project->renderTask()->setFPS(fps);
+    m_project->renderTask()->renderPreferences().setFps(fps);
 }
 
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
@@ -104,26 +105,26 @@ void SlowmoRenderer_sV::setImagesRenderTarget(QString filenamePattern, QString d
 
 void SlowmoRenderer_sV::setInterpolation(InterpolationType interpolation)
 {
-    m_project->renderTask()->setInterpolationType(interpolation);
+    m_project->renderTask()->renderPreferences().interpolation = interpolation;
+}
+
+void SlowmoRenderer_sV::setMotionblur(MotionblurType motionblur)
+{
+    m_project->renderTask()->renderPreferences().motionblur = motionblur;
 }
 
 void SlowmoRenderer_sV::setSize(bool original)
 {
     if (original) {
-        m_project->renderTask()->setSize(FrameSize_Orig);
+        m_project->renderTask()->renderPreferences().size = FrameSize_Orig;
     } else {
-        m_project->renderTask()->setSize(FrameSize_Small);
+        m_project->renderTask()->renderPreferences().size = FrameSize_Small;
     }
 }
 
 void SlowmoRenderer_sV::setV3dLambda(float lambda)
 {
-    V3dFlowSource_sV *v3d;
-    if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_project->flowSource())) != NULL) {
-        v3d->setLambda(lambda);
-    } else {
-        std::cout << "Could not set v3d lambda; Not a v3d flow source." << std::endl;
-    }
+    m_project->preferences()->flowV3DLambda() = lambda;
 }
 
 void SlowmoRenderer_sV::start()
@@ -146,9 +147,9 @@ void SlowmoRenderer_sV::slotTaskSize(QString desc, int size)
     m_taskSize = size;
 }
 
-void SlowmoRenderer_sV::slotFinished()
+void SlowmoRenderer_sV::slotFinished(QString time)
 {
-    std::cout << std::endl << "Rendering finished." << std::endl;
+    std::cout << std::endl << "Rendering finished.  Time taken: " << time.toStdString() << std::endl;
 }
 
 

@@ -43,6 +43,7 @@ public:
     void setVideoRenderTarget(QString filename, QString codec);
     void setImagesRenderTarget(QString filenamePattern, QString directory);
     void setInterpolation(InterpolationType interpolation);
+    void setMotionblur(MotionblurType motionblur);
     void setSize(bool original);
     void setV3dLambda(float lambda);
 
@@ -69,7 +70,7 @@ private:
 private slots:
     void slotProgressInfo(int progress);
     void slotTaskSize(QString desc, int size);
-    void slotFinished();
+    void slotFinished(QString time);
 };
 
 

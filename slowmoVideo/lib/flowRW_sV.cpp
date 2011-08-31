@@ -41,7 +41,8 @@ FlowRW_sV::FlowInfo_sV FlowRW_sV::readInfo(std::string filename)
 
     std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
-    char *magic = new char[m_magicNumber.size()];
+    char *magic = new char[m_magicNumber.size()+1];
+    magic[m_magicNumber.size()] = 0;
     file.read(magic, sizeof(char)*m_magicNumber.size());
     file.read(&info.version, sizeof(char));
     info.magic = std::string(magic);
@@ -68,7 +69,8 @@ FlowField_sV* FlowRW_sV::load(std::string filename) throw(FlowRWError)
 {
     std::ifstream file(filename.c_str(), std::ios_base::in | std::ios_base::binary);
 
-    char *magic = new char[m_magicNumber.size()];
+    char *magic = new char[m_magicNumber.size()+1];
+    magic[m_magicNumber.size()] = 0;
     char version;
 
     file.read(magic, sizeof(char)*m_magicNumber.size());

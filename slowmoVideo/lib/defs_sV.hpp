@@ -32,7 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 2
-#define SLOWMOVIDEO_VERSION_MICRO 1
+#define SLOWMOVIDEO_VERSION_MICRO 2
 
 
 /// Contains information about this slowmoVideo version
@@ -72,6 +72,7 @@ enum TagAxis { TagAxis_Source = 1, TagAxis_Output = 2 };
 enum InterpolationType { InterpolationType_Forward = 0, InterpolationType_ForwardNew = 1,
                          InterpolationType_Twoway = 10, InterpolationType_TwowayNew = 11,
                          InterpolationType_Bezier = 20 };
+enum MotionblurType { MotionblurType_Stacking = 0, MotionblurType_Convolving = 10 };
 
 /// Default colours used in slowmoVideo (e.g. in the user interface)
 namespace Colours_sV {
@@ -152,6 +153,7 @@ QString toString(const CurveType &curveType);
 QString toString(const QPointF &p);
 QString toString(const TagAxis &axis);
 QString toString(const InterpolationType &interpolation);
+QString toString(const MotionblurType &interpolation);
 
 inline QDebug operator<<(QDebug qd, const FlowDirection &direction) {
     switch (direction) {

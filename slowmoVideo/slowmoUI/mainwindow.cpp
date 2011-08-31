@@ -42,31 +42,13 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <functional>
 
-QStringList MainWindow::m_commands;
-
-void MainWindow::fillCommandList()
-{
-    m_commands.clear();
-    m_commands << "h:\tHelp";
-    m_commands << "q-q:\tQuit";
-    m_commands << "n:\tNew";
-    m_commands << "o:\tOpen";
-    m_commands << "s-s:\tSave";
-    m_commands << "s-a:\tSave as";
-    m_commands << "x:\tAbort current action";
-    m_commands << "x-s:\tAbort selection";
-    m_commands << "d-n:\tDelete selected nodes";
-    m_commands << "t-s:\tSelect tool";
-    m_commands << "t-m:\tMove tool";
-    m_commands << "t-t:\tTag";
-}
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(NULL),
     m_renderProgressDialog(NULL),
-    m_flowExaminer(NULL)
+    m_flowExaminer(NULL),
+    m_cs(this)
 {
     ui->setupUi(this);
 
@@ -106,11 +88,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
             QAction *a = new QAction(w->objectName(), this);
             a->setCheckable(true);
-            a->setChecked(w->isVisible());
             bool b = true;
             b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
-            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
+            // This does not work since it is also emitted e.g. when the window is minimized
+            // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
+            // Thanks ArGGu^^ for the tip!
+//            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
             Q_ASSERT(b);
+            a->setChecked(true);
+
+            // To uncheck the menu entry when the widget is closed via the (x)
+            w->installEventFilter(this);
 
             ui->menuView->addAction(a);
             m_widgetActions << a;
@@ -119,33 +107,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
-    // Set up shortcut bindings
-    m_keyList.insert(MainWindow::Help, "h");
-    m_keyList.insert(MainWindow::Quit, "q");
-    m_keyList.insert(MainWindow::Quit_Quit, "q");
-    m_keyList.insert(MainWindow::New, "n");
-    m_keyList.insert(MainWindow::Open, "o");
-    m_keyList.insert(MainWindow::Save, "s");
-    m_keyList.insert(MainWindow::Save_Same, "s");
-    m_keyList.insert(MainWindow::Save_As, "a");
-    m_keyList.insert(MainWindow::Abort, "x");
-    m_keyList.insert(MainWindow::Abort_Selection, "s");
-    m_keyList.insert(MainWindow::Delete, "d");
-    m_keyList.insert(MainWindow::Delete_Node, "n");
-    m_keyList.insert(MainWindow::Tool, "t");
-    m_keyList.insert(MainWindow::Tool_Select, "s");
-    m_keyList.insert(MainWindow::Tool_Move, "m");
-    m_keyList.insert(MainWindow::Tool_Tag, "t");
-    fillCommandList();
-
-    QList<QString> uniqueKeys;
-    QList<QString> keys = m_keyList.values();
-    for (int i = 0; i < keys.size(); i++) {
-        if (!uniqueKeys.contains(keys[i])) {
-            uniqueKeys.append(keys[i]);
-            qDebug() << "Added to key list: " << keys[i];
-        }
-    }
 
 
     ui->actionOpen->setShortcut(QKeySequence("Ctrl+O"));
@@ -159,23 +120,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
 
-
+    m_cs.addShortcut("h", Help, "Show help overlay");
+    m_cs.addShortcut("q-q", Quit, "Quit");
+    m_cs.addShortcut("n", New, "New project");
+    m_cs.addShortcut("o", Open, "Open project");
+    m_cs.addShortcut("s-s", Save_Same, "Save");
+    m_cs.addShortcut("s-a", Save_As, "Save as ...");
+    m_cs.addShortcut("a", Abort, "Abort move");
+    m_cs.addShortcut("a-s", Abort_Selection, "Unselect all");
+    m_cs.addShortcut("d-n", Delete_Node, "Delete selected nodes");
+    m_cs.addShortcut("t-s", Tool_Select, "Selecting tool");
+    m_cs.addShortcut("t-m", Tool_Move, "Move tool");
+    m_cs.addShortcut("t-t", Tag, "Insert label (tag)");
 
     bool b = true;
-
-    m_signalMapper = new QSignalMapper(this);
-    for (int i = 0; i < uniqueKeys.length(); i++) {
-
-        // Create a new shortcut for each unique key
-        QShortcut *shortcut = new QShortcut(QKeySequence(uniqueKeys[i]), this);
-
-        m_shortcutList.append(shortcut);
-        m_signalMapper->setMapping(shortcut, uniqueKeys[i]);
-
-        // Connect shortcut to the signal mapper
-        b &= connect(shortcut, SIGNAL(activated()), m_signalMapper, SLOT(map()));
-    }
-    b &= connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(shortcutUsed(QString)));
+    b &= connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
 
     b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
@@ -227,11 +186,6 @@ MainWindow::~MainWindow()
         delete m_flowExaminer;
     }
 
-    delete m_signalMapper;
-    for (int i = 0; i < m_shortcutList.length(); i++) {
-        delete m_shortcutList[i];
-    }
-
     for (int i = 0; i < m_widgetActions.size(); i++) {
         delete m_widgetActions[i];
     }
@@ -244,6 +198,28 @@ void MainWindow::closeEvent(QCloseEvent *e)
     QMainWindow::closeEvent(e);
 }
 
+bool MainWindow::eventFilter(QObject *obj, QEvent *e)
+{
+    QObjectList windowChildren = children();
+    QDockWidget *w;
+
+    if (e->type() == QEvent::Close && windowChildren.contains(obj)) {
+        if ((w = dynamic_cast<QDockWidget *>(obj)) != NULL) {
+
+            QList<QAction*> actions = findChildren<QAction *>();
+            for (int i = 0; i < actions.size(); i++) {
+                if (actions.at(i)->text() == w->objectName()) {
+                    actions.at(i)->setChecked(false);
+                    return true;
+                }
+            }
+
+        }
+    }
+
+    return false;
+}
+
 
 
 
@@ -251,89 +227,34 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 ////////// Shortcuts
 
-void MainWindow::shortcutUsed(QString which)
+void MainWindow::slotShortcutUsed(int id)
 {
-    TimedShortcut ts;
-    ts.shortcut = which;
-    ts.start = QTime::currentTime();
-
-    qDebug() << which << " pressed. Last shortcut: " << m_lastShortcut.start.elapsed() << " ms ago.";
-
-//    QString at = QString(" @ %1.%2::%3")
-//            .arg(ts.start.minute())
-//            .arg(ts.start.second())
-//            .arg(ts.start.msec());
-
-    bool handled = false;
-
-    // Use a timeout. Otherwise pressing a key may lead to unpredictable results
-    // since it may depend on the key you pressed several minutes ago.
-    if (m_lastShortcut.start.elapsed() < 600) {
-
-        // Handle combined shortcuts here.
-
-        if (m_lastShortcut.shortcut == m_keyList[MainWindow::Quit]) {
-            if (which == m_keyList[MainWindow::Quit_Quit]) {
-                qApp->quit();
-            }
-        }
-        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Abort]) {
-            if (which == m_keyList[MainWindow::Abort_Selection]) {
-                emit abort(Canvas::Abort_Selection);
-                handled = true;
-            }
-        }
-        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Delete]) {
-            if (which == m_keyList[MainWindow::Delete_Node]) {
-                emit deleteNodes();
-                handled = true;
-            }
-        }
-        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Tool]) {
-            if (which == m_keyList[MainWindow::Tool_Select]) {
-                emit setMode(Canvas::ToolMode_Select);
-                handled = true;
-            } else if (which == m_keyList[MainWindow::Tool_Move]) {
-                emit setMode(Canvas::ToolMode_Move);
-                handled = true;
-            } else if (which == m_keyList[MainWindow::Tool_Tag]) {
-                emit addTag();
-                handled = true;
-            }
-        }
-        else if (m_lastShortcut.shortcut == m_keyList[MainWindow::Save]) {
-            if (which == m_keyList[MainWindow::Save_Same]) {
-                slotSaveProject();
-                handled = true;
-            } else if (which == m_keyList[MainWindow::Save_As])  {
-                slotSaveProjectDialog();
-                handled = true;
-            }
-        }
-    } else {
-        if (which == m_keyList[MainWindow::Abort]) {
-            emit abort(Canvas::Abort_General);
-            handled = true;
-        } else {
-            qDebug() << "(Shortcut timed out.)";
-        }
+    if (id == Quit) {
+        qApp->quit();
+    } else if (id == Abort_Selection) {
+        emit abort(Canvas::Abort_Selection);
+    } else if (id == Delete_Node) {
+        emit deleteNodes();
+    } else if (id == Tool_Select) {
+        emit setMode(Canvas::ToolMode_Select);
+    } else if (id == Tool_Move) {
+        emit setMode(Canvas::ToolMode_Move);
+    } else if (id == Tag) {
+        emit addTag();
+    } else if (id == Save_Same) {
+        slotSaveProject();
+    } else if (id == Save_As) {
+        slotSaveProjectDialog();
+    } else if (id == Abort) {
+        emit abort(Canvas::Abort_General);
+    } else if (id == Help) {
+        slotToggleHelp();
+    } else if (id == New) {
+        newProject();
+    } else if (id == Open) {
+        slotLoadProjectDialog();
     }
-    if (!handled) {
-        if (which == m_keyList[MainWindow::Help]) {
-            slotToggleHelp();
-            handled = true;
-        } else if (which == m_keyList[MainWindow::New]) {
-            newProject();
-            handled = true;
-        } else if (which == m_keyList[MainWindow::Open]) {
-            slotLoadProjectDialog();
-            handled = true;
-        }
-    }
-
-    m_lastShortcut = ts;
 }
-
 
 
 ////////// Project R/W
@@ -416,6 +337,7 @@ void MainWindow::slotSaveProject(QString filename)
         try {
             XmlProjectRW_sV writer;
             writer.saveProject(m_project, filename);
+            statusBar()->showMessage(QString("Saved project as: %1").arg(filename));
         } catch (Error_sV &err) {
             QMessageBox(QMessageBox::Warning, "Error writing project file", err.message()).exec();
         }
@@ -442,12 +364,9 @@ void MainWindow::slotToggleHelp()
 {
     m_wCanvas->toggleHelp();
 }
-void MainWindow::displayHelp(QPainter &davinci)
+void MainWindow::displayHelp(QPainter &davinci) const
 {
-    QString helpText;
-    for (int i = 0; i < m_commands.size(); i++) {
-        helpText.append(m_commands.at(i) + ((i < m_commands.size()-1) ? "\n" : ""));
-    }
+    QString helpText = m_cs.shortcutList();
 
     QRect content;
     const QPoint topLeft(10, 10);

@@ -22,6 +22,7 @@ public:
     QString& renderEndTime();
     FrameSize& renderFrameSize();
     InterpolationType& renderInterpolationType();
+    MotionblurType& renderMotionblurType();
     Fps_sV& renderFPS();
     QString& renderTarget();
     QString& imagesOutputDir();
@@ -30,6 +31,7 @@ public:
     QString& videoCodec();
 
     float& flowV3DLambda();
+
 
 private:
     TagAxis m_tagAxis;
@@ -43,6 +45,7 @@ private:
     QString m_renderEndTime;
     FrameSize m_renderFrameSize;
     InterpolationType m_renderInterpolationType;
+    MotionblurType m_motionblurType;
     Fps_sV m_renderFPS;
     QString m_renderTarget;
 
@@ -52,6 +55,7 @@ private:
     QString m_vcodec;
 
     float m_flowV3DLambda;
+
 
 };
 

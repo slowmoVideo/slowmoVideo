@@ -7,7 +7,12 @@
 class FlowVisualization_sV
 {
 public:
-    static QImage colourizeFlow(const FlowField_sV *flowField, float boost = 1.0);
+    enum ColourizingType { WXY, HSV };
+    static QImage colourizeFlow(const FlowField_sV *flowField, ColourizingType type, float boost = 1.0);
+
+private:
+    static QImage colourizeFlowWXY(const FlowField_sV *flowField, float boost = 1.0);
+    static QImage colourizeFlowHSV(const FlowField_sV *flowField, float boost = 1.0);
 };
 
 #endif // FLOWVISUALIZATION_SV_H

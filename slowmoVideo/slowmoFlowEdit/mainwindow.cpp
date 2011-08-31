@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_cs.addShortcut("o", OPEN, "Open flow file");
     m_cs.addShortcut("s-s", SAVE, "Save");
-    m_cs.addShortcut("k", PREV, "Previous file");
-    m_cs.addShortcut("j", NEXT, "Next file");
+    m_cs.addShortcut("j", PREV, "Previous file");
+    m_cs.addShortcut("k", NEXT, "Next file");
     m_cs.addShortcut("b-1", BOOST1, "No amplification");
     m_cs.addShortcut("b-2", BOOST2, "Low amplification");
     m_cs.addShortcut("b-3", BOOST3, "High amplification (details best visible)");

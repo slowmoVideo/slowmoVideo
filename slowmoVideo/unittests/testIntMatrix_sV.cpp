@@ -20,7 +20,7 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == orig[i]);
     }
-    delete data;
+    delete[] data;
 
     mat += orig;
 //    dumpMatrix(&mat);
@@ -28,7 +28,7 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == 2*orig[i]);
     }
-    delete data;
+    delete[] data;
 
     mat /= 2;
 //    dumpMatrix(&mat);
@@ -36,7 +36,8 @@ void TestIntMatrix_sV::testAdd(int w, int h, int c)
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == orig[i]);
     }
-    delete data;
+    delete[] data;
+    delete[] orig;
 }
 
 void TestIntMatrix_sV::testAddMatrix()
@@ -56,7 +57,7 @@ void TestIntMatrix_sV::testInitMatrix()
     for (int i = 0; i < mat.width()*mat.height()*mat.channels(); i++) {
         QVERIFY(data[i] == 0);
     }
-    delete data;
+    delete[] data;
 }
 
 void TestIntMatrix_sV::dumpMatrix(IntMatrix_sV *mat)

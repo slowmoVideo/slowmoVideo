@@ -414,7 +414,13 @@ void Canvas::paintEvent(QPaintEvent *)
     }
 
     if (m_showHelp) {
-        MainWindow::displayHelp(davinci);
+        MainWindow *mw;
+        if ((mw = dynamic_cast<MainWindow*>(parentWidget())) != NULL) {
+            mw->displayHelp(davinci);
+        } else {
+            qDebug() << "Cannot show help; wrong parent widget?";
+            Q_ASSERT(false);
+        }
     }
 }
 
