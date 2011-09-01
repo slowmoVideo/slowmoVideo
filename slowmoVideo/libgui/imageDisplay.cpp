@@ -113,7 +113,11 @@ void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
     m_states.mousePrevPos = e->pos();
 
     if (!m_aScaling->isChecked()) {
+#if QT_VERSION < 0x040700
+        if (e->buttons().testFlag(Qt::MidButton)) {
+#else
         if (e->buttons().testFlag(Qt::MiddleButton)) {
+#endif
             // Move the viewport
             QPointF offset = m_states.mouseInitialImagePos - convertCanvasToPixel(e->pos());
             m_imageOffset = offset;
