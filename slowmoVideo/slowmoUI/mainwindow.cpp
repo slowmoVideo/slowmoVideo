@@ -273,7 +273,10 @@ void MainWindow::slotNewProject()
             writer.saveProject(project, npd.projectFilename());
             m_projectPath = npd.projectFilename();
 
+            project->preferences()->viewport_secRes() = QPointF(400, 400)/project->frameSource()->framesCount()*project->frameSource()->fps()->fps();
             loadProject(project);
+
+
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
         }

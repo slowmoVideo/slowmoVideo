@@ -26,11 +26,6 @@ VideoInfoSV getInfo(const char filename[])
     av_register_all();
 
     AVFormatContext *pFormatContext = NULL;
-    if (pFormatContext == NULL) {
-        printf("Format context is NULL.");
-    } else {
-        printf("Format context is %p.", (void*)pFormatContext);
-    }
 
     printf("Reading info for file %s.\n", filename);
     fflush(stdout);
