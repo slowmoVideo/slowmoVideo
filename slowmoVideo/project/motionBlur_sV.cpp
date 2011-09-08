@@ -122,23 +122,29 @@ QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float re
         low = endFrame; high = startFrame;
     }
     low = qMax(low, float(0));
-    high = qMin(high, (float)m_project->frameSource()->framesCount());
+    high = qMin(high, (float)m_project->frameSource()->framesCount()-1);
 
     if (floor(low) == floor(high) && low > .01) {
-        qDebug() << "Small shutter." << startFrame << endFrame;
-        FlowField_sV *field = m_project->requestFlow(floor(low), floor(low)+1, prefs.size);
-        QImage blur = Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, prefs),
-                                                  field,
-                                                  high-low,
-                                                  low-floor(low));
-        delete field;
-        return blur;
+        if (floor(low) < m_project->frameSource()->framesCount()-1) {
+            qDebug() << "Small shutter." << startFrame << endFrame;
+            FlowField_sV *field = m_project->requestFlow(floor(low), floor(low)+1, prefs.size);
+            QImage blur = Shutter_sV::convolutionBlur(Interpolator_sV::interpolate(m_project, startFrame, prefs),
+                                                      field,
+                                                      high-low,
+                                                      low-floor(low));
+            delete field;
+            return blur;
+        } else {
+            /// \todo Convolve last frame as well
+            qDebug() << "No shutter, at the last frame.";
+            return m_project->frameSource()->frameAt(floor(low), prefs.size);
+        }
     }
 
     QList<QImage> images;
     FlowField_sV *field;
     int start = floor(low);
-    int end = ceil(high);
+    int end = std::min((int64_t)ceil(high), m_project->frameSource()->framesCount()-2);
     int inc = 1;
     qDebug() << "Large shutter." << startFrame << endFrame << " -- replay speed is " << replaySpeed;
     qDebug() << "Additional parts: " << start << end;

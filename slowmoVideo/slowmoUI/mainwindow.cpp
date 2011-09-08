@@ -286,14 +286,21 @@ void MainWindow::loadProject(Project_sV *project)
 {
     Q_ASSERT(project != NULL);
     resetDialogs();
+
+    Project_sV *projTemp = NULL;
     if (m_project != NULL) {
-        delete m_project;
-        m_project = NULL;
+        projTemp = m_project;
     }
     m_project = project;
     m_wCanvas->load(m_project);
     m_wRenderPreview->load(m_project);
     updateWindowTitle();
+
+    if (projTemp != NULL) {
+        // Do not delete the old project object earlier to avoid segfaults
+        // (may still be used in the ShutterFunction dialog e.g.)
+        delete projTemp;
+    }
 
     bool b = true;
     b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));

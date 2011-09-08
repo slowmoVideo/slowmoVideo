@@ -20,6 +20,7 @@ class Project_sV;
 
 /**
   \todo Allow re-ordering of images
+  \todo Check image resolution more efficiently for large number of images
   */
 class ImagesFrameSource_sV : public AbstractFrameSource_sV
 {
