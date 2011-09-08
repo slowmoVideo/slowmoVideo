@@ -56,10 +56,13 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     m_blurGroup = new QButtonGroup(this);
     m_blurGroup->addButton(ui->radioBlurConvolution);
     m_blurGroup->addButton(ui->radioBlurStacking);
+    m_blurGroup->addButton(ui->radioBlurNearest);
     if (m_project->preferences()->renderMotionblurType() == MotionblurType_Convolving) {
         ui->radioBlurConvolution->setChecked(true);
-    } else {
+    } else if (m_project->preferences()->renderMotionblurType() == MotionblurType_Stacking) {
         ui->radioBlurStacking->setChecked(true);
+    } else {
+        ui->radioBlurNearest->setChecked(true);
     }
 
     fillTagLists();
@@ -258,8 +261,10 @@ void RenderingDialog::slotSaveSettings()
 
     if (ui->radioBlurConvolution->isChecked()) {
         m_project->preferences()->renderMotionblurType() = MotionblurType_Convolving;
-    } else {
+    } else if (ui->radioBlurStacking->isChecked()) {
         m_project->preferences()->renderMotionblurType() = MotionblurType_Stacking;
+    } else {
+        m_project->preferences()->renderMotionblurType() = MotionblurType_Nearest;
     }
 
     QString mode;

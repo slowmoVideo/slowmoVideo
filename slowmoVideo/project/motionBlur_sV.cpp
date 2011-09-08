@@ -31,7 +31,9 @@ MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
 QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs)
 throw(RangeTooSmallError_sV)
 {
-    if (prefs.motionblur == MotionblurType_Convolving) {
+    if (prefs.motionblur == MotionblurType_Nearest) {
+        return nearest(startFrame, prefs);
+    } else if (prefs.motionblur == MotionblurType_Convolving) {
         return convolutionBlur(startFrame, endFrame, replaySpeed, prefs);
     } else {
         if (replaySpeed > 0.5) {
@@ -40,6 +42,11 @@ throw(RangeTooSmallError_sV)
             return slowmoBlur(startFrame, endFrame, prefs);
         }
     }
+}
+
+QImage MotionBlur_sV::nearest(float startFrame, const RenderPreferences_sV &prefs)
+{
+    return m_project->frameSource()->frameAt(startFrame, prefs.size);
 }
 
 QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) throw(RangeTooSmallError_sV)
