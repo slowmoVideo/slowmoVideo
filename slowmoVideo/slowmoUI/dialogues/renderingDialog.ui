@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>718</width>
-    <height>776</height>
+    <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,9 +75,6 @@
        </property>
        <property name="maxLength">
         <number>16</number>
-       </property>
-       <property name="placeholderText">
-        <string/>
        </property>
       </widget>
      </item>
@@ -511,6 +508,13 @@
        <widget class="QLabel" name="label_14">
         <property name="text">
          <string>Smoother than stacking, usually the better choice.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioBlurNearest">
+        <property name="text">
+         <string>Nearest (no blurring)</string>
         </property>
        </widget>
       </item>

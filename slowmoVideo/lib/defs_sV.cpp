@@ -114,6 +114,8 @@ QString toString(const MotionblurType &type)
         return QString("Stacking");
     case MotionblurType_Convolving:
         return QString("Convolution");
+    case MotionblurType_Nearest:
+        return QString("Nearest (no blurring)");
     default:
         Q_ASSERT(false);
         return QString("Unknown motion blur type");

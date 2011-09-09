@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    ui->actionNew->setShortcut(QKeySequence("Ctrl+N"));
     ui->actionOpen->setShortcut(QKeySequence("Ctrl+O"));
     ui->actionSave->setShortcut(QKeySequence("Ctrl+S"));
     ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
@@ -146,6 +147,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
                  this, SLOT(slotForwardCurveSrcPosition(qreal)));
 
+    b &= connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
     b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
     b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
     b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
@@ -250,7 +252,7 @@ void MainWindow::slotShortcutUsed(int id)
     } else if (id == Help) {
         slotToggleHelp();
     } else if (id == New) {
-        newProject();
+        slotNewProject();
     } else if (id == Open) {
         slotLoadProjectDialog();
     }
@@ -259,7 +261,7 @@ void MainWindow::slotShortcutUsed(int id)
 
 ////////// Project R/W
 
-void MainWindow::newProject()
+void MainWindow::slotNewProject()
 {
     NewProjectDialog npd(this);
     if (npd.exec() == QDialog::Accepted) {
@@ -271,7 +273,10 @@ void MainWindow::newProject()
             writer.saveProject(project, npd.projectFilename());
             m_projectPath = npd.projectFilename();
 
+            project->preferences()->viewport_secRes() = QPointF(400, 400)/project->frameSource()->framesCount()*project->frameSource()->fps()->fps();
             loadProject(project);
+
+
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
         }
@@ -281,14 +286,21 @@ void MainWindow::loadProject(Project_sV *project)
 {
     Q_ASSERT(project != NULL);
     resetDialogs();
+
+    Project_sV *projTemp = NULL;
     if (m_project != NULL) {
-        delete m_project;
-        m_project = NULL;
+        projTemp = m_project;
     }
     m_project = project;
     m_wCanvas->load(m_project);
     m_wRenderPreview->load(m_project);
     updateWindowTitle();
+
+    if (projTemp != NULL) {
+        // Do not delete the old project object earlier to avoid segfaults
+        // (may still be used in the ShutterFunction dialog e.g.)
+        delete projTemp;
+    }
 
     bool b = true;
     b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));

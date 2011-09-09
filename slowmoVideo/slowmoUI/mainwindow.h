@@ -92,7 +92,6 @@ private:
     QThread m_rendererThread;
 
 
-    void newProject();
     void loadProject(Project_sV *project);
     void resetDialogs();
     void updateWindowTitle();
@@ -111,6 +110,7 @@ private slots:
 
     void slotRenderingAborted(QString message);
 
+    void slotNewProject();
     void slotSaveProject(QString filename = "");
     void slotSaveProjectDialog();
     void slotLoadProjectDialog();

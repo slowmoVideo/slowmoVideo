@@ -15,6 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QFileDialog>
 #include <QtGui/QContextMenuEvent>
 
+#include <QApplication>
 #include <QtCore/QSettings>
 #include <QtCore/QFileInfo>
 
@@ -98,6 +99,17 @@ QPointF ImageDisplay::convertCanvasToImage(QPoint p) const
     }
 }
 
+QPoint ImageDisplay::convertImageToCanvas(QPointF p) const
+{
+    if (m_aScaling->isChecked()) {
+
+        return (p / ((float)m_image.width()/m_scaledImageSize.width())).toPoint();
+    } else {
+        return contentsRect().topLeft() + ((p-m_imageOffset)/m_scale).toPoint();
+    }
+
+}
+
 void ImageDisplay::mousePressEvent(QMouseEvent *e)
 {
     m_states.mouseInitialImagePos = convertCanvasToImage(e->pos());
@@ -113,7 +125,11 @@ void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
     m_states.mousePrevPos = e->pos();
 
     if (!m_aScaling->isChecked()) {
+#if QT_VERSION < 0x040700
+        if (e->buttons().testFlag(Qt::MidButton)) {
+#else
         if (e->buttons().testFlag(Qt::MiddleButton)) {
+#endif
             // Move the viewport
             QPointF offset = m_states.mouseInitialImagePos - convertCanvasToPixel(e->pos());
             m_imageOffset = offset;
@@ -131,6 +147,7 @@ void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
         QPointF pos = convertCanvasToImage(e->pos());
         emit signalMouseMoved(pos.x(), pos.y());
     }
+    repaint();
 }
 void ImageDisplay::mouseReleaseEvent(QMouseEvent *e)
 {
@@ -195,6 +212,17 @@ void ImageDisplay::paintEvent(QPaintEvent *e)
 
         p.drawImage(contentsRect().topLeft(), subImg);
 
+        if (m_states.countsAsMove() && !QApplication::mouseButtons().testFlag(Qt::NoButton)) {
+            QRect r;
+            QPoint origin = convertImageToCanvas(m_states.mouseInitialImagePos);
+
+            r.setTopLeft(min(m_states.mousePrevPos, origin));
+            r.setWidth(abs(m_states.mousePrevPos.x()-origin.x()));
+            r.setHeight(abs(m_states.mousePrevPos.y()-origin.y()));
+
+            p.drawRect(r);
+        }
+
     }
 }
 
@@ -239,4 +267,13 @@ QPointF ImageDisplay::min(QPointF p1, QPointF p2, bool limitToImage) const
         p.ry() = clamp(p.y(), 0, m_image.height()-1);
     }
     return p;
+}
+
+QPoint ImageDisplay::min(QPoint p1, QPoint p2) const
+{
+    return QPoint(qMin(p1.x(), p2.x()), qMin(p1.y(), p2.y()));
+}
+QPoint ImageDisplay::max(QPoint p1, QPoint p2) const
+{
+    return QPoint(qMax(p1.x(), p2.x()), qMax(p1.y(), p2.y()));
 }

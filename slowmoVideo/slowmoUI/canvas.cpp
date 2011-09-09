@@ -434,11 +434,11 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
     dR += w;
 
     davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
-    davinci.drawImage(r - dR, t, QImage("res/iconSel.png").scaled(16, 16));
+    davinci.drawImage(r - dR, t, QImage(QCoreApplication::applicationDirPath() + "/res/iconSel.png").scaled(16, 16));
     dR += d+w;
 
     davinci.setOpacity(.5 + ((m_mode == ToolMode_Move) ? .5 : 0));
-    davinci.drawImage(r - dR, t, QImage("res/iconMov.png").scaled(16, 16));
+    davinci.drawImage(r - dR, t, QImage(QCoreApplication::applicationDirPath() + "/res/iconMov.png").scaled(16, 16));
 
     davinci.setOpacity(opacity);
 }
@@ -606,7 +606,11 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                 break;
             }
         }
+#if QT_VERSION < 0x040700
+    } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MidButton)) {
+#else
     } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MiddleButton)) {
+#endif
         QList<NodeList_sV::PointerWithDistance> nearObjects = m_project->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
         qDebug() << "Nearby objects:";
         for (int i = 0; i < nearObjects.size(); i++) {
@@ -676,7 +680,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
         if (m_secResX < .05) { m_secResX = .05; }
         // Y resolution is the same as X resolution (at least at the moment)
         m_secResY = m_secResX;
-        qDebug() << "Resolution: " << m_secResX;
+//        qDebug() << "Resolution: " << m_secResX;
 
         // Adjust t0 such that the mouse points to the same time as before
         Node_sV nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));

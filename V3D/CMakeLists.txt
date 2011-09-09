@@ -26,7 +26,6 @@ find_package(GLUT)
 find_package(GLEW)
 find_package(SDL)
 find_package(Cg)
-find_package(OpenCV)
 
 include_directories(${CMAKE_INSTALL_PREFIX}/include)
 set(SVFLOW_PATHS "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
@@ -36,9 +35,9 @@ find_library(SVFLOW_LIB
 )
 
 set(BUILD_FLOW_BUILDER "NO")
-if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
+if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND)
 set(BUILD_FLOW_BUILDER "YES")
-endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND OpenCV_LIBS)
+endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND)
 
 set(INCLUDE_SOURCE "YES")
 if(DISABLE_INCLUDE_SOURCE)
@@ -81,12 +80,6 @@ else(NOT SDL_FOUND)
 message("* (ok) SDL found in ${SDL_INCLUDE_DIR}")
 endif(NOT SDL_FOUND)
 
-if(NOT OpenCV_LIBS)
-message("* OpenCV could not be found.")
-else(NOT OpenCV_LIBS)
-message("* (ok) OpenCV found in ${OpenCV_LIB_DIR}")
-endif(NOT OpenCV_LIBS)
-
 if(NOT CG_FOUND)
 message("* Cg toolkit could not be found.")
 message("  Download from: http://developer.nvidia.com/cg-toolkit-download")
@@ -112,7 +105,6 @@ include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
 include_directories(${GLUT_INCLUDE_DIR})
 include_directories(${GLEW_INCLUDE_DIR})
-include_directories(${OPENCV_INCLUDE_DIRS})
 
 set (V3D_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -129,12 +121,10 @@ enable_feature (V3DLIB_ENABLE_LIBPNG)
 enable_feature_libraries (V3DLIB_ENABLE_LIBJPEG jpeg)
 enable_feature_libraries (V3DLIB_ENABLE_LIBPNG png)
 
-enable_feature (V3DLIB_ENABLE_OPENCV)
 enable_feature (V3DLIB_ENABLE_GPGPU)
 enable_conditional_feature (V3DLIB_GPGPU_ENABLE_CG V3DLIB_ENABLE_GPGPU)
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU GLEW GLU GL)
 enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG Cg CgGL pthread)
-enable_feature_libraries (V3DLIB_ENABLE_OPENCV ${OpenCV_LIBS})
 #--------------------------------------------------
 
 
@@ -208,4 +198,3 @@ message(STATUS "Shader files copied")
 
 add_library(V3D ${ALL_SRC})
 add_subdirectory(Apps)
-target_link_libraries(V3D ${OpenCV_LIBS})

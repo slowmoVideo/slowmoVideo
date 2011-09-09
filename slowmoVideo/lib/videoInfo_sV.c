@@ -26,11 +26,6 @@ VideoInfoSV getInfo(const char filename[])
     av_register_all();
 
     AVFormatContext *pFormatContext = NULL;
-    if (pFormatContext == NULL) {
-        printf("Format context is NULL.");
-    } else {
-        printf("Format context is %p.", (void*)pFormatContext);
-    }
 
     printf("Reading info for file %s.\n", filename);
     fflush(stdout);
@@ -57,7 +52,11 @@ VideoInfoSV getInfo(const char filename[])
     AVCodecContext *pCodecContext;
     int videoStream = -1;
     for (int i = 0; i < pFormatContext->nb_streams; i++) {
+#if LIBAVCODEC_VERSION_INT < (52<<16 | 64<<8 | 0)
+        if (pFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
+#else
         if (pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+#endif
 	    videoStream = i;
 	    pCodecContext = pFormatContext->streams[i]->codec;
 	    AVRational fps = pFormatContext->streams[i]->r_frame_rate;

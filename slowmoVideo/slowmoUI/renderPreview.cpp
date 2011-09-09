@@ -10,6 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "renderPreview.h"
 #include "ui_renderPreview.h"
+#include "project/emptyFrameSource_sV.h"
 #include "project/project_sV.h"
 #include "project/projectPreferences_sV.h"
 
@@ -56,6 +57,14 @@ void RenderPreview::notify(const QString message)
 
 void RenderPreview::slotRenderAt(qreal time)
 {
+    if (dynamic_cast<EmptyFrameSource_sV*>(m_project->frameSource()) != NULL) {
+        notify("Cannot render preview, no frames loaded.");
+        return;
+    }
+    if (m_project->nodes()->size() < 2) {
+        notify("Cannot render preview at the curve position since no curve is available.");
+        return;
+    }
     if (time >= m_project->nodes()->startTime() && time <= m_project->nodes()->endTime()) {
         notify(QString("Rendering preview at output time %1 s (might take some time) ...").arg(time));
 

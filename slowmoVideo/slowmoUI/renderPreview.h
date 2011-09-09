@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QWidget>
 #include <QtCore/QFuture>
 #include <QtCore/QFutureWatcher>
+#include "lib/defs_sV.hpp"
 
 namespace Ui {
     class RenderPreview;
