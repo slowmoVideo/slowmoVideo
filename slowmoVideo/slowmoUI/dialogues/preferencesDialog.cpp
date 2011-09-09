@@ -13,6 +13,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
 
+#if QT_VERSION >= 0x040700
+    ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0, QApplication::UnicodeUTF8));
+#endif
+
     bool b = true;
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
     b &= connect(ui->bCancel, SIGNAL(clicked()), this, SLOT(reject()));

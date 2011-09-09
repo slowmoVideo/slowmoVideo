@@ -143,8 +143,11 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     if (m_project->preferences()->renderEndTime().length() > 0) {
         ui->timeEnd->setText(m_project->preferences()->renderEndTime());
     }
+
+#if QT_VERSION >= 0x040700
     ui->timeStart->setPlaceholderText(QVariant(m_project->nodes()->startTime()).toString());
     ui->timeEnd->setPlaceholderText(QVariant(m_project->nodes()->endTime()).toString());
+#endif
 
     slotUpdateRenderTarget();
     slotSectionModeChanged();

@@ -76,9 +76,6 @@
        <property name="maxLength">
         <number>16</number>
        </property>
-       <property name="placeholderText">
-        <string/>
-       </property>
       </widget>
      </item>
      <item>

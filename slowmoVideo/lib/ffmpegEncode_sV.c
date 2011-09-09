@@ -86,7 +86,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     av_register_all();
 
     /* allocate the output media context */
-#if LIBAVFORMAT_VERSION_INT < (53<<16 | 3<<8 | 0)
+#if LIBAVFORMAT_VERSION_INT < (52<<16 | 45<<8 | 0)
+    video->fc = avformat_alloc_context();
+    video->fc->oformat = guess_format(NULL, filename, NULL);
+    strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
+#elif LIBAVFORMAT_VERSION_INT < (53<<16 | 3<<8 | 0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = av_guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
@@ -296,11 +300,19 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
     int ret = 0;
     AVCodecContext *cc = video->streamV->codec;
 
+#if LIBSWSCALE_VERSION_INT < AV_VERSION_INT(0,8,0)
+    sws_scale(video->rgbConversionContext,
+              (uint8_t**)&data, video->rgbLinesize,
+              0, cc->height,
+              video->picture->data, video->picture->linesize
+              );
+#else
     sws_scale(video->rgbConversionContext,
               &data, video->rgbLinesize,
               0, cc->height,
               video->picture->data, video->picture->linesize
               );
+#endif
 
 
     if (video->fc->oformat->flags & AVFMT_RAWPICTURE) {
@@ -309,7 +321,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
         AVPacket pkt;
         av_init_packet(&pkt);
 
-#if LIBAVCODEC_VERSION_INT < ( 52<<16 | 30<<8 | 2 )
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,30,2)
         pkt.flags |= PKT_FLAG_KEY;
 #else
         pkt.flags |= AV_PKT_FLAG_KEY;
@@ -332,7 +344,11 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
 //                printf("pkt.pts is %d.\n", pkt.pts);
             }
             if(cc->coded_frame->key_frame) {
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,30,2)
+                pkt.flags |= PKT_FLAG_KEY;
+#else
                 pkt.flags |= AV_PKT_FLAG_KEY;
+#endif
             }
             pkt.stream_index = video->streamV->index;
             pkt.data = video->outbufV;
@@ -389,7 +405,7 @@ void eatSample(VideoOut_sV *video)
             printf("pkt.pts is %ld.\n", pkt.pts);
         }
         if(cc->coded_frame->key_frame) {
-#if LIBAVCODEC_VERSION_INT < ( 52<<16 | 30<<8 | 2 )
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,30,2)
             pkt.flags |= PKT_FLAG_KEY;
 #else
             pkt.flags |= AV_PKT_FLAG_KEY;

@@ -466,7 +466,7 @@ int NodeList_sV::indexOf(const Node_sV *node) const
 
 int NodeList_sV::find(qreal time) const
 {
-    uint pos;
+    int pos;
     for (
          pos = 0;
          m_list.size() > (pos+1) && m_list.at(pos+1).x() <= time;
