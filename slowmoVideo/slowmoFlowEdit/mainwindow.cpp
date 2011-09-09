@@ -125,9 +125,11 @@ QString MainWindow::nextFilename(QString originalName, int shift) const
 
 void MainWindow::loadFlow(QString filename)
 {
-    m_canvas->slotLoadFlow(filename);
-    m_lastFlowFile = filename;
-    updateTitle();
+    if (QFileInfo(filename).exists()) {
+        m_canvas->slotLoadFlow(filename);
+        m_lastFlowFile = filename;
+        updateTitle();
+    }
 }
 
 void MainWindow::slotOpenFlow()

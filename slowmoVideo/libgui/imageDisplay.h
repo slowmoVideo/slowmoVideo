@@ -76,10 +76,13 @@ private:
 
     QPointF convertCanvasToImage(QPoint p) const;
     QPointF convertCanvasToPixel(QPoint p) const;
+    QPoint convertImageToCanvas(QPointF p) const;
 
     qreal clamp(qreal val, qreal min, qreal max) const;
     QPointF max(QPointF p1, QPointF p2, bool limitToImage) const;
     QPointF min(QPointF p1, QPointF p2, bool limitToImage) const;
+    QPoint min(QPoint p1, QPoint p2) const;
+    QPoint max(QPoint p1, QPoint p2) const;
 
 private slots:
     void slotExportImage();

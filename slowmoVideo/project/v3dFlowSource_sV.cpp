@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "abstractFrameSource_sV.h"
 #include "../lib/flowRW_sV.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
 
@@ -97,6 +98,7 @@ QString V3dFlowSource_sV::correctFlowBinaryLocation()
     QStringList paths;
     paths << programLocation;
     paths << QDir::currentPath() + "/flowBuilder";
+    paths << QCoreApplication::applicationDirPath() + "/flowBuilder";
     paths << "/usr/bin/flowBuilder" << "/usr/local/bin/flowBuilder";
     for (int i = 0; i < paths.size(); i++) {
         if (validateFlowBinary(paths.at(i))) {
