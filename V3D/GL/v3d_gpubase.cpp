@@ -19,6 +19,10 @@
 # include <Cg/cgGL.h>
 #endif
 
+#ifdef WIN32
+#include <stdio.h>
+#endif
+
 namespace
 {
 
@@ -803,7 +807,7 @@ namespace V3D_GPU
          if (baseDir == 0)
             baseDir = "."; // If environment var is not set, use "."
 
-#ifdef WIN32
+#ifdef _MSC_VER
          sprintf_s(completeName, "%s/%s", baseDir, fileName);
 #else
          snprintf(completeName, 1024, "%s/%s", baseDir, fileName);
@@ -814,7 +818,7 @@ namespace V3D_GPU
 
       if (!is)
       {
-#ifdef WIN32
+#ifdef _MSC_VER
          sprintf_s(completeName2, "./%s", fileName);
 #else
          snprintf(completeName2, 1024, "./%s", fileName);

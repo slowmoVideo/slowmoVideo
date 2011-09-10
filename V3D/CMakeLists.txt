@@ -20,12 +20,51 @@ set(CMAKE_CXX_FLAGS
 )
 
 
+if(WIN32)
+FIND_PATH( GLUT_INCLUDE_DIR NAMES GL/glut.h 
+	PATHS  ${PROJECT_SOURCE_DIR}/libs/include )
+FIND_LIBRARY( GLUT_LIBRARIES NAMES glut glut32 freeglut
+	PATHS ${PROJECT_SOURCE_DIR}/libs/lib 
+	NO_DEFAULT_PATH )
+message(STATUS "GLUT searched manually: ${GLUT_LIBRARIES} in ${GLUT_INCLUDE_DIR}")
+if(GLUT_INCLUDE_DIR AND GLUT_LIBRARIES)
+set(GLUT_FOUND TRUE)
+endif(GLUT_INCLUDE_DIR AND GLUT_LIBRARIES)
+endif(WIN32)
+
+if(NOT GLUT_FOUND)
+find_package(GLUT)
+endif(NOT GLUT_FOUND)
+
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
 find_package(OpenGL)
-find_package(GLUT)
 find_package(GLEW)
 find_package(SDL)
 find_package(Cg)
+find_package(JPEG)
+find_package(ZLIB)
+
+if(WIN32)
+if(NOT ZLIB_FOUND)
+FIND_PATH(ZLIB_INCLUDE_DIR zlib.h
+	PATHS ${PROJECT_SOURCE_DIR}/libs/include
+)
+find_library(ZLIB_LIBRARY NAMES zlib PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+if(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+set(ZLIB_FOUND TRUE)
+endif(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+message(STATUS "Manual search for zlib: ${ZLIB_LIBRARY} in ${ZLIB_INCLUDE_DIR}")
+endif(NOT ZLIB_FOUND)
+find_package(PNG)
+if(NOT PNG_FOUND)
+find_path(PNG_INCLUDE_DIR png.h PATHS ${PROJECT_SOURCE_DIR}/libs/include)
+find_library(PNG_LIBRARIES libpng PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+if(PNG_INCLUDE_DIR AND PNG_LIBRARIES)
+	set(PNG_FOUND TRUE)
+endif(PNG_INCLUDE_DIR AND PNG_LIBRARIES)
+message(STATUS "Manual search for png: ${PNG_LIBRARIES} in ${PNG_INCLUDE_DIR}")
+endif(NOT PNG_FOUND)
+endif(WIN32)
 
 include_directories(${CMAKE_INSTALL_PREFIX}/include)
 set(SVFLOW_PATHS "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
@@ -34,10 +73,25 @@ find_library(SVFLOW_LIB
     PATHS ${SVFLOW_PATHS}
 )
 
+
+
+if(NOT JPEG_FOUND)
+message(STATUS "Trying to find JPEG manually.")
+FIND_PATH(JPEG_INCLUDE_DIR jpeglib.h PATHS ${PROJECT_SOURCE_DIR}/libs/include)
+
+SET(JPEG_NAMES ${JPEG_NAMES} jpeg)
+FIND_LIBRARY(JPEG_LIBRARY NAMES ${JPEG_NAMES} PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+if(JPEG_INCLUDE_DIR AND JPEG_LIBRARY)
+set(JPEG_FOUND TRUE)
+endif(JPEG_INCLUDE_DIR AND JPEG_LIBRARY)
+message(STATUS "JPEG: ${JPEG_LIBRARY} at ${JPEG_INCLUDE_DIR}")
+endif(NOT JPEG_FOUND)
+
+
 set(BUILD_FLOW_BUILDER "NO")
-if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND)
+if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND JPEG_FOUND AND PNG_FOUND)
 set(BUILD_FLOW_BUILDER "YES")
-endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND)
+endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND JPEG_FOUND AND PNG_FOUND)
 
 set(INCLUDE_SOURCE "YES")
 if(DISABLE_INCLUDE_SOURCE)
@@ -59,13 +113,13 @@ endif(NOT SVFLOW_LIB)
 if(NOT OPENGL_FOUND)
 message("* OpenGL could not be found.")
 else(NOT OPENGL_FOUND)
-message("* (ok) OpenGL found in ${OPENGL_INCLUDE_DIR}")
+message("* (ok) OpenGL found in ${OPENGL_INCLUDE_DIR}: ${OPENGL_LIBRARIES}")
 endif(NOT OPENGL_FOUND)
 
 if(NOT GLUT_FOUND)
 message("* GLUT could not be found.")
 else(NOT GLUT_FOUND)
-message("* (ok) GLUT found in ${GLUT_INCLUDE_DIR}")
+message("* (ok) GLUT found in ${GLUT_INCLUDE_DIR}: ${GLUT_LIBRARIES}")
 endif(NOT GLUT_FOUND)
 
 if(NOT GLEW_FOUND)
@@ -84,8 +138,20 @@ if(NOT CG_FOUND)
 message("* Cg toolkit could not be found.")
 message("  Download from: http://developer.nvidia.com/cg-toolkit-download")
 else(NOT CG_FOUND)
-message("* (ok) Cg found at ${CG_LIBRARY}")
+message("* (ok) Cg found at ${CG_INCLUDE_DIR}")
 endif(NOT CG_FOUND)
+
+if(NOT JPEG_FOUND)
+message("* JPEG libraries could not be found.")
+else(NOT JPEG_FOUND)
+message("* (ok) JPEG libraries found at ${JPEG_INCLUDE_DIR}")
+endif(NOT JPEG_FOUND)
+
+if(NOT PNG_FOUND)
+message("* PNG libraries could not be found.")
+else(NOT PNG_FOUND)
+message("* (ok) PNG libraries found at ${PNG_INCLUDE_DIR}")
+endif(NOT PNG_FOUND)
 
 
 message("* Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
@@ -105,6 +171,10 @@ include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
 include_directories(${GLUT_INCLUDE_DIR})
 include_directories(${GLEW_INCLUDE_DIR})
+include_directories(${CG_INCLUDE_DIR})
+include_directories(${JPEG_INCLUDE_DIR})
+include_directories(${ZLIB_INCLUDE_DIR})
+include_directories(${PNG_INCLUDE_DIR})
 
 set (V3D_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -118,13 +188,15 @@ add_definitions(-DDISABLE_REDEFINITIONS)
 #--------------------------------------------------
 enable_feature (V3DLIB_ENABLE_LIBJPEG)
 enable_feature (V3DLIB_ENABLE_LIBPNG)
-enable_feature_libraries (V3DLIB_ENABLE_LIBJPEG jpeg)
-enable_feature_libraries (V3DLIB_ENABLE_LIBPNG png)
+enable_feature_libraries (V3DLIB_ENABLE_LIBJPEG ${JPEG_LIBRARIES})
+enable_feature_libraries (V3DLIB_ENABLE_LIBPNG ${PNG_LIBRARIES})
 
 enable_feature (V3DLIB_ENABLE_GPGPU)
 enable_conditional_feature (V3DLIB_GPGPU_ENABLE_CG V3DLIB_ENABLE_GPGPU)
-enable_feature_libraries (V3DLIB_ENABLE_GPGPU GLEW GLU GL)
-enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG Cg CgGL pthread)
+enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${OPENGL_LIBRARIES})
+enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLEW_LIBRARIES})
+enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLUT_LIBRARIES})
+enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG ${CG_LIBRARIES})
 #--------------------------------------------------
 
 
@@ -197,4 +269,5 @@ message(STATUS "Shader files copied")
 
 
 add_library(V3D ${ALL_SRC})
+target_link_libraries(V3D ${GLEW_LIBRARIES})
 add_subdirectory(Apps)

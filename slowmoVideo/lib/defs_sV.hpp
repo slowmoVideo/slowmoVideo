@@ -11,24 +11,14 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef DEFS_SV_HPP
 #define DEFS_SV_HPP
 
+#include "macros_sV.h"
+
 #include <QtCore/QDebug>
 #include <QtCore/QString>
 #include <QtCore/QSize>
 #include <QtCore/QPoint>
 #include <QtGui/QColor>
 #include <cmath>
-
-#if _WIN64 || __amd64__
-#define BITS_64
-#endif
-
-#if defined WIN32 || defined WIN64
-#define WINDOWS
-#elif defined __linux__
-#define LINUX
-#elif defined TARGET_OS_MAC
-#define OSX
-#endif
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 2

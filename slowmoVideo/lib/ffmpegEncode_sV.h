@@ -9,6 +9,8 @@
   (at your option) any later version.
   */
 
+#include "macros_sV.h"
+
 #include <inttypes.h>
 
 // Against the «UINT64_C not declared» message.
@@ -21,9 +23,13 @@
  # include <stdint.h>
 #endif
 
-
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
+#ifdef WINDOWS
+#include <libavcodec\avcodec.h>
+#include <libavformat\avformat.h>
+#else
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#endif
 
 /// This struct can eat frames and produces videos!
 /// Variables should not be changed from the outside.
