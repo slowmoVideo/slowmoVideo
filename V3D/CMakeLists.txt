@@ -204,7 +204,7 @@ enable_feature (V3DLIB_ENABLE_GPGPU)
 enable_conditional_feature (V3DLIB_GPGPU_ENABLE_CG V3DLIB_ENABLE_GPGPU)
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${OPENGL_LIBRARIES})
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLEW_LIBRARIES})
-enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLUT_LIBRARIES})
+enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLUT_glut_LIBRARY})
 enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG ${CG_LIBRARY} ${CG_GL_LIBRARY})
 #--------------------------------------------------
 

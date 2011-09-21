@@ -37,6 +37,7 @@ namespace Ui {
     class MainWindow;
 }
 
+/// \todo Call flow editor from here
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
