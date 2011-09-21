@@ -11,6 +11,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "flowField_sV.h"
 #include <iostream>
 
+float FlowField_sV::nullValue = 65535;
+
 FlowField_sV::FlowField_sV(int width, int height) :
     m_width(width),
     m_height(height)

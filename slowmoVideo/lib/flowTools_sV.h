@@ -2,6 +2,7 @@
 #define FLOWTOOLS_SV_H
 
 #include "flowField_sV.h"
+#include "kernel_sV.h"
 
 class FlowTools_sV
 {
@@ -14,6 +15,8 @@ public:
     static void difference(const FlowField_sV &left, const FlowField_sV &right, FlowField_sV &out);
     static void signedDifference(const FlowField_sV &left, const FlowField_sV &right, FlowField_sV &out);
 
+    static void deleteRect(FlowField_sV &field, int top, int left, int bottom, int right);
+
     /**
       \brief Clears the content of the given rectangle and fills it with the surrounding pixels.
 
@@ -22,8 +25,11 @@ public:
       */
     static void refill(FlowField_sV &field, int top, int left, int bottom, int right);
 
+    static void refill(FlowField_sV &field, const Kernel_sV &kernel, int top, int left, int bottom, int right);
+
 private:
     static void refillLine(FlowField_sV &field, int startTop, int startLeft, int length, LineFillMode fillMode);
+    static void refillLine(FlowField_sV &field, const Kernel_sV &kernel, int startTop, int startLeft, int length, bool horizontal);
     static void refillCorner(FlowField_sV &field, int top, int left, CornerPosition pos);
 };
 

@@ -61,7 +61,10 @@ void FlowEditCanvas::repaintFlow()
 void FlowEditCanvas::slotRectDrawn(QRectF imageRect)
 {
     qDebug() << "Rect drawn: " << imageRect;
-    FlowTools_sV::refill(*m_flowField, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
+    Kernel_sV k(8, 8);
+    k.gauss();
+    FlowTools_sV::deleteRect(*m_flowField, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
+    FlowTools_sV::refill(*m_flowField, k, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
     repaintFlow();
 }
 

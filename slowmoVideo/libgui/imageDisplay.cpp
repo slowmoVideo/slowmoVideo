@@ -98,14 +98,20 @@ QPointF ImageDisplay::convertCanvasToImage(QPoint p) const
         return convertCanvasToPixel(p);
     }
 }
-
+QPoint ImageDisplay::convertImageToPixel(QPointF p) const
+{
+    float scale = m_scale;
+    if (m_aScaling->isChecked()) {
+        scale = m_scaledImageSize.width()/float(m_image.width());
+    }
+    return (p*scale + QPointF(contentsRect().topLeft())).toPoint();
+}
 QPoint ImageDisplay::convertImageToCanvas(QPointF p) const
 {
-    if (m_aScaling->isChecked()) {
-
-        return (p / ((float)m_image.width()/m_scaledImageSize.width())).toPoint();
+    if (!m_aScaling->isChecked()) {
+        return convertImageToPixel(p - m_imageOffset);
     } else {
-        return contentsRect().topLeft() + ((p-m_imageOffset)/m_scale).toPoint();
+        return convertImageToPixel(p);
     }
 
 }

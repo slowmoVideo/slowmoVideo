@@ -19,6 +19,7 @@ namespace Ui {
     class FlowEditCanvas;
 }
 
+/// \todo Auto-fix feature (confirm to accept)
 class FlowEditCanvas : public QWidget
 {
     Q_OBJECT
