@@ -1,7 +1,13 @@
 #ifndef DEFS_SV_H
 #define DEFS_SV_H
 
+#include "macros_sV.h"
+
+#ifdef WINDOWS
+typedef __int64 int64_t;
+#else
 #include <inttypes.h>
+#endif
 
 /// Holds information about a video input file.
 typedef struct VideoInfoSV {

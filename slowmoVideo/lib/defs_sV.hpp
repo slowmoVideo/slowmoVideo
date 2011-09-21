@@ -13,6 +13,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "macros_sV.h"
 
+#ifdef WINDOWS
+typedef __int64 int64_t;
+#else
+#include <inttypes.h>
+#endif
+
 #include <QtCore/QDebug>
 #include <QtCore/QString>
 #include <QtCore/QSize>

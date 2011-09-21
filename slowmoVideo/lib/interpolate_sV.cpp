@@ -15,7 +15,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "vector_sV.h"
 #include "bezierTools_sV.h"
 
+#ifdef WINDOWS
+#include <math.h>
+#else
 #include <cmath>
+#endif
 
 #include <QDebug>
 #include <QImage>

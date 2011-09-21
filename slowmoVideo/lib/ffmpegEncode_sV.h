@@ -9,9 +9,7 @@
   (at your option) any later version.
   */
 
-#include "macros_sV.h"
-
-#include <inttypes.h>
+#include "defs_sV.h"
 
 // Against the «UINT64_C not declared» message.
 // See: http://code.google.com/p/ffmpegsource/issues/detail?id=11

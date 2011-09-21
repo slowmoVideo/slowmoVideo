@@ -1,10 +1,6 @@
 include_directories(${V3D_INCLUDE_DIRS} ${EXTRA_INC_DIRS})
 link_directories(${V3D_DIR} ${EXTRA_LIB_DIRS})
-# (WIN) Check: Really more than extra libs required?
-link_libraries (V3D ${EXTRA_LIBRARIES} ${GLUT_LIBRARIES} ${JPEG_LIBRARIES} ${GLEW_LIBRARIES} ${CG_LIBRARY} ${OPENGL_LIBRARIES})
-
-
-message(STATUS "Flow library: ${SVFLOW_LIB}")
+link_libraries (V3D ${EXTRA_LIBRARIES})
 
 #if(V3DLIB_ENABLE_GPGPU AND V3DLIB_GPGPU_ENABLE_CG)
 #  add_v3d_executable(tvl1_flow tvl1_flow.cpp)
