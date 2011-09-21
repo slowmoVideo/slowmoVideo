@@ -18,8 +18,9 @@ SET( FFMPEG_SWS_HEADERS swscale.h )
 SET( FFMPEG_SWS_PATH_SUFFIXES libswscale )
 
 if( WIN32 )
-   SET( FFMPEG_LIBRARIES avformat-52.lib avcodec-51.lib avutil-49.lib avdevice-52.lib )
-   SET( FFMPEG_SWS_LIBRARIES swscale-0.lib )
+   #SET( FFMPEG_LIBRARIES avformat.lib avcodec.lib avutil.lib avdevice.lib )
+   SET( FFMPEG_LIBRARIES avformat.lib avcodec.lib avutil.lib )
+   SET( FFMPEG_SWS_LIBRARIES swscale.lib )
    SET( FFMPEG_LIBRARY_DIR $ENV{FFMPEGDIR}\\lib )
    SET( FFMPEG_INCLUDE_PATHS $ENV{FFMPEGDIR}\\include )
 

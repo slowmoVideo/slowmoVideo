@@ -45,6 +45,8 @@ set(HEADERS
 )
 
 
+message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
+
 
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
@@ -52,7 +54,7 @@ target_link_libraries(sV  ${QT_LIBRARIES})
 add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode  STATIC ffmpegEncode_sV.c)
+add_library(sVencode  STATIC ffmpegEncode_sV.c macros_sV.h)
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 
 add_library(sVflow  STATIC ${LIB_SRC_FLOW})

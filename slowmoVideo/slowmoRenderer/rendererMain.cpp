@@ -73,9 +73,11 @@ int main(int argc, char *argv[])
     if (signal(SIGINT, terminate) == SIG_ERR) {
         std::cerr << "Could not set up SIGINT handler." << std::endl;
     }
+#ifndef WINDOWS
     if (signal(SIGUSR1, printProgress) == SIG_ERR) {
         std::cerr << "Could not set up SIGUSR1 handler." << std::endl;
     }
+#endif
 
     QStringList args = app.arguments();
     myName = args.at(0);
