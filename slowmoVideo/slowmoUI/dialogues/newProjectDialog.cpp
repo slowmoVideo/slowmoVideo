@@ -101,6 +101,20 @@ void NewProjectDialog::slotSelectVideoFile()
         ui->txtVideoInfo->clear();
 
         slotUpdateVideoInfo();
+
+        if (m_videoInfo.streamsCount <= 0) {
+            // No video stream found. Check if the path contains a non-ASCII character and warn if this is the case.
+            unsigned char ascii;
+            for (int i = 0; i < ui->inputVideo->text().length(); i++) {
+                ascii = ui->inputVideo->text().at(i).toAscii();
+                if (ascii == 0 || ascii > 0x7f) {
+                    ui->txtVideoInfo->appendPlainText(
+                                QString("Character %1 is not an ASCII character. This file path will likely not work with ffmpeg.")
+                                .arg(ui->inputVideo->text().at(i)));
+                    break;
+                }
+            }
+        }
     }
 }
 
