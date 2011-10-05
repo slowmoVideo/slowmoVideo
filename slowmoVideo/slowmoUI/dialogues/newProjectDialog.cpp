@@ -203,7 +203,7 @@ void NewProjectDialog::slotUpdateButtonStates()
 
     if (ui->radioVideo->isChecked()) {
         // Validate the video file
-        if (m_videoInfo.streamsCount > 0) {
+        if (m_videoInfo.streamsCount > 0 && m_videoInfo.framesCount > 0) {
             ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
             m_inputFile = ui->inputVideo->text();
         } else {
