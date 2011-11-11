@@ -429,21 +429,28 @@ void NodeList_sV::fixHandles(int leftIndex)
         m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).leftNodeHandle().y());
     }
 }
-void NodeList_sV::set1xSpeed(qreal segmentTime)
+void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
 {
     int left, right;
     findBySegment(segmentTime, left, right);
     if (left >= 0 && right >= 0) {
         Node_sV *leftN = &m_list[left];
         Node_sV *rightN = &m_list[right];
-        qreal y = leftN->y() + (rightN->x()-leftN->x());
-        if (y > m_maxY) {
-            qDebug() << "1x speed would shoot over maximum time. Correcting.";
-            y = m_maxY;
-            qreal xNew = leftN->x() + (m_maxY - leftN->y());
-            rightN->setY(m_maxY);
+        qreal y = leftN->y() + speed*(rightN->x()-leftN->x());
+        if (y > m_maxY || y < 0) {
+            if (y > m_maxY) {
+                qDebug() << speed << "x speed would shoot over maximum time. Correcting.";
+                y = m_maxY;
+            } else {
+                qDebug() << speed << "x speed goes below 0. Correcting.";
+                y = 0;
+            }
+            qreal xNew = leftN->x() + (y - leftN->y())/speed;
+            rightN->setY(y);
             if (xNew - leftN->x() >= m_minDist) {
-                add(Node_sV(xNew, m_maxY));
+                add(Node_sV(xNew, y));
+            } else {
+                qDebug() << "New node would be too close, not adding it.";
             }
         } else {
             rightN->setY(y);

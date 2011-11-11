@@ -19,6 +19,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define MAX_CONV_FRAMES 5
 
+//#define DEBUG
+
 MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     m_project(project),
     m_slowmoSamples(16),
@@ -209,6 +211,13 @@ QImage MotionBlur_sV::convolutionBlur(float startFrame, float endFrame, float re
 
         delete field;
     }
+
+#ifdef DEBUG
+    for (int i = 0; i < images.size(); i++) {
+        images.at(i).save(QString("/tmp/mblur-%1.png").arg(i));
+    }
+#endif
+
     return Shutter_sV::combine(images);
 }
 

@@ -33,6 +33,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtGui/QMenu>
+#include <QtGui/QInputDialog>
 
 
 
@@ -104,8 +105,16 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
-    m_a1xSpeed = new QAction(QString::fromUtf8("Set speed to 1×"), this);
+    m_aCustomSpeed = new QAction(QString::fromUtf8("Set custom speed"), this);
     m_aShutterFunction = new QAction("Set/edit shutter function", this);
+
+    m_speedsMapper = new QSignalMapper(this);
+    double arr[] = {1, .5, 0, -.5, -1};
+#define N_SPEEDS 5
+    for (int i = 0; i < N_SPEEDS; i++) {
+        m_aSpeeds.push_back(new QAction(QString::fromUtf8("Set speed to %1×").arg(arr[i], 0, 'f', 1), this));
+        m_speedsMapper->setMapping(m_aSpeeds.back(), QString("%1").arg(arr[i],0,'f',1));
+    }
 
     m_handleMapper = new QSignalMapper(this);
     m_aResetLeftHandle = new QAction("Reset left handle", this);
@@ -123,8 +132,12 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     b &= connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
-    b &= connect(m_a1xSpeed, SIGNAL(triggered()), this, SLOT(slotSet1xSpeed()));
+    b &= connect(m_aCustomSpeed, SIGNAL(triggered()), this, SLOT(slotSetSpeed()));
+    b &= connect(m_speedsMapper, SIGNAL(mapped(QString)), this, SLOT(slotSetSpeed(QString)));
     b &= connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
+    for (std::vector<QAction*>::iterator it = m_aSpeeds.begin(); it != m_aSpeeds.end(); ++it) {
+        b &= connect(*it, SIGNAL(triggered()), m_speedsMapper, SLOT(map()));
+    }
     Q_ASSERT(b);
 }
 
@@ -134,6 +147,12 @@ Canvas::~Canvas()
     if (m_shutterFunctionDialog != NULL) {
         delete m_shutterFunctionDialog;
     }
+
+    while (!m_aSpeeds.empty()) {
+        delete m_aSpeeds.back();
+        m_aSpeeds.pop_back();
+    }
+    delete m_speedsMapper;
 }
 
 void Canvas::load(Project_sV *project)
@@ -625,6 +644,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     m_states.contextmenuMouseTime = convertCanvasToTime(e->pos()).toQPointF();
 
     QMenu menu;
+    QMenu speedMenu(QString::fromUtf8("Segment replay speed …"), &menu);
 
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
@@ -645,8 +665,14 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
-        menu.addAction(m_a1xSpeed);
         menu.addAction(m_aShutterFunction);
+        std::vector<QAction*>::iterator it = m_aSpeeds.begin();
+        while (it != m_aSpeeds.end()) {
+            speedMenu.addAction(*it);
+            it++;
+        }
+        speedMenu.addAction(m_aCustomSpeed);
+        menu.addMenu(&speedMenu);
 
     } else {
         if (obj != NULL) {
@@ -879,11 +905,32 @@ void Canvas::slotResetHandle(const QString &position)
         qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
 }
-void Canvas::slotSet1xSpeed()
+void Canvas::setCurveSpeed(double speed)
 {
-    qDebug() << "Setting curve to 1x speed.";
-    m_nodes->set1xSpeed(convertCanvasToTime(m_states.prevMousePos).x());
+    qDebug() << "Setting curve to " << speed << "x speed.";
+    m_nodes->setSpeed(convertCanvasToTime(m_states.prevMousePos).x(), speed);
     emit nodesChanged();
+    repaint();
+}
+
+
+void Canvas::slotSetSpeed()
+{
+    bool ok = true;
+    double d = QInputDialog::getDouble(this, "Replay speed for current segment", "Speed:", 1, -1000, 1000, 2, &ok);
+    if (ok) {
+        setCurveSpeed(d);
+    }
+}
+void Canvas::slotSetSpeed(QString s)
+{
+    bool ok = true;
+    double d = s.toDouble(&ok);
+    if (ok) {
+        setCurveSpeed(d);
+    } else {
+        qDebug() << "Not ok: " << s;
+    }
 }
 void Canvas::slotSetShutterFunction()
 {

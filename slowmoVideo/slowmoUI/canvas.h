@@ -157,12 +157,14 @@ private:
 
     QSignalMapper *m_curveTypeMapper;
     QSignalMapper *m_handleMapper;
+    QSignalMapper *m_speedsMapper;
     QAction *m_aLinear;
     QAction *m_aBezier;
     QAction *m_aResetLeftHandle;
     QAction *m_aResetRightHandle;
-    QAction *m_a1xSpeed;
+    QAction *m_aCustomSpeed;
     QAction *m_aShutterFunction;
+    std::vector<QAction *> m_aSpeeds;
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
@@ -181,12 +183,15 @@ private:
 
     const CanvasObject_sV* objectAt(QPoint pos, Qt::KeyboardModifiers modifiers) const;
 
+    void setCurveSpeed(double speed);
+
 private slots:
     void slotDeleteNode();
     void slotSnapInNode();
     void slotChangeCurveType(int curveType);
     void slotResetHandle(const QString &position);
-    void slotSet1xSpeed();
+    void slotSetSpeed();
+    void slotSetSpeed(QString s);
     void slotSetShutterFunction();
 };
 
