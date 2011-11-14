@@ -98,6 +98,13 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 
     m_aDeleteNode = new QAction("&Delete node", this);
     m_aSnapInNode = new QAction("&Snap in node", this);
+    m_aDeleteTag = new QAction("&Delete tag", this);
+    m_aRenameTag = new QAction("&Rename tag", this);
+    m_hackMapper = new QSignalMapper(this);
+    m_hackMapper->setMapping(m_aRenameTag, &m_toRenameTag); m_toRenameTag.reason = TransferObject::ACTION_RENAME;
+    m_hackMapper->setMapping(m_aDeleteTag, &m_toDeleteTag); m_toDeleteTag.reason = TransferObject::ACTION_DELETE;
+    m_hackMapper->setMapping(m_aDeleteNode, &m_toDeleteNode); m_toDeleteNode.reason = TransferObject::ACTION_DELETE;
+    m_hackMapper->setMapping(m_aSnapInNode, &m_toSnapInNode); m_toSnapInNode.reason = TransferObject::ACTION_SNAPIN;
 
     m_curveTypeMapper = new QSignalMapper(this);
     m_aLinear = new QAction("&Linear curve", this);
@@ -124,8 +131,11 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 
 
     bool b = true;
-    b &= connect(m_aDeleteNode, SIGNAL(triggered()), this, SLOT(slotDeleteNode()));
-    b &= connect(m_aSnapInNode, SIGNAL(triggered()), this, SLOT(slotSnapInNode()));
+    b &= connect(m_aSnapInNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aDeleteNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aDeleteTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aRenameTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_hackMapper, SIGNAL(mapped(QObject*)), this, SLOT(slotRunAction(QObject*)));
     b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
@@ -153,6 +163,12 @@ Canvas::~Canvas()
         m_aSpeeds.pop_back();
     }
     delete m_speedsMapper;
+    delete m_hackMapper;
+
+    delete m_aSnapInNode;
+    delete m_aDeleteNode;
+    delete m_aDeleteTag;
+    delete m_aRenameTag;
 }
 
 void Canvas::load(Project_sV *project)
@@ -649,11 +665,15 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
     if (dynamic_cast<const Node_sV*>(obj)) {
-        int nodeIndex = m_nodes->indexOf((const Node_sV*)obj);
+        Node_sV *node = (Node_sV *) obj;
+        m_toDeleteNode.objectPointer = node;
+        m_toSnapInNode.objectPointer = node;
+
+        int nodeIndex = m_nodes->indexOf(node);
 
         menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
-        menu.addAction(m_aSnapInNode);
+//        menu.addAction(m_aSnapInNode); // \todo Activate Snap in
         menu.addSeparator()->setText("Handle actions");
         menu.addAction(m_aResetLeftHandle);
         menu.addAction(m_aResetRightHandle);
@@ -674,6 +694,15 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
             it++;
         }
         menu.addMenu(&speedMenu);
+
+    } else if (dynamic_cast<const Tag_sV*>(obj) != NULL) {
+        Tag_sV* tag = (Tag_sV*) obj;
+        m_toDeleteTag.objectPointer = tag;
+        m_toRenameTag.objectPointer = tag;
+
+        menu.addAction(QString("Tag %1").arg(tag->description()));
+        menu.addAction(m_aDeleteTag);
+        menu.addAction(m_aRenameTag);
 
     } else {
         if (obj != NULL) {
@@ -872,20 +901,65 @@ void Canvas::slotSetToolMode(ToolMode mode)
     repaint();
 }
 
-void Canvas::slotDeleteNode()
+
+
+
+void Canvas::slotRunAction(QObject *o)
 {
-    qDebug() << "Deleting node at " << m_states.prevMousePos;
-    int index = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
-    if (index >= 0) {
-        m_nodes->deleteNode(index);
-        emit nodesChanged();
+    TransferObject *to = (TransferObject*) o;
+
+    qDebug() << "Desired action: " << toString(to->reason);
+
+    if (dynamic_cast<Tag_sV*>(to->objectPointer) != NULL) {
+
+        /// Tag actions ///
+
+        Tag_sV* tag = (Tag_sV*) to->objectPointer;
+        qDebug() << " ... on Tag " << tag->description();
+        switch (to->reason) {
+        case TransferObject::ACTION_DELETE:
+            for (int i = 0; i < m_tags->size(); ++i) {
+                if (&m_tags->at(i) == tag) {
+                    qDebug() << "Tag found, removing: " << m_tags->at(i).description();
+                    m_tags->removeAt(i);
+                    break;
+                }
+            }
+            break;
+        case TransferObject::ACTION_RENAME:
+        {
+            bool ok;
+            QString newName = QInputDialog::getText(this, "New tag name", "Tag:", QLineEdit::Normal, tag->description(), &ok);
+            if (ok) {
+                tag->setDescription(newName);
+            }
+            break;
+        }
+        default:
+            qDebug() << "Unknown action on Tag: " << toString(to->reason);
+            Q_ASSERT(false);
+            break;
+        }
+    } else if (dynamic_cast<Node_sV*>(to->objectPointer)) {
+
+        /// Node actions ///
+
+        Node_sV const* node = (Node_sV const*) to->objectPointer;
+        qDebug() << " ... on node " << *node;
+        switch (to->reason) {
+        case TransferObject::ACTION_DELETE:
+            m_nodes->deleteNode(m_nodes->indexOf(node));
+            break;
+        default:
+            qDebug() << "Unknown action on Node: " << toString(to->reason);
+            Q_ASSERT(false);
+            break;
+        }
     }
+
+    repaint();
 }
-void Canvas::slotSnapInNode()
-{
-    /// \todo implement
-    qDebug() << "Snapping in at " << m_states.prevMousePos;
-}
+
 void Canvas::slotChangeCurveType(int curveType)
 {
     qDebug() << "Changing curve type to " << toString((CurveType)curveType) << " at " << convertCanvasToTime(m_states.prevMousePos).x();
@@ -983,4 +1057,19 @@ QDebug operator <<(QDebug qd, const Canvas::Abort &abort)
         break;
     }
     return qd.maybeSpace();
+}
+
+QString toString(TransferObject::Reason reason)
+{
+    switch (reason) {
+    case TransferObject::ACTION_DELETE :
+        return "Delete";
+    case TransferObject::ACTION_SNAPIN :
+        return "Snap in";
+    case TransferObject::ACTION_RENAME :
+        return "Rename";
+    default :
+        Q_ASSERT(false);
+        return "Unknown action";
+    }
 }

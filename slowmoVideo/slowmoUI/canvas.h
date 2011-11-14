@@ -39,6 +39,26 @@ namespace Ui {
     class Canvas;
 }
 
+
+
+
+class TransferObject : public QObject {
+    Q_OBJECT
+public:
+    CanvasObject_sV* objectPointer;
+    enum Reason {
+        ACTION_DELETE,
+        ACTION_RENAME,
+        ACTION_SNAPIN
+    } reason;
+
+
+    TransferObject() : objectPointer(NULL), reason(ACTION_SNAPIN) {}
+    TransferObject(CanvasObject_sV* objectPointer, Reason reason) :
+        objectPointer(objectPointer), reason(reason) {}
+};
+
+
 class Project_sV;
 
 /**
@@ -154,8 +174,11 @@ private:
         int travelledDistance;
     } m_states;
 
-    QAction *m_aDeleteNode;
-    QAction *m_aSnapInNode;
+    QAction *m_aDeleteNode; TransferObject m_toDeleteNode;
+    QAction *m_aSnapInNode; TransferObject m_toSnapInNode;
+    QAction *m_aDeleteTag; TransferObject m_toDeleteTag;
+    QAction *m_aRenameTag; TransferObject m_toRenameTag;
+    QSignalMapper *m_hackMapper;
 
     QSignalMapper *m_curveTypeMapper;
     QSignalMapper *m_handleMapper;
@@ -188,8 +211,7 @@ private:
     void setCurveSpeed(double speed);
 
 private slots:
-    void slotDeleteNode();
-    void slotSnapInNode();
+    void slotRunAction(QObject *o);
     void slotChangeCurveType(int curveType);
     void slotResetHandle(const QString &position);
     void slotSetSpeed();
@@ -199,5 +221,7 @@ private slots:
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);
 QDebug operator<<(QDebug qd, const Canvas::Abort &abort);
+
+QString toString(TransferObject::Reason reason);
 
 #endif // CANVAS_H
