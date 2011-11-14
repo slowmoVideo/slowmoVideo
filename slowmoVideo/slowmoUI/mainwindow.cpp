@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent) :
         if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
             qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
 
-            QAction *a = new QAction(w->objectName(), this);
+            QAction *a = new QAction("&" + w->objectName(), this);
             a->setCheckable(true);
             bool b = true;
             b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));

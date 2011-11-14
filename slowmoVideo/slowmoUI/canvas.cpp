@@ -96,17 +96,17 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
-    m_aDeleteNode = new QAction("Delete node", this);
-    m_aSnapInNode = new QAction("Snap in node", this);
+    m_aDeleteNode = new QAction("&Delete node", this);
+    m_aSnapInNode = new QAction("&Snap in node", this);
 
     m_curveTypeMapper = new QSignalMapper(this);
-    m_aLinear = new QAction("Linear curve", this);
-    m_aBezier = new QAction(QString::fromUtf8("Bézier curve"), this);
+    m_aLinear = new QAction("&Linear curve", this);
+    m_aBezier = new QAction(QString::fromUtf8("&Bézier curve"), this);
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
-    m_aCustomSpeed = new QAction(QString::fromUtf8("Set custom speed"), this);
-    m_aShutterFunction = new QAction("Set/edit shutter function", this);
+    m_aCustomSpeed = new QAction(QString::fromUtf8("Set &custom speed"), this);
+    m_aShutterFunction = new QAction("Set/edit shutter &function", this);
 
     m_speedsMapper = new QSignalMapper(this);
     double arr[] = {1, .5, 0, -.5, -1};
@@ -644,7 +644,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     m_states.contextmenuMouseTime = convertCanvasToTime(e->pos()).toQPointF();
 
     QMenu menu;
-    QMenu speedMenu(QString::fromUtf8("Segment replay speed …"), &menu);
+    QMenu speedMenu(QString::fromUtf8("Segment replay &speed …"), &menu);
 
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
@@ -666,12 +666,13 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
         menu.addAction(m_aShutterFunction);
+
+        speedMenu.addAction(m_aCustomSpeed);
         std::vector<QAction*>::iterator it = m_aSpeeds.begin();
         while (it != m_aSpeeds.end()) {
             speedMenu.addAction(*it);
             it++;
         }
-        speedMenu.addAction(m_aCustomSpeed);
         menu.addMenu(&speedMenu);
 
     } else {
@@ -917,9 +918,14 @@ void Canvas::setCurveSpeed(double speed)
 void Canvas::slotSetSpeed()
 {
     bool ok = true;
-    double d = QInputDialog::getDouble(this, "Replay speed for current segment", "Speed:", 1, -1000, 1000, 2, &ok);
+
+    double d = m_settings.value("canvas/replaySpeed", 1.0).toDouble();
+    qDebug() << "Getting: " << d;
+    d = QInputDialog::getDouble(this, "Replay speed for current segment", "Speed:", d, -1000, 1000, 3, &ok);
     if (ok) {
         setCurveSpeed(d);
+        m_settings.setValue("canvas/replaySpeed", d);
+        qDebug() << "Setting: " << d;
     }
 }
 void Canvas::slotSetSpeed(QString s)

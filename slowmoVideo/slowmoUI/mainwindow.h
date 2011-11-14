@@ -27,6 +27,7 @@ namespace Ui {
 #include <QtCore/QList>
 #include <QtCore/QTime>
 #include <QtCore/QThread>
+#include <QSettings>
 
 class Canvas;
 class ProgressDialog;

@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QWidget>
 #include <QList>
+#include <QSettings>
 
 
 
@@ -99,6 +100,7 @@ protected:
 
 private:
     Ui::Canvas *ui;
+    QSettings m_settings;
     Project_sV *m_project;
     ShutterFunctionDialog *m_shutterFunctionDialog;
     bool m_mouseWithinWidget;
