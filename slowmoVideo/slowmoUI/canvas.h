@@ -41,7 +41,10 @@ namespace Ui {
 
 
 
-
+/**
+  This class is for building helper objects for the signals&slots mechanism
+  for passing pointers to objects which are not QObjects.
+  */
 class TransferObject : public QObject {
     Q_OBJECT
 public:
@@ -49,6 +52,7 @@ public:
     enum Reason {
         ACTION_DELETE,
         ACTION_RENAME,
+        ACTION_SETTIME,
         ACTION_SNAPIN
     } reason;
 
@@ -174,10 +178,16 @@ private:
         int travelledDistance;
     } m_states;
 
+    /*
+      The transfer objects to each action defines the action to take
+      when the slot is called, and additionally stores a pointer to the
+      object it was called on (the object is known in the context menu event).
+      */
     QAction *m_aDeleteNode; TransferObject m_toDeleteNode;
     QAction *m_aSnapInNode; TransferObject m_toSnapInNode;
     QAction *m_aDeleteTag; TransferObject m_toDeleteTag;
     QAction *m_aRenameTag; TransferObject m_toRenameTag;
+    QAction *m_aSetTagTime; TransferObject m_toSetTagTime;
     QSignalMapper *m_hackMapper;
 
     QSignalMapper *m_curveTypeMapper;

@@ -100,11 +100,13 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_aSnapInNode = new QAction("&Snap in node", this);
     m_aDeleteTag = new QAction("&Delete tag", this);
     m_aRenameTag = new QAction("&Rename tag", this);
+    m_aSetTagTime = new QAction("Set tag &time", this);
     m_hackMapper = new QSignalMapper(this);
     m_hackMapper->setMapping(m_aRenameTag, &m_toRenameTag); m_toRenameTag.reason = TransferObject::ACTION_RENAME;
     m_hackMapper->setMapping(m_aDeleteTag, &m_toDeleteTag); m_toDeleteTag.reason = TransferObject::ACTION_DELETE;
     m_hackMapper->setMapping(m_aDeleteNode, &m_toDeleteNode); m_toDeleteNode.reason = TransferObject::ACTION_DELETE;
     m_hackMapper->setMapping(m_aSnapInNode, &m_toSnapInNode); m_toSnapInNode.reason = TransferObject::ACTION_SNAPIN;
+    m_hackMapper->setMapping(m_aSetTagTime, &m_toSetTagTime); m_toSetTagTime.reason = TransferObject::ACTION_SETTIME;
 
     m_curveTypeMapper = new QSignalMapper(this);
     m_aLinear = new QAction("&Linear curve", this);
@@ -135,6 +137,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     b &= connect(m_aDeleteNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
     b &= connect(m_aDeleteTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
     b &= connect(m_aRenameTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aSetTagTime, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
     b &= connect(m_hackMapper, SIGNAL(mapped(QObject*)), this, SLOT(slotRunAction(QObject*)));
     b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
@@ -699,10 +702,12 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         Tag_sV* tag = (Tag_sV*) obj;
         m_toDeleteTag.objectPointer = tag;
         m_toRenameTag.objectPointer = tag;
+        m_toSetTagTime.objectPointer = tag;
 
         menu.addAction(QString("Tag %1").arg(tag->description()));
         menu.addAction(m_aDeleteTag);
         menu.addAction(m_aRenameTag);
+        menu.addAction(m_aSetTagTime);
 
     } else {
         if (obj != NULL) {
@@ -935,6 +940,15 @@ void Canvas::slotRunAction(QObject *o)
             }
             break;
         }
+        case TransferObject::ACTION_SETTIME:
+        {
+            bool ok;
+            double d = QInputDialog::getDouble(this, "New tag time", "Time:", tag->time(), 0, 424242, 5, &ok);
+            if (ok) {
+                tag->setTime(d);
+            }
+            break;
+        }
         default:
             qDebug() << "Unknown action on Tag: " << toString(to->reason);
             Q_ASSERT(false);
@@ -1068,6 +1082,8 @@ QString toString(TransferObject::Reason reason)
         return "Snap in";
     case TransferObject::ACTION_RENAME :
         return "Rename";
+    case TransferObject::ACTION_SETTIME :
+        return "Set time";
     default :
         Q_ASSERT(false);
         return "Unknown action";
