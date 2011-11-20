@@ -2,10 +2,7 @@
 # http://www.itk.org/pipermail/insight-users/2007-November/024141.html
 # http://www.linux-magazin.de/Heft-Abo/Ausgaben/2007/02/Mal-ausspannen
 
-set(CMAKE_C_FLAGS
-  ${CMAKE_C_FLAGS}
-  -std=c99
-)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 
 set(LIB_SRC_BASE
   defs_sV.cpp
