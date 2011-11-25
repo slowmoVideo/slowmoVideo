@@ -70,6 +70,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     QDomElement prevTagAxis = doc.createElement("prevTagAxis");
     QDomElement viewport_t0 = doc.createElement("viewport_t0");
     QDomElement viewport_secRes = doc.createElement("viewport_secRes");
+    QDomElement canvas_xAxisFPS = doc.createElement("canvas_xAxisFPS");
     preferences.appendChild(renderSectionMode);
     renderSectionMode.appendChild(renderStartTag);
     renderSectionMode.appendChild(renderEndTag);
@@ -90,6 +91,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     preferences.appendChild(prevTagAxis);
     preferences.appendChild(viewport_t0);
     preferences.appendChild(viewport_secRes);
+    preferences.appendChild(canvas_xAxisFPS);
     renderSectionMode.setAttribute("mode", pr->renderSectionMode());
     renderStartTag.setAttribute("label", pr->renderStartTag());
     renderEndTag.setAttribute("label", pr->renderEndTag());
@@ -112,6 +114,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     viewport_t0.setAttribute("y", pr->viewport_t0().y());
     viewport_secRes.setAttribute("x", pr->viewport_secRes().x());
     viewport_secRes.setAttribute("y", pr->viewport_secRes().y());
+    canvas_xAxisFPS.setAttribute("fps", pr->canvas_xAxisFPS().toString());
 
 
     // Project Resources
@@ -532,7 +535,13 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
                                 pr->viewport_secRes().rx() = xml.attributes().value("x").toString().toFloat();
                                 pr->viewport_secRes().ry() = xml.attributes().value("y").toString().toFloat();
                                 xml.skipCurrentElement();
-                            } else {
+
+                            } else if (xml.name() == "canvas_xAxisFPS") {
+                                pr->canvas_xAxisFPS() = xml.attributes().value("fps").toString();
+                            }
+
+
+                            else {
                                 xml.skipCurrentElement();
                             }
                         }

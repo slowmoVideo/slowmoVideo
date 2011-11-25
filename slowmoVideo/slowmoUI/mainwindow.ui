@@ -53,7 +53,14 @@
      <string>&amp;View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>&amp;Project</string>
+    </property>
+    <addaction name="actionProjectPreferences"/>
+   </widget>
    <addaction name="menuSlowmoVideo_UI"/>
+   <addaction name="menuProject"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -122,6 +129,11 @@
   <action name="actionNew">
    <property name="text">
     <string>&amp;New …</string>
+   </property>
+  </action>
+  <action name="actionProjectPreferences">
+   <property name="text">
+    <string>&amp;Preferences</string>
    </property>
   </action>
  </widget>

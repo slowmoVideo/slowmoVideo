@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "canvas.h"
+#include "canvasTools.h"
 #include "ui_canvas.h"
 
 #include "mainwindow.h"
@@ -332,17 +333,13 @@ void Canvas::paintEvent(QPaintEvent *)
         int posX;
 
         davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
-        if (time.x() < 60) {
-            timeText = QString("%1 s").arg(time.x());
-        } else {
-            timeText = QString("%1 min %2 s").arg(int(time.x()/60)).arg(time.x()-60*int(time.x()/60), 0, 'f', 3);
-        }
+        timeText = CanvasTools::outputTimeLabel(this, time);
         // Ensure that the text does not go over the right border
         posX = m_states.prevMousePos.x() - 20;
         if (posX > width()-m_distLeft-40) {
             posX = width()-m_distLeft-40;
         }
-        davinci.drawText(posX, height()-1 - 20, timeText);
+        davinci.drawText(posX-180, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignRight, timeText);
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")

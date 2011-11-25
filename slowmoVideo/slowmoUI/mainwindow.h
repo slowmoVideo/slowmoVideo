@@ -102,6 +102,7 @@ private slots:
     void slotShortcutUsed(int id);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
+    void slotShowProjectPreferencesDialog();
     void slotShowFlowExaminerDialog();
     void slotForwardInputPosition(qreal frame);
     void slotForwardCurveSrcPosition(qreal frame);

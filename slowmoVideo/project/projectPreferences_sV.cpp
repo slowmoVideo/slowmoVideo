@@ -5,6 +5,7 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_tagAxis(TagAxis_Source),
     m_viewport_t0(0, 0),
     m_viewport_secRes(50, 50),
+    m_canvas_xAxisFPS(24),
     m_renderSectionMode("full"),
     m_renderFrameSize(FrameSize_Orig),
     m_renderInterpolationType(InterpolationType_TwowayNew),
@@ -30,6 +31,11 @@ QPointF& ProjectPreferences_sV::viewport_t0()
 {
     return m_viewport_t0;
 }
+Fps_sV& ProjectPreferences_sV::canvas_xAxisFPS()
+{
+    return m_canvas_xAxisFPS;
+}
+
 FrameSize& ProjectPreferences_sV::renderFrameSize()
 {
     return m_renderFrameSize;

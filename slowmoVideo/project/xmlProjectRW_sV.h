@@ -22,7 +22,7 @@ class AbstractFrameSource_sV;
 
 // Remember to change the slowmoVideo version as well
 #define SLOWMOPROJECT_VERSION_MAJOR 2
-#define SLOWMOPROJECT_VERSION_MINOR 5
+#define SLOWMOPROJECT_VERSION_MINOR 6
 
 /**
   \brief Reads and writes project files in XML format

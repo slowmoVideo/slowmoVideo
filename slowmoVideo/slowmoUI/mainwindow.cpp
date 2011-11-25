@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "newProjectDialog.h"
 #include "progressDialog.h"
 #include "renderingDialog.h"
+#include "projectPreferencesDialog.h"
 #include "preferencesDialog.h"
 #include "aboutDialog.h"
 
@@ -158,6 +159,7 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
     b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
     b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    b &= connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
 
     Q_ASSERT(b);
 
@@ -456,6 +458,12 @@ void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
     dialog.exec();
+}
+
+void MainWindow::slotShowProjectPreferencesDialog()
+{
+    ProjectPreferencesDialog ppd(m_project->preferences(), this);
+    ppd.exec();
 }
 
 void MainWindow::slotShowFlowExaminerDialog()

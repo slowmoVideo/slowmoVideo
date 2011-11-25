@@ -33,6 +33,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class QColor;
 class QPoint;
+class CanvasTools;
 class ShutterFunctionDialog;
 
 namespace Ui {
@@ -47,6 +48,7 @@ namespace Ui {
   */
 class TransferObject : public QObject {
     Q_OBJECT
+
 public:
     CanvasObject_sV* objectPointer;
     enum Reason {
@@ -74,6 +76,8 @@ class Project_sV;
 class Canvas : public QWidget
 {
     Q_OBJECT
+
+    friend class CanvasTools;
 
 public:
     explicit Canvas(Project_sV *project, QWidget *parent = 0);
@@ -134,8 +138,8 @@ private:
     int m_distTop;
     Node_sV m_t0;
     Node_sV m_tmax;
-    float m_secResX;
-    float m_secResY;
+    float m_secResX; ///< How many pixels wide is one output second?
+    float m_secResY; ///< How many pixels wide is one input second?
 
     bool m_showHelp;
 

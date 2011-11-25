@@ -10,10 +10,12 @@ set(SRCS
   main.cpp
   mainwindow.cpp
   canvas.cpp
+  canvasTools.cpp
   frameMonitor.cpp
   renderPreview.cpp
   dialogues/newProjectDialog.cpp
   dialogues/preferencesDialog.cpp
+  dialogues/projectPreferencesDialog.cpp
   dialogues/progressDialog.cpp
   dialogues/renderingDialog.cpp
   dialogues/shutterFunctionDialog.cpp
@@ -30,6 +32,7 @@ set(SRCS_UI
   renderPreview.ui
   dialogues/newProjectDialog.ui
   dialogues/preferencesDialog.ui
+  dialogues/projectPreferencesDialog.ui
   dialogues/progressDialog.ui
   dialogues/renderingDialog.ui
   dialogues/shutterFunctionDialog.ui
@@ -45,6 +48,7 @@ set(SRCS_MOC
   renderPreview.h
   dialogues/newProjectDialog.h
   dialogues/preferencesDialog.h
+  dialogues/projectPreferencesDialog.h
   dialogues/progressDialog.h
   dialogues/renderingDialog.h
   dialogues/shutterFunctionDialog.h
