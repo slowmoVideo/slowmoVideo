@@ -18,11 +18,8 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS
-  ${CMAKE_CXX_FLAGS}
-  #"-Wall --verbose"
-  "-Wall"
-)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 
 ## Find packages ##
 
