@@ -44,19 +44,23 @@ void V3dFlowSource_sV::setLambda(float lambda)
 
 FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
-    QSettings settings;
-    QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
-    if (!QFile(programLocation).exists()) {
-        programLocation = correctFlowBinaryLocation();
-    }
-    if (!QFile(programLocation).exists()) {
-        throw FlowBuildingError("Program\n" + programLocation + "\ndoes not exist, cannot build flow!");
-    }
-    QString program(programLocation);
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
 
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
+        QSettings settings;
+        QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
+        if (!QFile(programLocation).exists()) {
+            QString newLoc = correctFlowBinaryLocation();
+            if (newLoc.length() > 0) {
+                programLocation = newLoc;
+            }
+        }
+        if (!QFile(programLocation).exists()) {
+            throw FlowBuildingError("Program\n" + programLocation + "\ndoes not exist (did  you compile/make V3D?), cannot build flow!");
+        }
+        QString program(programLocation);
+
         qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
 
         QStringList args;

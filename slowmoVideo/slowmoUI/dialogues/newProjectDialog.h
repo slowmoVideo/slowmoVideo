@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDialog>
 #include <QtCore/QStringList>
+#include <QSettings>
 
 #include "project/project_sV.h"
 

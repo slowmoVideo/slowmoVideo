@@ -19,6 +19,10 @@
 # include <Cg/cgGL.h>
 #endif
 
+#ifdef WIN32
+#include <stdio.h>
+#endif
+
 namespace
 {
 
@@ -803,7 +807,7 @@ namespace V3D_GPU
          if (baseDir == 0)
             baseDir = "."; // If environment var is not set, use "."
 
-#ifdef WIN32
+#ifdef _MSC_VER
          sprintf_s(completeName, "%s/%s", baseDir, fileName);
 #else
          snprintf(completeName, 1024, "%s/%s", baseDir, fileName);
@@ -814,7 +818,7 @@ namespace V3D_GPU
 
       if (!is)
       {
-#ifdef WIN32
+#ifdef _MSC_VER
          sprintf_s(completeName2, "./%s", fileName);
 #else
          snprintf(completeName2, 1024, "./%s", fileName);
@@ -876,7 +880,8 @@ namespace V3D_GPU
          fragmentProfile = CG_PROFILE_UNKNOWN;
          vertexProfile   = CG_PROFILE_UNKNOWN;
 
-#if CG_VERSION_NUM >= 3000
+#if CG_VERSION_NUM >= 3000 && false
+         // Only checks if the library supports the profile
          if (cgIsProfileSupported(CG_PROFILE_ARBFP1)) fragmentProfile = CG_PROFILE_ARBFP1;
          if (cgIsProfileSupported(CG_PROFILE_FP20))   fragmentProfile = CG_PROFILE_FP20;
          if (cgIsProfileSupported(CG_PROFILE_FP30))   fragmentProfile = CG_PROFILE_FP30;
@@ -891,6 +896,7 @@ namespace V3D_GPU
          if (cgIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
          if (cgIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
 #else
+         // Checks if the platform supports the library
          if (cgGLIsProfileSupported(CG_PROFILE_ARBFP1)) fragmentProfile = CG_PROFILE_ARBFP1;
          if (cgGLIsProfileSupported(CG_PROFILE_FP20))   fragmentProfile = CG_PROFILE_FP20;
          if (cgGLIsProfileSupported(CG_PROFILE_FP30))   fragmentProfile = CG_PROFILE_FP30;

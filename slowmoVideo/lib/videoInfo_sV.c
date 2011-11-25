@@ -22,6 +22,7 @@ VideoInfoSV getInfo(const char filename[])
     info.frameRateNum = 0;
     info.frameRateDen = 0;
     info.streamsCount = 0;
+    info.framesCount = 0;
 
     av_register_all();
 

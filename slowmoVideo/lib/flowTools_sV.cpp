@@ -1,8 +1,100 @@
 #include "flowTools_sV.h"
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 //#define DEBUG
+
+void FlowTools_sV::deleteRect(FlowField_sV &field, int top, int left, int bottom, int right)
+{
+    for (int y = top; y <= bottom; y++) {
+        for (int x = left; x <= right; x++) {
+            field.rx(x,y) = FlowField_sV::nullValue;
+        }
+    }
+}
+
+void FlowTools_sV::refill(FlowField_sV &field, const Kernel_sV &kernel, int top, int left, int bottom, int right)
+{
+    assert(top <= bottom);
+    assert(left <= right);
+    assert(top >= 0);
+    assert(left >= 0);
+    assert(bottom < field.height());
+    assert(right < field.width());
+
+    int newTop = top;
+    int newLeft = left;
+    int newRight = right;
+    int newBottom = bottom;
+
+    if (top > 0) {
+        refillLine(field, kernel, top, left, right-left+1, true);
+        newTop++;
+    }
+    if (left > 0) {
+        refillLine(field, kernel, top, left, bottom-top+1, false);
+        newLeft++;
+    }
+    if (right+1 < field.width()) {
+        refillLine(field, kernel, top, right, bottom-top+1, false);
+        newRight--;
+    }
+    if (bottom+1 < field.height()) {
+        refillLine(field, kernel, bottom, left, right-left+1, true);
+        newBottom--;
+    }
+
+    if (newRight-newLeft >= 0 && newBottom-newTop >= 0) {
+        refill(field, kernel, newTop, newLeft, newBottom, newRight);
+    }
+}
+
+void FlowTools_sV::refillLine(FlowField_sV &field, const Kernel_sV &kernel,
+                              int startTop, int startLeft, int length, bool horizontal)
+{
+    int x = startLeft;
+    int y = startTop;
+
+    float valX = 0;
+    float valY = 0;
+    float weight = 0;
+
+    while (true) {
+        if (x >= field.width() || (horizontal && x >= startLeft+length)
+                || y >= field.height() || (!horizontal && y >= startTop+length)) {
+            break;
+        }
+        valX = 0;
+        valY = 0;
+        weight = 0;
+
+        for (int dx = -kernel.rX(); dx <= kernel.rX(); dx++) {
+            for (int dy = -kernel.rY(); dy <= kernel.rY(); dy++) {
+                if (x+dx >= 0 && x+dx < field.width()
+                        && y+dy >= 0 && y+dy < field.height()
+                        && field.x(x+dx,y+dy) != FlowField_sV::nullValue) {
+                    valX += field.x(x+dx,y+dy) * kernel(dx, dy);
+                    valY += field.y(x+dx,y+dy) * kernel(dx, dy);
+                    weight += kernel(dx, dy);
+                }
+            }
+        }
+        if (weight > 0) {
+            std::cout << "Before: " << field.rx(x,y);
+            field.rx(x,y) = valX/weight;
+            std::cout << ", Afterwards: " << field.rx(x,y) << std::endl;
+            field.ry(x,y) = valY/weight;
+        }
+
+        if (horizontal) {
+            x++;
+        } else {
+            y++;
+        }
+
+    }
+}
 
 void FlowTools_sV::refill(FlowField_sV &field, int top, int left, int bottom, int right)
 {

@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QWidget>
 #include <QList>
+#include <QSettings>
 
 
 
@@ -32,11 +33,37 @@ the Free Software Foundation, either version 3 of the License, or
 
 class QColor;
 class QPoint;
+class CanvasTools;
 class ShutterFunctionDialog;
 
 namespace Ui {
     class Canvas;
 }
+
+
+
+/**
+  This class is for building helper objects for the signals&slots mechanism
+  for passing pointers to objects which are not QObjects.
+  */
+class TransferObject : public QObject {
+    Q_OBJECT
+
+public:
+    CanvasObject_sV* objectPointer;
+    enum Reason {
+        ACTION_DELETE,
+        ACTION_RENAME,
+        ACTION_SETTIME,
+        ACTION_SNAPIN
+    } reason;
+
+
+    TransferObject() : objectPointer(NULL), reason(ACTION_SNAPIN) {}
+    TransferObject(CanvasObject_sV* objectPointer, Reason reason) :
+        objectPointer(objectPointer), reason(reason) {}
+};
+
 
 class Project_sV;
 
@@ -49,6 +76,8 @@ class Project_sV;
 class Canvas : public QWidget
 {
     Q_OBJECT
+
+    friend class CanvasTools;
 
 public:
     explicit Canvas(Project_sV *project, QWidget *parent = 0);
@@ -99,6 +128,7 @@ protected:
 
 private:
     Ui::Canvas *ui;
+    QSettings m_settings;
     Project_sV *m_project;
     ShutterFunctionDialog *m_shutterFunctionDialog;
     bool m_mouseWithinWidget;
@@ -108,8 +138,8 @@ private:
     int m_distTop;
     Node_sV m_t0;
     Node_sV m_tmax;
-    float m_secResX;
-    float m_secResY;
+    float m_secResX; ///< How many pixels wide is one output second?
+    float m_secResY; ///< How many pixels wide is one input second?
 
     bool m_showHelp;
 
@@ -152,17 +182,28 @@ private:
         int travelledDistance;
     } m_states;
 
-    QAction *m_aDeleteNode;
-    QAction *m_aSnapInNode;
+    /*
+      The transfer objects to each action defines the action to take
+      when the slot is called, and additionally stores a pointer to the
+      object it was called on (the object is known in the context menu event).
+      */
+    QAction *m_aDeleteNode; TransferObject m_toDeleteNode;
+    QAction *m_aSnapInNode; TransferObject m_toSnapInNode;
+    QAction *m_aDeleteTag; TransferObject m_toDeleteTag;
+    QAction *m_aRenameTag; TransferObject m_toRenameTag;
+    QAction *m_aSetTagTime; TransferObject m_toSetTagTime;
+    QSignalMapper *m_hackMapper;
 
     QSignalMapper *m_curveTypeMapper;
     QSignalMapper *m_handleMapper;
+    QSignalMapper *m_speedsMapper;
     QAction *m_aLinear;
     QAction *m_aBezier;
     QAction *m_aResetLeftHandle;
     QAction *m_aResetRightHandle;
-    QAction *m_a1xSpeed;
+    QAction *m_aCustomSpeed;
     QAction *m_aShutterFunction;
+    std::vector<QAction *> m_aSpeeds;
 
     Node_sV convertCanvasToTime(const QPoint &p) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
@@ -181,16 +222,20 @@ private:
 
     const CanvasObject_sV* objectAt(QPoint pos, Qt::KeyboardModifiers modifiers) const;
 
+    void setCurveSpeed(double speed);
+
 private slots:
-    void slotDeleteNode();
-    void slotSnapInNode();
+    void slotRunAction(QObject *o);
     void slotChangeCurveType(int curveType);
     void slotResetHandle(const QString &position);
-    void slotSet1xSpeed();
+    void slotSetSpeed();
+    void slotSetSpeed(QString s);
     void slotSetShutterFunction();
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);
 QDebug operator<<(QDebug qd, const Canvas::Abort &abort);
+
+QString toString(TransferObject::Reason reason);
 
 #endif // CANVAS_H

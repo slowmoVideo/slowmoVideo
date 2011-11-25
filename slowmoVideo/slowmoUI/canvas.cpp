@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "canvas.h"
+#include "canvasTools.h"
 #include "ui_canvas.h"
 
 #include "mainwindow.h"
@@ -33,6 +34,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtGui/QMenu>
+#include <QtGui/QInputDialog>
 
 
 
@@ -95,17 +97,34 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
-    m_aDeleteNode = new QAction("Delete node", this);
-    m_aSnapInNode = new QAction("Snap in node", this);
+    m_aDeleteNode = new QAction("&Delete node", this);
+    m_aSnapInNode = new QAction("&Snap in node", this);
+    m_aDeleteTag = new QAction("&Delete tag", this);
+    m_aRenameTag = new QAction("&Rename tag", this);
+    m_aSetTagTime = new QAction("Set tag &time", this);
+    m_hackMapper = new QSignalMapper(this);
+    m_hackMapper->setMapping(m_aRenameTag, &m_toRenameTag); m_toRenameTag.reason = TransferObject::ACTION_RENAME;
+    m_hackMapper->setMapping(m_aDeleteTag, &m_toDeleteTag); m_toDeleteTag.reason = TransferObject::ACTION_DELETE;
+    m_hackMapper->setMapping(m_aDeleteNode, &m_toDeleteNode); m_toDeleteNode.reason = TransferObject::ACTION_DELETE;
+    m_hackMapper->setMapping(m_aSnapInNode, &m_toSnapInNode); m_toSnapInNode.reason = TransferObject::ACTION_SNAPIN;
+    m_hackMapper->setMapping(m_aSetTagTime, &m_toSetTagTime); m_toSetTagTime.reason = TransferObject::ACTION_SETTIME;
 
     m_curveTypeMapper = new QSignalMapper(this);
-    m_aLinear = new QAction("Linear curve", this);
-    m_aBezier = new QAction(QString::fromUtf8("Bézier curve"), this);
+    m_aLinear = new QAction("&Linear curve", this);
+    m_aBezier = new QAction(QString::fromUtf8("&Bézier curve"), this);
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
-    m_a1xSpeed = new QAction(QString::fromUtf8("Set speed to 1×"), this);
-    m_aShutterFunction = new QAction("Set/edit shutter function", this);
+    m_aCustomSpeed = new QAction(QString::fromUtf8("Set &custom speed"), this);
+    m_aShutterFunction = new QAction("Set/edit shutter &function", this);
+
+    m_speedsMapper = new QSignalMapper(this);
+    double arr[] = {1, .5, 0, -.5, -1};
+#define N_SPEEDS 5
+    for (int i = 0; i < N_SPEEDS; i++) {
+        m_aSpeeds.push_back(new QAction(QString::fromUtf8("Set speed to %1×").arg(arr[i], 0, 'f', 1), this));
+        m_speedsMapper->setMapping(m_aSpeeds.back(), QString("%1").arg(arr[i],0,'f',1));
+    }
 
     m_handleMapper = new QSignalMapper(this);
     m_aResetLeftHandle = new QAction("Reset left handle", this);
@@ -115,16 +134,24 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 
 
     bool b = true;
-    b &= connect(m_aDeleteNode, SIGNAL(triggered()), this, SLOT(slotDeleteNode()));
-    b &= connect(m_aSnapInNode, SIGNAL(triggered()), this, SLOT(slotSnapInNode()));
+    b &= connect(m_aSnapInNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aDeleteNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aDeleteTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aRenameTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_aSetTagTime, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    b &= connect(m_hackMapper, SIGNAL(mapped(QObject*)), this, SLOT(slotRunAction(QObject*)));
     b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
     b &= connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
     b &= connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
     b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
-    b &= connect(m_a1xSpeed, SIGNAL(triggered()), this, SLOT(slotSet1xSpeed()));
+    b &= connect(m_aCustomSpeed, SIGNAL(triggered()), this, SLOT(slotSetSpeed()));
+    b &= connect(m_speedsMapper, SIGNAL(mapped(QString)), this, SLOT(slotSetSpeed(QString)));
     b &= connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
+    for (std::vector<QAction*>::iterator it = m_aSpeeds.begin(); it != m_aSpeeds.end(); ++it) {
+        b &= connect(*it, SIGNAL(triggered()), m_speedsMapper, SLOT(map()));
+    }
     Q_ASSERT(b);
 }
 
@@ -134,6 +161,18 @@ Canvas::~Canvas()
     if (m_shutterFunctionDialog != NULL) {
         delete m_shutterFunctionDialog;
     }
+
+    while (!m_aSpeeds.empty()) {
+        delete m_aSpeeds.back();
+        m_aSpeeds.pop_back();
+    }
+    delete m_speedsMapper;
+    delete m_hackMapper;
+
+    delete m_aSnapInNode;
+    delete m_aDeleteNode;
+    delete m_aDeleteTag;
+    delete m_aRenameTag;
 }
 
 void Canvas::load(Project_sV *project)
@@ -294,17 +333,13 @@ void Canvas::paintEvent(QPaintEvent *)
         int posX;
 
         davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
-        if (time.x() < 60) {
-            timeText = QString("%1 s").arg(time.x());
-        } else {
-            timeText = QString("%1 min %2 s").arg(int(time.x()/60)).arg(time.x()-60*int(time.x()/60), 0, 'f', 3);
-        }
+        timeText = CanvasTools::outputTimeLabel(this, time);
         // Ensure that the text does not go over the right border
         posX = m_states.prevMousePos.x() - 20;
         if (posX > width()-m_distLeft-40) {
             posX = width()-m_distLeft-40;
         }
-        davinci.drawText(posX, height()-1 - 20, timeText);
+        davinci.drawText(posX-180, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignRight, timeText);
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")
@@ -625,15 +660,20 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     m_states.contextmenuMouseTime = convertCanvasToTime(e->pos()).toQPointF();
 
     QMenu menu;
+    QMenu speedMenu(QString::fromUtf8("Segment replay &speed …"), &menu);
 
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
     if (dynamic_cast<const Node_sV*>(obj)) {
-        int nodeIndex = m_nodes->indexOf((const Node_sV*)obj);
+        Node_sV *node = (Node_sV *) obj;
+        m_toDeleteNode.objectPointer = node;
+        m_toSnapInNode.objectPointer = node;
+
+        int nodeIndex = m_nodes->indexOf(node);
 
         menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
-        menu.addAction(m_aSnapInNode);
+//        menu.addAction(m_aSnapInNode); // \todo Activate Snap in
         menu.addSeparator()->setText("Handle actions");
         menu.addAction(m_aResetLeftHandle);
         menu.addAction(m_aResetRightHandle);
@@ -645,8 +685,26 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
-        menu.addAction(m_a1xSpeed);
         menu.addAction(m_aShutterFunction);
+
+        speedMenu.addAction(m_aCustomSpeed);
+        std::vector<QAction*>::iterator it = m_aSpeeds.begin();
+        while (it != m_aSpeeds.end()) {
+            speedMenu.addAction(*it);
+            it++;
+        }
+        menu.addMenu(&speedMenu);
+
+    } else if (dynamic_cast<const Tag_sV*>(obj) != NULL) {
+        Tag_sV* tag = (Tag_sV*) obj;
+        m_toDeleteTag.objectPointer = tag;
+        m_toRenameTag.objectPointer = tag;
+        m_toSetTagTime.objectPointer = tag;
+
+        menu.addAction(QString("Tag %1").arg(tag->description()));
+        menu.addAction(m_aDeleteTag);
+        menu.addAction(m_aRenameTag);
+        menu.addAction(m_aSetTagTime);
 
     } else {
         if (obj != NULL) {
@@ -845,20 +903,74 @@ void Canvas::slotSetToolMode(ToolMode mode)
     repaint();
 }
 
-void Canvas::slotDeleteNode()
+
+
+
+void Canvas::slotRunAction(QObject *o)
 {
-    qDebug() << "Deleting node at " << m_states.prevMousePos;
-    int index = m_nodes->find(convertCanvasToTime(m_states.prevMousePos).toQPointF(), delta(SELECT_RADIUS));
-    if (index >= 0) {
-        m_nodes->deleteNode(index);
-        emit nodesChanged();
+    TransferObject *to = (TransferObject*) o;
+
+    qDebug() << "Desired action: " << toString(to->reason);
+
+    if (dynamic_cast<Tag_sV*>(to->objectPointer) != NULL) {
+
+        /// Tag actions ///
+
+        Tag_sV* tag = (Tag_sV*) to->objectPointer;
+        qDebug() << " ... on Tag " << tag->description();
+        switch (to->reason) {
+        case TransferObject::ACTION_DELETE:
+            for (int i = 0; i < m_tags->size(); ++i) {
+                if (&m_tags->at(i) == tag) {
+                    qDebug() << "Tag found, removing: " << m_tags->at(i).description();
+                    m_tags->removeAt(i);
+                    break;
+                }
+            }
+            break;
+        case TransferObject::ACTION_RENAME:
+        {
+            bool ok;
+            QString newName = QInputDialog::getText(this, "New tag name", "Tag:", QLineEdit::Normal, tag->description(), &ok);
+            if (ok) {
+                tag->setDescription(newName);
+            }
+            break;
+        }
+        case TransferObject::ACTION_SETTIME:
+        {
+            bool ok;
+            double d = QInputDialog::getDouble(this, "New tag time", "Time:", tag->time(), 0, 424242, 5, &ok);
+            if (ok) {
+                tag->setTime(d);
+            }
+            break;
+        }
+        default:
+            qDebug() << "Unknown action on Tag: " << toString(to->reason);
+            Q_ASSERT(false);
+            break;
+        }
+    } else if (dynamic_cast<Node_sV*>(to->objectPointer)) {
+
+        /// Node actions ///
+
+        Node_sV const* node = (Node_sV const*) to->objectPointer;
+        qDebug() << " ... on node " << *node;
+        switch (to->reason) {
+        case TransferObject::ACTION_DELETE:
+            m_nodes->deleteNode(m_nodes->indexOf(node));
+            break;
+        default:
+            qDebug() << "Unknown action on Node: " << toString(to->reason);
+            Q_ASSERT(false);
+            break;
+        }
     }
+
+    repaint();
 }
-void Canvas::slotSnapInNode()
-{
-    /// \todo implement
-    qDebug() << "Snapping in at " << m_states.prevMousePos;
-}
+
 void Canvas::slotChangeCurveType(int curveType)
 {
     qDebug() << "Changing curve type to " << toString((CurveType)curveType) << " at " << convertCanvasToTime(m_states.prevMousePos).x();
@@ -879,11 +991,37 @@ void Canvas::slotResetHandle(const QString &position)
         qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
 }
-void Canvas::slotSet1xSpeed()
+void Canvas::setCurveSpeed(double speed)
 {
-    qDebug() << "Setting curve to 1x speed.";
-    m_nodes->set1xSpeed(convertCanvasToTime(m_states.prevMousePos).x());
+    qDebug() << "Setting curve to " << speed << "x speed.";
+    m_nodes->setSpeed(convertCanvasToTime(m_states.prevMousePos).x(), speed);
     emit nodesChanged();
+    repaint();
+}
+
+
+void Canvas::slotSetSpeed()
+{
+    bool ok = true;
+
+    double d = m_settings.value("canvas/replaySpeed", 1.0).toDouble();
+    qDebug() << "Getting: " << d;
+    d = QInputDialog::getDouble(this, "Replay speed for current segment", "Speed:", d, -1000, 1000, 3, &ok);
+    if (ok) {
+        setCurveSpeed(d);
+        m_settings.setValue("canvas/replaySpeed", d);
+        qDebug() << "Setting: " << d;
+    }
+}
+void Canvas::slotSetSpeed(QString s)
+{
+    bool ok = true;
+    double d = s.toDouble(&ok);
+    if (ok) {
+        setCurveSpeed(d);
+    } else {
+        qDebug() << "Not ok: " << s;
+    }
 }
 void Canvas::slotSetShutterFunction()
 {
@@ -930,4 +1068,21 @@ QDebug operator <<(QDebug qd, const Canvas::Abort &abort)
         break;
     }
     return qd.maybeSpace();
+}
+
+QString toString(TransferObject::Reason reason)
+{
+    switch (reason) {
+    case TransferObject::ACTION_DELETE :
+        return "Delete";
+    case TransferObject::ACTION_SNAPIN :
+        return "Snap in";
+    case TransferObject::ACTION_RENAME :
+        return "Rename";
+    case TransferObject::ACTION_SETTIME :
+        return "Set time";
+    default :
+        Q_ASSERT(false);
+        return "Unknown action";
+    }
 }

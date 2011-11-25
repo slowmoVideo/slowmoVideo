@@ -23,7 +23,6 @@ extern "C" {
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtGui/QImage>
-#include <QSettings>
 
 class ProjectPreferences_sV;
 class Flow_sV;

@@ -20,7 +20,8 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS
   ${CMAKE_CXX_FLAGS}
-  -Wall
+  #"-Wall --verbose"
+  "-Wall"
 )
 
 ## Find packages ##
@@ -40,6 +41,7 @@ include_directories(${QT_INCLUDES})
 
 find_package(FFMPEG)
 include_directories(${FFMPEG_INCLUDE_DIR})
+link_directories(${FFMPEG_LIBRARY_DIR})
 
 
 set(BUILD_SLOWMO "NO")
@@ -55,6 +57,8 @@ message("* Qt4 libraries could not be found.")
 endif(NOT QT_LIBRARIES)
 if(NOT FFMPEG_FOUND)
 message("* ffmpeg libraries could not be found.")
+else(NOT FFMPEG_FOUND)
+message("* ffmpeg found at ${FFMPEG_LIBRARY_DIR}")
 endif(NOT FFMPEG_FOUND)
 if(NOT FFMPEG_SWSCALE_FOUND)
 message("* libswscale could not be found.")

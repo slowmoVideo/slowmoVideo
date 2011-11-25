@@ -20,12 +20,12 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSlowmoVideo_UI">
     <property name="title">
-     <string>slowmoVideo UI</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
@@ -43,17 +43,24 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionShortcuts"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>&amp;Project</string>
+    </property>
+    <addaction name="actionProjectPreferences"/>
+   </widget>
    <addaction name="menuSlowmoVideo_UI"/>
+   <addaction name="menuProject"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -68,7 +75,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRender">
    <property name="text">
-    <string>Render</string>
+    <string>&amp;Render</string>
    </property>
   </action>
   <action name="actionPreferences">
@@ -78,42 +85,42 @@
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
   </action>
   <action name="actionSave_as">
    <property name="text">
-    <string>Save as …</string>
+    <string>Save &amp;as …</string>
    </property>
   </action>
   <action name="actionOpen">
    <property name="text">
-    <string>Open</string>
+    <string>&amp;Open</string>
    </property>
   </action>
   <action name="actionShortcuts">
    <property name="text">
-    <string>Shortcuts</string>
+    <string>&amp;Shortcuts</string>
    </property>
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionRenderPreview">
    <property name="text">
-    <string>Render preview</string>
+    <string>Render &amp;preview</string>
    </property>
   </action>
   <action name="actionExamineFlow">
    <property name="text">
-    <string>Examine flow</string>
+    <string>E&amp;xamine flow</string>
    </property>
    <property name="toolTip">
     <string>Examine flow at input frame</string>
@@ -121,7 +128,12 @@
   </action>
   <action name="actionNew">
    <property name="text">
-    <string>New …</string>
+    <string>&amp;New …</string>
+   </property>
+  </action>
+  <action name="actionProjectPreferences">
+   <property name="text">
+    <string>&amp;Preferences</string>
    </property>
   </action>
  </widget>

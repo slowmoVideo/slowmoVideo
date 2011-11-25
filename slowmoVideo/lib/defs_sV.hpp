@@ -11,6 +11,14 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef DEFS_SV_HPP
 #define DEFS_SV_HPP
 
+#include "macros_sV.h"
+
+#ifdef WINDOWS
+typedef __int64 int64_t;
+#else
+#include <inttypes.h>
+#endif
+
 #include <QtCore/QDebug>
 #include <QtCore/QString>
 #include <QtCore/QSize>
@@ -18,21 +26,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QColor>
 #include <cmath>
 
-#if _WIN64 || __amd64__
-#define BITS_64
-#endif
-
-#if defined WIN32 || defined WIN64
-#define WINDOWS
-#elif defined __linux__
-#define LINUX
-#elif defined TARGET_OS_MAC
-#define OSX
-#endif
-
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 2
-#define SLOWMOVIDEO_VERSION_MICRO 3
+#define SLOWMOVIDEO_VERSION_MICRO 4
 
 
 /// Contains information about this slowmoVideo version
@@ -81,43 +77,6 @@ namespace Colours_sV {
     static QColor colBad(247, 122, 48); ///< For checked text fields that are invalid
 }
 
-/// FPS representation, can guess numerator/denominator from a float value.
-struct Fps_sV {
-    /// numerator
-    int num;
-    /// denominator
-    int den;
-    /// den is assumed to be > 0.
-    Fps_sV(int num, int den) :
-        num(num), den(den) {}
-    /// Converts a float fps number to a fractional.
-    /// 23.97 and 29.97 are detected.
-    Fps_sV(float fps)
-    {
-        // Check for 23.976 and similar numbers (24*1000/1001)
-        if (fabs(1000*ceil(fps)-1001*fps) < 7) {
-            num = 1000*ceil(fps);
-            den = 1001;
-        } else {
-            num = 100000*fps;
-            den = 100000;
-            // Prettify
-            for (int i = 10; i > 1; i--) {
-                while (num % i == 0 && den % i == 0) {
-                    num /= i;
-                    den /= i;
-                }
-            }
-        }
-    }
-    Fps_sV(QString fpsString);
-    QString toString() const;
-
-    /// Frames per second as float.
-    double fps() const {
-        return double(num)/den;
-    }
-};
 
 /// For general errors.
 class Error_sV {
@@ -128,6 +87,27 @@ public:
     QString message() const;
 private:
     QString m_message;
+};
+
+/// FPS representation, can guess numerator/denominator from a float value.
+struct Fps_sV {
+    /// numerator
+    int num;
+    /// denominator
+    int den;
+
+    Fps_sV(int num, int den) throw(Error_sV); ///< den must be > 0.
+
+    Fps_sV(float fps) throw(Error_sV); ///< Converts a float fps number to a fractional. 23.97 and 29.97 are detected.
+
+    Fps_sV(QString fpsString) throw(Error_sV); ///< Accepts fps strings like 24000/1001 for 23.97 fps.
+
+    QString toString() const;
+
+    /// Frames per second as float.
+    double fps() const {
+        return double(num)/den;
+    }
 };
 /// For errors related to building optical flow.
 class FlowBuildingError : public Error_sV {

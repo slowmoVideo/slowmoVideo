@@ -74,9 +74,13 @@ private:
 
     } m_states;
 
+    /// Convert canvas coordinates to image coordinates.
+    /// The image may have an offset.
     QPointF convertCanvasToImage(QPoint p) const;
+    /// Convert canvas coordinates to pixel coordinates (ignores the image offset)
     QPointF convertCanvasToPixel(QPoint p) const;
     QPoint convertImageToCanvas(QPointF p) const;
+    QPoint convertImageToPixel(QPointF p) const;
 
     qreal clamp(qreal val, qreal min, qreal max) const;
     QPointF max(QPointF p1, QPointF p2, bool limitToImage) const;

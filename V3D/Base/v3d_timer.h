@@ -29,7 +29,7 @@ namespace V3D
          {
             _name[0] = '\0';
 
-#ifdef WIN32
+#ifdef _MSC_VER
             LARGE_INTEGER freq;
             QueryPerformanceFrequency(&freq);
             _freq = freq.QuadPart;

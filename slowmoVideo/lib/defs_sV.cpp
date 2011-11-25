@@ -122,14 +122,48 @@ QString toString(const MotionblurType &type)
     }
 }
 
-Fps_sV::Fps_sV(QString fpsString)
+Fps_sV::Fps_sV(int num, int den) throw(Error_sV) :
+    num(num), den(den)
+{
+    if (den <= 0) {
+        throw Error_sV("FPS denominator must be >= 0.");
+    }
+}
+Fps_sV::Fps_sV(QString fpsString) throw(Error_sV)
 {
     QRegExp e("(\\d+)\\/(\\d+)");
     if (e.exactMatch(fpsString)) {
         num = e.cap(1).toInt();
         den = e.cap(2).toInt();
+        if (den <= 0) {
+            throw Error_sV("FPS denominator must be >= 0.");
+        }
+    } else {
+        throw Error_sV("Cannot create fps value from " + fpsString);
     }
 }
+Fps_sV::Fps_sV(float fps) throw(Error_sV)
+{
+    if (fps <= 0) {
+        throw Error_sV(QString("FPS value must be larger than zero (is: %1)").arg(fps));
+    }
+    // Check for 23.976 and similar numbers (24*1000/1001)
+    if (fabs(1000*ceil(fps)-1001*fps) < 7) {
+        num = 1000*ceil(fps);
+        den = 1001;
+    } else {
+        num = 100000*fps;
+        den = 100000;
+        // Prettify
+        for (int i = 10; i > 1; i--) {
+            while (num % i == 0 && den % i == 0) {
+                num /= i;
+                den /= i;
+            }
+        }
+    }
+}
+
 QString Fps_sV::toString() const
 {
     return QString("%1/%2").arg(num).arg(den);

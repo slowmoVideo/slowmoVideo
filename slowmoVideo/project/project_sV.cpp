@@ -342,7 +342,7 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
 
     qreal dist;
     for (int i = 0; i < m_tags->size(); i++) {
-        if (fabs(m_tags->at(i).axis() == TagAxis_Source)) {
+        if (m_tags->at(i).axis() == TagAxis_Source) {
             dist = fabs(pos.y() - m_tags->at(i).time());
         } else {
             dist = fabs(pos.x() - m_tags->at(i).time());

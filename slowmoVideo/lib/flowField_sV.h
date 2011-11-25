@@ -28,6 +28,8 @@ public:
     /** OpenGL format */
     enum GLFormat { GLFormat_RGB };
 
+    static float nullValue;
+
     /** Constructor for uninitialized data */
     FlowField_sV(int width, int height);
 

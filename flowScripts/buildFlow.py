@@ -1,21 +1,24 @@
+#!/usr/bin/env python3
 
-from optparse import OptionParser
+import argparse
 import os.path
 import signal
 
 
 from naming import *
 
-parser = OptionParser()
-parser.add_option("-i", "--input", dest="inDir", help="Input Directory", metavar="DIR")
-parser.add_option("-o", "--output", dest="outDir", help="Output Directory", metavar="DIR")
-parser.add_option("--flow", dest="flowExecutable", help="Executable for optical flow")
-parser.add_option("--forward-only", action="store_true", dest="forwardOnly",  help="Calculate forward flow only")
-parser.add_option("--backward-only", action="store_true", dest="backwardOnly",  help="Calculate backward flow only")
-parser.add_option("--force-rebuild", action="store_true", dest="forceRebuild", help="Force rebuild of existing flow images")
-parser.add_option("--offset", dest="offset", type="int", default=0, help="Frame offset")
+parser = argparse.ArgumentParser(description="Note that this is a rather old (read: deprecated) sample script. \
+It simply builds flow files for all files in the input directory.")
+parser.add_argument("-i", "--input", dest="inDir", required=True, help="Input Directory", metavar="DIR")
+parser.add_argument("-o", "--output", dest="outDir", required=True, help="Output Directory", metavar="DIR")
+parser.add_argument("--flow", dest="flowExecutable", required=True, help="Executable for optical flow")
+parser.add_argument("--forward-only", action="store_true", dest="forwardOnly",  help="Calculate forward flow only")
+parser.add_argument("--backward-only", action="store_true", dest="backwardOnly",  help="Calculate backward flow only")
+parser.add_argument("--force-rebuild", action="store_true", dest="forceRebuild", help="Force rebuild of existing flow images")
+parser.add_argument("--offset", dest="offset", type=int, default=0, help="Frame offset")
+parser.add_argument("--lambda", dest="lambdaValue", type=float, default=10, help="V3D lambda value")
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 
 def handler(signum, frame) :
@@ -24,46 +27,36 @@ def handler(signum, frame) :
 signal.signal(signal.SIGINT, handler)
 
 
-if options.inDir == None :
-    print("Please set an output directory.")
-    exit(-1)
-if options.outDir == None :
-    print("Please set an input directory.")
-    exit(-1)
-if options.flowExecutable == None :
-    print("Executable missing.")
-    exit(-1)
-
-if not os.path.exists(options.inDir) :
+if not os.path.exists(args.inDir) :
     print("Input directory does not exist.")
     exit(-2)
-if not os.path.isdir(options.inDir) :
+if not os.path.isdir(args.inDir) :
     print("Input directory is not a directory.")
     exit(-2)
 
-options.outDir = os.path.abspath(options.outDir)
-print("Output files go to %s." % options.outDir)
+args.outDir = os.path.abspath(args.outDir)
+print("Output files go to %s." % args.outDir)
 
 
-files = os.listdir(options.inDir)
+files = os.listdir(args.inDir)
 files.sort()
 
-if not os.path.exists(options.outDir) :
+if not os.path.exists(args.outDir) :
     print("Oputput directory does not exist. Creating it.")
-    os.makedirs(options.outDir)
+    os.makedirs(args.outDir)
 
 
 prev = None
 for s in files :
-    if frameID(s) != None and int(frameID(s)) >= options.offset :
+    if frameID(s) != None and int(frameID(s)) >= args.offset :
         if prev != None :
-            leftFile = options.inDir + os.sep + prev
-            rightFile = options.inDir + os.sep + s
+            leftFile = args.inDir + os.sep + prev
+            rightFile = args.inDir + os.sep + s
             
-            if not options.backwardOnly :
-                outFile = options.outDir + os.sep + nameForwardFlow(prev, s)
-                if not os.path.exists(outFile) or options.forceRebuild :
-                    cmd = "%s %s %s 50 100 %s x" % (options.flowExecutable, leftFile, rightFile, outFile)
+            if not args.backwardOnly :
+                outFile = args.outDir + os.sep + nameForwardFlow(prev, s, args.lambdaValue)
+                if not os.path.exists(outFile) or args.forceRebuild :
+                    cmd = "%s %s %s %s 10 100" % (args.flowExecutable, leftFile, rightFile, outFile)
                     ret = os.system(cmd)
                     print("%s: Returned %s" % (outFile, ret))
                     if ret == 2 :
@@ -73,10 +66,10 @@ for s in files :
                         print("Environment variable not set, terminating")
                         exit(65024)
             
-            if not options.forwardOnly :
-                outFile = options.outDir + os.sep + nameBackwardFlow(prev, s)
-                if (not os.path.exists(outFile)) or options.forceRebuild :
-                    cmd = "%s %s %s 50 100 %s x" % (options.flowExecutable, rightFile, leftFile, outFile)
+            if not args.forwardOnly :
+                outFile = args.outDir + os.sep + nameBackwardFlow(prev, s, args.lambdaValue)
+                if (not os.path.exists(outFile)) or args.forceRebuild :
+                    cmd = "%s %s %s %s 10 100" % (args.flowExecutable, rightFile, leftFile, outFile)
                     ret = os.system(cmd)
                     print("%s: Returned %s" % (outFile, ret))
                     if ret == 2 :

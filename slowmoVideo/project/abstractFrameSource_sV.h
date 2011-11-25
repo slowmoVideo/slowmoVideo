@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QImage>
 #include <QtCore/QDir>
-#include <inttypes.h>
+
 class Project_sV;
 
 class Div0Exception {};

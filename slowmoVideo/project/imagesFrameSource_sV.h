@@ -21,6 +21,7 @@ class Project_sV;
 /**
   \todo Allow re-ordering of images
   \todo Check image resolution more efficiently for large number of images
+  \todo Support OpenEXR or similar through ffmpeg. 16-bit images.
   */
 class ImagesFrameSource_sV : public AbstractFrameSource_sV
 {

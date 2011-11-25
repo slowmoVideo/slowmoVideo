@@ -14,6 +14,8 @@ public:
     QPointF& viewport_t0();
     QPointF& viewport_secRes();
 
+    Fps_sV& canvas_xAxisFPS();
+
     // Rendering
     QString& renderSectionMode();
     QString& renderStartTag();
@@ -37,6 +39,8 @@ private:
     TagAxis m_tagAxis;
     QPointF m_viewport_t0;
     QPointF m_viewport_secRes;
+
+    Fps_sV m_canvas_xAxisFPS;
 
     QString m_renderSectionMode;
     QString m_renderStartTag;

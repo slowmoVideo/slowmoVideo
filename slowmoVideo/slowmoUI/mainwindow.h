@@ -27,6 +27,7 @@ namespace Ui {
 #include <QtCore/QList>
 #include <QtCore/QTime>
 #include <QtCore/QThread>
+#include <QSettings>
 
 class Canvas;
 class ProgressDialog;
@@ -37,6 +38,7 @@ namespace Ui {
     class MainWindow;
 }
 
+/// \todo Call flow editor from here
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -100,6 +102,7 @@ private slots:
     void slotShortcutUsed(int id);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
+    void slotShowProjectPreferencesDialog();
     void slotShowFlowExaminerDialog();
     void slotForwardInputPosition(qreal frame);
     void slotForwardCurveSrcPosition(qreal frame);
