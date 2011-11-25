@@ -1,20 +1,22 @@
+#!/usr/bin/env python3
 
 import os
 import signal
-from optparse import OptionParser
+import argparse
 
 from naming import *
 
-framerate = 30
+parser = argparse.ArgumentParser(description="Deprecated. Used to render output frames. Executable not available anymore.")
+parser.add_argument("-i", "--input", dest="inDir", required=True, help="Input Directory containing the video's frames", metavar="DIR")
+parser.add_argument("-f", "--flow", dest="flowDir", required=True, help="Input Directory containing the optical flow frames", metavar="DIR")
+parser.add_argument("-o", "--output", dest="outDir", required=True, help="Output Directory", metavar="DIR")
+parser.add_argument("--slowmo", dest="slowmoExecutable", required=True, help="Executable for slowmoVideo")
+parser.add_argument("--oneway", dest="oneway", action="store_true", help="Use forward flow only")
+parser.add_argument("--offset", dest="offset", type=int, default=0, help="Frame offset")
+parser.add_argument("--lambda", dest="lambdaValue", required=True, type=float, default=10, help="V3D lambda value")
+parser.add_argument("--framerate", dest="framerate", type=float, default=30, help="Output frame rate")
 
-parser = OptionParser()
-parser.add_option("-i", "--input", dest="inDir", help="Input Directory containing the video's frames", metavar="DIR")
-parser.add_option("-f", "--flow", dest="flowDir", help="Input Directory containing the optical flow frames", metavar="DIR")
-parser.add_option("-o", "--output", dest="outDir", help="Output Directory", metavar="DIR")
-parser.add_option("--slowmo", dest="slowmoExecutable", help="Executable for slowmoVideo")
-parser.add_option("--oneway", dest="oneway", action="store_true", help="Use forward flow only")
-parser.add_option("--offset", dest="offset", type="int", default=0, help="Frame offset")
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 
 def handler(signum, frame) :
@@ -22,30 +24,30 @@ def handler(signum, frame) :
     exit(signum)
 signal.signal(signal.SIGINT, handler)
 
-if not os.path.exists(options.outDir) :
-    os.makedirs(options.outDir)
+if not os.path.exists(args.outDir) :
+    os.makedirs(args.outDir)
 
-frames = os.listdir(options.inDir)
+frames = os.listdir(args.inDir)
 frames.sort()
 
 counter = 0
 
 prev = None
 for frame in frames :
-    if frameID(frame) != None and int(frameID(frame)) >= options.offset :
+    if frameID(frame) != None and int(frameID(frame)) >= args.offset :
         if prev != None :
             
-            counter = int(frameID(frame))*framerate
+            counter = int(frameID(frame))*args.framerate
             
-            leftFrame = options.inDir + os.sep + prev
-            rightFrame = options.inDir + os.sep + frame
-            forwardFlow = options.flowDir + os.sep + nameForwardFlow(prev, frame)
-            backwardFlow = options.flowDir + os.sep + nameBackwardFlow(prev, frame)
+            leftFrame = args.inDir + os.sep + prev
+            rightFrame = args.inDir + os.sep + frame
+            forwardFlow = args.flowDir + os.sep + nameForwardFlow(prev, frame, args.lambdaValue)
+            backwardFlow = args.flowDir + os.sep + nameBackwardFlow(prev, frame, args.lambdaValue)
             
-            if options.oneway :
-                cmd = "%s forward %s %s %s/f%%1.png %s %s" % (options.slowmoExecutable, leftFrame, forwardFlow,  options.outDir, counter, framerate)
+            if args.oneway :
+                cmd = "%s forward %s %s %s/f%%1.png %s %s" % (args.slowmoExecutable, leftFrame, forwardFlow,  args.outDir, counter, args.framerate)
             else :
-                cmd = "%s twoway %s %s %s %s %s/f%%1.png %s %s" % (options.slowmoExecutable, leftFrame, rightFrame, forwardFlow, backwardFlow, options.outDir, counter, framerate)
+                cmd = "%s twoway %s %s %s %s %s/f%%1.png %s %s" % (args.slowmoExecutable, leftFrame, rightFrame, forwardFlow, backwardFlow, args.outDir, counter, args.framerate)
             print("Command: %s" % cmd)
             ret = os.system(cmd)
             if ret != 0 :
