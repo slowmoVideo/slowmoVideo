@@ -538,6 +538,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
 
                             } else if (xml.name() == "canvas_xAxisFPS") {
                                 pr->canvas_xAxisFPS() = xml.attributes().value("fps").toString();
+                                xml.skipCurrentElement();
                             }
 
 
