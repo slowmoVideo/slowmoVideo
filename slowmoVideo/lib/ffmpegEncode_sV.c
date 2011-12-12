@@ -86,11 +86,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     av_register_all();
 
     /* allocate the output media context */
-#if LIBAVFORMAT_VERSION_INT < (52<<16 | 45<<8 | 0)
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,45,0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
-#elif LIBAVFORMAT_VERSION_INT < (53<<16 | 3<<8 | 0)
+#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,3,0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = av_guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
@@ -212,7 +212,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
         return 2;
     }
 
-#if LIBAVFORMAT_VERSION_MAJOR  < 53
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(52,100,1)
     dump_format(video->fc, 0, filename, 1);
 #else
     av_dump_format(video->fc, 0, filename, 1);
@@ -236,7 +236,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
     /* open the output file, if needed */
     if (!(video->format->flags & AVFMT_NOFILE)) {
-#if LIBAVFORMAT_VERSION_MAJOR < 53
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(52,102,0)
         if (url_fopen(&video->fc->pb, filename, URL_WRONLY) < 0) {
 #else
         if (avio_open(&video->fc->pb, filename, AVIO_FLAG_WRITE) < 0) {
@@ -269,7 +269,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     }
 
     /* write the stream header, if any */
-#if LIBAVFORMAT_VERSION_MAJOR < 53
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(53,1,3)
     av_write_header(video->fc);
 #else
     avformat_write_header(video->fc, NULL);
@@ -447,7 +447,7 @@ void finish(VideoOut_sV *video)
 
     if (!(video->format->flags & AVFMT_NOFILE)) {
         /* close the output file */
-#if LIBAVFORMAT_VERSION_MAJOR < 53
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(52,106,0)
         url_fclose(video->fc->pb);
 #else
         avio_close(video->fc->pb);
