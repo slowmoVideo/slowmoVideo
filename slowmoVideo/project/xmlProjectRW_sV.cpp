@@ -112,8 +112,8 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     prevTagAxis.setAttribute("axis", QVariant(pr->lastSelectedTagAxis()).toString());
     viewport_t0.setAttribute("x", pr->viewport_t0().x());
     viewport_t0.setAttribute("y", pr->viewport_t0().y());
-    viewport_secRes.setAttribute("x", pr->viewport_secRes().x());
-    viewport_secRes.setAttribute("y", pr->viewport_secRes().y());
+    viewport_secRes.setAttribute("x", QString().setNum(pr->viewport_secRes().x()));
+    viewport_secRes.setAttribute("y", QString().setNum(pr->viewport_secRes().y()));
     canvas_xAxisFPS.setAttribute("fps", pr->canvas_xAxisFPS().toString());
 
 
@@ -538,6 +538,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
 
                             } else if (xml.name() == "canvas_xAxisFPS") {
                                 pr->canvas_xAxisFPS() = xml.attributes().value("fps").toString();
+                                xml.skipCurrentElement();
                             }
 
 

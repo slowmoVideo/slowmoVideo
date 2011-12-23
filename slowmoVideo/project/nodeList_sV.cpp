@@ -34,7 +34,6 @@ void NodeList_sV::setMaxY(qreal time)
     m_maxY = time;
 }
 
-inline
 qreal NodeList_sV::startTime() const
 {
     if (m_list.length() > 0) {
@@ -44,7 +43,6 @@ qreal NodeList_sV::startTime() const
         return 0;
     }
 }
-inline
 qreal NodeList_sV::endTime() const
 {
     if (m_list.length() > 0) {

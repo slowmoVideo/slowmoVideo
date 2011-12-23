@@ -187,6 +187,8 @@ void Canvas::load(Project_sV *project)
     m_t0 = m_project->preferences()->viewport_t0();
     m_secResX = m_project->preferences()->viewport_secRes().x();
     m_secResY = m_project->preferences()->viewport_secRes().y();
+    Q_ASSERT(m_secResX > 0);
+    Q_ASSERT(m_secResY > 0);
     qDebug() << "Canvas: Project loaded from " << project;
     m_nodes = project->nodes();
     m_tags = project->tags();
