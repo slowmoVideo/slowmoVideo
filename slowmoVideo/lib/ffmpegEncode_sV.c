@@ -84,6 +84,9 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
     /* initialize libavcodec, and register all codecs and formats */
     av_register_all();
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,13,0)
+    avformat_network_init();
+#endif
 
     /* allocate the output media context */
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,45,0)
@@ -459,4 +462,9 @@ void finish(VideoOut_sV *video)
 
     sws_freeContext(video->rgbConversionContext);
     printf("\nWrote to %s.\n", video->filename);
+
+
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,13,0)
+    avformat_network_deinit();
+#endif
 }
