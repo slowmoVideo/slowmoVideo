@@ -164,6 +164,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Q_ASSERT(b);
 
     updateWindowTitle();
+    setWindowIcon(QIcon(":icons/slowmoIcon.png"));
 }
 
 MainWindow::~MainWindow()
