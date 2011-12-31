@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+ <qresource>
+   <file alias="icons/iconAdd.png">res/iconAdd.png</file>
+   <file alias="icons/iconSel.png">res/iconSel.png</file>
+   <file alias="icons/iconMov.png">res/iconMov.png</file>
+   <file alias="images/shutterFunc.png">res/shutterFunction.png</file>
+ </qresource>
+</RCC>

@@ -67,7 +67,7 @@ void ShutterFunctionDialog::paintEvent(QPaintEvent *e)
 {
     QDialog::paintEvent(e);
     QPainter p(this);
-    QImage img("res/shutterFunction.png");
+    QImage img(":images/shutterFunc.png");
     p.drawImage(ui->verticalLayout_code->contentsRect().topRight() - QPoint(img.width()+10, -10), img);
 }
 

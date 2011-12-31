@@ -58,18 +58,16 @@ set(SRCS_MOC
   dialogues/aboutDialog.h
 )
 
+
 # Without these includes the promoted widgets fail to compile
 # since the headers are not found. (For whatever reason.)
 include_directories(dialogues)
 include_directories(.)
 include_directories(${slowmoVideo_SOURCE_DIR}/libgui)
 
-set(RES
-  res/iconSel.png
-  res/iconMov.png
-  res/shutterFunction.png
-)
-copy_files("${RES}")
+# Embed images in the binary
+set(SRC_RES resources.qrc)
+qt4_add_resources(RES_OUT ${SRC_RES})
 
 # Generate header files from the .ui files
 qt4_wrap_ui(UI_H_OUT ${SRCS_UI})
@@ -78,8 +76,7 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
-add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT})
+add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 target_link_libraries(slowmoUI sVproj sVvis sVgui ${QT_LIBRARIES})
 
 install(TARGETS slowmoUI DESTINATION bin)
-install(FILES ${RES} DESTINATION bin/res PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)

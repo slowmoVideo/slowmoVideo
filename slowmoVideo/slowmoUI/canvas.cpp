@@ -471,11 +471,11 @@ void Canvas::drawModes(QPainter &davinci, int t, int r)
     dR += w;
 
     davinci.setOpacity(.5 + ((m_mode == ToolMode_Select) ? .5 : 0));
-    davinci.drawImage(r - dR, t, QImage(QCoreApplication::applicationDirPath() + "/res/iconSel.png").scaled(16, 16));
+    davinci.drawImage(r - dR, t, QImage(":icons/iconSel.png").scaled(16, 16));
     dR += d+w;
 
     davinci.setOpacity(.5 + ((m_mode == ToolMode_Move) ? .5 : 0));
-    davinci.drawImage(r - dR, t, QImage(QCoreApplication::applicationDirPath() + "/res/iconMov.png").scaled(16, 16));
+    davinci.drawImage(r - dR, t, QImage(":icons/iconMov.png").scaled(16, 16));
 
     davinci.setOpacity(opacity);
 }
