@@ -48,7 +48,11 @@ int open_video(VideoOut_sV *video)
     }
 
     /* open the codec */
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,6,0)
     if (avcodec_open(cc, codec) < 0) {
+#else
+    if (avcodec_open2(cc, codec, NULL) < 0) {
+#endif
         char s[200];
         sprintf(s, "Could not open codec %s.\n", codec->long_name);
         fputs(s, stderr);
@@ -73,9 +77,10 @@ int open_video(VideoOut_sV *video)
 int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const int width, const int height, const int bitrate,
              const unsigned int numerator, const unsigned int denominator)
 {
-
-    /* must be called before using avcodec lib */
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,7,1)
+    // Must be called before using the avcodec library. (Done automatically in more recent versions.)
     avcodec_init();
+#endif
 
     video->frameNr = 0;
     video->errorMessage = NULL;
@@ -132,7 +137,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->streamV = NULL;
     if (video->format->video_codec != CODEC_ID_NONE) {
 
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,10,0)
         video->streamV = av_new_stream(video->fc, 0);
+#else
+        video->streamV = avformat_new_stream(video->fc, 0);
+#endif
         if (!video->streamV) {
             const char *s = "Could not allocate the video stream.\n";
             fputs(s, stderr);
