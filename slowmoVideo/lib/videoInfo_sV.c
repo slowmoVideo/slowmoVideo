@@ -25,6 +25,9 @@ VideoInfoSV getInfo(const char filename[])
     info.framesCount = 0;
 
     av_register_all();
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_init();
+#endif
 
     AVFormatContext *pFormatContext = NULL;
 
@@ -62,18 +65,18 @@ VideoInfoSV getInfo(const char filename[])
 #else
         if (pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
 #endif
-	    videoStream = i;
-	    pCodecContext = pFormatContext->streams[i]->codec;
-	    AVRational fps = pFormatContext->streams[i]->r_frame_rate;
-	    printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
-	    info.frameRateNum = fps.num;
+            videoStream = i;
+            pCodecContext = pFormatContext->streams[i]->codec;
+            AVRational fps = pFormatContext->streams[i]->r_frame_rate;
+            printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
+            info.frameRateNum = fps.num;
             info.frameRateDen = fps.den;
             info.width = pCodecContext->width;
             info.height = pCodecContext->height;
             info.framesCount = pFormatContext->streams[i]->nb_frames;
             info.streamsCount++;
             printf("Total frames: %ld (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
-	}
+        }
     }
 
     av_free(pFormatContext);

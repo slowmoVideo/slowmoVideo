@@ -48,7 +48,7 @@ int open_video(VideoOut_sV *video)
     }
 
     /* open the codec */
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,6,0)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,8,0)
     if (avcodec_open(cc, codec) < 0) {
 #else
     if (avcodec_open2(cc, codec, NULL) < 0) {
@@ -89,7 +89,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
     /* initialize libavcodec, and register all codecs and formats */
     av_register_all();
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,13,0)
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
     avformat_network_init();
 #endif
 
