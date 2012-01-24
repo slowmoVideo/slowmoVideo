@@ -27,6 +27,8 @@ public:
 
     static void refill(FlowField_sV &field, const Kernel_sV &kernel, int top, int left, int bottom, int right);
 
+    static FlowField_sV* median(FlowField_sV const * const fa, FlowField_sV const * const fb, FlowField_sV const * const fc);
+
 private:
     static void refillLine(FlowField_sV &field, int startTop, int startLeft, int length, LineFillMode fillMode);
     static void refillLine(FlowField_sV &field, const Kernel_sV &kernel, int startTop, int startLeft, int length, bool horizontal);
