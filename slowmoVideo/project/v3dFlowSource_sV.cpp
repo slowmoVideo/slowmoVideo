@@ -73,7 +73,7 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
 
         QProcess proc;
         proc.start(program, args);
-        proc.waitForFinished();
+        proc.waitForFinished(-1);
         if (proc.exitCode() != 0) {
             qDebug() << "Failed: " << proc.readAllStandardError() << proc.readAllStandardOutput();
             throw FlowBuildingError(QString("Flow builder exited with exit code %1; For details see debugging output").arg(proc.exitCode()));
