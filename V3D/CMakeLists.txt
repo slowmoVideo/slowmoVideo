@@ -224,6 +224,8 @@ set (ALL_SRC
     Base/v3d_timer.h
     Base/v3d_serialization.h
     Base/v3d_utilities.h
+    Math/v3d_linear.h
+    Math/v3d_linearbase.h
 )
 
 
