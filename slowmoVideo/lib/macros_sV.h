@@ -11,6 +11,8 @@
 #define WINDOWS (1)
 #elif defined __linux__
 #define LINUX
-#elif defined TARGET_OS_MAC
+#elif defined TARGET_OS_MAC || defined __APPLE__
 #define OSX
+#else
+#error Operating system cannot be determined!
 #endif
