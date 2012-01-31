@@ -251,7 +251,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 #if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(52,102,0)
         if (url_fopen(&video->fc->pb, filename, URL_WRONLY) < 0) {
 #else
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(53,0,0)
+        if (avio_open(&video->fc->pb, filename, AVIO_WRONLY) < 0) {
+#else
         if (avio_open(&video->fc->pb, filename, AVIO_FLAG_WRITE) < 0) {
+#endif
 #endif
 
             // Check if non-ASCII characters are present in the file path
