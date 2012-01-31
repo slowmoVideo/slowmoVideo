@@ -52,6 +52,8 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -134,6 +136,16 @@
   <action name="actionProjectPreferences">
    <property name="text">
     <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom &amp;in</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom &amp;out</string>
    </property>
   </action>
  </widget>

@@ -729,24 +729,7 @@ void Canvas::wheelEvent(QWheelEvent *e)
     int deg = e->delta()/8;
 
     if (e->modifiers().testFlag(Qt::ControlModifier)) {
-        Node_sV n0 = convertCanvasToTime(e->pos());
-
-        // Update the line resolution
-        if (deg > 0) {
-            m_secResX *= ZOOM_FACTOR;
-        } else {
-            m_secResX /= ZOOM_FACTOR;
-        }
-        if (m_secResX < .05) { m_secResX = .05; }
-        // Y resolution is the same as X resolution (at least at the moment)
-        m_secResY = m_secResX;
-//        qDebug() << "Resolution: " << m_secResX;
-
-        // Adjust t0 such that the mouse points to the same time as before
-        Node_sV nDiff = convertCanvasToTime(e->pos()) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
-        m_t0 = n0 - nDiff;
-        if (m_t0.x() < 0) { m_t0.setX(0); }
-        if (m_t0.y() < 0) { m_t0.setY(0); }
+        zoom(deg > 0, e->pos());
     } else if (e->modifiers().testFlag(Qt::ShiftModifier)) {
         // Horizontal scrolling
         m_t0 -= Node_sV(SCROLL_FACTOR*convertDistanceToTime(QPoint(deg, 0)).x(),0);
@@ -769,6 +752,41 @@ void Canvas::wheelEvent(QWheelEvent *e)
     Q_ASSERT(m_t0.y() >= 0);
 
     repaint();
+}
+void Canvas::zoom(bool in, QPoint pos)
+{
+    Node_sV n0 = convertCanvasToTime(pos);
+
+    // Update the line resolution
+    if (in) {
+        m_secResX *= ZOOM_FACTOR;
+    } else {
+        m_secResX /= ZOOM_FACTOR;
+    }
+    if (m_secResX < .05) { m_secResX = .05; }
+    // Y resolution is the same as X resolution (at least at the moment)
+    m_secResY = m_secResX;
+//  qDebug() << "Resolution: " << m_secResX;
+
+    // Adjust t0 such that the mouse points to the same time as before
+    Node_sV nDiff = convertCanvasToTime(pos) - convertCanvasToTime(QPoint(m_distLeft, height()-1-m_distBottom));
+    m_t0 = n0 - nDiff;
+    if (m_t0.x() < 0) { m_t0.setX(0); }
+    if (m_t0.y() < 0) { m_t0.setY(0); }
+
+    Q_ASSERT(m_secResX > 0);
+    Q_ASSERT(m_secResY > 0);
+    Q_ASSERT(m_t0.x() >= 0);
+    Q_ASSERT(m_t0.y() >= 0);
+    repaint();
+}
+void Canvas::slotZoomIn()
+{
+    zoom(true, QCursor::pos());
+}
+void Canvas::slotZoomOut()
+{
+    zoom(false, QCursor::pos());
 }
 
 

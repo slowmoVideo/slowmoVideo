@@ -121,6 +121,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
+    ui->actionZoomIn->setShortcut(QKeySequence::ZoomIn);
+    ui->actionZoomOut->setShortcut(QKeySequence::ZoomOut);
 
     m_cs.addShortcut("h", Help, "Show help overlay");
     m_cs.addShortcut("q-q", Quit, "Quit");
@@ -142,6 +144,9 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
     b &= connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
+
+    b &= connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
+    b &= connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
 
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
