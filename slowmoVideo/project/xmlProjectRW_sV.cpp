@@ -318,6 +318,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
         xml.setDevice(&file);
         if (!xml.readNextStartElement()) {
             qDebug() << "Could not read " << filename;
+            throw Error_sV(QString("Invalid project file: %1").arg(filename));
 
         } else {
             if (xml.name() != "sVproject") {

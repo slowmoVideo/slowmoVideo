@@ -44,7 +44,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QString projectPath = QString(), QWidget *parent = 0);
     ~MainWindow();
 
     void displayHelp(QPainter &davinci) const;
@@ -94,6 +94,7 @@ private:
     QThread m_rendererThread;
 
 
+    void loadProject(QString path);
     void loadProject(Project_sV *project);
     void resetDialogs();
     void updateWindowTitle();

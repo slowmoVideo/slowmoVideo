@@ -43,7 +43,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <functional>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(NULL),
@@ -170,6 +170,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
+
+
+    if (!projectPath.isEmpty()) {
+        loadProject(projectPath);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -326,21 +331,26 @@ void MainWindow::slotLoadProjectDialog()
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setDirectory(m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString());
     if (dialog.exec() == QDialog::Accepted) {
-        m_settings.setValue("directories/lastOpenedProject", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
-        XmlProjectRW_sV reader;
-        try {
-            QString warning;
-            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0), &warning);
-            if (warning.length() > 0) {
-                QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
-            }
-            m_projectPath = dialog.selectedFiles().at(0);
-            loadProject(project);
-        } catch (FrameSourceError &err) {
-            QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
-        } catch (Error_sV &err) {
-            QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
+        loadProject(QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
+    }
+}
+
+void MainWindow::loadProject(QString path)
+{
+    m_settings.setValue("directories/lastOpenedProject", path);
+    XmlProjectRW_sV reader;
+    try {
+        QString warning;
+        Project_sV *project = reader.loadProject(path, &warning);
+        if (warning.length() > 0) {
+            QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
         }
+        m_projectPath = path;
+        loadProject(project);
+    } catch (FrameSourceError &err) {
+        QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+    } catch (Error_sV &err) {
+        QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
     }
 }
 
