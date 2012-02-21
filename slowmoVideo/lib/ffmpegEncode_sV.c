@@ -98,7 +98,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->fc = avformat_alloc_context();
     video->fc->oformat = guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
-#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,3,0)
+#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,2,0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = av_guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
