@@ -98,11 +98,12 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->fc = avformat_alloc_context();
     video->fc->oformat = guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
-#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,2,0)
+#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,4,0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = av_guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
 #else
+    // Actually introduced in 53.2.0 but not working in 53.3.0 packages
     avformat_alloc_output_context2(&video->fc, NULL, NULL, filename);
     if (!video->fc) {
         printf("Could not deduce output format from file extension: using MPEG.\n");
