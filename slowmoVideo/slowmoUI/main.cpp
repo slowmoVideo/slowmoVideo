@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     QString projectPath;
     qDebug() << a.arguments();
-    if (a.arguments().size() >= 1) {
+    if (a.arguments().size() >= 2) {
         qDebug() << a.arguments().at(1);
         QFileInfo info(a.arguments().at(1));
         if (info.exists() && info.isReadable() && info.isFile()) {
