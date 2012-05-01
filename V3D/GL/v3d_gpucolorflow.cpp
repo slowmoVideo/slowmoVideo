@@ -4,6 +4,7 @@
 
 #include "Base/v3d_utilities.h"
 #include "v3d_gpucolorflow.h"
+#include "glsl_shaders.h"
 
 #include <iostream>
 #include <cmath>
@@ -14,25 +15,31 @@ using namespace V3D_GPU;
 
 namespace
 {
-
+   const std::string SOURCE(                                                                                                                                          
+      "#version 330\n"
+      "\n"                                                                                                                                                           
+      "uniform sampler2D src_tex;\n"                                                                                                               
+      "\n"                                                                                                                                                           
+      "in vec4 gl_TexCoord[4];\n"
+      "\n"
+      "out vec4 my_FragColor;"
+      "\n"                                                                                                                                                           
+      "void main(void)\n"                                                                                                                                            
+      "{\n"
+      "   my_FragColor = gl_TexCoord[3] * texture2D(src_tex, gl_TexCoord[0].st);\n"                                                                                                           
+      "}\n");
+   
    void
    upsampleDisparities(unsigned uvSrcTex, unsigned pSrcTex, float pScale,
                        RTT_Buffer& ubuffer, RTT_Buffer& pbuffer)
    {
-      static Cg_FragmentProgram * upsampleShader = 0;
+      static GLSL_FragmentProgram * upsampleShader = 0;
 
       if (upsampleShader == 0)
       {
-         upsampleShader = new Cg_FragmentProgram("v3d_gpuflow::upsampleDisparities::upsampleShader");
+         upsampleShader = new GLSL_FragmentProgram("v3d_gpuflow::upsampleDisparities::upsampleShader");
 
-         char const * source =
-            "void main(uniform sampler2D src_tex : TEXTURE0, \n"
-            "                  float2 st0 : TEXCOORD0, \n"
-            "                  float4 st3 : TEXCOORD3, \n"
-            "              out float4 res_out : COLOR0) \n"
-            "{ \n"
-            "   res_out = st3 * tex2D(src_tex, st0); \n"
-            "} \n";
+         char const * source = SOURCE.c_str();
          upsampleShader->setProgram(source);
          upsampleShader->compile();
          checkGLErrorsHere0();
@@ -69,20 +76,13 @@ namespace
    upsampleDisparities(unsigned uvSrcTex, unsigned pSrcTex, unsigned qSrcTex, float pScale,
                        RTT_Buffer& ubuffer, RTT_Buffer& pbuffer, RTT_Buffer& qbuffer)
    {
-      static Cg_FragmentProgram * upsampleShader = 0;
+      static GLSL_FragmentProgram * upsampleShader = 0;
 
       if (upsampleShader == 0)
       {
-         upsampleShader = new Cg_FragmentProgram("v3d_gpuflow::upsampleDisparities::upsampleShader");
+         upsampleShader = new GLSL_FragmentProgram("v3d_gpuflow::upsampleDisparities::upsampleShader");
 
-         char const * source =
-            "void main(uniform sampler2D src_tex : TEXTURE0, \n"
-            "                  float2 st0 : TEXCOORD0, \n"
-            "                  float4 st3 : TEXCOORD3, \n"
-            "              out float4 res_out : COLOR0) \n"
-            "{ \n"
-            "   res_out = st3 * tex2D(src_tex, st0); \n"
-            "} \n";
+         char const * source = SOURCE.c_str();
          upsampleShader->setProgram(source);
          upsampleShader->compile();
          checkGLErrorsHere0();
@@ -362,7 +362,7 @@ namespace V3D_GPU
 
 #ifdef INCLUDE_SOURCE
       _shader_uv->setProgram(GlShaderStrings::tvl1_color_flow_new_update_uv.c_str());
-//      _shader_p->setProgram(GlShaderStrings::tvl1_color_flow_new_update_p.c_str());   // Does not exist anywhere ...
+//       _shader_p->setProgram(GlShaderStrings::tvl1_color_flow_new_update_p.c_str());
       _shader_q->setProgram(GlShaderStrings::tvl1_color_flow_new_update_q.c_str());
 #else
       _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_new_update_uv.cg");
@@ -540,16 +540,10 @@ namespace V3D_GPU
    {
       TVL1_ColorFlowEstimatorBase::allocate(W, H);
 
-      _shader_uv = new Cg_FragmentProgram("tvl1_color_flow_new_update_uv");
-      _shader_p = new Cg_FragmentProgram("tvl1_flow_relaxed_update_p");
-#ifdef INCLUDE_SOURCE
-      _shader_uv->setProgram(GlShaderStrings::tvl1_color_flow_QR_update_uv.c_str());
-      _shader_p->setProgram(GlShaderStrings::tvl1_flow_new_update_p.c_str());
-#else
-      _shader_uv->setProgramFromFile("OpticalFlow/tvl1_color_flow_QR_update_uv.cg");
-      //_shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_relaxed_update_p.cg");
-      _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_new_update_p.cg");
-#endif
+      _shader_uv = new GLSL_FragmentProgram("tvl1_color_flow_new_update_uv");
+      _shader_p = new GLSL_FragmentProgram("tvl1_flow_relaxed_update_p");
+      _shader_uv->setProgram(GLSL_Shaders::tvl1_color_flow_QR_update_uv.c_str());
+      _shader_p->setProgram(GLSL_Shaders::tvl1_flow_new_update_p.c_str());
       _shader_uv->compile();
       _shader_p->compile();
 
@@ -651,6 +645,8 @@ namespace V3D_GPU
                pbuffer2->enableTexture(GL_TEXTURE1_ARB);
 
                _shader_p->enable();
+               _shader_p->bindTexture("uv_src", 0);
+               _shader_p->bindTexture("p_uv_src", 1);
                renderNormalizedQuad(GPU_SAMPLE_REVERSE_NEIGHBORS, ds, dt);
                _shader_p->disable();
 
@@ -667,7 +663,13 @@ namespace V3D_GPU
                warpedBuffer_G.enableTexture(GL_TEXTURE3_ARB);
                warpedBuffer_B.enableTexture(GL_TEXTURE4_ARB);
 
+
                _shader_uv->enable();
+               _shader_uv->bindTexture("uv_src", 0);
+               _shader_uv->bindTexture("p_uv_src", 1);
+               _shader_uv->bindTexture("warped_R_tex", 2);
+               _shader_uv->bindTexture("warped_G_tex", 3);
+               _shader_uv->bindTexture("warped_B_tex", 4);
                renderNormalizedQuad(GPU_SAMPLE_REVERSE_NEIGHBORS, ds, dt);
                _shader_uv->disable();
 

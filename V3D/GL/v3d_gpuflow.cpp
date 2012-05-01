@@ -1,10 +1,10 @@
-
 #include "config.h"
 
 #if defined(V3DLIB_GPGPU_ENABLE_CG)
 
 #include "Base/v3d_utilities.h"
 #include "v3d_gpuflow.h"
+#include "glsl_shaders.h"
 
 #include <iostream>
 #include <cmath>
@@ -15,7 +15,6 @@ using namespace V3D_GPU;
 
 namespace
 {
-
    void
    upsampleDisparities(unsigned uvSrcTex, unsigned pSrcTex, float pScale,
                        RTT_Buffer& ubuffer, RTT_Buffer& pbuffer)
@@ -1231,14 +1230,13 @@ namespace V3D_GPU
       TVL1_FlowEstimatorBase::allocate(W, H);
 
       _shader_u = new Cg_FragmentProgram("tvl1_flow_CLG_update_u");
-      _shader_p = new Cg_FragmentProgram("tvl1_flow_CLG_update_p");
+      _shader_p = new GLSL_FragmentProgram("tvl1_flow_CLG_update_p");
 
+	  _shader_p->setProgram(GLSL_Shaders::tvl1_flow_new_update_p.c_str());
 #ifdef INCLUDE_SOURCE
       _shader_u->setProgram(GlShaderStrings::tvl1_flow_CLG_update_u.c_str());
-      _shader_p->setProgram(GlShaderStrings::tvl1_flow_new_update_p.c_str());
 #else
       _shader_u->setProgramFromFile("OpticalFlow/tvl1_flow_CLG_update_u.cg");
-      _shader_p->setProgramFromFile("OpticalFlow/tvl1_flow_new_update_p.cg");
 #endif
 
       _shader_u->compile();
@@ -1622,15 +1620,11 @@ namespace V3D_GPU
    warpImageWithFlowField(unsigned int uv_tex, unsigned int I0_tex,
                           unsigned int I1_tex, int level, RTT_Buffer& dest)
    {
-      static Cg_FragmentProgram * shader = 0;
+      static GLSL_FragmentProgram * shader = 0;
       if (shader == 0)
       {
-         shader = new Cg_FragmentProgram("v3d_gpuflow::warpImageWithFlowField::shader");
-#ifdef INCLUDE_SOURCE
-         shader->setProgram(GlShaderStrings::flow_warp_image.c_str());
-#else
-         shader->setProgramFromFile("flow_warp_image.cg");
-#endif
+         shader = new GLSL_FragmentProgram("v3d_gpuflow::warpImageWithFlowField::shader");
+         shader->setProgram(GLSL_Shaders::flow_warp_image.c_str());
          shader->compile();
          checkGLErrorsHere0();
       }
@@ -1645,6 +1639,7 @@ namespace V3D_GPU
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, uv_tex);
       glEnable(GL_TEXTURE_2D);
+
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, I0_tex);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
@@ -1661,6 +1656,9 @@ namespace V3D_GPU
       // Provide uniform paramter via texcoord to avoid recompilation of shaders
       glMultiTexCoord3f(GL_TEXTURE3_ARB, 1.0f/w, 1.0f/h, 1 << level);
       shader->enable();
+      shader->bindTexture("uv_src", 0);
+      shader->bindTexture("I0_tex", 1);
+      shader->bindTexture("I1_tex", 2);
       renderNormalizedQuad();
       shader->disable();
 

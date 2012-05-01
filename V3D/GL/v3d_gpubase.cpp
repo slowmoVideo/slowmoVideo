@@ -1210,6 +1210,20 @@ namespace V3D_GPU
       _inUse = false;
       glUseProgramObjectARB(0);
    }
+   
+   void 
+   GLSL_FragmentProgram::bindTexture(const std::string& name, unsigned int unit)
+   {
+      glUniform1i(glGetUniformLocation(_program, name.c_str()), unit);
+   }
+   
+   void 
+   GLSL_FragmentProgram::parameter(char const * param, int x)
+   {
+      glUseProgramObjectARB(_program);
+      glUniform1iARB(glGetUniformLocationARB(_program, param), x);
+      if (!_inUse) glUseProgramObjectARB(0);
+   }
 
    void
    GLSL_FragmentProgram::parameter(char const * param, float x)

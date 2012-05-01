@@ -206,6 +206,7 @@ enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG ${CG_LIBRARY} ${CG_GL_LIBRARY})
 include_directories(Config)
 
 set (GL_SRC
+    GL/glsl_shaders.cpp
     GL/v3d_gpubase.cpp
     GL/v3d_gpuflow.cpp
     GL/v3d_gpucolorflow.cpp

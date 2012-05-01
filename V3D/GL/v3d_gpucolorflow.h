@@ -194,7 +194,8 @@ namespace V3D_GPU
       protected:
          Config _cfg;
 
-         Cg_FragmentProgram *_shader_uv, *_shader_p;
+         GLSL_FragmentProgram *_shader_uv;
+         GLSL_FragmentProgram *_shader_p;
 
          std::vector<RTT_Buffer *> _uBuffer1Pyramid, _uBuffer2Pyramid;
          std::vector<RTT_Buffer *> _pBuffer1Pyramid, _pBuffer2Pyramid;

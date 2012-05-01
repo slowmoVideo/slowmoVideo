@@ -326,6 +326,8 @@ namespace V3D_GPU
          virtual void enable();
          virtual void disable();
 
+         virtual void bindTexture(const std::string& name, unsigned int unit);
+         virtual void parameter(char const * param, int x);
          virtual void parameter(char const * param, float x);
          virtual void parameter(char const * param, float x, float y);
          virtual void parameter(char const * param, float x, float y, float z);

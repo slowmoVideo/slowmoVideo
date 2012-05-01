@@ -41,7 +41,7 @@ namespace V3D_GPU
    struct PyramidWithDerivativesCreator
    {
          PyramidWithDerivativesCreator(bool useFP32 = false, char const * srcTexSpec = "r=8 noRTT")
-            : _useFP32(useFP32), _width(0), _height(0), _nLevels(0), _srcTexSpec(srcTexSpec),
+            : _useFP32(useFP32), _width(0), _height(0), _nLevels(0), _srcTexSpec(srcTexSpec), _preSmoothingFilter(0),
               _pass1HorizShader(0), _pass1VertShader(0), _pass2Shader(0), shaders_initialized(false)
          { }
 
@@ -71,9 +71,12 @@ namespace V3D_GPU
          unsigned int _pyrTexID, _tmpTexID, _tmpTex2ID;
          ImageTexture2D _srcTex;
          char const *   _srcTexSpec;
+         int _preSmoothingFilter;
 
-         Cg_FragmentProgram *_pass1HorizShader, *_pass1VertShader, *_pass2Shader;
-     bool shaders_initialized; 
+         GLSL_FragmentProgram *_pass1HorizShader;
+         GLSL_FragmentProgram *_pass1VertShader;
+         GLSL_FragmentProgram *_pass2Shader;
+         bool shaders_initialized;
    }; // end struct PyramidWithDerivativesCreator
 
 } // end namespace V3D_GPU

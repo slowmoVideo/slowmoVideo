@@ -4,6 +4,7 @@
 
 #include "v3d_gpupyramid.h"
 #include "Base/v3d_timer.h"
+#include "glsl_shaders.h"
 #include <GL/glew.h>
 
 #include <iostream>
@@ -16,7 +17,6 @@ using namespace V3D;
 
 namespace
 {
-
    inline void
    renderQuad4Tap(float dS, float dT)
    {
@@ -291,6 +291,7 @@ namespace V3D_GPU
     _width = w;
     _height = h;
     _nLevels = nLevels;
+      _preSmoothingFilter = preSmoothingFilter;
 
     GLenum const textureTarget = GL_TEXTURE_2D;
     GLenum const floatFormat = _useFP32 ? GL_RGBA32F_ARB : GL_RGBA16F_ARB;
@@ -339,7 +340,7 @@ namespace V3D_GPU
     glTexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
-    glTexImage2D(textureTarget, 0, GL_RGBA16F_ARB, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(textureTarget, 0, floatFormat, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     glBindTexture(textureTarget, 0);
     checkGLErrorsHere0();
@@ -356,46 +357,29 @@ namespace V3D_GPU
      
     shaders_initialized = true; 
 
-    vector<string> args;
-    char str[512];
-    sprintf(str, "-DPRESMOOTHING=%i", preSmoothingFilter);
-    args.push_back(str);
-
     if (_pass1HorizShader == 0)
       {
 	_pass1HorizShader
-	  = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1HorizShader");
-#ifdef INCLUDE_SOURCE
-	_pass1HorizShader->setProgram(GlShaderStrings::pyramid_with_derivative_pass1v.c_str());
-#else
-	_pass1HorizShader->setProgramFromFile("pyramid_with_derivative_pass1v.cg");
-#endif
-	_pass1HorizShader->compile(args);
+            = new GLSL_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1HorizShader");
+         _pass1HorizShader->setProgram(GLSL_Shaders::pyramid_with_derivative_pass1v.c_str());
+         _pass1HorizShader->compile();
 	checkGLErrorsHere0();
       } // end if (_pass1HorizShader == 0)
 
     if (_pass1VertShader == 0)
       {
 	_pass1VertShader
-	  = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1VertShader");
-#ifdef INCLUDE_SOURCE
-	_pass1VertShader->setProgram(GlShaderStrings::pyramid_with_derivative_pass1h.c_str());
-#else
-	_pass1VertShader->setProgramFromFile("pyramid_with_derivative_pass1h.cg");
-#endif
-	_pass1VertShader->compile(args);
+            = new GLSL_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass1VertShader");
+         _pass1VertShader->setProgram(GLSL_Shaders::pyramid_with_derivative_pass1h.c_str());
+         _pass1VertShader->compile();
 	checkGLErrorsHere0();
       } // end if (_pass1VertShader == 0)
 
     if (_pass2Shader == 0)
       {
 	_pass2Shader
-	  = new Cg_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass2Shader");
-#ifdef INCLUDE_SOURCE
-	_pass2Shader->setProgram(GlShaderStrings::pyramid_with_derivative_pass2.c_str());
-#else
-	_pass2Shader->setProgramFromFile("pyramid_with_derivative_pass2.cg");
-#endif
+            = new GLSL_FragmentProgram("PyramidWithDerivativesCreator::buildPyramidForGrayscaleImage_impl::pass2Shader");
+         _pass2Shader->setProgram(GLSL_Shaders::pyramid_with_derivative_pass2.c_str());
 	_pass2Shader->compile();
 	checkGLErrorsHere0();
       } // end if (_pass2Shader == 0)
@@ -442,7 +426,9 @@ namespace V3D_GPU
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tmp2FbID);
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, textureTarget, _tmpTex2ID, 0);
 
+      _pass1HorizShader->parameter("presmoothing", _preSmoothingFilter);
     _pass1HorizShader->enable();
+      _pass1HorizShader->bindTexture("src_tex", 0);
     renderQuad8Tap(0.0f, 1.0f/_height);
     _pass1HorizShader->disable();
 
@@ -450,7 +436,9 @@ namespace V3D_GPU
     glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,GL_TEXTURE_2D,_pyrTexID,0);
     glBindTexture(textureTarget, _tmpTex2ID);
 
+      _pass1VertShader->parameter("presmoothing", _preSmoothingFilter);
     _pass1VertShader->enable();
+      _pass1VertShader->bindTexture("src_tex", 0);
     renderQuad8Tap(1.0f/_width, 0.0f);
     _pass1VertShader->disable();
 
