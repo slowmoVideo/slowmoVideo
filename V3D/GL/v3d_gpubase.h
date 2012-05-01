@@ -310,7 +310,6 @@ namespace V3D_GPU
    };
 #  endif // defined(V3DLIB_GPGPU_ENABLE_CG)
 
-#  if defined(V3DLIB_GPGPU_ENABLE_GLSL)
    struct GLSL_FragmentProgram : public ProgramBase
    {
          GLSL_FragmentProgram(char const * shaderName)
@@ -323,6 +322,7 @@ namespace V3D_GPU
 
          virtual void compile(char const * * compilerArgs = 0, char const *entry = 0);
          virtual void compile(std::vector<std::string> const& compilerArgs, char const *entry = 0);
+         virtual void bindFragDataLocation(const std::string& var);
          virtual void enable();
          virtual void disable();
 
@@ -343,7 +343,6 @@ namespace V3D_GPU
 
          std::map<std::string, int> _texUnitMap;
    };
-#  endif // defined(V3DLIB_GPGPU_ENABLE_GLSL)
 
 //----------------------------------------------------------------------
 

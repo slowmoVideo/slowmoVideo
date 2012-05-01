@@ -1056,8 +1056,6 @@ namespace V3D_GPU
 
 //----------------------------------------------------------------------
 
-# if defined(V3DLIB_GPGPU_ENABLE_GLSL)
-
 namespace V3D_GPU
 {
 
@@ -1071,7 +1069,7 @@ namespace V3D_GPU
    }
 
    void
-   GLSL_FragmentProgram::compile(char const * * compilerArgs, char const *entry = 0)
+   GLSL_FragmentProgram::compile(char const * * compilerArgs, char const *entry)
    {
       if (compilerArgs != 0)
          cerr << "GLSL_FragmentProgram::compile(): arguments to the compiler are not supported (and ignored)." << endl;
@@ -1182,7 +1180,7 @@ namespace V3D_GPU
    } // end GLSL_FragmentProgram::compile()
 
    void
-   GLSL_FragmentProgram::compile(std::vector<std::string> const& compilerArgs, char const *entry = 0)
+   GLSL_FragmentProgram::compile(std::vector<std::string> const& compilerArgs, char const *entry)
    {
       if (compilerArgs.size() != 0)
          cerr << "GLSL_FragmentProgram::compile(): arguments to the compiler are not supported (and ignored)." << endl;
@@ -1190,10 +1188,18 @@ namespace V3D_GPU
           cerr << "GLSL_FragmentProgram::compile(): named entry point is not supported (and ignored)." << endl;
       this->compile();
    }
-
+   
+   void 
+   GLSL_FragmentProgram::bindFragDataLocation(const std::string& var)
+   {
+      glBindFragDataLocation(_program, 0, var.c_str());
+   }
+   
    void
    GLSL_FragmentProgram::enable()
    {
+      // implicitly bind FragDataLocation. Maybe this can be done elsewhere once an apropriate interface is available.
+      bindFragDataLocation("my_FragColor");
       glUseProgramObjectARB(_program);
       _inUse = true;
    }
@@ -1319,8 +1325,6 @@ namespace V3D_GPU
    }
 
 } // end namespace V3D_GPU
-
-# endif // defined(V3DLIB_GPGPU_ENABLE_CG)
 
 //----------------------------------------------------------------------
 
