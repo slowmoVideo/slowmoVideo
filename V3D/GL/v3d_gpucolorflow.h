@@ -5,8 +5,6 @@
 #ifndef V3D_GPU_COLOR_FLOW_H
 #define V3D_GPU_COLOR_FLOW_H
 
-# if defined(V3DLIB_GPGPU_ENABLE_CG)
-
 #include "GL/v3d_gpubase.h"
 #include "GL/v3d_gpuflow.h"
 
@@ -60,98 +58,6 @@ namespace V3D_GPU
 
 //----------------------------------------------------------------------
 
-   struct TVL1_ColorFlowEstimator_Direct : public TVL1_ColorFlowEstimatorBase
-   {
-      public:
-         struct Config
-         {
-               Config(float tau_primal = 0.7f, float tau_dual = 0.7f, float lambdaScale = 1.0f)
-                  : _tau_primal(tau_primal), _tau_dual(tau_dual), _lambdaScale(lambdaScale)
-               { }
-
-               float _tau_primal, _tau_dual, _lambdaScale;
-         };
-
-         TVL1_ColorFlowEstimator_Direct(int nLevels)
-            : TVL1_ColorFlowEstimatorBase(nLevels)
-         {
-            _shader_uv = 0;
-            _shader_q  = 0;
-            _shader_p  = 0;
-         }
-
-         ~TVL1_ColorFlowEstimator_Direct() { }
-
-         void configure(Config const& cfg) { _cfg = cfg; }
-
-         void allocate(int w, int h);
-         void deallocate();
-
-         void run(unsigned int I0_TexIDs[3], unsigned int I1_TexIDs[3]);
-
-         unsigned int getFlowFieldTextureID()
-         {
-            return _uBuffer2Pyramid[_startLevel]->textureID();
-         }
-
-      protected:
-         Config _cfg;
-
-         Cg_FragmentProgram *_shader_uv, *_shader_q, *_shader_p;
-
-         std::vector<RTT_Buffer *> _uBuffer1Pyramid, _uBuffer2Pyramid;
-         std::vector<RTT_Buffer *> _pBuffer1Pyramid, _pBuffer2Pyramid;
-         std::vector<RTT_Buffer *> _qBuffer1Pyramid, _qBuffer2Pyramid;
-   }; // end struct TVL1_ColorFlowEstimator_Direct
-
-//----------------------------------------------------------------------
-
-   struct TVL1_ColorFlowEstimator_New : public TVL1_ColorFlowEstimatorBase
-   {
-      public:
-         struct Config
-         {
-               Config(float tau_primal = 0.7f, float tau_dual = 0.7f, float lambdaScale = 1.0f)
-                  : _tau_primal(tau_primal), _tau_dual(tau_dual), _lambdaScale(lambdaScale)
-               { }
-
-               float _tau_primal, _tau_dual, _lambdaScale;
-         };
-
-         TVL1_ColorFlowEstimator_New(int nLevels)
-            : TVL1_ColorFlowEstimatorBase(nLevels)
-         {
-            _shader_uv = 0;
-            _shader_q  = 0;
-            _shader_p  = 0;
-         }
-
-         ~TVL1_ColorFlowEstimator_New() { }
-
-         void configure(Config const& cfg) { _cfg = cfg; }
-
-         void allocate(int w, int h);
-         void deallocate();
-
-         void run(unsigned int I0_TexIDs[3], unsigned int I1_TexIDs[3]);
-
-         unsigned int getFlowFieldTextureID()
-         {
-            return _uBuffer2Pyramid[_startLevel]->textureID();
-         }
-
-      protected:
-         Config _cfg;
-
-         Cg_FragmentProgram *_shader_uv, *_shader_q, *_shader_p;
-
-         std::vector<RTT_Buffer *> _uBuffer1Pyramid, _uBuffer2Pyramid;
-         std::vector<RTT_Buffer *> _pBuffer1Pyramid, _pBuffer2Pyramid;
-         std::vector<RTT_Buffer *> _qBuffer1Pyramid, _qBuffer2Pyramid;
-   }; // end struct TVL1_ColorFlowEstimator_New
-
-//----------------------------------------------------------------------
-
    // Quadratic relaxation approach
    struct TVL1_ColorFlowEstimator_QR : public TVL1_ColorFlowEstimatorBase
    {
@@ -202,7 +108,5 @@ namespace V3D_GPU
    }; // end struct TVL1_ColorFlowEstimator_QR
 
 } // end namespace V3D_GPU
-
-# endif
 
 #endif // defined(V3D_GPU_FLOW_H)

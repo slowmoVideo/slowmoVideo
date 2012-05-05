@@ -97,7 +97,6 @@ void drawscene()
   {
     ScopedTimer st("glew/cg init"); 
     glewInit();
-    Cg_ProgramBase::initializeCg();
   }
   {
     ScopedTimer st("initialization flow"); 
@@ -190,13 +189,6 @@ void drawscene()
 
 int main( int argc, char** argv)
 {
-#ifndef INCLUDE_SOURCE
-   if (getenv("V3D_SHADER_DIR") == NULL) {
-       std::cout << "V3D_SHADER_DIR environment variable needs to be set!" << std::endl;
-       return -2;
-   }
-#endif
-
    if ((argc-1) == 1) {
      if (strcmp(argv[1], "--identify") == 0) {
             std::cout << "flowBuilder v" << VERSION << std::endl;

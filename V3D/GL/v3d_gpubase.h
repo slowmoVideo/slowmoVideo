@@ -19,16 +19,6 @@
 #define raiseGLErrorHere1(MSG) { V3D_GPU::raiseGLError(__FILE__, __LINE__, MSG); }
 #define raiseGLErrorHere2(MSG, NAME) { V3D_GPU::raiseGLError(__FILE__, __LINE__, MSG, NAME); }
 
-# if defined(V3DLIB_GPGPU_ENABLE_CG)
-
-struct _CGcontext;
-typedef _CGcontext * CGcontext;
-
-struct _CGprogram;
-typedef _CGprogram * CGprogram;
-
-# endif
-
 namespace V3D_GPU
 {
    typedef unsigned char uchar;
@@ -238,8 +228,6 @@ namespace V3D_GPU
          virtual void setProgram(char const * source) = 0;
          virtual void setProgram(std::string const& source) { this->setProgram(source.c_str()); }
 
-         virtual void setProgramFromFile(char const * fileName);
-
          virtual void compile(char const * * compilerArgs = 0, char const *entry = 0) = 0;
          virtual void compile(std::vector<std::string> const& compilerArgs, char const *entry = 0) = 0;
          virtual void enable() = 0;
@@ -260,55 +248,6 @@ namespace V3D_GPU
       protected:
          std::string _shaderName;
    };
-
-#  if defined(V3DLIB_GPGPU_ENABLE_CG)
-   struct Cg_ProgramBase
-   {
-         Cg_ProgramBase() 
-            : _source(), _program(0)
-         { }
-
-         virtual ~Cg_ProgramBase();
-
-         char const * getCompiledString();
-
-         static void initializeCg();
-
-      protected:
-         static void handleCgError() ;
-
-         std::string _source;
-         CGprogram   _program;
-
-         static CGcontext _context;
-   };
-
-   struct Cg_FragmentProgram : public ProgramBase, public Cg_ProgramBase
-   {
-         Cg_FragmentProgram(char const * shaderName)
-            : ProgramBase(shaderName), Cg_ProgramBase()
-         { }
-
-         virtual ~Cg_FragmentProgram() { }
-
-         virtual void setProgram(char const * source);
-
-         virtual void compile(char const * * compilerArgs = 0, char const *entry = 0);
-         virtual void compile(std::vector<std::string> const& compilerArgs, char const *entry = 0);
-         virtual void enable();
-         virtual void disable();
-
-         virtual void parameter(char const * param, float x);
-         virtual void parameter(char const * param, float x, float y);
-         virtual void parameter(char const * param, float x, float y, float z);
-         virtual void parameter(char const * param, float x, float y, float z, float w);
-         virtual void parameter(char const * param, int len, float const * array);
-         virtual void matrixParameterR(char const * param, int rows, int cols, double const * values);
-         virtual void matrixParameterC(char const * param, int rows, int cols, double const * values);
-
-         virtual unsigned getTexUnit(char const * param);
-   };
-#  endif // defined(V3DLIB_GPGPU_ENABLE_CG)
 
    struct GLSL_FragmentProgram : public ProgramBase
    {
@@ -382,10 +321,8 @@ namespace V3D_GPU
    void renderNormalizedQuad();
    void renderNormalizedQuad(GPUTextureSamplingPattern pattern, float ds, float dt);
 
-#  if defined(V3DLIB_GPGPU_ENABLE_CG)
    void enableTrivialTexture2DShader();
    void disableTrivialTexture2DShader();
-#  endif
 
 } // end namespace V3D_GPU
 
