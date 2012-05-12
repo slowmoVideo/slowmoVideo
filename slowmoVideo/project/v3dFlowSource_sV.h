@@ -20,6 +20,7 @@ class V3dFlowSource_sV : public AbstractFlowSource_sV
 public:
     /** Creates a new flow source using V3D optical flow */
     V3dFlowSource_sV(Project_sV *project, float lambda = 10);
+    ~V3dFlowSource_sV() {}
     void setLambda(float lambda);
 
 

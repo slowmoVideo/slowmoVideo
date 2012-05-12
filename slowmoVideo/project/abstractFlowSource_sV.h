@@ -20,6 +20,7 @@ class AbstractFlowSource_sV
 {
 public:
     AbstractFlowSource_sV(Project_sV *project);
+    virtual ~AbstractFlowSource_sV() {}
 
     /** \return The flow field from \c leftFrame to \c rightFrame */
     virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError) = 0;
