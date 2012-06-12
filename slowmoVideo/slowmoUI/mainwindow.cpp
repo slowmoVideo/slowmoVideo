@@ -43,7 +43,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <functional>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_progressDialog(NULL),
@@ -121,6 +121,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
+    ui->actionZoomIn->setShortcut(QKeySequence::ZoomIn);
+    ui->actionZoomOut->setShortcut(QKeySequence::ZoomOut);
 
     m_cs.addShortcut("h", Help, "Show help overlay");
     m_cs.addShortcut("q-q", Quit, "Quit");
@@ -143,6 +145,9 @@ MainWindow::MainWindow(QWidget *parent) :
     b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
     b &= connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
 
+    b &= connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
+    b &= connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
+
     b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
     b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
@@ -164,6 +169,12 @@ MainWindow::MainWindow(QWidget *parent) :
     Q_ASSERT(b);
 
     updateWindowTitle();
+    setWindowIcon(QIcon(":icons/slowmoIcon.png"));
+
+
+    if (!projectPath.isEmpty()) {
+        loadProject(projectPath);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -313,28 +324,31 @@ void MainWindow::loadProject(Project_sV *project)
 }
 void MainWindow::slotLoadProjectDialog()
 {
-    QFileDialog dialog(this, "Load project");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setDefaultSuffix("sVproj");
-    dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setDirectory(m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString());
-    if (dialog.exec() == QDialog::Accepted) {
-        m_settings.setValue("directories/lastOpenedProject", QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
-        XmlProjectRW_sV reader;
-        try {
-            QString warning;
-            Project_sV *project = reader.loadProject(dialog.selectedFiles().at(0), &warning);
-            if (warning.length() > 0) {
-                QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
-            }
-            m_projectPath = dialog.selectedFiles().at(0);
-            loadProject(project);
-        } catch (FrameSourceError &err) {
-            QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
-        } catch (Error_sV &err) {
-            QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
+    QString dir = m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString();
+    QString file = QFileDialog::getOpenFileName(this, "Load Project", dir, "slowmoVideo projects (*.sVproj)");
+
+    if (!file.isEmpty()) {
+        qDebug() << file;
+        loadProject(QFileInfo(file).absoluteFilePath());
+    }
+}
+
+void MainWindow::loadProject(QString path)
+{
+    m_settings.setValue("directories/lastOpenedProject", path);
+    XmlProjectRW_sV reader;
+    try {
+        QString warning;
+        Project_sV *project = reader.loadProject(path, &warning);
+        if (warning.length() > 0) {
+            QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
         }
+        m_projectPath = path;
+        loadProject(project);
+    } catch (FrameSourceError &err) {
+        QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+    } catch (Error_sV &err) {
+        QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
     }
 }
 

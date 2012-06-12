@@ -26,10 +26,12 @@ public:
     ~AboutDialog();
 
 protected:
-    void keyPressEvent(QKeyEvent *);
+    virtual void keyPressEvent(QKeyEvent *);
+    virtual void paintEvent(QPaintEvent *e);
 
 private:
     Ui::AboutDialog *ui;
+    QImage m_appIcon;
 };
 
 #endif // ABOUTDIALOG_H

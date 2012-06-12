@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QtCore/QSettings>
+#include <QtGui/QButtonGroup>
 
 namespace Ui {
     class PreferencesDialog;
@@ -21,10 +22,13 @@ protected slots:
 
 private:
     Ui::PreferencesDialog *ui;
+    QButtonGroup m_flowMethodGroup;
     QSettings m_settings;
 
 private slots:
     void slotValidateFlowBinary();
+    void slotUpdateFlowMethod();
+    void slotUpdateFfmpeg();
     void slotBrowseFlow();
 };
 

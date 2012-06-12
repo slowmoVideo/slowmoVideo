@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>141</height>
+    <height>202</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,16 @@
         <string>Binary locations</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="buildFlow"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="bBuildFlow">
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
@@ -29,12 +39,18 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="buildFlow">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>ffmpeg</string>
+          </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="bBuildFlow">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="ffmpeg"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="bFFmpeg">
           <property name="text">
            <string>Browse</string>
           </property>
@@ -44,6 +60,32 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Flow method</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="methodV3D">
+        <property name="text">
+         <string>GPU, V3D (nVidia card required)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="methodOCV">
+        <property name="text">
+         <string>CPU, OpenCV</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

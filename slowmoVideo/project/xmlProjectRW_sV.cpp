@@ -311,13 +311,14 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Cannot read file " << filename;
-        throw Error_sV(QString("Cannot read from file %1!").arg(filename));
+        throw Error_sV(QString("Cannot read from file %1. (Opening in read-only mode failed.)").arg(filename));
     } else {
 
         QXmlStreamReader xml;
         xml.setDevice(&file);
         if (!xml.readNextStartElement()) {
             qDebug() << "Could not read " << filename;
+            throw Error_sV(QString("Invalid project file: %1").arg(filename));
 
         } else {
             if (xml.name() != "sVproject") {

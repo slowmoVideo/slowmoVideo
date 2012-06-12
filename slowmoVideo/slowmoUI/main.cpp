@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include <QtGui/QApplication>
+#include <QtCore/QDebug>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -20,7 +21,22 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
 
-    MainWindow w;
+    QString projectPath;
+    qDebug() << a.arguments();
+    if (a.arguments().size() >= 2) {
+        qDebug() << a.arguments().at(1);
+        QFileInfo info(a.arguments().at(1));
+        if (info.exists() && info.isReadable() && info.isFile()) {
+            projectPath = info.absoluteFilePath();
+            qDebug() << "Loading project: " << projectPath;
+        } else {
+            qDebug() << projectPath << " does not exist.";
+        }
+    } else {
+        qDebug() << "No argument given.";
+    }
+
+    MainWindow w(projectPath);
 
     w.show();
 

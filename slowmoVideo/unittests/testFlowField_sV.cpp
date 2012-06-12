@@ -46,3 +46,52 @@ void TestFlowField_sV::slotTestGaussKernel()
     QVERIFY(fabs(kernel(-3,-1)) < .001);
 
 }
+
+void TestFlowField_sV::slotTestMedian()
+{
+    int *values = new int[4];
+
+    values[0] = 0; values[1] = 0;
+    values[2] = 0; values[3] = 2;
+    FlowField_sV f1(2,2);
+    initFlowField(&f1, values);
+
+    values[0] = 0; values[1] = 1;
+    values[2] = 0; values[3] = 1;
+    FlowField_sV f2(2,2);
+    initFlowField(&f2, values);
+
+    values[0] = 0; values[1] = 2;
+    values[2] = 1; values[3] = 0;
+    FlowField_sV f3(2,2);
+    initFlowField(&f3, values);
+
+    FlowField_sV *outField = FlowTools_sV::median(&f1, &f2, &f3);
+
+    values[0] = 0; values[1] = 1;
+    values[2] = 0; values[3] = 1;
+
+    QVERIFY(outField->x(0,0) == values[0]);
+    QVERIFY(outField->x(1,0) == values[1]);
+    QVERIFY(outField->x(0,1) == values[2]);
+    QVERIFY(outField->x(1,1) == values[3]);
+    QVERIFY(outField->y(0,0) == values[0]);
+    QVERIFY(outField->y(1,0) == values[1]);
+    QVERIFY(outField->y(0,1) == values[2]);
+    QVERIFY(outField->y(1,1) == values[3]);
+
+    delete values;
+    delete outField;
+}
+
+void TestFlowField_sV::initFlowField(FlowField_sV *field, int *values)
+{
+    int c = 0;
+    for (int y = 0; y < field->height(); y++) {
+        for (int x = 0; x < field->width(); x++) {
+            field->rx(x,y) = values[c];
+            field->ry(x,y) = values[c];
+            c++;
+        }
+    }
+}

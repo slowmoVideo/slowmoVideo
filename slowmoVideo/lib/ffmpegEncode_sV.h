@@ -21,12 +21,11 @@
  # include <stdint.h>
 #endif
 
-#ifdef WINDOWS
-#include <libavcodec\avcodec.h>
-#include <libavformat\avformat.h>
-#else
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+
+#if ((LIBAVFORMAT_VERSION_MAJOR == 53) && (LIBAVFORMAT_VERSION_MINOR >= 21) && (LIBAVFORMAT_VERSION_MICRO < 100))
+#define MOST_LIKELY_LIBAV
 #endif
 
 /// This struct can eat frames and produces videos!

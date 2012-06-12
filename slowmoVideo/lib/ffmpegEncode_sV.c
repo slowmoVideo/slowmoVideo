@@ -48,7 +48,11 @@ int open_video(VideoOut_sV *video)
     }
 
     /* open the codec */
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,8,0)
     if (avcodec_open(cc, codec) < 0) {
+#else
+    if (avcodec_open2(cc, codec, NULL) < 0) {
+#endif
         char s[200];
         sprintf(s, "Could not open codec %s.\n", codec->long_name);
         fputs(s, stderr);
@@ -73,9 +77,10 @@ int open_video(VideoOut_sV *video)
 int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const int width, const int height, const int bitrate,
              const unsigned int numerator, const unsigned int denominator)
 {
-
-    /* must be called before using avcodec lib */
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,7,1)
+    // Must be called before using the avcodec library. (Done automatically in more recent versions.)
     avcodec_init();
+#endif
 
     video->frameNr = 0;
     video->errorMessage = NULL;
@@ -84,17 +89,21 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
     /* initialize libavcodec, and register all codecs and formats */
     av_register_all();
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_init();
+#endif
 
     /* allocate the output media context */
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,45,0)
     video->fc = avformat_alloc_context();
     video->fc->oformat = guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
-#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,3,0)
+#elif LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,4,0) || defined(MOST_LIKELY_LIBAV)
     video->fc = avformat_alloc_context();
     video->fc->oformat = av_guess_format(NULL, filename, NULL);
     strncpy(video->fc->filename, filename, sizeof(video->fc->filename));
 #else
+    // Actually introduced in 53.2.0 but not working in 53.3.0 packages
     avformat_alloc_output_context2(&video->fc, NULL, NULL, filename);
     if (!video->fc) {
         printf("Could not deduce output format from file extension: using MPEG.\n");
@@ -129,7 +138,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->streamV = NULL;
     if (video->format->video_codec != CODEC_ID_NONE) {
 
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,10,0)
         video->streamV = av_new_stream(video->fc, 0);
+#else
+        video->streamV = avformat_new_stream(video->fc, 0);
+#endif
         if (!video->streamV) {
             const char *s = "Could not allocate the video stream.\n";
             fputs(s, stderr);
@@ -239,7 +252,11 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 #if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(52,102,0)
         if (url_fopen(&video->fc->pb, filename, URL_WRONLY) < 0) {
 #else
+#if LIBAVFORMAT_VERSION_INT <= AV_VERSION_INT(53,0,0)
+        if (avio_open(&video->fc->pb, filename, AVIO_WRONLY) < 0) {
+#else
         if (avio_open(&video->fc->pb, filename, AVIO_FLAG_WRITE) < 0) {
+#endif
 #endif
 
             // Check if non-ASCII characters are present in the file path
@@ -459,4 +476,9 @@ void finish(VideoOut_sV *video)
 
     sws_freeContext(video->rgbConversionContext);
     printf("\nWrote to %s.\n", video->filename);
+
+
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,13,0)
+    avformat_network_deinit();
+#endif
 }

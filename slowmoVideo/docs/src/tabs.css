@@ -1,20 +1,20 @@
-.tablist {
+.tablist, .navpath ul {
     clear: left;
 }
-.tablist li {
+.tablist li, .navpath ul li {
     border-top: 1px solid #999;
     border-bottom: 1px dotted #999;
     float: left;
     list-style-type: none;
 }
-.tablist li a {
+.tablist li a, .navpath ul li a {
     display: block;
     padding: .5em;
 }
-.tablist li a:hover {
+.tablist li a:hover, .navpath ul li a:hover {
     background-color: #999;
 }
-.tabs2 .tablist li {
+.tabs2 .tablist li, .navpath ul li {
     border-top: none;
 }
 #searchli {

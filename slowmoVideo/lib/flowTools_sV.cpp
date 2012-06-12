@@ -332,3 +332,46 @@ void FlowTools_sV::refillCorner(FlowField_sV &field, int top, int left, CornerPo
     field.rx(left,top) = sumX/count;
     field.ry(left,top) = sumY/count;
 }
+
+
+FlowField_sV* FlowTools_sV::median(const FlowField_sV *const fa, const FlowField_sV *const fb, const FlowField_sV *const fc)
+{
+    assert(fa != NULL);
+    assert(fb != NULL);
+    assert(fc != NULL);
+    assert(fa->width() == fb->width() && fa->width() == fc->width());
+    assert(fa->height() == fb->height() && fa->height() == fc->height());
+
+    int w = fa->width();
+    int h = fa->height();
+    FlowField_sV *ff = new FlowField_sV(w, h);
+
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            float a = fa->x(x,y)*fa->x(x,y) + fa->y(x,y)*fa->y(x,y);
+            float b = fb->x(x,y)*fb->x(x,y) + fb->y(x,y)*fb->y(x,y);
+            float c = fc->x(x,y)*fc->x(x,y) + fc->y(x,y)*fc->y(x,y);
+
+            // Determine the median
+            // < a b c
+            // a - ? ?
+            // b ? - ?
+            // c ? ? -
+            // The median element has SUM == 1 for its row
+            char detA = (a < b) + (a < c);
+            char detB = (b < a) + (b < c);
+
+            if (detA == 1) {
+                ff->rx(x,y) = fa->x(x,y);
+                ff->ry(x,y) = fa->y(x,y);
+            } else if (detB == 1) {
+                ff->rx(x,y) = fb->x(x,y);
+                ff->ry(x,y) = fb->y(x,y);
+            } else {
+                ff->rx(x,y) = fc->x(x,y);
+                ff->ry(x,y) = fc->y(x,y);
+            }
+        }
+    }
+    return ff;
+}

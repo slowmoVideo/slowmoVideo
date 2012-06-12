@@ -28,7 +28,7 @@ typedef __int64 int64_t;
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
 #define SLOWMOVIDEO_VERSION_MINOR 2
-#define SLOWMOVIDEO_VERSION_MICRO 5
+#define SLOWMOVIDEO_VERSION_MICRO 6
 
 
 /// Contains information about this slowmoVideo version

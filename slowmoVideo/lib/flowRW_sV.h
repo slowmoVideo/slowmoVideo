@@ -18,6 +18,15 @@ class FlowField_sV;
 
 /**
   \brief Reads and writes Optical Flow fields.
+
+  Binary format description:
+  \code
+  "flow_sV" 0x1(char) width(int) height(int)
+  x0(float) y0(float) x1 y1 x2 y2 ... x[width*height-1] y[width*height-1]
+  \endcode
+  The number after \c flow_sV describes the file version, this allows to e.g. add compression
+  in future. Width and height should match the image resolution. The following flow data
+  describes the movement of each pixel in x and y direction.
   \see FlowField_sV
   */
 class FlowRW_sV

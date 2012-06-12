@@ -12,7 +12,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "projectPreferences_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
-#include "v3dFlowSource_sV.h"
+#include "flowSourceV3D_sV.h"
+#include "flowSourceOpenCV_sV.h"
 #include "interpolator_sV.h"
 #include "motionBlur_sV.h"
 #include "nodeList_sV.h"
@@ -29,6 +30,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QSettings>
 
 //#define DEBUG_P
 #ifdef DEBUG_P
@@ -60,13 +62,22 @@ void Project_sV::init()
 {
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
-    m_flowSource = new V3dFlowSource_sV(this);
+    m_flowSource = new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
+
+    QSettings settings;
+    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+        m_flowSource = new FlowSourceV3D_sV(this);
+    } else {
+        m_flowSource = new FlowSourceOpenCV_sV(this);
+    }
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
     m_shutterFunctions = new ShutterFunctionList_sV(m_nodes);
     m_renderTask = NULL;
+
+    m_v3dFailCounter = 0;
 }
 
 Project_sV::~Project_sV()
@@ -199,14 +210,24 @@ QImage Project_sV::render(qreal outTime, RenderPreferences_sV prefs)
     return Interpolator_sV::interpolate(this, sourceFrame, prefs);
 }
 
-FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError)
+FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) throw(FlowBuildingError)
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
     if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
-        V3dFlowSource_sV *v3d;
-        if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_flowSource)) != NULL) {
+
+        FlowSourceV3D_sV *v3d;
+        if ((v3d = dynamic_cast<FlowSourceV3D_sV*>(m_flowSource)) != NULL) {
             v3d->setLambda(m_preferences->flowV3DLambda());
+            try {
+                return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
+            } catch (FlowBuildingError err) {
+                m_v3dFailCounter++;
+                qDebug() << "Failed creating optical flow, falling back to OpenCV ...";
+                qDebug() << "Failed attempts so far: " << m_v3dFailCounter;
+                FlowSourceOpenCV_sV fso(this);
+                return fso.buildFlow(leftFrame, rightFrame, frameSize);
+            }
         }
         return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
     } else {

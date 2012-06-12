@@ -231,6 +231,12 @@ private slots:
     void slotSetSpeed();
     void slotSetSpeed(QString s);
     void slotSetShutterFunction();
+    void slotZoomIn();
+    void slotZoomOut();
+
+private:
+    void zoom(bool in, QPoint pos);
+
 };
 
 QDebug operator<<(QDebug qd, const Canvas::ToolMode &mode);

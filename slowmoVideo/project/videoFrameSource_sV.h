@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
+#include <QtCore/QSettings>
 #include <QtCore/QSemaphore>
 
 extern "C" {
@@ -61,6 +62,7 @@ private:
     QFile m_inFile;
     QDir m_dirFramesSmall;
     QDir m_dirFramesOrig;
+    QSettings m_settings;
 
     VideoInfoSV *m_videoInfo;
     Fps_sV m_fps;
@@ -81,6 +83,9 @@ private:
       whether they need to be extracted with extractFrames()
       */
     bool rebuildRequired(const FrameSize frameSize);
+
+    void locateFFmpeg();
+    bool testFfmpegExecutable(QString path);
 
 signals:
     /** Emitted when the task for extracting original-sized images has finished (or has been terminated) */

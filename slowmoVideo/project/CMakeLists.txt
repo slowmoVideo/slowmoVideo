@@ -18,7 +18,8 @@ set(SRCS_PROJ
   imagesRenderTarget_sV.cpp
   videoRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
-  v3dFlowSource_sV.cpp
+  flowSourceOpenCV_sV.cpp
+  flowSourceV3D_sV.cpp
   interpolator_sV.cpp
   shutterFunction_sV.cpp
   shutterFunctionList_sV.cpp
@@ -38,4 +39,4 @@ set(SRCS_MOC
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 add_library(sVproj STATIC ${SRCS_PROJ} ${MOC_OUT})
-target_link_libraries(sVproj sV sVinfo sVflow sVencode ${QT_LIBRARIES})
+target_link_libraries(sVproj sV sVinfo sVflow sVencode ${QT_LIBRARIES} ${OpenCV_LIBS})

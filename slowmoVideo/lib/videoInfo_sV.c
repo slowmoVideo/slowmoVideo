@@ -25,6 +25,9 @@ VideoInfoSV getInfo(const char filename[])
     info.framesCount = 0;
 
     av_register_all();
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_init();
+#endif
 
     AVFormatContext *pFormatContext = NULL;
 
@@ -37,12 +40,16 @@ VideoInfoSV getInfo(const char filename[])
 #else
     if ((ret = avformat_open_input(&pFormatContext, filename, NULL, NULL)) != 0) {
 #endif
-	printf("Could not open file %s.\n", filename);
-	return info;
+        printf("Could not open file %s.\n", filename);
+        return info;
     }
+#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,9,0)
     if (av_find_stream_info(pFormatContext) < 0) {
-	printf("No stream information found.\n");
-	return info;
+#else
+    if (avformat_find_stream_info(pFormatContext, NULL) < 0) {
+#endif
+        printf("No stream information found.\n");
+        return info;
     }
 #if LIBAVFORMAT_VERSION_MAJOR < 53
     dump_format(pFormatContext, 0, filename, 0);
@@ -58,18 +65,18 @@ VideoInfoSV getInfo(const char filename[])
 #else
         if (pFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
 #endif
-	    videoStream = i;
-	    pCodecContext = pFormatContext->streams[i]->codec;
-	    AVRational fps = pFormatContext->streams[i]->r_frame_rate;
-	    printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
-	    info.frameRateNum = fps.num;
+            videoStream = i;
+            pCodecContext = pFormatContext->streams[i]->codec;
+            AVRational fps = pFormatContext->streams[i]->r_frame_rate;
+            printf("Frame rate: %d/%d = %f\n", fps.num, fps.den, (float)fps.num / fps.den);
+            info.frameRateNum = fps.num;
             info.frameRateDen = fps.den;
             info.width = pCodecContext->width;
             info.height = pCodecContext->height;
             info.framesCount = pFormatContext->streams[i]->nb_frames;
             info.streamsCount++;
             printf("Total frames: %ld (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
-	}
+        }
     }
 
     av_free(pFormatContext);

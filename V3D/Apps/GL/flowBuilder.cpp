@@ -9,7 +9,11 @@
 #include <iostream>
 
 #include <GL/glew.h>
+#ifdef __APPLE__
+#include <glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 #include "flowRW_sV.h"
 #include "flowField_sV.h"
