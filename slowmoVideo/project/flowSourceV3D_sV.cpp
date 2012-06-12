@@ -8,7 +8,7 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include "v3dFlowSource_sV.h"
+#include "flowSourceV3D_sV.h"
 #include "project_sV.h"
 #include "abstractFrameSource_sV.h"
 #include "../lib/flowRW_sV.h"
@@ -17,32 +17,32 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
 
-V3dFlowSource_sV::V3dFlowSource_sV(Project_sV *project, float lambda) :
+FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, float lambda) :
     AbstractFlowSource_sV(project),
     m_lambda(lambda)
 {
     createDirectories();
 }
 
-void V3dFlowSource_sV::slotUpdateProjectDir()
+void FlowSourceV3D_sV::slotUpdateProjectDir()
 {
     m_dirFlowSmall.rmdir(".");
     m_dirFlowOrig.rmdir(".");
     createDirectories();
 }
 
-void V3dFlowSource_sV::createDirectories()
+void FlowSourceV3D_sV::createDirectories()
 {
     m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
     m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
-void V3dFlowSource_sV::setLambda(float lambda)
+void FlowSourceV3D_sV::setLambda(float lambda)
 {
     m_lambda = lambda;
 }
 
-FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
+FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
 
@@ -94,7 +94,7 @@ FlowField_sV* V3dFlowSource_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
 
 
 
-QString V3dFlowSource_sV::correctFlowBinaryLocation()
+QString FlowSourceV3D_sV::correctFlowBinaryLocation()
 {
     QSettings settings;
     QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
@@ -113,7 +113,7 @@ QString V3dFlowSource_sV::correctFlowBinaryLocation()
     return QString();
 }
 
-bool V3dFlowSource_sV::validateFlowBinary(const QString path)
+bool FlowSourceV3D_sV::validateFlowBinary(const QString path)
 {
     bool valid = false;
     qDebug() << "Checking " << path << " ...";
@@ -136,7 +136,7 @@ bool V3dFlowSource_sV::validateFlowBinary(const QString path)
 }
 
 
-const QString V3dFlowSource_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
+const QString FlowSourceV3D_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
 {
     QDir dir;
     if (frameSize == FrameSize_Orig) {

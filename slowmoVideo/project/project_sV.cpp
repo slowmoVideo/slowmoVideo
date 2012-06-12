@@ -12,7 +12,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "projectPreferences_sV.h"
 #include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
-#include "v3dFlowSource_sV.h"
+#include "flowSourceV3D_sV.h"
 #include "interpolator_sV.h"
 #include "motionBlur_sV.h"
 #include "nodeList_sV.h"
@@ -60,7 +60,7 @@ void Project_sV::init()
 {
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
-    m_flowSource = new V3dFlowSource_sV(this);
+    m_flowSource = new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
 
     m_tags = new QList<Tag_sV>();
@@ -204,8 +204,8 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
     if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
-        V3dFlowSource_sV *v3d;
-        if ((v3d = dynamic_cast<V3dFlowSource_sV*>(m_flowSource)) != NULL) {
+        FlowSourceV3D_sV *v3d;
+        if ((v3d = dynamic_cast<FlowSourceV3D_sV*>(m_flowSource)) != NULL) {
             v3d->setLambda(m_preferences->flowV3DLambda());
         }
         return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);

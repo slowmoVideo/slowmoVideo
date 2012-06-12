@@ -1,7 +1,7 @@
 #include "preferencesDialog.h"
 #include "ui_preferencesDialog.h"
 
-#include "project/v3dFlowSource_sV.h"
+#include "project/flowSourceV3D_sV.h"
 #include "lib/defs_sV.hpp"
 #include <QtCore/QProcess>
 #include <QtGui/QFileDialog>
@@ -24,8 +24,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     b &= connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
     Q_ASSERT(b);
 
-    if (!V3dFlowSource_sV::validateFlowBinary(ui->buildFlow->text())) {
-        V3dFlowSource_sV::correctFlowBinaryLocation();
+    if (!FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
+        FlowSourceV3D_sV::correctFlowBinaryLocation();
         ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
     }
     slotValidateFlowBinary();
@@ -38,7 +38,7 @@ PreferencesDialog::~PreferencesDialog()
 
 void PreferencesDialog::accept()
 {
-    if (V3dFlowSource_sV::validateFlowBinary(ui->buildFlow->text())) {
+    if (FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         m_settings.setValue("binaries/v3dFlowBuilder", ui->buildFlow->text());
     }
     QDialog::accept();
@@ -46,7 +46,7 @@ void PreferencesDialog::accept()
 
 void PreferencesDialog::slotValidateFlowBinary()
 {
-    if (V3dFlowSource_sV::validateFlowBinary(ui->buildFlow->text())) {
+    if (FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         ui->buildFlow->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
     } else {
         ui->buildFlow->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));

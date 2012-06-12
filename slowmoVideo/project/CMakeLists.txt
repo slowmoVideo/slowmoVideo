@@ -18,7 +18,7 @@ set(SRCS_PROJ
   imagesRenderTarget_sV.cpp
   videoRenderTarget_sV.cpp
   abstractFlowSource_sV.cpp
-  v3dFlowSource_sV.cpp
+  flowSourceV3D_sV.cpp
   interpolator_sV.cpp
   shutterFunction_sV.cpp
   shutterFunctionList_sV.cpp

@@ -15,12 +15,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QDir>
 
-class V3dFlowSource_sV : public AbstractFlowSource_sV
+class FlowSourceV3D_sV : public AbstractFlowSource_sV
 {
 public:
     /** Creates a new flow source using V3D optical flow */
-    V3dFlowSource_sV(Project_sV *project, float lambda = 10);
-    ~V3dFlowSource_sV() {}
+    FlowSourceV3D_sV(Project_sV *project, float lambda = 10);
+    ~FlowSourceV3D_sV() {}
     void setLambda(float lambda);
 
 
