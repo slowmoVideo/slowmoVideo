@@ -38,19 +38,10 @@ throw(FrameSourceError) :
     }
     m_fps = Fps_sV(m_videoInfo->frameRateNum, m_videoInfo->frameRateDen);
 
-    QProcess ffmpeg(this);
-    QStringList args;
-    args << "-version";
-    ffmpeg.start("ffmpeg", args);
-    ffmpeg.waitForFinished(2000);
-    QByteArray output = ffmpeg.readAllStandardOutput();
-    if (output.size() == 0) {
-        throw FrameSourceError(QString("ffmpeg executable not found! Cannot load %1."
-                                       "\n(It is also possible that it took a little long to respond "
-                                       "due to high workload, so you might want to try again.)").arg(filename));
-    }
+
 
     createDirectories();
+    locateFFmpeg();
 
     m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
@@ -64,6 +55,33 @@ VideoFrameSource_sV::~VideoFrameSource_sV()
     delete m_ffmpeg;
     delete m_timer;
     delete m_videoInfo;
+}
+
+bool VideoFrameSource_sV::testFfmpegExecutable(QString path)
+{
+    QProcess ffmpeg(this);
+    QStringList args;
+    args << "-version";
+    ffmpeg.start(path, args);
+    ffmpeg.waitForFinished(2000);
+    QByteArray output = ffmpeg.readAllStandardOutput();
+    return output.size() > 0;
+
+}
+void VideoFrameSource_sV::locateFFmpeg()
+{
+    QString path = m_settings.value("binaries/ffmpeg", "ffmpeg").toString();
+    if (!testFfmpegExecutable(path)) {
+        path = "avconv";
+        if (!testFfmpegExecutable(path)) {
+            throw FrameSourceError(QString("ffmpeg/avconv executable not found! Cannot load video."
+                                           "\n(It is also possible that it took a little long to respond "
+                                           "due to high workload, so you might want to try again.)"));
+        }
+        qDebug() << "Changing from ffmpeg to avconv";
+        m_settings.setValue("binaries/ffmpeg", "avconv");
+        m_settings.sync();
+    }
 }
 
 void VideoFrameSource_sV::slotUpdateProjectDir()
@@ -147,7 +165,7 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
         args << m_dirFramesOrig.absoluteFilePath("frame%05d.png");
     }
 
-    process->start("ffmpeg", args);
+    process->start(m_settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
     qDebug() << process->readAllStandardOutput();
     qDebug() << process->readAllStandardError();
 }

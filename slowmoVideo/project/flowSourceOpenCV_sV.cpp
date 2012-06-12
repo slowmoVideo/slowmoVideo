@@ -44,16 +44,6 @@ void FlowSourceOpenCV_sV::createDirectories()
 
 
 
-
-void help()
-{
-    std::cout <<
-            "\nThis program demonstrates dense optical flow algorithm by Gunnar Farneback\n"
-            "Mainly the function: calcOpticalFlowFarneback()\n"
-            "Call:\n"
-            "./fback\n"
-            "This reads from video camera 0\n" << std::endl;
-}
 void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
                     double, const Scalar& color, std::string flowname )
 {
@@ -134,7 +124,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     if (!QFile(flowFileName).exists()) {
 
         Mat prevgray, gray, flow, cflow;
-        namedWindow("flow", 1);
+//        namedWindow("flow", 1);
 
         prevgray = imread(project()->frameSource()->framePath(leftFrame, frameSize).toStdString(), 0);
         gray = imread(project()->frameSource()->framePath(rightFrame, frameSize).toStdString(), 0);

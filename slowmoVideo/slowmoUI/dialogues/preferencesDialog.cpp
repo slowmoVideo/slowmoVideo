@@ -12,6 +12,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
+    ui->ffmpeg->setText(m_settings.value("binaries/ffmpeg", "ffmpeg").toString());
 
 #if QT_VERSION >= 0x040700
     ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0, QApplication::UnicodeUTF8));
@@ -70,6 +71,10 @@ void PreferencesDialog::accept()
 
 void PreferencesDialog::slotUpdateFlowMethod()
 {
+}
+void PreferencesDialog::slotUpdateFfmpeg()
+{
+    m_settings.setValue("binaries/ffmpeg", ui->ffmpeg->text());
 }
 
 void PreferencesDialog::slotValidateFlowBinary()
