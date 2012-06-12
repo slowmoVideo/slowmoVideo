@@ -21,6 +21,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 
+
 ## Find packages ##
 
 set(CMAKE_MODULE_PATH
@@ -40,6 +41,9 @@ find_package(FFMPEG)
 include_directories(${FFMPEG_INCLUDE_DIR})
 link_directories(${FFMPEG_LIBRARY_DIR})
 
+find_package(OpenCV)
+include_directories(${OPENCV_INCLUDE_DIRS})
+
 
 set(BUILD_SLOWMO "NO")
 if(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
@@ -50,16 +54,21 @@ message("==================================================")
 message("* slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
 message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.)")
 if(NOT QT_LIBRARIES)
-message("* Qt4 libraries could not be found.")
+message("x Qt4 libraries could not be found.")
 endif(NOT QT_LIBRARIES)
 if(NOT FFMPEG_FOUND)
-message("* ffmpeg libraries could not be found.")
+message("x ffmpeg libraries could not be found.")
 else(NOT FFMPEG_FOUND)
 message("* ffmpeg found at ${FFMPEG_LIBRARY_DIR}")
 endif(NOT FFMPEG_FOUND)
 if(NOT FFMPEG_SWSCALE_FOUND)
-message("* libswscale could not be found.")
+message("x libswscale could not be found.")
 endif(NOT FFMPEG_SWSCALE_FOUND)
+if(NOT OpenCV_VERSION)
+message("x OpenCV could not be found.")
+else(NOT OpenCV_VERSION)
+message("* OpenCV ${OpenCV_VERSION} found at ${OPENCV_LIB_DIR}.")
+endif(NOT OpenCV_VERSION)
 message("* slowmoVideo will be built: ${BUILD_SLOWMO}")
 message("==================================================")
 

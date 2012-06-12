@@ -108,7 +108,7 @@ public:
 
     QImage render(qreal outTime, RenderPreferences_sV prefs);
 
-    FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) const throw(FlowBuildingError);
+    FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) throw(FlowBuildingError);
 
     /**
       \brief Searches for objects near the given \c pos.
@@ -138,6 +138,11 @@ private:
     qreal sourceTimeToFrame(qreal time) const;
 
     void init();
+
+private:
+    /// Count how many times V3D failed, after a certain limit we assume the user does not have an nVidia card
+    /// and constantly switch to OpenCV
+    int m_v3dFailCounter;
 
 };
 

@@ -311,7 +311,7 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Cannot read file " << filename;
-        throw Error_sV(QString("Cannot read from file %1!").arg(filename));
+        throw Error_sV(QString("Cannot read from file %1. (Opening in read-only mode failed.)").arg(filename));
     } else {
 
         QXmlStreamReader xml;
