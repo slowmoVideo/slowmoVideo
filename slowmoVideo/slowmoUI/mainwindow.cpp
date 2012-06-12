@@ -324,14 +324,12 @@ void MainWindow::loadProject(Project_sV *project)
 }
 void MainWindow::slotLoadProjectDialog()
 {
-    QFileDialog dialog(this, "Load project");
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    dialog.setDefaultSuffix("sVproj");
-    dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setDirectory(m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString());
-    if (dialog.exec() == QDialog::Accepted) {
-        loadProject(QFileInfo(dialog.selectedFiles().at(0)).absolutePath());
+    QString dir = m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString();
+    QString file = QFileDialog::getOpenFileName(this, "Load Project", dir, "slowmoVideo projects (*.sVproj)");
+
+    if (!file.isEmpty()) {
+        qDebug() << file;
+        loadProject(QFileInfo(file).absoluteFilePath());
     }
 }
 
