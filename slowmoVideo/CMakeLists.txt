@@ -1,6 +1,6 @@
-# Docs: http://www.cmake.org/cmake/help/cmake-2-8-docs.html
+# Docs: http://www.cmake.org/cmake/help/cmake2.6docs.html
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 project(slowmoVideo)
 
