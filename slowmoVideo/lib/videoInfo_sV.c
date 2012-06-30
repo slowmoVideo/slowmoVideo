@@ -73,7 +73,9 @@ VideoInfoSV getInfo(const char filename[])
             info.frameRateDen = fps.den;
             info.width = pCodecContext->width;
             info.height = pCodecContext->height;
-            info.framesCount = pFormatContext->streams[i]->nb_frames;
+            // info.framesCount = pFormatContext->streams[i]->nb_frames; // Doesn't work for each format.
+            AVRational tb = pFormatContext->streams[i]->time_base; // Use the precise timebase of this stream.
+            info.framesCount = (long)( (double)fps.num/fps.den * pFormatContext->streams[i]->duration * (double)tb.num/tb.den ); // Works really good for any type of video.
             info.streamsCount++;
             printf("Total frames: %ld (Length: %f s)\n", info.framesCount, info.framesCount/((float)fps.num/fps.den));
         }
