@@ -98,6 +98,8 @@ public:
     static QColor outTagCol;
     static QColor handleLineCol;
     static QColor backgroundCol;
+    static QColor shutterRegionCol;
+    static QColor shutterRegionBoundCol;
 
     void load(Project_sV *project);
 

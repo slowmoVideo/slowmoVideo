@@ -15,6 +15,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "tagAddDialog.h"
 #include "shutterFunctionDialog.h"
+#include "project/shutterFunction_sV.h"
+#include "project/shutterFunctionList_sV.h"
+#include "lib/bezierTools_sV.h"
 
 #include "project/projectPreferences_sV.h"
 #include "project/abstractFrameSource_sV.h"
@@ -60,6 +63,8 @@ QColor Canvas::handleLineCol(255, 255, 255, 128);
 QColor Canvas::srcTagCol    ( 30, 245,   0, 150);
 QColor Canvas::outTagCol    ( 30, 245,   0, 150);
 QColor Canvas::backgroundCol( 34,  34,  34);
+QColor Canvas::shutterRegionCol(175, 25, 75, 100);
+QColor Canvas::shutterRegionBoundCol(240, 0, 60, 150);
 
 /// \todo move with MMB
 /// \todo replay curve
@@ -358,6 +363,66 @@ void Canvas::paintEvent(QPaintEvent *)
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
+
+    // Shutter Lengths (for motion blur)
+    davinci.setRenderHint(QPainter::Antialiasing, false);
+    const Node_sV *leftNode = NULL;
+    const Node_sV *rightNode = NULL;
+    const float outFps = m_project->preferences()->canvas_xAxisFPS().fps();
+    const float sourceFps = m_project->frameSource()->fps()->fps();
+    for (int i = 0; i < m_nodes->size(); i++) {
+        rightNode = &m_nodes->at(i);
+        QPoint p = convertTimeToCanvas(*rightNode);
+
+        if (leftNode != NULL) {
+            ShutterFunction_sV *shutterFunction = m_project->shutterFunctions()->function(leftNode->shutterFunctionID());
+            if (shutterFunction != NULL) {
+
+                QPoint pp = convertTimeToCanvas(*leftNode);
+                for (int x = pp.x(); x < p.x(); x++) {
+                    qreal progressOnCurve = ((qreal)x - pp.x()) / (p.x() - pp.x());
+
+                    QPointF time;
+                    if (leftNode->rightCurveType() == CurveType_Bezier && rightNode->leftCurveType() == CurveType_Bezier) {
+                        time = BezierTools_sV::interpolateAtX(convertCanvasToTime(QPoint(x, 0)).x(),
+                                    leftNode->toQPointF(), leftNode->toQPointF()+leftNode->rightNodeHandle(),
+                                    rightNode->toQPointF()+rightNode->leftNodeHandle(), rightNode->toQPointF());
+                    } else {
+                        time = leftNode->toQPointF() + (rightNode->toQPointF() - leftNode->toQPointF()) * progressOnCurve;
+                    }
+
+                    qreal outTime = time.x();
+                    qreal sourceTime = time.y();
+                    qreal sourceFrame = sourceFrame * sourceFps;
+
+                    float dy;
+                    if (outTime + 1/outFps <= m_nodes->endTime()) {
+                        dy = m_nodes->sourceTime(outTime + 1/outFps) - sourceTime;
+                    } else {
+                        dy = sourceTime - m_nodes->sourceTime(outTime - 1/outFps);
+                    }
+                    float shutter = shutterFunction->evaluate(
+                        progressOnCurve, // x on [0,1]
+                        outTime, // t
+                        outFps, // FPS
+                        sourceFrame, // y
+                        dy // dy to next frame
+                        );
+                    QPoint sourceShutterTimeStart = QPoint(x, convertTimeToCanvas(time).y());
+                    QPoint sourceShutterTimeEnd = QPoint(x, convertTimeToCanvas(time + QPointF(0, shutter * outFps/sourceFps)).y());
+                    if (shutter > 0) {
+                        davinci.setPen(shutterRegionCol);
+                        davinci.drawLine(sourceShutterTimeStart, sourceShutterTimeEnd);
+                    }
+                    davinci.setPen(shutterRegionBoundCol);
+                    davinci.drawPoint(x, sourceShutterTimeEnd.y() - 1);
+                }
+
+            }
+        }
+
+        leftNode = &m_nodes->at(i);
+    }
 
     // Tags
     davinci.setRenderHint(QPainter::Antialiasing, false);
