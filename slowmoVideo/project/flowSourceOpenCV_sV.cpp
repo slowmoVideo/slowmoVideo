@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include <QtCore/QTime>
 #include <iostream>
 #include <fstream>
 using namespace cv;
@@ -123,6 +124,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
 
+        QTime time;
+        time.start();
+
         Mat prevgray, gray, flow, cflow;
 //        namedWindow("flow", 1);
 
@@ -139,7 +143,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                 const float pyrScale = 0.5;
                 const float levels = 3;
                 const float winsize = 15;
-                const float iterations = 3;
+                const float iterations = 8;
                 const float polyN = 5;
                 const float polySigma = 1.2;
                 const int flags = 0;
@@ -163,6 +167,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                 //imwrite(argv[4],cflow);
             }
         }
+
+        qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
+
     } else {
         qDebug().nospace() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame << ": " << flowFileName;
     }

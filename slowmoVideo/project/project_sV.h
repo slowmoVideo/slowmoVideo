@@ -118,6 +118,10 @@ public:
     QList<NodeList_sV::PointerWithDistance> objectsNear(QPointF pos, qreal tmaxdist) const;
 
 
+public:
+    /// Reload the flow source in case the user changed the default (preferred) method.
+    void reloadFlowSource();
+
 
 
 private:
