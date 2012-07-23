@@ -85,7 +85,9 @@ private:
     bool rebuildRequired(const FrameSize frameSize);
 
     void locateFFmpeg();
-    bool testFfmpegExecutable(QString path);
+
+public:
+    static bool testFfmpegExecutable(QString path);
 
 signals:
     /** Emitted when the task for extracting original-sized images has finished (or has been terminated) */

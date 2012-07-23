@@ -69,12 +69,14 @@ public:
     /// Code used by this function
     QString function() const;
     /**
-      Evaluates the function with the given parameters.
+      Evaluates the function with the given parameters. The returned value is
+      the desired shutter duration in seconds.
       \param x x location between two nodes, scaled to <pre>[0,1]</pre>
       \param t Output time
-      \param fps Frames per second
+      \param fps Output frames per second
       \param y Source frame at position x
       \param dy y change to the next frame
+      \return Shutter duration in seconds
       */
     float evaluate(const float x, const float t, const float fps, const float y, const float dy);
 

@@ -59,7 +59,7 @@ VideoFrameSource_sV::~VideoFrameSource_sV()
 
 bool VideoFrameSource_sV::testFfmpegExecutable(QString path)
 {
-    QProcess ffmpeg(this);
+    QProcess ffmpeg(NULL);
     QStringList args;
     args << "-version";
     ffmpeg.start(path, args);
@@ -165,6 +165,16 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
         args << m_dirFramesOrig.absoluteFilePath("frame%05d.png");
     }
 
+    qDebug() << "Extracting frames with " << m_settings.value("binaries/ffmpeg", "ffmpeg").toString() << args;
+    {
+        QStringList a2;
+        a2 << "-version";
+        process->start(m_settings.value("binaries/ffmpeg");//, "ffmpeg").toString(), a2);
+        qDebug() << process->readAllStandardOutput();
+        qDebug() << process->readAllStandardError();
+        process->terminate();
+        process->
+    }
     process->start(m_settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
     qDebug() << process->readAllStandardOutput();
     qDebug() << process->readAllStandardError();
