@@ -166,15 +166,14 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     }
 
     qDebug() << "Extracting frames with " << m_settings.value("binaries/ffmpeg", "ffmpeg").toString() << args;
-    {
-        QStringList a2;
-        a2 << "-version";
-        process->start(m_settings.value("binaries/ffmpeg");//, "ffmpeg").toString(), a2);
-        qDebug() << process->readAllStandardOutput();
-        qDebug() << process->readAllStandardError();
-        process->terminate();
-        process->
-    }
+//    {
+//        QStringList a2;
+//        a2 << "-version";
+//        process->start(m_settings.value("binaries/ffmpeg").toString());//, "ffmpeg").toString(), a2);
+//        qDebug() << process->readAllStandardOutput();
+//        qDebug() << process->readAllStandardError();
+//        process->terminate();
+//    }
     process->start(m_settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
     qDebug() << process->readAllStandardOutput();
     qDebug() << process->readAllStandardError();
