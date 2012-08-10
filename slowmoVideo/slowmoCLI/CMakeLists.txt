@@ -11,10 +11,10 @@ set(SOURCES_VINFO
 )
 
 add_executable(slowmoInterpolate ${SOURCES_MAIN})
-target_link_libraries(slowmoInterpolate sV sVflow ${QT_LIBRARIES})
+target_link_libraries(slowmoInterpolate sV sVflow ${QT_LIBRARIES} ${ADDITIONAL_LIBS})
 
-add_executable(videoInfo ${SOURCES_VINFO})
-target_link_libraries(videoInfo sVinfo)
+#add_executable(videoInfo ${SOURCES_VINFO})
+#target_link_libraries(videoInfo sVinfo ${ADDITIONAL_LIBS})
 
 install(TARGETS slowmoInterpolate DESTINATION bin)
-install(TARGETS videoInfo DESTINATION bin)
+#install(TARGETS videoInfo DESTINATION bin)

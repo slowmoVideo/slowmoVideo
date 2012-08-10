@@ -13,14 +13,25 @@ set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
 
 
-## Compiler options ##
+### Compiler options ###
 
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
+if(CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+endif(CMAKE_TOOLCHAIN_FILE)
 
+
+### CMake Configuration ###
+set(ADDITIONAL_LIBS "")
+if(MSYS)
+  message(STATUS "MSYS system detected.")
+  include("${PROJECT_SOURCE_DIR}/cmake/MingwCrossEnv.cmake")
+endif(MSYS)
 
 ## Find packages ##
 
@@ -46,9 +57,16 @@ include_directories(${OPENCV_INCLUDE_DIRS})
 
 
 set(BUILD_SLOWMO "NO")
-if(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
+if(QT_LIBRARIES AND FFMPEG_FOUND)
 set(BUILD_SLOWMO "YES")
-endif(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
+endif(QT_LIBRARIES AND FFMPEG_FOUND)
+if(NOT FFMPEG_SWSCALE_FOUND)
+  if(CMAKE_TOOLCHAIN_FILE)
+
+  else(CMAKE_TOOLCHAIN_FILE)
+  set(BUILD_SLOWMO "NO")
+  endif(CMAKE_TOOLCHAIN_FILE)
+endif(NOT FFMPEG_SWSCALE_FOUND)
 
 message("==================================================")
 message("* slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
