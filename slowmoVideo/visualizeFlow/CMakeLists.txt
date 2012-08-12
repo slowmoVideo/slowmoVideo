@@ -6,6 +6,6 @@ set(SRCS
 )
 
 add_executable(visualizeFlow ${SRCS})
-target_link_libraries(visualizeFlow sVvis ${QT_LIBRARIES})
+target_link_libraries(visualizeFlow sVvis ${QT_LIBRARIES} ${ADDITIONAL_LIBS})
 
 install(TARGETS visualizeFlow DESTINATION bin)

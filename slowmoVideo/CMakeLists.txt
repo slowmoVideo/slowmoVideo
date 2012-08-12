@@ -48,7 +48,13 @@ find_package(Qt4)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
-find_package(FFMPEG)
+
+if(NOT MSYS)
+	find_package(FFMPEG)
+else(NOT MSYS)
+    # Handled by MingwCrossEnv.cmake to avoid errors like:
+    # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
+endif(NOT MSYS)
 include_directories(${FFMPEG_INCLUDE_DIR})
 link_directories(${FFMPEG_LIBRARY_DIR})
 
