@@ -1,5 +1,5 @@
 
 add_executable(slowmoInfo slowmoInfo.cpp)
-target_link_libraries(slowmoInfo sV ${QT_LIBRARIES} ${ADDITIONAL_LIBS})
+target_link_libraries(slowmoInfo sV ${EXTERNAL_LIBS})
 
 install(TARGETS slowmoInfo DESTINATION "bin")

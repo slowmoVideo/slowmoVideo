@@ -26,4 +26,4 @@ set(SRCS_MOC
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 add_executable(UnitTests ${SRCS} ${MOC_OUT})
-target_link_libraries(UnitTests sVproj ${QT_LIBRARIES} ${ADDITIONAL_LIBS})
+target_link_libraries(UnitTests sVproj ${EXTERNAL_LIBS})

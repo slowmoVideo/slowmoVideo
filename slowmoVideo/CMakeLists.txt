@@ -33,7 +33,8 @@ if(MSYS)
   include("${PROJECT_SOURCE_DIR}/cmake/MingwCrossEnv.cmake")
 endif(MSYS)
 
-## Find packages ##
+
+### Find packages ###
 
 set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
@@ -62,6 +63,16 @@ find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
 
+
+### Set up libraries ###
+if(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS_OPT} ${OpenCV_EXTRA_LIBS_OPT} ${ADDITIONAL_LIBS})
+else(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS} ${ADDITIONAL_LIBS})
+endif(MSYS)
+
+
+### Information output
 set(BUILD_SLOWMO "NO")
 if(QT_LIBRARIES AND FFMPEG_FOUND)
 set(BUILD_SLOWMO "YES")
@@ -100,6 +111,9 @@ message("==================================================")
 if(NOT BUILD_SLOWMO)
 message(FATAL_ERROR "Cannot build slowmoVideo, please install the missing packages first.")
 endif(NOT BUILD_SLOWMO)
+
+
+
 
 
 ## Include projects to build ##
