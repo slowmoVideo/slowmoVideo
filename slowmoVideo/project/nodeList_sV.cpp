@@ -52,6 +52,12 @@ qreal NodeList_sV::endTime() const
         return 0;
     }
 }
+bool NodeList_sV::isInsideCurve(qreal targetTime) const
+{
+    return m_list.size() >= 2  &&
+            startTime() <= targetTime &&
+            targetTime <= endTime();
+}
 qreal NodeList_sV::totalTime() const
 {
     return endTime()-startTime();

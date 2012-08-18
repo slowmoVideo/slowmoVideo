@@ -29,6 +29,7 @@ class Project_sV;
 /**
   \brief Uses frames from a video file
   \todo Use libav directly for frame extraction? (not the ffmpeg command)
+  \todo Extract full frames only before rendering, only used ones
  */
 class VideoFrameSource_sV : public AbstractFrameSource_sV
 {

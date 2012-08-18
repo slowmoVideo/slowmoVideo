@@ -335,18 +335,20 @@ void Canvas::paintEvent(QPaintEvent *)
     // Frames/seconds
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_states.prevMousePos)) {
-        QString timeText;
+        QString timeText, speedText;
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
         int posX;
 
         davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
         timeText = CanvasTools::outputTimeLabel(this, time);
+        speedText = CanvasTools::outputSpeedLabel(time, m_project);
         // Ensure that the text does not go over the right border
         posX = m_states.prevMousePos.x() - 20;
         if (posX > width()-m_distLeft-40) {
             posX = width()-m_distLeft-40;
         }
         davinci.drawText(posX-180, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignRight, timeText);
+        davinci.drawText(posX+ 40, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignLeft, speedText);
         davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")
