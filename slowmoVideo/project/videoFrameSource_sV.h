@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "abstractFrameSource_sV.h"
 #include "../lib/defs_sV.hpp"
+#include "../lib/avconvInfo_sV.h"
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
@@ -64,6 +65,7 @@ private:
     QDir m_dirFramesSmall;
     QDir m_dirFramesOrig;
     QSettings m_settings;
+    AvconvInfo m_avconvInfo;
 
     VideoInfoSV *m_videoInfo;
     Fps_sV m_fps;

@@ -57,32 +57,6 @@ VideoFrameSource_sV::~VideoFrameSource_sV()
     delete m_videoInfo;
 }
 
-bool VideoFrameSource_sV::testFfmpegExecutable(QString path)
-{
-    QProcess ffmpeg(NULL);
-    QStringList args;
-    args << "-version";
-    ffmpeg.start(path, args);
-    ffmpeg.waitForFinished(2000);
-    QByteArray output = ffmpeg.readAllStandardOutput();
-    return output.size() > 0;
-
-}
-void VideoFrameSource_sV::locateFFmpeg()
-{
-    QString path = m_settings.value("binaries/ffmpeg", "ffmpeg").toString();
-    if (!testFfmpegExecutable(path)) {
-        path = "avconv";
-        if (!testFfmpegExecutable(path)) {
-            throw FrameSourceError(QString("ffmpeg/avconv executable not found! Cannot load video."
-                                           "\n(It is also possible that it took a little long to respond "
-                                           "due to high workload, so you might want to try again.)"));
-        }
-        qDebug() << "Changing from ffmpeg to avconv";
-        m_settings.setValue("binaries/ffmpeg", "avconv");
-        m_settings.sync();
-    }
-}
 
 void VideoFrameSource_sV::slotUpdateProjectDir()
 {
@@ -149,7 +123,7 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     QStringList args;
     args << "-i" << m_inFile.fileName();
     args << "-f" << "image2";
-    args << "-sameq";
+    args << m_avconvInfo.optionSameQuant();
 
     if (frameSize == FrameSize_Small) {
         int w = m_videoInfo->width;
@@ -190,6 +164,18 @@ bool VideoFrameSource_sV::rebuildRequired(const FrameSize frameSize)
     needsRebuild |= frame.isNull();
 
     return needsRebuild;
+}
+
+void VideoFrameSource_sV::locateFFmpeg()
+{
+    if (m_avconvInfo.locate(m_settings.value("binaries/ffmpeg", "").toString())) {
+        m_settings.setValue("binaries/ffmpeg", m_avconvInfo.executablePath());
+        m_settings.sync();
+    } else {
+        throw FrameSourceError(QString("ffmpeg/avconv executable not found! Cannot load video."
+                                       "\n(It is also possible that it took a little long to respond "
+                                       "due to high workload, so you might want to try again.)"));
+    }
 }
 
 void VideoFrameSource_sV::slotExtractSmallFrames()
