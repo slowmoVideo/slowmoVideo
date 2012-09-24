@@ -1,0 +1,7 @@
+
+* UI [0/1]
+- [ ] Always display some units (user feedback when scrolling)
+
+* File loading [0/2]
+- [ ] Skip defect image files
+- [ ] Project loading speed for big files
