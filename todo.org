@@ -1,7 +1,13 @@
+#+STARTUP: showall
+#+STARTUP: nohideblocks
+
 
 * UI [0/1]
 - [ ] Always display some units (user feedback when scrolling)
+- [ ] Customize grid: Replay speed (e.g. 1x, 0.5x, etc.)
+- [ ] Help texts
 
 * File loading [0/2]
 - [ ] Skip defect image files
+  - [ ] Maybe: Run a checker thread (image size, validity) in the background
 - [ ] Project loading speed for big files
