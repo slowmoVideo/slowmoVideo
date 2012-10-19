@@ -11,8 +11,13 @@
 #include <GL/glew.h>
 #ifdef __APPLE__
 #include <glut.h>
-#else
+#elseif defined(_WIN32)
 #include <GL/glut.h>
+#else
+#include<X11/X.h>
+#include<X11/Xlib.h>
+#include<GL/gl.h>
+#include<GL/glx.h>
 #endif
 
 #include "flowRW_sV.h"
@@ -191,8 +196,8 @@ int main( int argc, char** argv)
    }
 #endif
 
-    if ((argc-1) == 1) {
-        if (strcmp(argv[1], "--identify") == 0) {
+   if ((argc-1) == 1) {
+     if (strcmp(argv[1], "--identify") == 0) {
             std::cout << "flowBuilder v" << VERSION << std::endl;
             return 0;
         }
@@ -226,10 +231,43 @@ int main( int argc, char** argv)
 
    {
      ScopedTimer st("initialization GL"); 
-   
+#if 1
+     Display *dpy = XOpenDisplay(0); 
+     if (!dpy) {
+       std::cerr << "ERROR: could not open display\n"; 
+       exit(1); 
+     }
+     GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None, 0 };
+     XVisualInfo *vi = glXChooseVisual(dpy,0,att);
+     if (!vi) {
+       std::cerr << "ERROR: could not choose a GLX visual\n"; 
+       exit(1); 
+     }
+
+     Colormap cmap = XCreateColormap(dpy, DefaultRootWindow(dpy), vi->visual, AllocNone);
+     XSetWindowAttributes wattr; 
+     wattr.colormap = cmap; 
+     
+     Window win = XCreateWindow(dpy, DefaultRootWindow(dpy), 0, 0, 1, 1, 0, vi->depth, InputOutput, vi->visual,CWColormap, &wattr);
+     if (win == None) {
+       std::cerr << "ERROR: could not create window\n"; 
+       exit(1); 
+     }
+     GLXContext ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
+     if (!ctx) {
+       std::cerr << "ERROR: could not create GL context\n"; 
+       exit(1); 
+     }
+
+     if (!glXMakeCurrent(dpy,win,ctx)) {
+       std::cerr << "ERROR: could not make context current\n"; 
+       exit(1);     
+     }
+#else
      glutInitWindowPosition(0, 0);
      glutInitWindowSize(100, 100);
      glutInit(&argc, argv);
+#endif
    }
 
 #if !defined(USE_LAB_COLORSPACE)
@@ -267,6 +305,9 @@ int main( int argc, char** argv)
    std::cout << "minB = " << minB << " maxB = " << maxB << std::endl;
 #endif
 
+#if 1
+   drawscene(); 
+#else
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
    if (!glutCreateWindow("GPU TV-L1 Optic Flow")) {
@@ -276,6 +317,7 @@ int main( int argc, char** argv)
 
    glutDisplayFunc(drawscene);
    glutMainLoop();
+#endif
 
    return 0;
 }
