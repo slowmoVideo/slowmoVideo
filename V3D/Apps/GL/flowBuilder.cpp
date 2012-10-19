@@ -3,7 +3,7 @@
 #include "Base/v3d_image.h"
 #include "Base/v3d_imageprocessing.h"
 #include "Base/v3d_timer.h"
-#include "Base/v3d_utilities.h"
+
 #include "GL/v3d_gpucolorflow.h"
 
 #include <iostream>
@@ -24,7 +24,6 @@ using namespace V3D_GPU;
 #define VERSION "1.01"
 
 //#define USE_LAB_COLORSPACE 1
-#define USE_NEW_TVL1_FLOW 1
 
 int const nLevels = 6;  // Must be large enough for big images. Number of pyramid levels.
 int const startLevel = 0;
@@ -41,8 +40,8 @@ float lambda = 1.0f;
 float const tau   = 0.249f;
 float const theta = 0.1f;
 typedef TVL1_ColorFlowEstimator_QR TVL1_FlowEstimator;
-TVL1_FlowEstimator::Config flowCfg(tau, theta);
 
+TVL1_FlowEstimator::Config flowCfg(tau, theta);
 TVL1_FlowEstimator * flowEstimator;
 
 #if !defined(USE_LAB_COLORSPACE)
@@ -56,6 +55,7 @@ PyramidWithDerivativesCreator leftPyrG(false, pyrTexSpec), rightPyrG(false, pyrT
 PyramidWithDerivativesCreator leftPyrB(false, pyrTexSpec), rightPyrB(false, pyrTexSpec);
 #endif
 
+#ifdef USE_LAB_COLORSPACE
 inline void convertRGBImageToCIELab(Image<unsigned char> const& src, Image<float>& dst)
 {
   int const w = src.width();
@@ -81,96 +81,106 @@ inline void convertRGBImageToCIELab(Image<unsigned char> const& src, Image<float
         dst(x, y, 2) = lab[2];
      }
 } // end convertRGBImageToCIELab()
-
-
-void drawscene()
-   {
-      int const w = leftImage.width();
-      int const h = leftImage.height();
-
-//     std::cout << "Start initialization..." << std::endl;
-     glewInit();
-     Cg_ProgramBase::initializeCg();
-
-     flowEstimator = new TVL1_FlowEstimator(nLevels);
-     flowEstimator->configurePrecision(false, false, false);
-     flowEstimator->allocate(w, h);
-     flowEstimator->setLambda(lambda);
-     flowEstimator->configure(flowCfg);
-     flowEstimator->setInnerIterations(nIterations);
-     flowEstimator->setOuterIterations(nOuterIterations);
-     flowEstimator->setStartLevel(startLevel);
-
-     leftPyrR.allocate(w, h, nLevels);
-     rightPyrR.allocate(w, h, nLevels);
-     leftPyrG.allocate(w, h, nLevels);
-     rightPyrG.allocate(w, h, nLevels);
-     leftPyrB.allocate(w, h, nLevels);
-     rightPyrB.allocate(w, h, nLevels);
-//     std::cout << "done." << std::endl;
-
-#if !defined(USE_LAB_COLORSPACE)
-      if (leftImage.numChannels() == 3) {
-         leftPyrR.buildPyramidForGrayscaleImage(leftImage.begin(0));
-         leftPyrG.buildPyramidForGrayscaleImage(leftImage.begin(1));
-         leftPyrB.buildPyramidForGrayscaleImage(leftImage.begin(2));
-      } else {
-         leftPyrR.buildPyramidForGrayscaleImage(leftImage.begin(0));
-         leftPyrG.buildPyramidForGrayscaleImage(leftImage.begin(0));
-         leftPyrB.buildPyramidForGrayscaleImage(leftImage.begin(0));
-      }
-      if (rightImage.numChannels() == 3) {
-         rightPyrR.buildPyramidForGrayscaleImage(rightImage.begin(0));
-         rightPyrG.buildPyramidForGrayscaleImage(rightImage.begin(1));
-         rightPyrB.buildPyramidForGrayscaleImage(rightImage.begin(2));
-      } else {
-         rightPyrR.buildPyramidForGrayscaleImage(rightImage.begin(0));
-         rightPyrG.buildPyramidForGrayscaleImage(rightImage.begin(0));
-         rightPyrB.buildPyramidForGrayscaleImage(rightImage.begin(0));
-      }
-#else
-      leftPyrR.buildPyramidForGrayscaleImage(leftImageLab.begin(0));
-      leftPyrG.buildPyramidForGrayscaleImage(leftImageLab.begin(1));
-      leftPyrB.buildPyramidForGrayscaleImage(leftImageLab.begin(2));
-
-      rightPyrR.buildPyramidForGrayscaleImage(rightImageLab.begin(0));
-      rightPyrG.buildPyramidForGrayscaleImage(rightImageLab.begin(1));
-      rightPyrB.buildPyramidForGrayscaleImage(rightImageLab.begin(2));
 #endif
 
-      unsigned int leftPyrTexIDs[3];
-      unsigned int rightPyrTexIDs[3];
+void drawscene()
+{
+  int const w = leftImage.width();
+  int const h = leftImage.height();
+   
+  {
+    ScopedTimer st("glew/cg init"); 
+    glewInit();
+    Cg_ProgramBase::initializeCg();
+  }
+  {
+    ScopedTimer st("initialization flow"); 
+	
+    flowEstimator = new TVL1_FlowEstimator(nLevels);
+    flowEstimator->configurePrecision(false, false, false);
+    flowEstimator->allocate(w, h);
+    flowEstimator->setLambda(lambda);
+    flowEstimator->configure(flowCfg);
+    flowEstimator->setInnerIterations(nIterations);
+    flowEstimator->setOuterIterations(nOuterIterations);
+    flowEstimator->setStartLevel(startLevel);
+  }
+  {
+    ScopedTimer st("allocating pyramids"); 
 
-      leftPyrTexIDs[0] = leftPyrR.textureID();
-      leftPyrTexIDs[1] = leftPyrG.textureID();
-      leftPyrTexIDs[2] = leftPyrB.textureID();
-      rightPyrTexIDs[0] = rightPyrR.textureID();
-      rightPyrTexIDs[1] = rightPyrG.textureID();
-      rightPyrTexIDs[2] = rightPyrB.textureID();
+    leftPyrR.allocate(w, h, nLevels);
+    rightPyrR.allocate(w, h, nLevels);
+    leftPyrG.allocate(w, h, nLevels);
+    rightPyrG.allocate(w, h, nLevels);
+    leftPyrB.allocate(w, h, nLevels);
+    rightPyrB.allocate(w, h, nLevels);
+  }
 
-      flowEstimator->run(leftPyrTexIDs, rightPyrTexIDs);
+  unsigned int leftPyrTexIDs[3];
+  unsigned int rightPyrTexIDs[3];
 
-      warpImageWithFlowField(flowEstimator->getFlowFieldTextureID(),
-                             leftPyrG.textureID(), rightPyrG.textureID(), startLevel,
-                             *flowEstimator->getWarpedBuffer(1, startLevel));
+  {
+    ScopedTimer st("building pyramids"); 
+       
+#if !defined(USE_LAB_COLORSPACE)
+    if (leftImage.numChannels() == 3) {
+      leftPyrR.buildPyramidForGrayscaleImage(leftImage.begin(0));
+      leftPyrG.buildPyramidForGrayscaleImage(leftImage.begin(1));
+      leftPyrB.buildPyramidForGrayscaleImage(leftImage.begin(2));
+    } else {
+      leftPyrR.buildPyramidForGrayscaleImage(leftImage.begin(0));
+      leftPyrG.buildPyramidForGrayscaleImage(leftImage.begin(0));
+      leftPyrB.buildPyramidForGrayscaleImage(leftImage.begin(0));
+    }
+    if (rightImage.numChannels() == 3) {
+      rightPyrR.buildPyramidForGrayscaleImage(rightImage.begin(0));
+      rightPyrG.buildPyramidForGrayscaleImage(rightImage.begin(1));
+      rightPyrB.buildPyramidForGrayscaleImage(rightImage.begin(2));
+    } else {
+      rightPyrR.buildPyramidForGrayscaleImage(rightImage.begin(0));
+      rightPyrG.buildPyramidForGrayscaleImage(rightImage.begin(0));
+      rightPyrB.buildPyramidForGrayscaleImage(rightImage.begin(0));
+    }
+#else
+    leftPyrR.buildPyramidForGrayscaleImage(leftImageLab.begin(0));
+    leftPyrG.buildPyramidForGrayscaleImage(leftImageLab.begin(1));
+    leftPyrB.buildPyramidForGrayscaleImage(leftImageLab.begin(2));
+	
+    rightPyrR.buildPyramidForGrayscaleImage(rightImageLab.begin(0));
+    rightPyrG.buildPyramidForGrayscaleImage(rightImageLab.begin(1));
+    rightPyrB.buildPyramidForGrayscaleImage(rightImageLab.begin(2));
+#endif	
+	
+    leftPyrTexIDs[0] = leftPyrR.textureID();
+    leftPyrTexIDs[1] = leftPyrG.textureID();
+    leftPyrTexIDs[2] = leftPyrB.textureID();
+    rightPyrTexIDs[0] = rightPyrR.textureID();
+    rightPyrTexIDs[1] = rightPyrG.textureID();
+    rightPyrTexIDs[2] = rightPyrB.textureID();
+  }
+   
+  {
+    ScopedTimer st("flowEstimator"); 	
+    flowEstimator->run(leftPyrTexIDs, rightPyrTexIDs);
+  }
 
-
-      // Save the generated flow field
-      float *data = new float[3*leftImage.width()*leftImage.height()];
-
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, flowEstimator->getFlowFieldTextureID());
-//      glEnable(GL_TEXTURE_2D); // Not required for reading
-//      glReadPixels(0, 0, leftImage.width(), leftImage.height(), GL_RGB, GL_FLOAT, data); // Wrong, reads frame buffer
-      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, data);
-
-      FlowField_sV field(leftImage.width(), leftImage.height(), data, FlowField_sV::GLFormat_RGB);
-      FlowRW_sV::save(outputFile, &field);
-
-      delete[] data;
-
-      exit(0);
-   }
+  // Save the generated flow field
+  float *data = new float[2*leftImage.width()*leftImage.height()];	
+  {
+    ScopedTimer st("readPixels"); 
+    RTT_Buffer *buf = flowEstimator->getFlowBuffer(); 
+    buf->makeCurrent(); 
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glReadPixels(0,0,leftImage.width(), leftImage.height(), GL_RG, GL_FLOAT, data); 
+  }
+  
+  { 
+    ScopedTimer st("saving"); 
+    FlowField_sV field(leftImage.width(), leftImage.height(), data, FlowField_sV::GLFormat_RG);
+    FlowRW_sV::save(outputFile, &field);   
+  }
+  exit(0);
+}
 
 int main( int argc, char** argv)
 {
@@ -193,11 +203,15 @@ int main( int argc, char** argv)
                "[ <lambda=" << lambda << "> [<nIterations=" << nIterations << ">] ]" << std::endl;
        return -1;
    }
-
-   loadImageFile(argv[1], leftImage);
-   loadImageFile(argv[2], rightImage);
+   
+   {
+     ScopedTimer st("loading files"); 
+     loadImageFile(argv[1], leftImage);
+     loadImageFile(argv[2], rightImage);
+   }
+   
    outputFile = argv[3];
-
+	
    if ((argc-1) >= 4) {
        lambda = atof(argv[4]);
        if ((argc-1) >= 5) {
@@ -210,9 +224,13 @@ int main( int argc, char** argv)
         std::cout << "rightImage.numChannels() = " << rightImage.numChannels() << std::endl;
    }
 
-   glutInitWindowPosition(0, 0);
-   glutInitWindowSize(100, 100);
-   glutInit(&argc, argv);
+   {
+     ScopedTimer st("initialization GL"); 
+   
+     glutInitWindowPosition(0, 0);
+     glutInitWindowSize(100, 100);
+     glutInit(&argc, argv);
+   }
 
 #if !defined(USE_LAB_COLORSPACE)
    if (leftImage.numChannels() < 3 || rightImage.numChannels() < 3)

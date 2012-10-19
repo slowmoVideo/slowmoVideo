@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 2.6)
 project(slowmoVideo)
 
 
-
 # Installation prefix
 # Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
 get_filename_component(SV_INST_DIR "${slowmoVideo_SOURCE_DIR}/../install/" ABSOLUTE)
@@ -18,7 +17,7 @@ set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 if(CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")

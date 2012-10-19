@@ -26,7 +26,7 @@ class FlowField_sV
 {
 public:
     /** OpenGL format */
-    enum GLFormat { GLFormat_RGB };
+    enum GLFormat { GLFormat_RGB, GLFormat_RG };
 
     static float nullValue;
 

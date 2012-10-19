@@ -2,10 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 project(V3D)
 
-#set (CMAKE_BUILD_TYPE Release)
-set (CMAKE_BUILD_TYPE Debug)
-
-
+set (CMAKE_BUILD_TYPE Release)
+#set (CMAKE_BUILD_TYPE Debug)
 
 # Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
 get_filename_component(SV_INST_DIR "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
@@ -13,8 +11,7 @@ message(STATUS "Directory is ${SV_INST_DIR}")
 set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -DNDEBUG_GL -mtune=corei7")
 
 if(WIN32)
 set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
