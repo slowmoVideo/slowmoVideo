@@ -14,6 +14,7 @@
 #elseif defined(_WIN32)
 #include <GL/glut.h>
 #else
+#define USE_RAW_X11
 #include<X11/X.h>
 #include<X11/Xlib.h>
 #include<GL/gl.h>
@@ -231,12 +232,13 @@ int main( int argc, char** argv)
 
    {
      ScopedTimer st("initialization GL"); 
-#if 1
+#ifdef USE_RAW_X11
      Display *dpy = XOpenDisplay(0); 
      if (!dpy) {
        std::cerr << "ERROR: could not open display\n"; 
        exit(1); 
      }
+
      GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None, 0 };
      XVisualInfo *vi = glXChooseVisual(dpy,0,att);
      if (!vi) {
@@ -305,7 +307,7 @@ int main( int argc, char** argv)
    std::cout << "minB = " << minB << " maxB = " << maxB << std::endl;
 #endif
 
-#if 1
+#ifdef USE_RAW_X11
    drawscene(); 
 #else
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
