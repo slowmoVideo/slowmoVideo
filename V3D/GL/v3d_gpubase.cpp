@@ -25,7 +25,6 @@
 
 namespace
 {
-
    unsigned int const extPixelFormat[] = { 0, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA };
 
    inline int
@@ -328,7 +327,7 @@ namespace V3D_GPU
       _height = height;
 
       unsigned internalFormat = texSpec.getGLInternalFormat();
-      unsigned format = texSpec.isDepthTexture ? GL_DEPTH_COMPONENT : GL_RGB;
+      unsigned format = texSpec.isDepthTexture ? GL_DEPTH_COMPONENT : GL_RGBA;
       unsigned type = texSpec.isFloatTexture ? GL_FLOAT : GL_UNSIGNED_BYTE;
 
       glBindTexture(_textureTarget, _textureID);
@@ -428,7 +427,7 @@ namespace V3D_GPU
    ImageTexture2D::clear()
    {
       glBindTexture(_textureTarget, _textureID);
-      glTexImage2D(_textureTarget, 0, GL_RGB, 0, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+      glTexImage2D(_textureTarget, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
       checkGLErrorsHere1(_texName);
    }
 
@@ -661,6 +660,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
+      std::cout << "error checking\n"; 
       while ((errnum = glGetError()))
       {
          errstr = reinterpret_cast<const char *>(gluErrorString(errnum));
@@ -684,6 +684,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
+      std::cout << "error checking\n"; 
       while ((errnum = glGetError()))
       {
          hasError = true;
@@ -708,6 +709,7 @@ namespace V3D_GPU
       GLuint errnum;
       char const * errstr;
       bool hasError = false;
+      std::cout << "error checking\n"; 
       while ((errnum = glGetError()))
       {
          errstr = reinterpret_cast<const char *>(gluErrorString(errnum));

@@ -262,8 +262,8 @@ namespace V3D_GPU
             glClear(GL_COLOR_BUFFER_BIT);
          }
          else
-         {
-            //cout << "upsampleDisparities" << endl;
+	   {
+	     //cout << "upsampleDisparities" << endl;
             upsampleDisparities(_uBuffer2Pyramid[level+1]->textureID(),
                                 _pBuffer2Pyramid[level+1]->textureID(),
                                 _qBuffer2Pyramid[level+1]->textureID(),
@@ -558,7 +558,7 @@ namespace V3D_GPU
       _pBuffer1Pyramid.resize(_nLevels);
       _pBuffer2Pyramid.resize(_nLevels);
 
-      char const * uvTexSpec = _uvBufferHighPrecision ? "rgb=32f tex2D" : "rgb=16f tex2D";
+      char const * uvTexSpec = _uvBufferHighPrecision ? "rg=32f tex2D enableTextureRG" : "rg=16f tex2D enableTextureRG";
       char const * pTexSpec  = _pBufferHighPrecision ? "rgba=32f tex2D" : "rgba=16f tex2D";
 
       for (int level = 0; level < _nLevels; ++level)

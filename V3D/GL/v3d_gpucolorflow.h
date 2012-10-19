@@ -185,6 +185,11 @@ namespace V3D_GPU
          {
             return _uBuffer2Pyramid[_startLevel]->textureID();
          }
+     
+     RTT_Buffer *getFlowBuffer() 
+     { 
+       return _uBuffer2Pyramid[_startLevel];
+     }
 
       protected:
          Config _cfg;

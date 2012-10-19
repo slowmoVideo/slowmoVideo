@@ -19,48 +19,6 @@
 
 namespace V3D
 {
-
-   template <typename T>
-   inline void sort2(T& a, T&b)
-   {
-      if (a > b) std::swap(a, b);
-   }
-
-   template <typename T>
-   inline void sort3(T& a, T&b, T&c)
-   {
-      T A(a), B(b), C(c);
-
-      if (a < b)
-      {
-         if (c < a)
-         {
-            a = C; b = A; c = B;
-         }
-         else if (c < b)
-         {
-            a = A; b = C; c = B;
-         }
-         // Otherwise a < b < c and the orig. sequence is sorted.
-      }
-      else
-      {
-         // a >= b
-         if (c > a)
-         {
-            a = B; b = A; c = C;
-         }
-         else if (c < b)
-         {
-            a = C; b = B; c = A;
-         }
-         else
-         {
-            a = B; b = C; c = A;
-         }
-      }
-   } // end sort3()
-
 //----------------------------------------------------------------------
 
    inline Image<unsigned char>
@@ -169,53 +127,6 @@ namespace V3D
                std::swap(I(x, y, c), I(x, y1, c));
          }
    } // end flipImageUpsideDown()
-
-//----------------------------------------------------------------------
-
-   //! A helper struct to map arbitrary integers to a compressed range [0, N-1].
-   struct CompressedRangeMapping
-   {
-         CompressedRangeMapping()
-         { }
-
-         int addElement(int el)
-         {
-            using namespace std;
-
-            map<int, int>::const_iterator p = _fwdMap.find(el);
-            if (p != _fwdMap.end()) return p->second;
-            int const id = _bwdMap.size();
-            _fwdMap.insert(make_pair(el, id));
-            _bwdMap.push_back(el);
-            return id;
-         }
-
-         int toCompressed(int el) const
-         {
-            assert(_fwdMap.find(el) != _fwdMap.end());
-            return _fwdMap.find(el)->second;
-         }
-
-         int toOrig(int el) const
-         {
-            assert(el >= 0 && el < (int)_bwdMap.size());
-            return _bwdMap[el];
-         }
-
-         size_t size() const { return _bwdMap.size(); }
-
-         bool has(int el) const { return _fwdMap.find(el) != _fwdMap.end(); }
-
-         std::vector<int> const& bwdMap() const { return _bwdMap; }
-
-      protected:
-         std::map<int, int> _fwdMap;
-         std::vector<int>   _bwdMap;
-   }; // end struct CompressedRangeMapping
-
-   void getMinimumSpanningForest(std::vector<std::pair<int, int> > const& edges, std::vector<double> const& weights,
-                                 std::vector<std::pair<int, int> >& mstEdges, std::vector<std::set<int> >& connComponents);
-
 
 } // end namespace V3D
 

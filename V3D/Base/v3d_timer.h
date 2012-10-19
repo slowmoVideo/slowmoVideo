@@ -133,7 +133,9 @@ namespace V3D
        ~ScopedTimer()
        {
           _timer.stop();
+#ifndef NDEBUG
           _timer.print();
+#endif
        }
 
    private:
