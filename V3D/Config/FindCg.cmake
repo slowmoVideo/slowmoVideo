@@ -132,6 +132,7 @@ ELSE (APPLE)
       /usr/local/bin
       DOC "The Cg Compiler"
       )
+    message("Cg compiler is at ${CG_COMPILER}")
     GET_FILENAME_COMPONENT(CG_COMPILER_DIR "${CG_COMPILER}" PATH)
     GET_FILENAME_COMPONENT(CG_COMPILER_SUPER_DIR "${CG_COMPILER_DIR}" PATH)
     FIND_PATH( CG_INCLUDE_DIR Cg/cg.h
@@ -140,6 +141,7 @@ ELSE (APPLE)
       ${CG_COMPILER_SUPER_DIR}/include
       DOC "The directory where Cg/cg.h resides"
       )
+    message("Cg include dir is at ${CG_INCLUDE_DIR}")
     FIND_LIBRARY( CG_LIBRARY Cg
       PATHS
       /usr/lib64
@@ -167,7 +169,8 @@ ENDIF (APPLE)
 IF (CG_INCLUDE_DIR)
   SET( CG_FOUND 1 CACHE STRING "Set to 1 if CG is found, 0 otherwise")
 ELSE (CG_INCLUDE_DIR)
-  SET( CG_FOUND 0 CACHE STRING "Set to 1 if CG is found, 0 otherwise")
+  unset(CG_FOUND CACHE)
+  SET( CG_FOUND 0 STRING "Set to 1 if CG is found, 0 otherwise")
 ENDIF (CG_INCLUDE_DIR)
 
 MARK_AS_ADVANCED( CG_FOUND )
