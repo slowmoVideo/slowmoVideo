@@ -880,6 +880,8 @@ namespace V3D_GPU
          fragmentProfile = CG_PROFILE_UNKNOWN;
          vertexProfile   = CG_PROFILE_UNKNOWN;
 
+         // Note to self: maybe interesting: http://forum-archive.developer.nvidia.com/index.php?showtopic=6521
+
 #if CG_VERSION_NUM >= 3000 && false
          // Only checks if the library supports the profile
          if (cgIsProfileSupported(CG_PROFILE_ARBFP1)) fragmentProfile = CG_PROFILE_ARBFP1;
@@ -912,6 +914,8 @@ namespace V3D_GPU
          if (cgGLIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
 #endif
 
+         std::cout << "Fragment profile used is: " << fragmentProfile << std::endl;
+         std::cout << "Vertex profile used is: " << vertexProfile << std::endl;
          if (fragmentProfile == CG_PROFILE_UNKNOWN)
             cerr << "Warning: No useful fragment shader profile found." << endl;
          if (vertexProfile == CG_PROFILE_UNKNOWN)
