@@ -1,0 +1,6 @@
+message("==========================================================")
+message("This CMake file is only here to give you this information:")
+message("* To build slowmoVideo use the CMakeLists.txt file in the slowmoVideo subdirectory (inside the main directory).")
+message("* To build flowBuilder (runs on nVidia GPUs) run cmake in the V3D subdirectory. (A CPU version is included in slowmoVideo and flowBuilder is not necessary anymore.)")
+message("==========================================================")
+message(FATAL_ERROR "Aborting therefore.")

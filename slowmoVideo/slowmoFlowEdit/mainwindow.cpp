@@ -102,25 +102,48 @@ void MainWindow::closeEvent(QCloseEvent *e)
 
 QString MainWindow::nextFilename(QString originalName, int shift) const
 {
-    QStringList parts;
-    QRegExp e("(\\d+)");
-    int min = originalName.indexOf("_");
-    int pos = 0;
-    int prevPos = 0;
-    while ((pos = e.indexIn(originalName, pos)) != -1) {
-        parts << originalName.mid(prevPos, pos-prevPos);
+    if (false) {
+        QStringList parts;
+        QRegExp e("(\\d+)");
+        int min = originalName.indexOf("_");
+        int pos = 0;
+        int prevPos = 0;
+        while ((pos = e.indexIn(originalName, pos)) != -1) {
+            parts << originalName.mid(prevPos, pos-prevPos);
 
-        if (pos > min) {
-            parts << QVariant(e.cap(1).toInt()+shift).toString();
+            if (pos > min) {
+                parts << QVariant(e.cap(1).toInt()+shift).toString();
+            } else {
+                parts << e.cap(1);
+            }
+
+            pos += e.matchedLength();
+            prevPos = pos;
+        }
+        parts << originalName.mid(prevPos);
+        return parts.join("");
+    } else {
+        QStringList filters;
+        filters << "*.sVflow";
+
+        QDir dir(QFileInfo(originalName).absolutePath());
+        QStringList filenames = dir.entryList(filters, QDir::Files | QDir::Readable, QDir::Name);
+
+        QString current = QFileInfo(originalName).fileName();
+        QString next;
+        if (filenames.contains(current)) {
+            int index = filenames.indexOf(current);
+            if (filenames.size() > index+shift && index+shift >= 0) {
+                next = QFileInfo(originalName).absolutePath() + "/" + filenames[index+shift];
+            } else {
+                qDebug() << "No file in this direction";
+            }
         } else {
-            parts << e.cap(1);
+            qDebug() << filenames;
         }
 
-        pos += e.matchedLength();
-        prevPos = pos;
+        return next;
     }
-    parts << originalName.mid(prevPos);
-    return parts.join("");
 }
 
 void MainWindow::loadFlow(QString filename)

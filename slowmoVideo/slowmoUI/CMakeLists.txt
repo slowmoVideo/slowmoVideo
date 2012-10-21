@@ -77,6 +77,6 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoUI)
 
 add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
-target_link_libraries(slowmoUI sVproj sVvis sVgui ${QT_LIBRARIES})
+target_link_libraries(slowmoUI sVproj sVvis sVgui ${EXTERNAL_LIBS})
 
 install(TARGETS slowmoUI DESTINATION bin)

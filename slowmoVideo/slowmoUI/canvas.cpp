@@ -15,6 +15,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "tagAddDialog.h"
 #include "shutterFunctionDialog.h"
+#include "project/shutterFunction_sV.h"
+#include "project/shutterFunctionList_sV.h"
+#include "lib/bezierTools_sV.h"
 
 #include "project/projectPreferences_sV.h"
 #include "project/abstractFrameSource_sV.h"
@@ -60,6 +63,8 @@ QColor Canvas::handleLineCol(255, 255, 255, 128);
 QColor Canvas::srcTagCol    ( 30, 245,   0, 150);
 QColor Canvas::outTagCol    ( 30, 245,   0, 150);
 QColor Canvas::backgroundCol( 34,  34,  34);
+QColor Canvas::shutterRegionCol(175, 25, 75, 100);
+QColor Canvas::shutterRegionBoundCol(240, 0, 60, 150);
 
 /// \todo move with MMB
 /// \todo replay curve
@@ -200,6 +205,12 @@ void Canvas::load(Project_sV *project)
     repaint();
 }
 
+void Canvas::showHelp(bool show)
+{
+    m_showHelp = show;
+    repaint();
+}
+
 void Canvas::toggleHelp()
 {
     m_showHelp = !m_showHelp;
@@ -255,7 +266,24 @@ bool Canvas::insideCanvas(const QPoint &pos)
             pos.y() < height()-m_distBottom;
 }
 
-
+QRect Canvas::leftDrawingRect(int y, const int height, const int min, const int max) const
+{
+    if (y < min) { y = min; }
+    if (max > 0 && y > max-height) { y = max-height; }
+    return QRect(8, y-6, m_distLeft-2*8, 50);
+}
+QRect Canvas::bottomDrawingRect(int x, const int width, const int min, const int max, bool rightJustified) const
+{
+    if (rightJustified) {
+        if (max > 0 && x > max) { x = max; }
+        if (min > 0 && x< min+width) { x = min+width; }
+        return QRect(x-width, height()-1 - (m_distBottom-8), width, m_distBottom-2*8);
+    } else {
+        if (max > 0 && x > max-width) { x = max-width; }
+        if (min > 0 && x < min) { x = min; }
+        return QRect(x, height()-1 - (m_distBottom-8), width, m_distBottom-2*8);
+    }
+}
 
 void Canvas::paintEvent(QPaintEvent *)
 {
@@ -330,19 +358,20 @@ void Canvas::paintEvent(QPaintEvent *)
     // Frames/seconds
     davinci.setPen(lineCol);
     if (m_mouseWithinWidget && insideCanvas(m_states.prevMousePos)) {
-        QString timeText;
+        QString timeText, speedText;
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
-        int posX;
 
-        davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
+        const int mX = m_states.prevMousePos.x();
+        const int mY = m_states.prevMousePos.y();
+
+        davinci.drawLine(mX, m_distTop, mX, height()-1 - m_distBottom);
         timeText = CanvasTools::outputTimeLabel(this, time);
+        speedText = CanvasTools::outputSpeedLabel(time, m_project);
         // Ensure that the text does not go over the right border
-        posX = m_states.prevMousePos.x() - 20;
-        if (posX > width()-m_distLeft-40) {
-            posX = width()-m_distLeft-40;
-        }
-        davinci.drawText(posX-180, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignRight, timeText);
-        davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
+
+        davinci.drawText(bottomDrawingRect(mX-20, 160, m_distLeft, -180+width()-m_distRight-50), Qt::AlignRight, timeText);
+        davinci.drawText(bottomDrawingRect(mX+20, 160, m_distLeft+180,  width()-m_distRight-50, false), Qt::AlignLeft, speedText);
+        davinci.drawLine(m_distLeft, mY, mX, mY);
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")
                     .arg(time.y()*m_project->frameSource()->fps()->fps(), 2, 'f', 2)
@@ -353,11 +382,96 @@ void Canvas::paintEvent(QPaintEvent *)
                     .arg(int(time.y()/60))
                     .arg(time.y()-60*int(time.y()/60), 0, 'f', 2);
         }
-        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 50, Qt::AlignRight, timeText);
+        davinci.drawText(leftDrawingRect(mY, 48, m_distTop+24, height()-m_distBottom), Qt::AlignRight, timeText);
+    }
+    {
+        Node_sV node; QString timeText ;
+
+        // yMax
+        node = convertCanvasToTime(QPoint(m_distLeft, m_distTop));
+        timeText = QString("f %1").arg(node.y(), 0, 'f', 1);
+        davinci.drawText(leftDrawingRect(m_distTop), Qt::AlignRight, timeText);
+
+        // yMin
+        node = convertCanvasToTime(QPoint(m_distLeft, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.y(), 0, 'f', 1);
+        davinci.drawText(leftDrawingRect(height()-m_distBottom-8), Qt::AlignRight, timeText);
+
+        // xMin
+        node = convertCanvasToTime(QPoint(m_distLeft, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.x(), 0, 'f', 1);
+        davinci.drawText(bottomDrawingRect(m_distLeft+8), Qt::AlignRight, timeText);
+
+        // xMax
+        node = convertCanvasToTime(QPoint(width()-1 - m_distRight, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.x(), 0, 'f', 1);
+        davinci.drawText(bottomDrawingRect(width()-1-m_distRight), Qt::AlignRight, timeText);
+
+
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
     davinci.drawLine(m_distLeft, bottom, m_distLeft, m_distTop);
+
+    // Shutter Lengths (for motion blur)
+    davinci.setRenderHint(QPainter::Antialiasing, false);
+    const Node_sV *leftNode = NULL;
+    const Node_sV *rightNode = NULL;
+    const float outFps = m_project->preferences()->canvas_xAxisFPS().fps();
+    const float sourceFps = m_project->frameSource()->fps()->fps();
+    for (int i = 0; i < m_nodes->size(); i++) {
+        rightNode = &m_nodes->at(i);
+        QPoint p = convertTimeToCanvas(*rightNode);
+
+        if (leftNode != NULL) {
+            ShutterFunction_sV *shutterFunction = m_project->shutterFunctions()->function(leftNode->shutterFunctionID());
+            if (shutterFunction != NULL) {
+
+                QPoint pp = convertTimeToCanvas(*leftNode);
+                for (int x = pp.x(); x < p.x(); x++) {
+                    qreal progressOnCurve = ((qreal)x - pp.x()) / (p.x() - pp.x());
+
+                    QPointF time;
+                    if (leftNode->rightCurveType() == CurveType_Bezier && rightNode->leftCurveType() == CurveType_Bezier) {
+                        time = BezierTools_sV::interpolateAtX(convertCanvasToTime(QPoint(x, 0)).x(),
+                                    leftNode->toQPointF(), leftNode->toQPointF()+leftNode->rightNodeHandle(),
+                                    rightNode->toQPointF()+rightNode->leftNodeHandle(), rightNode->toQPointF());
+                    } else {
+                        time = leftNode->toQPointF() + (rightNode->toQPointF() - leftNode->toQPointF()) * progressOnCurve;
+                    }
+
+                    qreal outTime = time.x();
+                    qreal sourceTime = time.y();
+                    qreal sourceFrame = sourceTime * sourceFps;
+
+                    float dy;
+                    if (outTime + 1/outFps <= m_nodes->endTime()) {
+                        dy = m_nodes->sourceTime(outTime + 1/outFps) - sourceTime;
+                    } else {
+                        dy = sourceTime - m_nodes->sourceTime(outTime - 1/outFps);
+                    }
+                    float shutter = shutterFunction->evaluate(
+                        progressOnCurve, // x on [0,1]
+                        outTime, // t
+                        outFps, // FPS
+                        sourceFrame, // y
+                        dy // dy to next frame
+                        );
+                    QPoint sourceShutterTimeStart = QPoint(x, convertTimeToCanvas(time).y());
+                    QPoint sourceShutterTimeEnd = QPoint(x, convertTimeToCanvas(time + QPointF(0, shutter * outFps/sourceFps)).y());
+                    if (shutter > 0) {
+                        davinci.setPen(shutterRegionCol);
+                        davinci.drawLine(sourceShutterTimeStart, sourceShutterTimeEnd);
+                    }
+                    davinci.setPen(shutterRegionBoundCol);
+                    davinci.drawPoint(x, sourceShutterTimeEnd.y() - 1);
+                }
+
+            }
+        }
+
+        leftNode = &m_nodes->at(i);
+    }
 
     // Tags
     davinci.setRenderHint(QPainter::Antialiasing, false);

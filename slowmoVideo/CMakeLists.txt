@@ -1,9 +1,8 @@
-# Docs: http://www.cmake.org/cmake/help/cmake-2-8-docs.html
+# Docs: http://www.cmake.org/cmake/help/cmake2.6docs.html
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 project(slowmoVideo)
-
 
 
 # Installation prefix
@@ -13,16 +12,28 @@ set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL
 set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
 
 
-## Compiler options ##
+### Compiler options ###
 
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
+if(CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+endif(CMAKE_TOOLCHAIN_FILE)
 
 
-## Find packages ##
+### CMake Configuration ###
+set(ADDITIONAL_LIBS "")
+if(MSYS)
+  message(STATUS "MSYS system detected.")
+  include("${PROJECT_SOURCE_DIR}/cmake/MingwCrossEnv.cmake")
+endif(MSYS)
+
+
+### Find packages ###
 
 set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
@@ -37,7 +48,13 @@ find_package(Qt4)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
-find_package(FFMPEG)
+
+if(NOT MSYS)
+	find_package(FFMPEG)
+else(NOT MSYS)
+    # Handled by MingwCrossEnv.cmake to avoid errors like:
+    # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
+endif(NOT MSYS)
 include_directories(${FFMPEG_INCLUDE_DIR})
 link_directories(${FFMPEG_LIBRARY_DIR})
 
@@ -45,10 +62,27 @@ find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
 
+
+### Set up libraries ###
+if(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS_OPT} ${OpenCV_EXTRA_LIBS_OPT} ${ADDITIONAL_LIBS})
+else(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS} ${ADDITIONAL_LIBS})
+endif(MSYS)
+
+
+### Information output
 set(BUILD_SLOWMO "NO")
-if(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
+if(QT_LIBRARIES AND FFMPEG_FOUND)
 set(BUILD_SLOWMO "YES")
-endif(QT_LIBRARIES AND FFMPEG_FOUND AND FFMPEG_SWSCALE_FOUND)
+endif(QT_LIBRARIES AND FFMPEG_FOUND)
+if(NOT FFMPEG_SWSCALE_FOUND)
+  if(CMAKE_TOOLCHAIN_FILE)
+
+  else(CMAKE_TOOLCHAIN_FILE)
+  set(BUILD_SLOWMO "NO")
+  endif(CMAKE_TOOLCHAIN_FILE)
+endif(NOT FFMPEG_SWSCALE_FOUND)
 
 message("==================================================")
 message("* slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
@@ -76,6 +110,9 @@ message("==================================================")
 if(NOT BUILD_SLOWMO)
 message(FATAL_ERROR "Cannot build slowmoVideo, please install the missing packages first.")
 endif(NOT BUILD_SLOWMO)
+
+
+
 
 
 ## Include projects to build ##

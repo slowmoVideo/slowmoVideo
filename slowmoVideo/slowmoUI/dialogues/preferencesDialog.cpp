@@ -3,6 +3,8 @@
 
 #include "project/flowSourceV3D_sV.h"
 #include "lib/defs_sV.hpp"
+#include "lib/avconvInfo_sV.h"
+#include "../../project/videoFrameSource_sV.h"
 #include <QtCore/QProcess>
 #include <QtGui/QFileDialog>
 
@@ -62,6 +64,13 @@ void PreferencesDialog::accept()
         method = "V3D";
     }
     m_settings.setValue("preferences/flowMethod", method);
+
+    // ffmpeg location
+    if (AvconvInfo::testAvconvExecutable(ui->ffmpeg->text())) {
+        m_settings.setValue("binaries/ffmpeg", ui->ffmpeg->text());
+    } else {
+        qDebug() << "Not a valid ffmpeg/avconv executable: " << ui->ffmpeg->text();
+    }
 
     // Store the values right now
     m_settings.sync();

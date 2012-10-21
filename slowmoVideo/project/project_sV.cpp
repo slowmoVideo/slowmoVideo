@@ -92,6 +92,20 @@ Project_sV::~Project_sV()
     delete m_shutterFunctions;
 }
 
+void Project_sV::reloadFlowSource()
+{
+    Q_ASSERT(m_flowSource != NULL);
+
+    delete m_flowSource;
+
+    QSettings settings;
+    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+        m_flowSource = new FlowSourceV3D_sV(this);
+    } else {
+        m_flowSource = new FlowSourceOpenCV_sV(this);
+    }
+}
+
 void Project_sV::setProjectDir(QString projectDir)
 {
     m_projDir = projectDir;

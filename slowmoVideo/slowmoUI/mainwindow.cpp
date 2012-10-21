@@ -170,6 +170,7 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
 
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
+    m_wCanvas->showHelp(true);
 
 
     if (!projectPath.isEmpty()) {
@@ -289,6 +290,8 @@ void MainWindow::slotNewProject()
             project->preferences()->viewport_secRes() = QPointF(400, 400)/project->frameSource()->framesCount()*project->frameSource()->fps()->fps();
             loadProject(project);
 
+            m_wCanvas->showHelp(true);
+
 
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
@@ -394,7 +397,9 @@ void MainWindow::slotToggleHelp()
 }
 void MainWindow::displayHelp(QPainter &davinci) const
 {
-    QString helpText = m_cs.shortcutList();
+    QString helpText = m_cs.shortcutList()
+            + "\nNavigation: [Shift] Scroll"
+            + "\nMove nodes: [Ctrl]  Drag";
 
     QRect content;
     const QPoint topLeft(10, 10);
@@ -472,6 +477,9 @@ void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
     dialog.exec();
+
+    // Use the new flow method (if it has changed)
+    m_project->reloadFlowSource();
 }
 
 void MainWindow::slotShowProjectPreferencesDialog()

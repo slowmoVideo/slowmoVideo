@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "flowField_sV.h"
+#include "string.h"
 #include <iostream>
 
 float FlowField_sV::nullValue = 65535;
@@ -27,6 +28,9 @@ FlowField_sV::FlowField_sV(int width, int height, float *data, FlowField_sV::GLF
     m_data = new float[2*m_width*m_height];
 
     switch (format) {
+    case GLFormat_RG: 
+      memcpy(m_data, data, width*height*2*sizeof(float)); 
+      break; 
     case GLFormat_RGB:
     default:
         float *fieldData = m_data;

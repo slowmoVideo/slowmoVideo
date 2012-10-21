@@ -11,6 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "canvasTools.h"
 
 #include "canvas.h"
+#include "project/project_sV.h"
 #include "project/projectPreferences_sV.h"
 
 //#define DEBUG
@@ -43,4 +44,34 @@ QString CanvasTools::outputTimeLabel(Canvas *canvas, Node_sV &time)
     timeText += QString("\nFrame %1").arg(frame, 0, 'f', (decimals <= 1 ? 0 : 1));
 
     return timeText;
+}
+
+QString CanvasTools::outputSpeedLabel(Node_sV &time, Project_sV *project)
+{
+    if (!project->nodes()->isInsideCurve(time.x())) {
+        return "";
+    }
+
+    const qreal dx = 1.0/project->preferences()->canvas_xAxisFPS().fps();
+
+
+    qreal t1, t2;
+    if (time.x()+dx <= project->nodes()->endTime()) {
+        t1 = project->nodes()->sourceTime(time.x());
+        t2 = project->nodes()->sourceTime(time.x()+dx);
+    } else {
+        t1 = project->nodes()->sourceTime(time.x()-dx);
+        t2 = project->nodes()->sourceTime(time.x());
+    }
+
+    const qreal dy = t2-t1;
+
+    qreal percent = 0;
+    if (dy != 0) {
+        percent = dy/dx;
+    }
+
+    return QString("%1 %").arg(percent, 0, 'f');//, 1);
+
+
 }

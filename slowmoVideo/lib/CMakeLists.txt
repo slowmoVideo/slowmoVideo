@@ -18,6 +18,7 @@ set(LIB_SRC_BASE
 set(LIB_SRC_VIDEO
   defs_sV.h
   videoInfo_sV.c
+  avconvInfo_sV.cpp
 )
 
 set(LIB_SRC_ARGS

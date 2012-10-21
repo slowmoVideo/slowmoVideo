@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "macros_sV.h"
 
-#ifdef WINDOWS
+#if defined(WINDOWS) && !defined(MXE)
 typedef __int64 int64_t;
 #else
 #include <inttypes.h>
@@ -27,8 +27,8 @@ typedef __int64 int64_t;
 #include <cmath>
 
 #define SLOWMOVIDEO_VERSION_MAJOR 0
-#define SLOWMOVIDEO_VERSION_MINOR 2
-#define SLOWMOVIDEO_VERSION_MICRO 6
+#define SLOWMOVIDEO_VERSION_MINOR 3
+#define SLOWMOVIDEO_VERSION_MICRO 0
 
 
 /// Contains information about this slowmoVideo version

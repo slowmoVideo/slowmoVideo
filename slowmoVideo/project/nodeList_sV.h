@@ -64,6 +64,7 @@ public:
     qreal startTime() const; ///< Time of the first node
     qreal endTime() const; ///< Time of the rightmost node. See totalTime() for the curve length.
     qreal totalTime() const; ///< Length of the curve, ignores space (startTime())at the beginning.
+    bool isInsideCurve(qreal targetTime) const; ///< Returns true if startTime <= targetTime <= endTime
 
     /**
       Add a new node at the given position.

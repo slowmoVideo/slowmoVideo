@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "abstractFrameSource_sV.h"
 #include "../lib/defs_sV.hpp"
+#include "../lib/avconvInfo_sV.h"
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
@@ -29,6 +30,7 @@ class Project_sV;
 /**
   \brief Uses frames from a video file
   \todo Use libav directly for frame extraction? (not the ffmpeg command)
+  \todo Extract full frames only before rendering, only used ones
  */
 class VideoFrameSource_sV : public AbstractFrameSource_sV
 {
@@ -63,6 +65,7 @@ private:
     QDir m_dirFramesSmall;
     QDir m_dirFramesOrig;
     QSettings m_settings;
+    AvconvInfo m_avconvInfo;
 
     VideoInfoSV *m_videoInfo;
     Fps_sV m_fps;
@@ -85,7 +88,9 @@ private:
     bool rebuildRequired(const FrameSize frameSize);
 
     void locateFFmpeg();
-    bool testFfmpegExecutable(QString path);
+
+public:
+    static bool testFfmpegExecutable(QString path);
 
 signals:
     /** Emitted when the task for extracting original-sized images has finished (or has been terminated) */

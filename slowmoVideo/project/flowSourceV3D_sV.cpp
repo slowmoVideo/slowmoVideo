@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
+#include <QtCore/QTime>
 
 FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, float lambda) :
     AbstractFlowSource_sV(project),
@@ -71,14 +72,18 @@ FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
 
         qDebug() << "Arguments: " << args;
 
+
+        QTime time;
         QProcess proc;
+
+        time.start();
         proc.start(program, args);
         proc.waitForFinished(-1);
         if (proc.exitCode() != 0) {
             qDebug() << "Failed: " << proc.readAllStandardError() << proc.readAllStandardOutput();
             throw FlowBuildingError(QString("Flow builder exited with exit code %1; For details see debugging output").arg(proc.exitCode()));
         } else {
-            qDebug() << "Optical flow built for " << flowFileName;
+            qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms";
             qDebug() << proc.readAllStandardError() << proc.readAllStandardOutput();
         }
     } else {
