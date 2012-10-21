@@ -22,7 +22,6 @@ find_package(OpenGL)
 find_package(GLEW)
 find_package(GLUT)
 find_package(SDL)
-find_package(Cg)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
@@ -93,9 +92,9 @@ endif(WIN32)
 
 
 set(BUILD_FLOW_BUILDER "NO")
-if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND JPEG_FOUND AND PNG_FOUND)
+if(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
 	set(BUILD_FLOW_BUILDER "YES")
-endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND CG_FOUND AND JPEG_FOUND AND PNG_FOUND)
+endif(SVFLOW_LIB AND OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
 
 set(INCLUDE_SOURCE "YES")
 if(DISABLE_INCLUDE_SOURCE)
@@ -138,13 +137,6 @@ else(NOT SDL_FOUND)
 	message("* (ok) SDL found in ${SDL_INCLUDE_DIR}")
 endif(NOT SDL_FOUND)
 
-if(NOT CG_FOUND)
-	message("* Cg toolkit could not be found.")
-	message("  Download from: http://developer.nvidia.com/cg-toolkit-download")
-else(NOT CG_FOUND)
-	message("* (ok) Cg found at ${CG_INCLUDE_DIR}: ${CG_LIBRARY} ${CG_GL_LIBRARY}")
-endif(NOT CG_FOUND)
-
 if(NOT JPEG_FOUND)
 	message("* JPEG libraries could not be found.")
 else(NOT JPEG_FOUND)
@@ -175,7 +167,6 @@ include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
 include_directories(${GLUT_INCLUDE_DIR})
 include_directories(${GLEW_INCLUDE_DIR})
-include_directories(${CG_INCLUDE_DIR})
 include_directories(${JPEG_INCLUDE_DIR})
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${PNG_INCLUDE_DIR})
@@ -195,17 +186,16 @@ enable_feature_libraries (V3DLIB_ENABLE_LIBJPEG ${JPEG_LIBRARIES})
 enable_feature_libraries (V3DLIB_ENABLE_LIBPNG ${PNG_LIBRARIES})
 
 enable_feature (V3DLIB_ENABLE_GPGPU)
-enable_conditional_feature (V3DLIB_GPGPU_ENABLE_CG V3DLIB_ENABLE_GPGPU)
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${OPENGL_LIBRARIES})
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLEW_LIBRARIES})
 enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLUT_glut_LIBRARY})
-enable_feature_libraries (V3DLIB_GPGPU_ENABLE_CG ${CG_LIBRARY} ${CG_GL_LIBRARY})
 #--------------------------------------------------
 
 
 include_directories(Config)
 
 set (GL_SRC
+    GL/glsl_shaders.cpp
     GL/v3d_gpubase.cpp
     GL/v3d_gpuflow.cpp
     GL/v3d_gpucolorflow.cpp
@@ -224,55 +214,6 @@ set (ALL_SRC
     Math/v3d_linear.h
     Math/v3d_linearbase.h
 )
-
-
-set (SHADERS
-    ./GL/Shaders/flow_cholesky_3x3.cg
-    ./GL/Shaders/flow_warp_image_with_gain.cg
-    ./GL/Shaders/pyramid_with_derivative_pass2.cg
-    ./GL/Shaders/pyramid_pass2.cg
-    ./GL/Shaders/pyramid_with_derivative_pass1v.cg
-    ./GL/Shaders/pyramid_with_derivative_pass1h.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_p.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_update_u.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_v.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_direct_update_uvq.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_u.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_direct_update_p.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_vd.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_u_iter1.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_pb.cg
-    ./GL/Shaders/OpticalFlow/tvl1_color_flow_direct_update_q.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_q_with_gain.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_b.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_PD_update_u.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv.cg
-    ./GL/Shaders/OpticalFlow/tvl1_color_flow_new_update_uv.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_u_iterN.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_bregman_update_p.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_compute_UV.cg
-    ./GL/Shaders/OpticalFlow/tvl1_color_flow_QR_update_uv.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_relaxed_update_uv_with_gain.cg
-    ./GL/Shaders/OpticalFlow/tvl1_color_flow_direct_update_uv.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_new_update_p.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_DR_update_p.cg
-    ./GL/Shaders/OpticalFlow/tvl1_flow_CLG_PD_update_q.cg
-    ./GL/Shaders/OpticalFlow/tvl1_color_flow_new_update_q.cg
-    ./GL/Shaders/flow_accumulate_tensor.cg
-    ./GL/Shaders/pyramid_pass1v.cg
-    ./GL/Shaders/pyramid_pass1h.cg
-    ./GL/Shaders/flow_warp_image.cg
-)
-
-if(NOT INCLUDE_SOURCE)
-	foreach (FILENAME ${SHADERS})
-		set(FILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-		set(FILE_DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-		configure_file(${FILE_SRC} ${FILE_DST} COPYONLY)
-	endforeach(FILENAME)
-	message(STATUS "Shader files copied")
-endif(NOT INCLUDE_SOURCE)
-
 
 add_library(V3D ${ALL_SRC})
 target_link_libraries(V3D ${GLEW_LIBRARIES})

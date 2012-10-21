@@ -14,11 +14,6 @@
 
 #include <GL/glew.h>
 
-#if defined(V3DLIB_GPGPU_ENABLE_CG)
-# include <Cg/cg.h>
-# include <Cg/cgGL.h>
-#endif
-
 #ifdef WIN32
 #include <stdio.h>
 #endif
@@ -791,277 +786,6 @@ namespace V3D_GPU
 {
 
    void
-   ProgramBase::setProgramFromFile(char const * fileName)
-   {
-      ostringstream oss;
-
-      char completeName[1024];
-      char completeName2[1024];
-
-      if (fileName[0] == '/')
-      {
-         // Absolute path for the shader file
-         strncpy(completeName, fileName, 1024);
-      }
-      else
-      {
-         char const * baseDir = getenv("V3D_SHADER_DIR");
-         if (baseDir == 0)
-            baseDir = "."; // If environment var is not set, use "."
-
-#ifdef _MSC_VER
-         sprintf_s(completeName, "%s/%s", baseDir, fileName);
-#else
-         snprintf(completeName, 1024, "%s/%s", baseDir, fileName);
-#endif
-      }
-      
-      ifstream is(completeName);
-
-      if (!is)
-      {
-#ifdef _MSC_VER
-         sprintf_s(completeName2, "./%s", fileName);
-#else
-         snprintf(completeName2, 1024, "./%s", fileName);
-#endif
-         is.open(completeName2);
-      }
-
-      char buf[1024];
-
-      if (!is)
-      {
-         raiseGLErrorHere2("Cannot load shader file.", _shaderName.c_str());
-         cerr << "Tried " << completeName << " and " << completeName2 << "." << endl;
-         return;
-      }
-
-      while (!is.eof())
-      {
-         is.get(buf, 1024, -1);
-         oss << buf;
-      }
-
-      is.close();
-
-      this->setProgram(oss.str());
-   } // end GPU_ProgramBase::setProgramFromFile()
-
-} // end namespace V3D_GPU
-
-# if defined(V3DLIB_GPGPU_ENABLE_CG)
-
-namespace
-{
-   CGprofile fragmentProfile = CG_PROFILE_UNKNOWN;
-   CGprofile vertexProfile   = CG_PROFILE_UNKNOWN;
-
-} // end namespace
-
-namespace V3D_GPU
-{
-
-   CGcontext Cg_ProgramBase::_context = 0;
-
-   char const *
-   Cg_ProgramBase::getCompiledString()
-   {
-      if (!cgIsProgramCompiled(_program)) return 0;
-      return cgGetProgramString(_program, CG_COMPILED_PROGRAM);
-   }
-
-   void
-   Cg_ProgramBase::initializeCg()
-   {
-      if (_context == 0)
-      {
-         cgSetErrorCallback(Cg_ProgramBase::handleCgError);
-         _context = cgCreateContext();
-
-         fragmentProfile = CG_PROFILE_UNKNOWN;
-         vertexProfile   = CG_PROFILE_UNKNOWN;
-
-         // Note to self: maybe interesting: http://forum-archive.developer.nvidia.com/index.php?showtopic=6521
-
-#if CG_VERSION_NUM >= 3000 && false
-         // Only checks if the library supports the profile
-         if (cgIsProfileSupported(CG_PROFILE_ARBFP1)) fragmentProfile = CG_PROFILE_ARBFP1;
-         if (cgIsProfileSupported(CG_PROFILE_FP20))   fragmentProfile = CG_PROFILE_FP20;
-         if (cgIsProfileSupported(CG_PROFILE_FP30))   fragmentProfile = CG_PROFILE_FP30;
-         if (cgIsProfileSupported(CG_PROFILE_FP40))   fragmentProfile = CG_PROFILE_FP40;
-         if (cgIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
-         if (cgIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
-
-         if (cgIsProfileSupported(CG_PROFILE_ARBVP1)) vertexProfile = CG_PROFILE_ARBVP1;
-         if (cgIsProfileSupported(CG_PROFILE_VP20))   vertexProfile = CG_PROFILE_VP20;
-         if (cgIsProfileSupported(CG_PROFILE_VP30))   vertexProfile = CG_PROFILE_VP30;
-         if (cgIsProfileSupported(CG_PROFILE_VP40))   vertexProfile = CG_PROFILE_VP40;
-         if (cgIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
-         if (cgIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
-#else
-         // Checks if the platform supports the library
-         if (cgGLIsProfileSupported(CG_PROFILE_ARBFP1)) fragmentProfile = CG_PROFILE_ARBFP1;
-         if (cgGLIsProfileSupported(CG_PROFILE_FP20))   fragmentProfile = CG_PROFILE_FP20;
-         if (cgGLIsProfileSupported(CG_PROFILE_FP30))   fragmentProfile = CG_PROFILE_FP30;
-         if (cgGLIsProfileSupported(CG_PROFILE_FP40))   fragmentProfile = CG_PROFILE_FP40;
-         if (cgGLIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
-         if (cgGLIsProfileSupported(CG_PROFILE_GPU_FP)) fragmentProfile = CG_PROFILE_GPU_FP;
-
-         if (cgGLIsProfileSupported(CG_PROFILE_ARBVP1)) vertexProfile = CG_PROFILE_ARBVP1;
-         if (cgGLIsProfileSupported(CG_PROFILE_VP20))   vertexProfile = CG_PROFILE_VP20;
-         if (cgGLIsProfileSupported(CG_PROFILE_VP30))   vertexProfile = CG_PROFILE_VP30;
-         if (cgGLIsProfileSupported(CG_PROFILE_VP40))   vertexProfile = CG_PROFILE_VP40;
-         if (cgGLIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
-         if (cgGLIsProfileSupported(CG_PROFILE_GPU_VP)) vertexProfile = CG_PROFILE_GPU_VP;
-#endif
-
-         std::cout << "Fragment profile used is: " << fragmentProfile << std::endl;
-         std::cout << "Vertex profile used is: " << vertexProfile << std::endl;
-         if (fragmentProfile == CG_PROFILE_UNKNOWN)
-            cerr << "Warning: No useful fragment shader profile found." << endl;
-         if (vertexProfile == CG_PROFILE_UNKNOWN)
-            cerr << "Warning: No useful vertex shader profile found." << endl;
-      }
-   }
-
-   Cg_ProgramBase::~Cg_ProgramBase()
-   {
-      if (_program == 0) return;
-      cgDestroyProgram(_program);
-   }
-
-   void
-   Cg_ProgramBase::handleCgError() 
-   {
-      cerr << "Cg error: " << cgGetErrorString(cgGetError()) << endl;;
-   }
-
-//----------------------------------------------------------------------
-
-   void
-   Cg_FragmentProgram::setProgram(char const * source)
-   {
-      _source = source;
-      if (_program != 0) cgDestroyProgram(_program);
-      _program = 0;
-   }
-
-   void
-   Cg_FragmentProgram::compile(char const * * compilerArgs, char const *entry)
-   {
-      if (_program == 0)
-      {
-         _program = cgCreateProgram(_context, CG_SOURCE, _source.c_str(),
-                                    fragmentProfile, entry, compilerArgs);
-         if (_program == 0)
-         {
-            cerr << "Program: " << _shaderName << endl;
-            cerr << "Cg compiler report:" << endl << cgGetLastListing(_context) << endl;
-         }
-      }
-      if (!cgIsProgramCompiled(_program))
-         cgCompileProgram(_program);
-   }
-
-   void
-   Cg_FragmentProgram::compile(std::vector<std::string> const& compilerArgs, char const *entry)
-   {
-      size_t const nArgs = compilerArgs.size();
-      char const * * args = new char const* [nArgs + 1];
-      for (size_t i = 0; i < nArgs; ++i)
-         args[i] = compilerArgs[i].c_str();
-      args[nArgs] = 0;
-      this->compile(args,entry);
-      delete [] args;
-   }
-
-   void
-   Cg_FragmentProgram::enable()
-   {
-      cgGLEnableProfile(fragmentProfile);
-      cgGLLoadProgram(_program);
-      cgGLBindProgram(_program);
-   }
-
-   void 
-   Cg_FragmentProgram::disable()
-   {
-      cgGLDisableProfile(fragmentProfile);
-   }
-
-   void
-   Cg_FragmentProgram::parameter(char const * param, float x)
-   {
-      cgSetParameter1f(cgGetNamedParameter(_program, param), x);
-   }
-
-   void
-   Cg_FragmentProgram::parameter(char const * param, float x, float y)
-   {
-      cgSetParameter2f(cgGetNamedParameter(_program, param), x, y);
-   }
-
-   void
-   Cg_FragmentProgram::parameter(char const * param, float x, float y, float z)
-   {
-      cgSetParameter3f(cgGetNamedParameter(_program, param), x, y, z);
-   }
-
-   void
-   Cg_FragmentProgram::parameter(char const * param, float x, float y, float z, float w)
-   {
-      cgSetParameter4f(cgGetNamedParameter(_program, param), x, y, z, w);
-   }
-
-   void
-   Cg_FragmentProgram::parameter(char const * param, int len, float const * array)
-   {
-      cgGLSetParameterArray1f(cgGetNamedParameter(_program, param), 0, len, array);
-   }
-
-   void
-   Cg_FragmentProgram::matrixParameterR(char const * param, int rows, int cols, double const * values)
-   {
-      if (rows > 4 || cols > 4)
-      {
-         raiseGLErrorHere2("Matrix parameter should be <= 4x4.", _shaderName.c_str());
-         return;
-      }
-
-      cgGLSetMatrixParameterdr(cgGetNamedParameter(_program, param), values);
-   }
-
-   void
-   Cg_FragmentProgram::matrixParameterC(char const * param, int rows, int cols, double const * values)
-   {
-      if (rows > 4 || cols > 4)
-      {
-         raiseGLErrorHere2("Matrix parameter should be <= 4x4.", _shaderName.c_str());
-         return;
-      }
-
-      cgGLSetMatrixParameterdc(cgGetNamedParameter(_program, param), values);
-   }
-
-   unsigned
-   Cg_FragmentProgram::getTexUnit(char const * param)
-   {
-      return cgGLGetTextureEnum(cgGetNamedParameter(_program, param));
-   }
-
-} // end namespace V3D_GPU
-
-# endif // defined(V3DLIB_GPGPU_ENABLE_CG)
-
-//----------------------------------------------------------------------
-
-# if defined(V3DLIB_GPGPU_ENABLE_GLSL)
-
-namespace V3D_GPU
-{
-
-   void
    GLSL_FragmentProgram::setProgram(char const * source)
    {
       _source = source;
@@ -1071,7 +795,7 @@ namespace V3D_GPU
    }
 
    void
-   GLSL_FragmentProgram::compile(char const * * compilerArgs, char const *entry = 0)
+   GLSL_FragmentProgram::compile(char const * * compilerArgs, char const *entry)
    {
       if (compilerArgs != 0)
          cerr << "GLSL_FragmentProgram::compile(): arguments to the compiler are not supported (and ignored)." << endl;
@@ -1182,7 +906,7 @@ namespace V3D_GPU
    } // end GLSL_FragmentProgram::compile()
 
    void
-   GLSL_FragmentProgram::compile(std::vector<std::string> const& compilerArgs, char const *entry = 0)
+   GLSL_FragmentProgram::compile(std::vector<std::string> const& compilerArgs, char const *entry)
    {
       if (compilerArgs.size() != 0)
          cerr << "GLSL_FragmentProgram::compile(): arguments to the compiler are not supported (and ignored)." << endl;
@@ -1190,10 +914,18 @@ namespace V3D_GPU
           cerr << "GLSL_FragmentProgram::compile(): named entry point is not supported (and ignored)." << endl;
       this->compile();
    }
-
+   
+   void 
+   GLSL_FragmentProgram::bindFragDataLocation(const std::string& var)
+   {
+      glBindFragDataLocation(_program, 0, var.c_str());
+   }
+   
    void
    GLSL_FragmentProgram::enable()
    {
+      // implicitly bind FragDataLocation. Maybe this can be done elsewhere once an apropriate interface is available.
+      bindFragDataLocation("my_FragColor");
       glUseProgramObjectARB(_program);
       _inUse = true;
    }
@@ -1203,6 +935,20 @@ namespace V3D_GPU
    {
       _inUse = false;
       glUseProgramObjectARB(0);
+   }
+   
+   void 
+   GLSL_FragmentProgram::bindTexture(const std::string& name, unsigned int unit)
+   {
+      glUniform1i(glGetUniformLocation(_program, name.c_str()), unit);
+   }
+   
+   void 
+   GLSL_FragmentProgram::parameter(char const * param, int x)
+   {
+      glUseProgramObjectARB(_program);
+      glUniform1iARB(glGetUniformLocationARB(_program, param), x);
+      if (!_inUse) glUseProgramObjectARB(0);
    }
 
    void
@@ -1319,8 +1065,6 @@ namespace V3D_GPU
    }
 
 } // end namespace V3D_GPU
-
-# endif // defined(V3DLIB_GPGPU_ENABLE_CG)
 
 //----------------------------------------------------------------------
 
@@ -1447,11 +1191,9 @@ namespace V3D_GPU
 
 } // end namespace V3D_GPU
 
-# if defined(V3DLIB_GPGPU_ENABLE_CG)
-
 namespace
 {
-   V3D_GPU::Cg_FragmentProgram * trivialTexture2DShader = 0;
+   V3D_GPU::GLSL_FragmentProgram * trivialTexture2DShader = 0;
 }
 
 namespace V3D_GPU
@@ -1462,7 +1204,7 @@ namespace V3D_GPU
    {
       if (trivialTexture2DShader == 0)
       {
-         trivialTexture2DShader = new Cg_FragmentProgram("trivialTexture2DShader");
+         trivialTexture2DShader = new GLSL_FragmentProgram("trivialTexture2DShader");
          char const * source =
             "void main(uniform sampler2D texture, \n"
             "                  float2 st : TEXCOORD0, \n"
@@ -1484,7 +1226,5 @@ namespace V3D_GPU
    }
 
 } // end namespace V3D_GPU
-
-# endif
 
 #endif // defined(V3DLIB_ENABLE_GPGPU)
