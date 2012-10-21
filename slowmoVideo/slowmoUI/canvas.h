@@ -103,6 +103,7 @@ public:
 
     void load(Project_sV *project);
 
+    void showHelp(bool show);
     void toggleHelp();
 
     const QPointF prevMouseTime() const;
@@ -238,6 +239,9 @@ private slots:
 
 private:
     void zoom(bool in, QPoint pos);
+
+    QRect leftDrawingRect(int y, const int height = 12, const int min = -1, const int max = -1) const;
+    QRect bottomDrawingRect(int x, const int width = 160, const int min = -1, const int max = -1, bool rightJustified = true) const;
 
 };
 

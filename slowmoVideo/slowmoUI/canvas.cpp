@@ -205,6 +205,12 @@ void Canvas::load(Project_sV *project)
     repaint();
 }
 
+void Canvas::showHelp(bool show)
+{
+    m_showHelp = show;
+    repaint();
+}
+
 void Canvas::toggleHelp()
 {
     m_showHelp = !m_showHelp;
@@ -260,7 +266,24 @@ bool Canvas::insideCanvas(const QPoint &pos)
             pos.y() < height()-m_distBottom;
 }
 
-
+QRect Canvas::leftDrawingRect(int y, const int height, const int min, const int max) const
+{
+    if (y < min) { y = min; }
+    if (max > 0 && y > max-height) { y = max-height; }
+    return QRect(8, y-6, m_distLeft-2*8, 50);
+}
+QRect Canvas::bottomDrawingRect(int x, const int width, const int min, const int max, bool rightJustified) const
+{
+    if (rightJustified) {
+        if (max > 0 && x > max) { x = max; }
+        if (min > 0 && x< min+width) { x = min+width; }
+        return QRect(x-width, height()-1 - (m_distBottom-8), width, m_distBottom-2*8);
+    } else {
+        if (max > 0 && x > max-width) { x = max-width; }
+        if (min > 0 && x < min) { x = min; }
+        return QRect(x, height()-1 - (m_distBottom-8), width, m_distBottom-2*8);
+    }
+}
 
 void Canvas::paintEvent(QPaintEvent *)
 {
@@ -337,19 +360,18 @@ void Canvas::paintEvent(QPaintEvent *)
     if (m_mouseWithinWidget && insideCanvas(m_states.prevMousePos)) {
         QString timeText, speedText;
         Node_sV time = convertCanvasToTime(m_states.prevMousePos);
-        int posX;
 
-        davinci.drawLine(m_states.prevMousePos.x(), m_distTop, m_states.prevMousePos.x(), height()-1 - m_distBottom);
+        const int mX = m_states.prevMousePos.x();
+        const int mY = m_states.prevMousePos.y();
+
+        davinci.drawLine(mX, m_distTop, mX, height()-1 - m_distBottom);
         timeText = CanvasTools::outputTimeLabel(this, time);
         speedText = CanvasTools::outputSpeedLabel(time, m_project);
         // Ensure that the text does not go over the right border
-        posX = m_states.prevMousePos.x() - 20;
-        if (posX > width()-m_distLeft-40) {
-            posX = width()-m_distLeft-40;
-        }
-        davinci.drawText(posX-180, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignRight, timeText);
-        davinci.drawText(posX+ 40, height()-1 - (m_distBottom-8), 200, m_distBottom-2*8, Qt::AlignLeft, speedText);
-        davinci.drawLine(m_distLeft, m_states.prevMousePos.y(), m_states.prevMousePos.x(), m_states.prevMousePos.y());
+
+        davinci.drawText(bottomDrawingRect(mX-20, 160, m_distLeft, -180+width()-m_distRight-50), Qt::AlignRight, timeText);
+        davinci.drawText(bottomDrawingRect(mX+20, 160, m_distLeft+180,  width()-m_distRight-50, false), Qt::AlignLeft, speedText);
+        davinci.drawLine(m_distLeft, mY, mX, mY);
         if (time.y() < 60) {
             timeText = QString("f %1\n%2 s")
                     .arg(time.y()*m_project->frameSource()->fps()->fps(), 2, 'f', 2)
@@ -360,7 +382,32 @@ void Canvas::paintEvent(QPaintEvent *)
                     .arg(int(time.y()/60))
                     .arg(time.y()-60*int(time.y()/60), 0, 'f', 2);
         }
-        davinci.drawText(8, m_states.prevMousePos.y()-6, m_distLeft-2*8, 50, Qt::AlignRight, timeText);
+        davinci.drawText(leftDrawingRect(mY, 48, m_distTop+24, height()-m_distBottom), Qt::AlignRight, timeText);
+    }
+    {
+        Node_sV node; QString timeText ;
+
+        // yMax
+        node = convertCanvasToTime(QPoint(m_distLeft, m_distTop));
+        timeText = QString("f %1").arg(node.y(), 0, 'f', 1);
+        davinci.drawText(leftDrawingRect(m_distTop), Qt::AlignRight, timeText);
+
+        // yMin
+        node = convertCanvasToTime(QPoint(m_distLeft, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.y(), 0, 'f', 1);
+        davinci.drawText(leftDrawingRect(height()-m_distBottom-8), Qt::AlignRight, timeText);
+
+        // xMin
+        node = convertCanvasToTime(QPoint(m_distLeft, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.x(), 0, 'f', 1);
+        davinci.drawText(bottomDrawingRect(m_distLeft+8), Qt::AlignRight, timeText);
+
+        // xMax
+        node = convertCanvasToTime(QPoint(width()-1 - m_distRight, height()-1 - m_distBottom));
+        timeText = QString("f %1").arg(node.x(), 0, 'f', 1);
+        davinci.drawText(bottomDrawingRect(width()-1-m_distRight), Qt::AlignRight, timeText);
+
+
     }
     int bottom = height()-1 - m_distBottom;
     davinci.drawLine(m_distLeft, bottom, width()-1 - m_distRight, bottom);
@@ -395,7 +442,7 @@ void Canvas::paintEvent(QPaintEvent *)
 
                     qreal outTime = time.x();
                     qreal sourceTime = time.y();
-                    qreal sourceFrame = sourceFrame * sourceFps;
+                    qreal sourceFrame = sourceTime * sourceFps;
 
                     float dy;
                     if (outTime + 1/outFps <= m_nodes->endTime()) {

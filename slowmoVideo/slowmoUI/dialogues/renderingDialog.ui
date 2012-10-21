@@ -31,21 +31,19 @@
     </spacer>
    </item>
    <item>
-    <widget class="QToolBox" name="toolBox">
+    <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>-24</y>
-        <width>683</width>
-        <height>123</height>
-       </rect>
+     <widget class="QWidget" name="tabWidgetPage1" native="true">
+      <property name="accessibleName">
+       <string>a</string>
       </property>
-      <attribute name="label">
-       <string>&amp;Rendering settings</string>
+      <property name="accessibleDescription">
+       <string>a</string>
+      </property>
+      <attribute name="title">
+       <string>Rendering settings</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
@@ -332,34 +330,40 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_4">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <property name="topMargin">
+          <number>8</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>For two frames A and B, the two-way interpolations calculate both the flows A→B and B→A, which leads to smoother transitions between them. Forward interpolations only calculate A→B; Twice as fast, but usually less smooth.</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Maximum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>80</height>
+           <height>40</height>
           </size>
          </property>
         </spacer>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>700</width>
-        <height>95</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>Optical &amp;Flow preferences</string>
+     <widget class="QWidget" name="tabWidgetPage2" native="true">
+      <attribute name="title">
+       <string>Optical Flow</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
@@ -430,14 +434,44 @@
             </item>
            </layout>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_10">
+            <property name="topMargin">
+             <number>8</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>The lambda is only used with the GPU based Optical Flow algorithm. There is no general rule which value is best, so it is usually a good idea to render a short part with a low (5) and a high (50) lambda to see the differences, and then try to find the best value between.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_3">
-      <attribute name="label">
-       <string>Motion &amp;Blur</string>
+     <widget class="QWidget" name="tabWidgetPage3" native="true">
+      <attribute name="title">
+       <string>Motion Blur</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
@@ -459,14 +493,7 @@
           <item>
            <widget class="QRadioButton" name="radioBlurStacking">
             <property name="text">
-             <string>Stacking blur</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Uses more disk space, but is faster for repeated rendering.</string>
+             <string>Stacking blur (Uses more disk space, but is faster for repeated rendering.)</string>
             </property>
            </widget>
           </item>
@@ -540,14 +567,7 @@
           <item>
            <widget class="QRadioButton" name="radioBlurConvolution">
             <property name="text">
-             <string>Convolution blur</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Smoother than stacking, usually the better choice.</string>
+             <string>Convolution blur (Smoother than stacking, usually the better choice.)</string>
             </property>
            </widget>
           </item>
@@ -561,11 +581,24 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_4">
-      <attribute name="label">
-       <string>&amp;Output</string>
+     <widget class="QWidget" name="tabWidgetPage4" native="true">
+      <attribute name="title">
+       <string>Output</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
@@ -735,38 +768,22 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <spacer name="verticalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -785,6 +802,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="bSave">
+       <property name="toolTip">
+        <string>Will *not* save the project!</string>
+       </property>
        <property name="text">
         <string>&amp;Save settings</string>
        </property>

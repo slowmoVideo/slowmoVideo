@@ -27,7 +27,7 @@
 using namespace V3D;
 using namespace V3D_GPU;
 
-#define VERSION "1.01"
+#define VERSION "2.0"
 
 //#define USE_LAB_COLORSPACE 1
 

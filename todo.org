@@ -2,8 +2,8 @@
 #+STARTUP: nohideblocks
 
 
-* UI [0/1]
-- [ ] Always display some units (user feedback when scrolling)
+* UI [1/3]
+- [X] Always display some units (user feedback when scrolling)
 - [ ] Customize grid: Replay speed (e.g. 1x, 0.5x, etc.)
 - [ ] Help texts
 

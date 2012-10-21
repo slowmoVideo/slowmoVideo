@@ -294,6 +294,8 @@ void RenderingDialog::slotSaveSettings()
     m_project->preferences()->renderFrameSize() = size;
     m_project->preferences()->renderFPS() = fps;
     m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
+
+    accept();
 }
 
 bool RenderingDialog::slotValidate()
