@@ -209,12 +209,15 @@ void Canvas::showHelp(bool show)
 {
     m_showHelp = show;
     repaint();
+
+    qDebug() << "ui/displayHelp is set to " << m_settings.value("ui/displayHelp", true).toBool() << ", setting to " << show;
+    m_settings.setValue("ui/displayHelp", show);
+    m_settings.sync();
 }
 
 void Canvas::toggleHelp()
 {
-    m_showHelp = !m_showHelp;
-    repaint();
+    showHelp(!m_showHelp);
 }
 
 const QPointF Canvas::prevMouseTime() const
