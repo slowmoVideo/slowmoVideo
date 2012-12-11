@@ -163,6 +163,7 @@ private:
         QPoint prevMousePos;
         QPoint initialMousePos;
         QPointF contextmenuMouseTime;
+        Node_sV initial_t0;
 
         Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;
