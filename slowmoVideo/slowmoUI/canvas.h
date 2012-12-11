@@ -139,8 +139,8 @@ private:
     int m_distBottom;
     int m_distRight;
     int m_distTop;
-    Node_sV m_t0;
-    Node_sV m_tmax;
+    Node_sV m_t0;    ///< Viewport, bottom left
+    Node_sV m_tmax;  ///< Upper bounds for the viewport (so the user does not get lost by zooming too far up)
     float m_secResX; ///< How many pixels wide is one output second?
     float m_secResY; ///< How many pixels wide is one input second?
 
@@ -163,6 +163,7 @@ private:
         QPoint prevMousePos;
         QPoint initialMousePos;
         QPointF contextmenuMouseTime;
+        Node_sV initial_t0;
 
         Qt::KeyboardModifiers prevModifiers;
         Qt::KeyboardModifiers initialModifiers;

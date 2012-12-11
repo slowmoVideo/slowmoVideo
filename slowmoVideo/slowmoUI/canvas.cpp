@@ -209,12 +209,14 @@ void Canvas::showHelp(bool show)
 {
     m_showHelp = show;
     repaint();
+
+    m_settings.setValue("ui/displayHelp", show);
+    m_settings.sync();
 }
 
 void Canvas::toggleHelp()
 {
-    m_showHelp = !m_showHelp;
-    repaint();
+    showHelp(!m_showHelp);
 }
 
 const QPointF Canvas::prevMouseTime() const
@@ -606,6 +608,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.initialButtons = e->buttons();
 
     m_states.initialContextObject = objectAt(e->pos(), e->modifiers());
+    m_states.initial_t0 = m_t0;
 
     if (m_states.initialContextObject != NULL) {
         qDebug() << "Mouse pressed. Context: " << typeid(*m_states.initialContextObject).name();
@@ -677,9 +680,16 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                 }
                 m_states.nodesMoved = true;
             } else {
-                if (m_states.initialContextObject != NULL) {
-                    qDebug() << "Trying to move " << typeid(*m_states.initialContextObject).name() << ": Not supported yet!";
-                }
+                // Cannot move this object, so move the canvas instead.
+//                if (m_states.initialContextObject != NULL) {
+//                    qDebug() << "Trying to move " << typeid(*m_states.initialContextObject).name() << ": Not supported yet!";
+//                }
+
+                m_t0 = m_states.initial_t0 - diff;
+                if (m_t0.y() < 0) { m_t0.setY(0); }
+                if (m_t0.x() < 0) { m_t0.setX(0); }
+                if (m_t0.y() > m_tmax.y()) { m_t0.setY(m_tmax.y()); }
+
             }
 
         } else if (m_mode == ToolMode_Move) {

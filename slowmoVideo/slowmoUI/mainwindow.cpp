@@ -121,8 +121,8 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
     ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
-    ui->actionZoomIn->setShortcut(QKeySequence::ZoomIn);
-    ui->actionZoomOut->setShortcut(QKeySequence::ZoomOut);
+    ui->actionZoomIn->setShortcut(QKeySequence("+"));
+    ui->actionZoomOut->setShortcut(QKeySequence("-"));
 
     m_cs.addShortcut("h", Help, "Show help overlay");
     m_cs.addShortcut("q-q", Quit, "Quit");
@@ -170,7 +170,11 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
 
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
-    m_wCanvas->showHelp(true);
+
+    QSettings settings;
+    bool show = settings.value("ui/displayHelp", true).toBool();
+    m_wCanvas->showHelp(show);
+    settings.sync();
 
 
     if (!projectPath.isEmpty()) {
@@ -398,7 +402,7 @@ void MainWindow::slotToggleHelp()
 void MainWindow::displayHelp(QPainter &davinci) const
 {
     QString helpText = m_cs.shortcutList()
-            + "\nNavigation: [Shift] Scroll"
+            + "\nNavigation: [Shift] Scroll, Drag"
             + "\nMove nodes: [Ctrl]  Drag";
 
     QRect content;
