@@ -11,7 +11,7 @@
 #include <GL/glew.h>
 #ifdef __APPLE__
 #include <glut.h>
-#elseif defined(_WIN32)
+#elif defined(_WIN32)
 #include <GL/glut.h>
 #else
 #define USE_RAW_X11
