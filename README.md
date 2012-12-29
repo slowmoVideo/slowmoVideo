@@ -37,7 +37,8 @@ Download it from http://ffmpeg.zeranoe.com/builds/ and put it into the same dire
 Translating
 -----------
 
-For this you should be in the slowmoVideo subdirectory which contains the tr/ directory.
+For this you should be in the slowmoVideo subdirectory which contains the tr/ directory. 
+The tools (`linguist`, `lupdate`, `lrelease`) are available in the `qt4-dev-tools` package for Debian based systems.
 
 ### Adding your language
 To add your language xx (like fr, it), run the following command to generate the respective .ts file:
