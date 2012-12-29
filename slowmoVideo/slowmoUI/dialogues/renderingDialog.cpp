@@ -91,8 +91,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->cbFps->setCurrentIndex(ui->cbFps->findText(fps));
 
     // Output size
-    ui->cbSize->addItem("Original size", QVariant(FrameSize_Orig));
-    ui->cbSize->addItem("Small", QVariant(FrameSize_Small));
+    ui->cbSize->addItem(tr("Original size"), QVariant(FrameSize_Orig));
+    ui->cbSize->addItem(tr("Small"), QVariant(FrameSize_Small));
     ui->cbSize->setCurrentIndex(ui->cbSize->findData(QVariant(m_project->preferences()->renderFrameSize())));
 
     // Interpolation type
@@ -241,12 +241,12 @@ void RenderingDialog::fillTagLists()
         }
     }
     qSort(list);
-    ui->cbStartTag->addItem("<Start>", QVariant(m_project->nodes()->startTime()));
+    ui->cbStartTag->addItem(tr("<Start>"), QVariant(m_project->nodes()->startTime()));
     for (int i = 0; i < list.size(); i++) {
         ui->cbStartTag->addItem(list.at(i).description(), QVariant(list.at(i).time()));
         ui->cbEndTag->addItem(list.at(i).description(), QVariant(list.at(i).time()));
     }
-    ui->cbEndTag->addItem("<End>", QVariant(m_project->nodes()->endTime()));
+    ui->cbEndTag->addItem(tr("<End>"), QVariant(m_project->nodes()->endTime()));
 }
 
 void RenderingDialog::slotSaveSettings()
@@ -357,10 +357,10 @@ bool RenderingDialog::slotValidate()
         }
         if (timeEnd <= timeStart) {
             endOk = false;
-            messages << "Start time must be < end time!";
+            messages << tr("Start time must be < end time!");
         }
 
-        messages << QString("Rendering from %1 s to %2 s.").arg(timeStart).arg(timeEnd);
+        messages << tr("Rendering from %1 s to %2 s.").arg(timeStart).arg(timeEnd);
         ui->sectionMessage->setText(messages.join("\n"));
 
         ok &= startOk && endOk;
@@ -395,7 +395,7 @@ void RenderingDialog::slotUpdateRenderTarget()
 
 void RenderingDialog::slotBrowseImagesDir()
 {
-    QFileDialog dialog(this, "Output directory for rendered images");
+    QFileDialog dialog(this, tr("Output directory for rendered images"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly, true);
@@ -407,7 +407,7 @@ void RenderingDialog::slotBrowseImagesDir()
 
 void RenderingDialog::slotBrowseVideoFile()
 {
-    QFileDialog dialog(this, "Output video file");
+    QFileDialog dialog(this, tr("Output video file"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setDirectory(QFileInfo(ui->videoOutputFile->text()).absolutePath());

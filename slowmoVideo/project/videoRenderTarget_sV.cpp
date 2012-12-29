@@ -20,6 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "videoRenderTarget_sV.h"
 #include "renderTask_sV.h"
+#include <QtCore/QObject>
 
 extern "C" {
 #include "../lib/ffmpegEncode_sV.h"
@@ -57,7 +58,7 @@ void VideoRenderTarget_sV::openRenderTarget() throw(Error_sV)
             renderTask()->fps().fps() * renderTask()->resolution().width() * renderTask()->resolution().height(),
             renderTask()->fps().den, renderTask()->fps().num);
     if (worked != 0) {
-        throw Error_sV(QString("Video could not be prepared (error code %1).\n%2").arg(worked).arg(m_videoOut->errorMessage));
+        throw Error_sV(QObject::tr("Video could not be prepared (error code %1).\n%2").arg(worked).arg(m_videoOut->errorMessage));
     }
 }
 

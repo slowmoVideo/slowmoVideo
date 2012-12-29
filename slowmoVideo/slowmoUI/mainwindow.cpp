@@ -63,19 +63,19 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
 
 
     m_wInputMonitor = new FrameMonitor(this);
-    m_wInputMonitorDock = new QDockWidget("Input monitor", this);
+    m_wInputMonitorDock = new QDockWidget(tr("Input monitor"), this);
     m_wInputMonitorDock->setWidget(m_wInputMonitor);
     m_wInputMonitorDock->setObjectName("inputMonitor");
     addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
 
     m_wCurveMonitor = new FrameMonitor(this);
-    m_wCurveMonitorDock = new QDockWidget("Curve monitor", this);
+    m_wCurveMonitorDock = new QDockWidget(tr("Curve monitor"), this);
     m_wCurveMonitorDock->setWidget(m_wCurveMonitor);
     m_wCurveMonitorDock->setObjectName("curveMonitor");
     addDockWidget(Qt::TopDockWidgetArea, m_wCurveMonitorDock);
 
     m_wRenderPreview = new RenderPreview(m_project, this);
-    m_wRenderPreviewDock = new QDockWidget("Render preview", this);
+    m_wRenderPreviewDock = new QDockWidget(tr("Render preview"), this);
     m_wRenderPreviewDock->setWidget(m_wRenderPreview);
     m_wRenderPreviewDock->setObjectName("renderPreview");
     addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
@@ -124,18 +124,18 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     ui->actionZoomIn->setShortcut(QKeySequence("+"));
     ui->actionZoomOut->setShortcut(QKeySequence("-"));
 
-    m_cs.addShortcut("h", Help, "Show help overlay");
-    m_cs.addShortcut("q-q", Quit, "Quit");
-    m_cs.addShortcut("n", New, "New project");
-    m_cs.addShortcut("o", Open, "Open project");
-    m_cs.addShortcut("s-s", Save_Same, "Save");
-    m_cs.addShortcut("s-a", Save_As, "Save as ...");
-    m_cs.addShortcut("a", Abort, "Abort move");
-    m_cs.addShortcut("a-s", Abort_Selection, "Unselect all");
-    m_cs.addShortcut("d-n", Delete_Node, "Delete selected nodes");
-    m_cs.addShortcut("t-s", Tool_Select, "Selecting tool");
-    m_cs.addShortcut("t-m", Tool_Move, "Move tool");
-    m_cs.addShortcut("t-t", Tag, "Insert label (tag)");
+    m_cs.addShortcut("h", Help, tr("Show help overlay"));
+    m_cs.addShortcut("q-q", Quit, tr("Quit"));
+    m_cs.addShortcut("n", New, tr("New project"));
+    m_cs.addShortcut("o", Open, tr("Open project"));
+    m_cs.addShortcut("s-s", Save_Same, tr("Save"));
+    m_cs.addShortcut("s-a", Save_As, tr("Save as ..."));
+    m_cs.addShortcut("a", Abort, tr("Abort move"));
+    m_cs.addShortcut("a-s", Abort_Selection, tr("Unselect all"));
+    m_cs.addShortcut("d-n", Delete_Node, tr("Delete selected nodes"));
+    m_cs.addShortcut("t-s", Tool_Select, tr("Selecting tool"));
+    m_cs.addShortcut("t-m", Tool_Move, tr("Move tool"));
+    m_cs.addShortcut("t-t", Tag, tr("Insert label (tag)"));
 
     bool b = true;
     b &= connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
@@ -332,7 +332,7 @@ void MainWindow::loadProject(Project_sV *project)
 void MainWindow::slotLoadProjectDialog()
 {
     QString dir = m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString();
-    QString file = QFileDialog::getOpenFileName(this, "Load Project", dir, "slowmoVideo projects (*.sVproj)");
+    QString file = QFileDialog::getOpenFileName(this, tr("Load Project"), dir, tr("slowmoVideo projects (*.sVproj)"));
 
     if (!file.isEmpty()) {
         qDebug() << file;
@@ -348,14 +348,14 @@ void MainWindow::loadProject(QString path)
         QString warning;
         Project_sV *project = reader.loadProject(path, &warning);
         if (warning.length() > 0) {
-            QMessageBox(QMessageBox::Warning, "Warning", warning).exec();
+            QMessageBox(QMessageBox::Warning, tr("Warning"), warning).exec();
         }
         m_projectPath = path;
         loadProject(project);
     } catch (FrameSourceError &err) {
-        QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
+        QMessageBox(QMessageBox::Warning, tr("Frame source error"), err.message()).exec();
     } catch (Error_sV &err) {
-        QMessageBox(QMessageBox::Warning, "Error", err.message()).exec();
+        QMessageBox(QMessageBox::Warning, tr("Error"), err.message()).exec();
     }
 }
 
@@ -366,24 +366,24 @@ void MainWindow::slotSaveProject(QString filename)
     }
     if (filename.length() == 0) {
         qDebug() << "No filename given, won't save. (Perhaps an empty project?)";
-        statusBar()->showMessage("No filename given, won't save. (Perhaps an empty project?)", 5000);
+        statusBar()->showMessage(tr("No filename given, won't save. (Perhaps an empty project?)"), 5000);
     } else {
         qDebug() << "Saving project as " << filename;
         try {
             XmlProjectRW_sV writer;
             writer.saveProject(m_project, filename);
-            statusBar()->showMessage(QString("Saved project as: %1").arg(filename));
+            statusBar()->showMessage(QString(tr("Saved project as: %1")).arg(filename));
         } catch (Error_sV &err) {
-            QMessageBox(QMessageBox::Warning, "Error writing project file", err.message()).exec();
+            QMessageBox(QMessageBox::Warning, tr("Error writing project file"), err.message()).exec();
         }
     }
 }
 void MainWindow::slotSaveProjectDialog()
 {
-    QFileDialog dialog(this, "Save project");
+    QFileDialog dialog(this, tr("Save project"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("sVproj");
-    dialog.setNameFilter("slowmoVideo projects (*.sVproj)");
+    dialog.setNameFilter(tr("slowmoVideo projects (*.sVproj)"));
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setDirectory(QFileInfo(m_project->projectFilename()).absolutePath());
     if (dialog.exec() == QDialog::Accepted) {
@@ -402,8 +402,8 @@ void MainWindow::slotToggleHelp()
 void MainWindow::displayHelp(QPainter &davinci) const
 {
     QString helpText = m_cs.shortcutList()
-            + "\nNavigation: [Shift] Scroll, Drag"
-            + "\nMove nodes: [Ctrl]  Drag";
+            + tr("\nNavigation: [Shift] Scroll, Drag")
+            + tr("\nMove nodes: [Ctrl]  Drag");
 
     QRect content;
     const QPoint topLeft(10, 10);
@@ -441,7 +441,7 @@ void MainWindow::slotUpdateRenderPreview()
 }
 void MainWindow::updateWindowTitle()
 {
-    QString project("empty project");
+    QString project(tr("empty project"));
     if (m_projectPath.length() > 0) {
         project = m_projectPath;
     }
@@ -526,7 +526,7 @@ void MainWindow::slotShowRenderDialog()
 
         if (m_renderProgressDialog == NULL) {
             m_renderProgressDialog = new ProgressDialog(this);
-            m_renderProgressDialog->setWindowTitle("Rendering progress");
+            m_renderProgressDialog->setWindowTitle(tr("Rendering progress"));
         } else {
             m_renderProgressDialog->disconnect();
         }
@@ -553,14 +553,14 @@ void MainWindow::slotShowRenderDialog()
 }
 void MainWindow::slotRenderingAborted(QString message)
 {
-    QMessageBox(QMessageBox::Warning, "Error", message, QMessageBox::Ok).exec();
+    QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
 }
 
 void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskSize)
 {
     if (m_progressDialog == NULL) {
         m_progressDialog = new ProgressDialog(this);
-        m_progressDialog->setWindowTitle("Frame extraction progress");
+        m_progressDialog->setWindowTitle(tr("Frame extraction progress"));
         bool b = true;
         b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
         b &= connect(m_project->frameSource(), SIGNAL(signalTaskProgress(int)), m_progressDialog, SLOT(slotTaskProgress(int)));

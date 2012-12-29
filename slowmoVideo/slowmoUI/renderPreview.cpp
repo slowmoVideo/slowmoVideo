@@ -58,18 +58,18 @@ void RenderPreview::notify(const QString message)
 void RenderPreview::slotRenderAt(qreal time)
 {
     if (dynamic_cast<EmptyFrameSource_sV*>(m_project->frameSource()) != NULL) {
-        notify("Cannot render preview, no frames loaded.");
+        notify(tr("Cannot render preview, no frames loaded."));
         return;
     }
     if (m_project->nodes()->size() < 2) {
-        notify("Cannot render preview at the curve position since no curve is available.");
+        notify(tr("Cannot render preview at the curve position since no curve is available."));
         return;
     }
     if (time >= m_project->nodes()->startTime() && time <= m_project->nodes()->endTime()) {
-        notify(QString("Rendering preview at output time %1 s (might take some time) ...").arg(time));
+        notify(tr("Rendering preview at output time %1 s (might take some time) ...").arg(time));
 
         if (m_future.isRunning()) {
-            notify("Preview is still being rendered.");
+            notify(tr("Preview is still being rendered."));
         } else {
 
             RenderPreferences_sV prefs;
@@ -85,7 +85,7 @@ void RenderPreview::slotRenderAt(qreal time)
             }
         }
     } else {
-        notify(QString("Cannot render at output time %1 s; Not within the curve.").arg(time));
+        notify(tr("Cannot render at output time %1 s; Not within the curve.").arg(time));
     }
 }
 
@@ -95,5 +95,5 @@ void RenderPreview::slotUpdateImage()
     ui->imageDisplay->loadImage(m_future.result());
     ui->imageDisplay->image().save("/tmp/renderPreview.jpg");
     repaint();
-    notify("Preview rendering finished.");
+    notify(tr("Preview rendering finished."));
 }

@@ -87,8 +87,8 @@ QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, const RenderPre
     if (frameList.size() > 1) {
         return Shutter_sV::combine(frameList);
     } else {
-        throw RangeTooSmallError_sV(QString("Range too small: Start frame is %1, end frame is %2. "
-                                            "Using normal interpolation.").arg(startFrame).arg(endFrame));
+        throw RangeTooSmallError_sV(QObject::tr("Range too small: Start frame is %1, end frame is %2. "
+                                                "Using normal interpolation.").arg(startFrame).arg(endFrame));
     }
 
 }

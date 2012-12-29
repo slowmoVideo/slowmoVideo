@@ -11,3 +11,6 @@
 - [ ] Skip defect image files
   - [ ] Maybe: Run a checker thread (image size, validity) in the background
 - [ ] Project loading speed for big files
+
+* Windows [/]
+- [ ] Rendering: Check if directory exists (/tmp/...)

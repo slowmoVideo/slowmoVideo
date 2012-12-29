@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/project_sV.h"
 #include "project/projectPreferences_sV.h"
 
+#include <QtCore/QObject>
 //#define DEBUG
 #ifdef DEBUG
 #include <QDebug>
@@ -35,13 +36,13 @@ QString CanvasTools::outputTimeLabel(Canvas *canvas, Node_sV &time)
 
     QString timeText;
     if (time.x() < 60) {
-        timeText = QString("%1 s").arg(time.x(), 0, 'f', decimals);
+        timeText = QString(QObject::tr("%1 s")).arg(time.x(), 0, 'f', decimals);
     } else {
-        timeText = QString("%1 min %2 s").arg(int(time.x()/60)).arg(time.x()-60*int(time.x()/60), 0, 'f', decimals);
+        timeText = QString(QObject::tr("%1 min %2 s")).arg(int(time.x()/60)).arg(time.x()-60*int(time.x()/60), 0, 'f', decimals);
     }
 
     float frame = canvas->m_project->preferences()->canvas_xAxisFPS().fps()*time.x();
-    timeText += QString("\nFrame %1").arg(frame, 0, 'f', (decimals <= 1 ? 0 : 1));
+    timeText += QString(QObject::tr("\nFrame %1")).arg(frame, 0, 'f', (decimals <= 1 ? 0 : 1));
 
     return timeText;
 }
@@ -71,7 +72,7 @@ QString CanvasTools::outputSpeedLabel(Node_sV &time, Project_sV *project)
         percent = dy/dx;
     }
 
-    return QString("%1 %").arg(percent, 0, 'f');//, 1);
+    return QString(QObject::tr("%1 %")).arg(percent, 0, 'f');//, 1);
 
 
 }

@@ -1,7 +1,7 @@
 #include "avconvInfo_sV.h"
 
-#include "QProcess"
-#include "QFileInfo"
+#include <QProcess>
+#include <QFileInfo>
 
 AvconvInfo::AvconvInfo() :
     m_executablePath(""),

@@ -2,6 +2,7 @@
 #include "abstractFrameSource_sV.h"
 #include "../lib/flowField_sV.h"
 #include "../lib/interpolate_sV.h"
+#include <QtCore/QObject>
 
 #define MIN_FRAME_DIST .001
 
@@ -9,7 +10,7 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPre
                             throw(FlowBuildingError, InterpolationError)
 {
     if (frame > pr->frameSource()->framesCount()) {
-        throw InterpolationError(QString("Requested frame %1: Not within valid range. (%2 frames)")
+        throw InterpolationError(QObject::tr("Requested frame %1: Not within valid range. (%2 frames)")
                                  .arg(frame).arg(pr->frameSource()->framesCount()));
     }
     if (frame-floor(frame) > MIN_FRAME_DIST) {

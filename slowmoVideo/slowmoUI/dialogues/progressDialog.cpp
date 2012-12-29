@@ -37,8 +37,8 @@ void ProgressDialog::slotNextTask(const QString taskDescription, int taskSize)
     ui->lblTaskDesc->setText(taskDescription);
     ui->progress->setMaximum(taskSize);
     ui->progress->setValue(0);
-    if (windowTitle().startsWith("(Finished) ")) {
-        setWindowTitle(windowTitle().remove(0, strlen("(Finished) ")));
+    if (windowTitle().startsWith(tr("(Finished) "))) {
+        setWindowTitle(windowTitle().remove(0, tr("(Finished) ").length()));
     }
     setWorking(true);
 }
@@ -59,7 +59,7 @@ void ProgressDialog::slotAborted(const QString &message)
 {
     if (message.length() > 0) {
         // Show message
-        QMessageBox box(QMessageBox::Warning, "Aborted", message, QMessageBox::Ok);
+        QMessageBox box(QMessageBox::Warning, tr("Aborted"), message, QMessageBox::Ok);
         box.show();
     }
     reject();
@@ -70,9 +70,9 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
     ui->progress->setValue(ui->progress->maximum());
     setWorking(false);
     if (timePassed.length() > 0) {
-        slotTaskItemDescription(QString("Task finished in %1.").arg(timePassed));
+        slotTaskItemDescription(tr("Task finished in %1.").arg(timePassed));
     } else {
-        slotTaskItemDescription("Task finished.");
+        slotTaskItemDescription(tr("Task finished."));
     }
-    setWindowTitle("(Finished) " + windowTitle());
+    setWindowTitle(tr("(Finished) %1").arg(windowTitle()));
 }

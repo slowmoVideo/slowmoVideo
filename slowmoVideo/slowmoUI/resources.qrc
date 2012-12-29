@@ -1,9 +1,13 @@
-<RCC>
+<!DOCTYPE RCC>
+<RCC version="1.0">
     <qresource prefix="/">
         <file alias="icons/iconAdd.png">res/iconAdd.png</file>
         <file alias="icons/iconSel.png">res/iconSel.png</file>
         <file alias="icons/iconMov.png">res/iconMov.png</file>
         <file alias="images/shutterFunc.png">res/shutterFunction.png</file>
         <file alias="icons/slowmoIcon.png">res/AppIcon.png</file>
+    </qresource>
+    <qresource lang="de">
+        <file alias="translations.qm">../tr/slowmoVideo_de.qm</file>
     </qresource>
 </RCC>

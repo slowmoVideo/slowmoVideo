@@ -26,7 +26,7 @@ throw(FrameSourceError) :
     m_initialized(false)
 {
     if (!QFileInfo(filename).exists()) {
-        throw FrameSourceError(QString("Video file %1 does not exist!").arg(filename));
+        throw FrameSourceError(tr("Video file %1 does not exist!").arg(filename));
     }
 
     m_videoInfo = new VideoInfoSV();
@@ -34,7 +34,7 @@ throw(FrameSourceError) :
     *m_videoInfo = getInfo(filename.toStdString().c_str());
     if (m_videoInfo->streamsCount <= 0) {
         qDebug() << "Video info is invalid: " << filename;
-        throw FrameSourceError("Video is invalid, no streams found: " + filename);
+        throw FrameSourceError(tr("Video is invalid, no streams found in %1").arg(filename));
     }
     m_fps = Fps_sV(m_videoInfo->frameRateNum, m_videoInfo->frameRateDen);
 
@@ -172,15 +172,15 @@ void VideoFrameSource_sV::locateFFmpeg()
         m_settings.setValue("binaries/ffmpeg", m_avconvInfo.executablePath());
         m_settings.sync();
     } else {
-        throw FrameSourceError(QString("ffmpeg/avconv executable not found! Cannot load video."
-                                       "\n(It is also possible that it took a little long to respond "
-                                       "due to high workload, so you might want to try again.)"));
+        throw FrameSourceError(tr("ffmpeg/avconv executable not found! Cannot load video."
+                                  "\n(It is also possible that it took a little long to respond "
+                                  "due to high workload, so you might want to try again.)"));
     }
 }
 
 void VideoFrameSource_sV::slotExtractSmallFrames()
 {
-    emit signalNextTask("Extracting thumbnail-sized frames from the video file", m_videoInfo->framesCount);
+    emit signalNextTask(tr("Extracting thumbnail-sized frames from the video file"), m_videoInfo->framesCount);
     m_timer->start(100);
     if (rebuildRequired(FrameSize_Small)) {
 
@@ -205,7 +205,7 @@ void VideoFrameSource_sV::slotExtractSmallFrames()
 
 void VideoFrameSource_sV::slotExtractOrigFrames()
 {
-    emit signalNextTask("Extracting original-sized frames from the video file", m_videoInfo->framesCount);
+    emit signalNextTask(tr("Extracting original-sized frames from the video file"), m_videoInfo->framesCount);
     m_timer->start(100);
     if (rebuildRequired(FrameSize_Orig)) {
 
@@ -261,7 +261,7 @@ void VideoFrameSource_sV::slotProgressUpdate()
     s = QString(m_ffmpeg->readAllStandardError());
     if (regex.lastIndexIn(s) >= 0) {
         emit signalTaskProgress(regex.cap(1).toInt());
-        emit signalTaskItemDescription(QString("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
+        emit signalTaskItemDescription(tr("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
     }
     m_ffmpegSemaphore.release();
 }

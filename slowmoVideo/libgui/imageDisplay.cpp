@@ -25,11 +25,11 @@ ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     QFrame(parent, f),
     m_scale(1)
 {
-    m_aScaling = new QAction("Scale image to widget size", this);
+    m_aScaling = new QAction(tr("Scale image to widget size"), this);
     m_aScaling->setCheckable(true);
     m_aScaling->setChecked(true);
 
-    m_aExportImage = new QAction("Export image", this);
+    m_aExportImage = new QAction(tr("Export image"), this);
 
     bool b = true;
     b &= connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
@@ -238,7 +238,7 @@ void ImageDisplay::slotExportImage()
 
     QSettings settings;
 
-    QFileDialog dialog(this, "Export render preview to image");
+    QFileDialog dialog(this, tr("Export render preview to image"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setDirectory(settings.value("directories/imageDisplay", QDir::homePath()).toString());

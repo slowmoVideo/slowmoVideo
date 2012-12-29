@@ -99,7 +99,7 @@ void RenderTask_sV::slotContinueRendering()
             m_initialized = true;
         } catch (Error_sV &err) {
             m_stopRendering = true;
-            emit signalRenderingAborted("Rendering aborted. " + err.message());
+            emit signalRenderingAborted(tr("Rendering aborted.") + " " + err.message());
             return;
         }
     }
@@ -107,7 +107,7 @@ void RenderTask_sV::slotContinueRendering()
 
     m_stopwatch.start();
     emit signalRenderingContinued();
-    emit signalNewTask("Rendering slowmo ...", int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
+    emit signalNewTask(trUtf8("Rendering Slow-Mo …"), int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
     bool b = QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     if (!b) {
         qDebug() << "invokeMethod returned false.";
@@ -118,12 +118,12 @@ void RenderTask_sV::slotRenderFrom(qreal time)
 {
     if (m_renderTarget == NULL) {
         m_stopRendering = true;
-        emit signalRenderingAborted("No rendering target given! Aborting rendering.");
+        emit signalRenderingAborted(tr("No rendering target given! Aborting rendering."));
         return;
     }
     if (dynamic_cast<EmptyFrameSource_sV*>(const_cast<Project_sV*>(m_project)->frameSource()) != NULL) {
         m_stopRendering = true;
-        emit signalRenderingAborted("Empty frame source, cannot be rendered.");
+        emit signalRenderingAborted(tr("Empty frame source, cannot be rendered."));
     }
 
     int outputFrame = (time - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5;
@@ -140,7 +140,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
             qreal srcTime = m_project->nodes()->sourceTime(time);
 
             qDebug() << "Rendering frame number " << outputFrame << " @" << time << " from source time " << srcTime;
-            emit signalItemDesc(QString("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
+            emit signalItemDesc(tr("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
                                 .arg(outputFrame).arg(time).arg(srcTime).arg(srcTime*m_project->frameSource()->fps()->fps()));
             try {
                 QImage rendered = m_project->render(time, m_prefs);

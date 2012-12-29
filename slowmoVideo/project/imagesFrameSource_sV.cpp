@@ -38,12 +38,12 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
 
 QString ImagesFrameSource_sV::validateImages(const QStringList images)
 {
-    if (images.size() == 0) { return "No images selected."; }
+    if (images.size() == 0) { return tr("No images selected."); }
 
     QSize size = QImage(images.at(0)).size();
     for (int i = 0; i < images.length(); i++) {
         if (QImage(images.at(i)).size() != size) {
-            return QString("Image %1 is not of the same size (%2) as the first image (%3).")
+            return tr("Image %1 is not of the same size (%2) as the first image (%3).")
                     .arg(images.at(i)).arg(toString(QImage(images.at(i)).size())).arg(toString(size));
         }
     }
@@ -79,14 +79,14 @@ bool ImagesFrameSource_sV::initialized() const
 /// \todo What if image missing?
 void ImagesFrameSource_sV::slotContinueInitialization()
 {
-    emit signalNextTask("Creating preview images from the input images", m_imagesList.size());
+    emit signalNextTask(tr("Creating preview images from the input images"), m_imagesList.size());
     for (; m_nextFrame < m_imagesList.size(); m_nextFrame++) {
 
         QString outputFile(framePath(m_nextFrame, FrameSize_Small));
         if (QFile(outputFile).exists()) {
-            emit signalTaskItemDescription("Resized image already exists for " + QFileInfo(m_imagesList.at(m_nextFrame)).fileName());
+            emit signalTaskItemDescription(tr("Resized image already exists for %1").arg(QFileInfo(m_imagesList.at(m_nextFrame)).fileName()));
         } else {
-            emit signalTaskItemDescription(QString("Re-sizing image %1 to:\n%2")
+            emit signalTaskItemDescription(tr("Re-sizing image %1 to:\n%2")
                                            .arg(QFileInfo(m_imagesList.at(m_nextFrame)).fileName())
                                            .arg(outputFile));
             QImage small = QImage(m_imagesList.at(m_nextFrame)).scaled(m_sizeSmall, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

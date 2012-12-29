@@ -35,12 +35,12 @@ QString toString(const FrameSize &size)
 {
     switch (size) {
     case FrameSize_Orig:
-        return QString("Orig");
+        return QObject::tr("Orig");
     case FrameSize_Small:
-        return QString("Small");
+        return QObject::tr("Small");
     default:
         Q_ASSERT(false);
-        return QString("Unknown size");
+        return QObject::tr("Unknown size");
     }
 }
 
@@ -48,12 +48,12 @@ QString toString(const FlowDirection &dir)
 {
     switch (dir) {
     case FlowDirection_Forward:
-        return QString("Forward");
+        return QObject::tr("Forward");
     case FlowDirection_Backward:
-        return QString("Backward");
+        return QObject::tr("Backward");
     default:
         Q_ASSERT(false);
-        return QString("Unknown direction");
+        return QObject::tr("Unknown direction");
     }
 }
 
@@ -61,12 +61,12 @@ QString toString(const CurveType &curveType)
 {
     switch (curveType) {
     case CurveType_Linear:
-        return QString("Linear");
+        return QObject::tr("Linear");
     case CurveType_Bezier:
-        return QString::fromUtf8("Bézier");
+        return QObject::trUtf8("Bézier");
     default:
         Q_ASSERT(false);
-        return QString("Unknown curve type");
+        return QObject::tr("Unknown curve type");
     }
 }
 
@@ -79,12 +79,12 @@ QString toString(const TagAxis axis)
 {
     switch (axis) {
     case TagAxis_Source:
-        return QString("Source axis");
+        return QObject::tr("Source axis");
     case TagAxis_Output:
-        return QString("Output axis");
+        return QObject::tr("Output axis");
     default:
         Q_ASSERT(false);
-        return QString("Unknown axis");
+        return QObject::tr("Unknown axis");
     }
 }
 
@@ -92,18 +92,18 @@ QString toString(const InterpolationType &interpolation)
 {
     switch (interpolation) {
     case InterpolationType_Forward:
-        return QString("Forward interpolation (fast)");
+        return QObject::tr("Forward interpolation (fast)");
     case InterpolationType_ForwardNew:
-        return QString("Forward interpolation (accurate)");
+        return QObject::tr("Forward interpolation (accurate)");
     case InterpolationType_Twoway:
-        return QString("Two-way interpolation (fast)");
+        return QObject::tr("Two-way interpolation (fast)");
     case InterpolationType_TwowayNew:
-        return QString("Two-way interpolation (accurate)");
+        return QObject::tr("Two-way interpolation (accurate)");
     case InterpolationType_Bezier:
-        return QString::fromUtf8("Bézier interpolation");
+        return QObject::trUtf8("Bézier interpolation");
     default:
         Q_ASSERT(false);
-        return QString("Unknown interpolation");
+        return QObject::tr("Unknown interpolation");
     }
 }
 
@@ -111,11 +111,11 @@ QString toString(const MotionblurType &type)
 {
     switch (type) {
     case MotionblurType_Stacking:
-        return QString("Stacking");
+        return QObject::tr("Stacking");
     case MotionblurType_Convolving:
-        return QString("Convolution");
+        return QObject::tr("Convolution");
     case MotionblurType_Nearest:
-        return QString("Nearest (no blurring)");
+        return QObject::tr("Nearest (no blurring)");
     default:
         Q_ASSERT(false);
         return QString("Unknown motion blur type");

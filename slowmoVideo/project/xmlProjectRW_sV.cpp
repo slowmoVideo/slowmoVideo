@@ -156,7 +156,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
 
     QFile outFile(filename);
     if (!outFile.open(QIODevice::WriteOnly)) {
-        throw Error_sV(QString("Cannot write to %1; please check if you have write permissions.").arg(filename));
+        throw Error_sV(QObject::tr("Cannot write to %1; please check if you have write permissions.").arg(filename));
     }
     QTextStream output(&outFile);
     doc.save(output, 4);
@@ -302,7 +302,7 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     } else {
         reader->skipCurrentElement();
         qDebug() << "Unknown frame source: " << frameSourceType << "; Cannot load!";
-        throw FrameSourceError(QString::fromUtf8("Unknown frame source “%1”. Cannot load the project.").arg(frameSourceType.toString()));
+        throw FrameSourceError(QObject::trUtf8("Unknown frame source “%1”. Cannot load the project.").arg(frameSourceType.toString()));
     }
 }
 
@@ -311,14 +311,14 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Cannot read file " << filename;
-        throw Error_sV(QString("Cannot read from file %1. (Opening in read-only mode failed.)").arg(filename));
+        throw Error_sV(QObject::tr("Cannot read from file %1. (Opening in read-only mode failed.)").arg(filename));
     } else {
 
         QXmlStreamReader xml;
         xml.setDevice(&file);
         if (!xml.readNextStartElement()) {
             qDebug() << "Could not read " << filename;
-            throw Error_sV(QString("Invalid project file: %1").arg(filename));
+            throw Error_sV(QObject::tr("Invalid project file: %1").arg(filename));
 
         } else {
             if (xml.name() != "sVproject") {

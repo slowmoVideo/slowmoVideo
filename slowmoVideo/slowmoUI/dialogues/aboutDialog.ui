@@ -118,7 +118,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>version number goes here.</string>
+        <string notr="true">version number goes here.</string>
        </property>
       </widget>
      </item>

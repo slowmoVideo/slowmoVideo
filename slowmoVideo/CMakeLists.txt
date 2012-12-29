@@ -117,6 +117,7 @@ endif(NOT BUILD_SLOWMO)
 
 ## Include projects to build ##
 
+include_directories(tr)
 add_subdirectory(lib)
 add_subdirectory(libgui)
 add_subdirectory(project)

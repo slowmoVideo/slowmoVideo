@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include <QtGui/QApplication>
+#include <QtCore/QTranslator>
 #include <QtCore/QDebug>
 #include "mainwindow.h"
 
@@ -20,6 +21,18 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Granjow");
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
+
+    // Changes the file loaded from the resource container
+    if (a.arguments().contains("--de")) {
+        QLocale::setDefault(QLocale::German);
+    } else if (a.arguments().contains("--en")) {
+        QLocale::setDefault(QLocale::English);
+    }
+
+    // Load the translation file from the resource container and use it
+    QTranslator translator;
+    translator.load(":translations");
+    a.installTranslator(&translator);
 
     QString projectPath;
     qDebug() << a.arguments();

@@ -33,9 +33,9 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="tabWidgetPage1" native="true">
+     <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
        <string>a</string>
       </property>
@@ -217,46 +217,46 @@
             <bool>true</bool>
            </property>
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <item>
             <property name="text">
-             <string>23.976</string>
+             <string notr="true">23.976</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>24</string>
+             <string notr="true">24</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>25</string>
+             <string notr="true">25</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>29.976</string>
+             <string notr="true">29.976</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>30</string>
+             <string notr="true">30</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>50</string>
+             <string notr="true">50</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>60</string>
+             <string notr="true">60</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>72</string>
+             <string notr="true">72</string>
             </property>
            </item>
           </widget>
@@ -361,7 +361,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabWidgetPage2" native="true">
+     <widget class="QWidget" name="tabWidgetPage2">
       <attribute name="title">
        <string>Optical Flow</string>
       </attribute>
@@ -469,7 +469,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabWidgetPage3" native="true">
+     <widget class="QWidget" name="tabWidgetPage3">
       <attribute name="title">
        <string>Motion Blur</string>
       </attribute>
@@ -596,7 +596,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabWidgetPage4" native="true">
+     <widget class="QWidget" name="tabWidgetPage4">
       <attribute name="title">
        <string>Output</string>
       </attribute>
@@ -751,7 +751,7 @@
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_5">
                    <property name="text">
-                    <string>vcodec</string>
+                    <string notr="true">vcodec</string>
                    </property>
                   </widget>
                  </item>

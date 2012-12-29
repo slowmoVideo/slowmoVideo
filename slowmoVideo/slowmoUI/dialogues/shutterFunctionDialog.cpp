@@ -92,7 +92,7 @@ void ShutterFunctionDialog::setSegment(int segment)
 {
     qDebug() << "setSegment(" << segment << ");";
     m_segment = segment;
-    ui->lblSegmentNumber->setText(QString("Segment %1 (total number: %2)")
+    ui->lblSegmentNumber->setText(tr("Segment %1 (total number: %2)")
                                   .arg(m_segment).arg(m_project->nodes()->size()-1));
 
     // Enable/disable buttons
@@ -181,7 +181,7 @@ void ShutterFunctionDialog::slotLoadSelectedFunction()
             count++;
         }
     }
-    ui->lblUsage->setText(QString("Used: %1 times").arg(count));
+    ui->lblUsage->setText(tr("Used: %1 times").arg(count));
 
 }
 

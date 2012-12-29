@@ -20,7 +20,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     m_appIcon(":icons/slowmoIcon.png")
 {
     ui->setupUi(this);
-    ui->lblVersion->setText(QString("Version %1, %2").arg(Version_sV::version).arg(Version_sV::bits));
+    ui->lblVersion->setText(tr("Version %1, %2").arg(Version_sV::version).arg(Version_sV::bits));
 }
 
 AboutDialog::~AboutDialog()

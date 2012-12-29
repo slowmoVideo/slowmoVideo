@@ -102,11 +102,11 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
 
-    m_aDeleteNode = new QAction("&Delete node", this);
-    m_aSnapInNode = new QAction("&Snap in node", this);
-    m_aDeleteTag = new QAction("&Delete tag", this);
-    m_aRenameTag = new QAction("&Rename tag", this);
-    m_aSetTagTime = new QAction("Set tag &time", this);
+    m_aDeleteNode = new QAction(tr("&Delete node"), this);
+    m_aSnapInNode = new QAction(tr("&Snap in node"), this);
+    m_aDeleteTag = new QAction(tr("&Delete tag"), this);
+    m_aRenameTag = new QAction(tr("&Rename tag"), this);
+    m_aSetTagTime = new QAction(tr("Set tag &time"), this);
     m_hackMapper = new QSignalMapper(this);
     m_hackMapper->setMapping(m_aRenameTag, &m_toRenameTag); m_toRenameTag.reason = TransferObject::ACTION_RENAME;
     m_hackMapper->setMapping(m_aDeleteTag, &m_toDeleteTag); m_toDeleteTag.reason = TransferObject::ACTION_DELETE;
@@ -115,25 +115,25 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_hackMapper->setMapping(m_aSetTagTime, &m_toSetTagTime); m_toSetTagTime.reason = TransferObject::ACTION_SETTIME;
 
     m_curveTypeMapper = new QSignalMapper(this);
-    m_aLinear = new QAction("&Linear curve", this);
-    m_aBezier = new QAction(QString::fromUtf8("&Bézier curve"), this);
+    m_aLinear = new QAction(tr("&Linear curve"), this);
+    m_aBezier = new QAction(trUtf8("&Bézier curve"), this);
     m_curveTypeMapper->setMapping(m_aLinear, CurveType_Linear);
     m_curveTypeMapper->setMapping(m_aBezier, CurveType_Bezier);
 
-    m_aCustomSpeed = new QAction(QString::fromUtf8("Set &custom speed"), this);
-    m_aShutterFunction = new QAction("Set/edit shutter &function", this);
+    m_aCustomSpeed = new QAction(tr("Set &custom speed"), this);
+    m_aShutterFunction = new QAction(tr("Set/edit shutter &function"), this);
 
     m_speedsMapper = new QSignalMapper(this);
     double arr[] = {1, .5, 0, -.5, -1};
 #define N_SPEEDS 5
     for (int i = 0; i < N_SPEEDS; i++) {
-        m_aSpeeds.push_back(new QAction(QString::fromUtf8("Set speed to %1×").arg(arr[i], 0, 'f', 1), this));
+        m_aSpeeds.push_back(new QAction(trUtf8("Set speed to %1×").arg(arr[i], 0, 'f', 1), this));
         m_speedsMapper->setMapping(m_aSpeeds.back(), QString("%1").arg(arr[i],0,'f',1));
     }
 
     m_handleMapper = new QSignalMapper(this);
-    m_aResetLeftHandle = new QAction("Reset left handle", this);
-    m_aResetRightHandle = new QAction("Reset right handle", this);
+    m_aResetLeftHandle = new QAction(tr("Reset left handle"), this);
+    m_aResetRightHandle = new QAction(tr("Reset right handle"), this);
     m_handleMapper->setMapping(m_aResetLeftHandle, "left");
     m_handleMapper->setMapping(m_aResetRightHandle, "right");
 
@@ -786,7 +786,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     m_states.contextmenuMouseTime = convertCanvasToTime(e->pos()).toQPointF();
 
     QMenu menu;
-    QMenu speedMenu(QString::fromUtf8("Segment replay &speed …"), &menu);
+    QMenu speedMenu(trUtf8("Segment replay &speed …"), &menu);
 
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
@@ -797,10 +797,10 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
 
         int nodeIndex = m_nodes->indexOf(node);
 
-        menu.addAction(QString("Node %1").arg(nodeIndex))->setEnabled(false);
+        menu.addAction(QString(tr("Node %1")).arg(nodeIndex))->setEnabled(false);
         menu.addAction(m_aDeleteNode);
 //        menu.addAction(m_aSnapInNode); // \todo Activate Snap in
-        menu.addSeparator()->setText("Handle actions");
+        menu.addSeparator()->setText(tr("Handle actions"));
         menu.addAction(m_aResetLeftHandle);
         menu.addAction(m_aResetRightHandle);
 
@@ -808,7 +808,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         const Segment_sV* segment = (const Segment_sV*) obj;
         int leftNode = segment->leftNodeIndex();
 
-        menu.addAction(QString("Segment between node %1 and %2").arg(leftNode).arg(leftNode+1))->setEnabled(false);
+        menu.addAction(QString(tr("Segment between node %1 and %2")).arg(leftNode).arg(leftNode+1))->setEnabled(false);
         menu.addAction(m_aLinear);
         menu.addAction(m_aBezier);
         menu.addAction(m_aShutterFunction);
@@ -827,7 +827,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         m_toRenameTag.objectPointer = tag;
         m_toSetTagTime.objectPointer = tag;
 
-        menu.addAction(QString("Tag %1").arg(tag->description()));
+        menu.addAction(QString(tr("Tag %1")).arg(tag->description()));
         menu.addAction(m_aDeleteTag);
         menu.addAction(m_aRenameTag);
         menu.addAction(m_aSetTagTime);
@@ -1075,7 +1075,7 @@ void Canvas::slotRunAction(QObject *o)
         case TransferObject::ACTION_RENAME:
         {
             bool ok;
-            QString newName = QInputDialog::getText(this, "New tag name", "Tag:", QLineEdit::Normal, tag->description(), &ok);
+            QString newName = QInputDialog::getText(this, tr("New tag name"), tr("Tag:"), QLineEdit::Normal, tag->description(), &ok);
             if (ok) {
                 tag->setDescription(newName);
             }
@@ -1084,7 +1084,7 @@ void Canvas::slotRunAction(QObject *o)
         case TransferObject::ACTION_SETTIME:
         {
             bool ok;
-            double d = QInputDialog::getDouble(this, "New tag time", "Time:", tag->time(), 0, 424242, 5, &ok);
+            double d = QInputDialog::getDouble(this, tr("New tag time"), tr("Time:"), tag->time(), 0, 424242, 5, &ok);
             if (ok) {
                 tag->setTime(d);
             }
@@ -1150,7 +1150,7 @@ void Canvas::slotSetSpeed()
 
     double d = m_settings.value("canvas/replaySpeed", 1.0).toDouble();
     qDebug() << "Getting: " << d;
-    d = QInputDialog::getDouble(this, "Replay speed for current segment", "Speed:", d, -1000, 1000, 3, &ok);
+    d = QInputDialog::getDouble(this, tr("Replay speed for current segment"), tr("Speed:"), d, -1000, 1000, 3, &ok);
     if (ok) {
         setCurveSpeed(d);
         m_settings.setValue("canvas/replaySpeed", d);

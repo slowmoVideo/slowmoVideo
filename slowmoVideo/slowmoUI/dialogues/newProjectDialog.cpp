@@ -88,7 +88,7 @@ const QString NewProjectDialog::projectFilename() const
 
 void NewProjectDialog::slotSelectVideoFile()
 {
-    QFileDialog dialog(this, "Select input video file");
+    QFileDialog dialog(this, tr("Select input video file"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFile);
     if (ui->inputVideo->text().length() > 0) {
@@ -109,7 +109,7 @@ void NewProjectDialog::slotSelectVideoFile()
                 ascii = ui->inputVideo->text().at(i).toAscii();
                 if (ascii == 0 || ascii > 0x7f) {
                     ui->txtVideoInfo->appendPlainText(
-                                QString("Character %1 is not an ASCII character. This file path will likely not work with ffmpeg.")
+                                tr("Character %1 is not an ASCII character. This file path will likely not work with ffmpeg.")
                                 .arg(ui->inputVideo->text().at(i)));
                     break;
                 }
@@ -120,7 +120,7 @@ void NewProjectDialog::slotSelectVideoFile()
 
 void NewProjectDialog::slotSelectImages()
 {
-    QFileDialog dialog(this, "Select input images");
+    QFileDialog dialog(this, tr("Select input images"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::ExistingFiles);
     if (m_images.size() > 0) {
@@ -143,7 +143,7 @@ void NewProjectDialog::slotSelectImages()
 
 void NewProjectDialog::slotSelectProjectDir()
 {
-    QFileDialog dialog(this, "Select a project directory");
+    QFileDialog dialog(this, tr("Select a project directory"));
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::Directory);
     if (ui->projectDir->text().length() > 0) {
@@ -162,14 +162,14 @@ void NewProjectDialog::slotUpdateVideoInfo()
     QFile file(ui->inputVideo->text());
     if (file.exists()) {
         m_videoInfo = getInfo(ui->inputVideo->text().toStdString().c_str());
-        QString text = QString::fromUtf8("Number of video streams: %1\nFrames: %2\nSize: %3×%4\n")
+        QString text = trUtf8("Number of video streams: %1\nFrames: %2\nSize: %3×%4\n")
                 .arg(m_videoInfo.streamsCount).arg(m_videoInfo.framesCount)
                 .arg(m_videoInfo.width).arg(m_videoInfo.height);
-        text.append(QString("Frame rate: %1/%2").arg(m_videoInfo.frameRateNum).arg(m_videoInfo.frameRateDen));
+        text.append(tr("Frame rate: %1/%2").arg(m_videoInfo.frameRateNum).arg(m_videoInfo.frameRateDen));
         ui->txtVideoInfo->setPlainText(text);
     } else {
         m_videoInfo.streamsCount = 0;
-        ui->txtVideoInfo->setPlainText("No video stream detected.");
+        ui->txtVideoInfo->setPlainText(tr("No video stream detected."));
     }
     slotUpdateButtonStates();
 }
@@ -214,7 +214,7 @@ void NewProjectDialog::slotUpdateButtonStates()
         // Validate the images
         if (m_imagesMsg.length() == 0) {
             ui->inputImages->setStyleSheet(QString("QListWidget { background-color: %1; }").arg(Colours_sV::colOk.name()));
-            ui->txtImageInfo->setText("Image size: " + toString(QImage(m_images.at(0)).size()));
+            ui->txtImageInfo->setText(tr("Image size: %1").arg(toString(QImage(m_images.at(0)).size())));
         } else {
             ui->inputImages->setStyleSheet(QString("QListWidget { background-color: %1; }").arg(Colours_sV::colBad.name()));
             ui->txtImageInfo->setText(m_imagesMsg);

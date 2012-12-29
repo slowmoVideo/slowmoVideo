@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Render preview</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -60,7 +60,7 @@
   <customwidget>
    <class>ImageDisplay</class>
    <extends>QFrame</extends>
-   <header>imageDisplay.h</header>
+   <header>libgui/imageDisplay.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
