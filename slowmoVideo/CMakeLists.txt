@@ -56,6 +56,7 @@ else(NOT MSYS)
     # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
 endif(NOT MSYS)
 include_directories(${FFMPEG_INCLUDE_DIR})
+include_directories("/usr/include/ffmpeg/")
 link_directories(${FFMPEG_LIBRARY_DIR})
 
 find_package(OpenCV)
