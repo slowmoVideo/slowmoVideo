@@ -10,4 +10,7 @@
     <qresource lang="de">
         <file alias="translations.qm">../tr/slowmoVideo_de.qm</file>
     </qresource>
+    <qresource lang="it">
+        <file alias="translations.qm">../tr/slowmoVideo_it.qm</file>
+    </qresource>
 </RCC>

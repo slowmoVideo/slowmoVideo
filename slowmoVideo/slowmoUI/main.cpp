@@ -22,32 +22,51 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
 
-    // Changes the file loaded from the resource container
-    if (a.arguments().contains("--de")) {
-        QLocale::setDefault(QLocale::German);
-    } else if (a.arguments().contains("--en")) {
-        QLocale::setDefault(QLocale::English);
+
+
+    QString projectPath;
+    qDebug() << a.arguments();
+
+    const int N = a.arguments().size();
+    for (int n = 1; n < N; n++) {
+        QString arg = a.arguments().at(n);
+        if (arg.startsWith("--")) {
+
+            bool langUpdated = true;
+
+            // Changes the file loaded from the resource container
+            // to force a different language
+            if (arg == "--de") {
+                QLocale::setDefault(QLocale::German);
+            } else if (arg == "--en") {
+                QLocale::setDefault(QLocale::English);
+            } else if (arg == "--it") {
+                QLocale::setDefault(QLocale::Italian);
+            } else {
+                langUpdated = false;
+            }
+
+            if (langUpdated) {
+                qDebug() << "Changed locale to " << QLocale::languageToString(QLocale().language());
+            } else {
+                qDebug() << "Not handled: " << arg;
+            }
+
+        } else {
+            QFileInfo info(arg);
+            if (info.exists() && info.isReadable() && info.isFile()) {
+                projectPath = info.absoluteFilePath();
+                qDebug() << "Loading project: " << projectPath;
+            } else {
+                qDebug() << projectPath << " does not exist.";
+            }
+        }
     }
 
     // Load the translation file from the resource container and use it
     QTranslator translator;
     translator.load(":translations");
     a.installTranslator(&translator);
-
-    QString projectPath;
-    qDebug() << a.arguments();
-    if (a.arguments().size() >= 2) {
-        qDebug() << a.arguments().at(1);
-        QFileInfo info(a.arguments().at(1));
-        if (info.exists() && info.isReadable() && info.isFile()) {
-            projectPath = info.absoluteFilePath();
-            qDebug() << "Loading project: " << projectPath;
-        } else {
-            qDebug() << projectPath << " does not exist.";
-        }
-    } else {
-        qDebug() << "No argument given.";
-    }
 
     MainWindow w(projectPath);
 
