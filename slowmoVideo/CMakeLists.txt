@@ -5,13 +5,6 @@ cmake_minimum_required(VERSION 2.6)
 project(slowmoVideo)
 
 
-# Installation prefix
-# Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
-get_filename_component(SV_INST_DIR "${slowmoVideo_SOURCE_DIR}/../install/" ABSOLUTE)
-set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
-set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
-
-
 ### Compiler options ###
 
 # To compile with clang:
@@ -26,6 +19,7 @@ endif(CMAKE_TOOLCHAIN_FILE)
 
 
 ### CMake Configuration ###
+option (ENABLE_TESTS "Build the unit tests" TRUE)
 set(ADDITIONAL_LIBS "")
 if(MSYS)
   message(STATUS "MSYS system detected.")
@@ -128,5 +122,7 @@ add_subdirectory(slowmoFlowEdit)
 add_subdirectory(slowmoInfo)
 add_subdirectory(slowmoRenderer)
 add_subdirectory(visualizeFlow)
+if(ENABLE_TESTS)
 add_subdirectory(test)
 add_subdirectory(unittests)
+endif(ENABLE_TESTS)

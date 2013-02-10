@@ -50,7 +50,7 @@ FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
         QSettings settings;
-        QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
+        QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/slowmoFlowBuilder").toString());
         if (!QFile(programLocation).exists()) {
             QString newLoc = correctFlowBinaryLocation();
             if (newLoc.length() > 0) {
@@ -102,13 +102,13 @@ FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
 QString FlowSourceV3D_sV::correctFlowBinaryLocation()
 {
     QSettings settings;
-    QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/flowBuilder").toString());
+    QString programLocation(settings.value("binaries/v3dFlowBuilder", "/usr/local/bin/slowmoFlowBuilder").toString());
 
     QStringList paths;
     paths << programLocation;
-    paths << QDir::currentPath() + "/flowBuilder";
-    paths << QCoreApplication::applicationDirPath() + "/flowBuilder";
-    paths << "/usr/bin/flowBuilder" << "/usr/local/bin/flowBuilder";
+    paths << QDir::currentPath() + "/slowmoFlowBuilder";
+    paths << QCoreApplication::applicationDirPath() + "/slowmoFlowBuilder";
+    paths << "/usr/bin/slowmoFlowBuilder" << "/usr/local/bin/slowmoFlowBuilder";
     for (int i = 0; i < paths.size(); i++) {
         if (validateFlowBinary(paths.at(i))) {
             settings.setValue("binaries/v3dFlowBuilder", paths.at(i));
@@ -129,7 +129,7 @@ bool FlowSourceV3D_sV::validateFlowBinary(const QString path)
         process.start(path, args);
         process.waitForFinished(2000);
         QString output(process.readAllStandardOutput());
-        if (output.startsWith("flowBuilder")) {
+        if (output.startsWith("slowmoFlowBuilder")) {
             valid = true;
             qDebug() << path << " is valid.";
         } else {
