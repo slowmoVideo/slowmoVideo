@@ -26,6 +26,7 @@ endif(CMAKE_TOOLCHAIN_FILE)
 
 
 ### CMake Configuration ###
+option (ENABLE_TESTS "Build the unit tests" TRUE)
 set(ADDITIONAL_LIBS "")
 if(MSYS)
   message(STATUS "MSYS system detected.")
@@ -128,5 +129,7 @@ add_subdirectory(slowmoFlowEdit)
 add_subdirectory(slowmoInfo)
 add_subdirectory(slowmoRenderer)
 add_subdirectory(visualizeFlow)
+if(ENABLE_TESTS)
 add_subdirectory(test)
 add_subdirectory(unittests)
+endif(ENABLE_TESTS)
