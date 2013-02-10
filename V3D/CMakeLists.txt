@@ -5,12 +5,6 @@ project(V3D)
 set (CMAKE_BUILD_TYPE Release)
 #set (CMAKE_BUILD_TYPE Debug)
 
-# Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
-get_filename_component(SV_INST_DIR "${V3D_SOURCE_DIR}/../install/" ABSOLUTE)
-message(STATUS "Directory is ${SV_INST_DIR}")
-set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
-set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -DNDEBUG_GL -mtune=corei7")
 
 if(WIN32)
@@ -82,11 +76,16 @@ if(WIN32)
 	add_library(sVflow STATIC ${LIB_SRC_FLOW})
 else(WIN32)
 	# On Unix just include the previously built library.
-	include_directories(${CMAKE_INSTALL_PREFIX}/include)
-	set(SVFLOW_PATHS "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
+	if(NOT BUILD_INCLUDE_DIR)
+		set (BUILD_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include")
+	endif(NOT BUILD_INCLUDE_DIR)
+	include_directories(${BUILD_INCLUDE_DIR})
+	if(NOT BUILD_LIB_DIR)
+		set(BUILD_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
+	endif(NOT BUILD_LIB_DIR)
 	find_library(SVFLOW_LIB
 		NAMES sVflow sVflow.a libsVflow libsVflow.a
-		PATHS ${SVFLOW_PATHS}
+		PATHS ${BUILD_LIB_DIR}
 	)
 endif(WIN32)
 
@@ -108,7 +107,7 @@ endif(DISABLE_INCLUDE_SOURCE)
 message("==================================================")
 if(NOT SVFLOW_LIB)
 	message("* sVflow library not found. Did you make --install it?")
-	message("  (Searched in ${SVFLOW_PATHS} for the sVflow library.)")
+	message("  (Searched in ${BUILD_LIB_DIR} for the sVflow library.)")
 else(NOT SVFLOW_LIB)
 	message("* (ok) sVflow found")
 endif(NOT SVFLOW_LIB)
@@ -217,4 +216,5 @@ set (ALL_SRC
 
 add_library(V3D ${ALL_SRC})
 target_link_libraries(V3D ${GLEW_LIBRARIES})
+install(TARGETS V3D DESTINATION lib)
 add_subdirectory(Apps)

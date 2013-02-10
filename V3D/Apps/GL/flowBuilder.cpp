@@ -191,7 +191,7 @@ int main( int argc, char** argv)
 {
    if ((argc-1) == 1) {
      if (strcmp(argv[1], "--identify") == 0) {
-            std::cout << "flowBuilder v" << VERSION << std::endl;
+            std::cout << "slowmoFlowBuilder v" << VERSION << std::endl;
             return 0;
         }
     }
