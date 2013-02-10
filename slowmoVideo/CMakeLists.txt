@@ -5,13 +5,6 @@ cmake_minimum_required(VERSION 2.6)
 project(slowmoVideo)
 
 
-# Installation prefix
-# Thanks to David Cole: http://www.mail-archive.com/cmake@cmake.org/msg07872.html
-get_filename_component(SV_INST_DIR "${slowmoVideo_SOURCE_DIR}/../install/" ABSOLUTE)
-set(INSTALL_PREFIX ${SV_INST_DIR} CACHE PATH "Installation prefix (CMAKE_INSTALL_PREFIX will NOT work)")
-set(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE INTERNAL "Install prefix" FORCE)
-
-
 ### Compiler options ###
 
 # To compile with clang:
