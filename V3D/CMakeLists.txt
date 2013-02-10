@@ -217,4 +217,5 @@ set (ALL_SRC
 
 add_library(V3D ${ALL_SRC})
 target_link_libraries(V3D ${GLEW_LIBRARIES})
+install(TARGETS V3D DESTINATION lib)
 add_subdirectory(Apps)
