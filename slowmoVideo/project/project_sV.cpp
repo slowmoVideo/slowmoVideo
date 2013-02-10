@@ -239,8 +239,9 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
                 m_v3dFailCounter++;
                 qDebug() << "Failed creating optical flow, falling back to OpenCV ...";
                 qDebug() << "Failed attempts so far: " << m_v3dFailCounter;
-                FlowSourceOpenCV_sV fso(this);
-                return fso.buildFlow(leftFrame, rightFrame, frameSize);
+                delete m_flowSource;
+                m_flowSource = new FlowSourceOpenCV_sV (this);
+                return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
             }
         }
         return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
