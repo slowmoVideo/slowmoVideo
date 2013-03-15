@@ -77,11 +77,11 @@ if(WIN32)
 else(WIN32)
 	# On Unix just include the previously built library.
 	if(NOT BUILD_INCLUDE_DIR)
-		set (BUILD_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include")
+		set (BUILD_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/slowmoVideo")
 	endif(NOT BUILD_INCLUDE_DIR)
 	include_directories(${BUILD_INCLUDE_DIR})
 	if(NOT BUILD_LIB_DIR)
-		set(BUILD_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" /usr/local/lib)
+		set(BUILD_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib/slowmoVideo" /usr/local/lib/slowmoVideo)
 	endif(NOT BUILD_LIB_DIR)
 	find_library(SVFLOW_LIB
 		NAMES sVflow sVflow.a libsVflow libsVflow.a
