@@ -150,7 +150,7 @@ endif(NOT PNG_FOUND)
 
 
 message("* Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
-message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). \n  Default is ${SV_INST_DIR}.)")
+message("  (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path.\n  Default is ${SV_INST_DIR}.)")
 message("* V3D will be built: ${BUILD_FLOW_BUILDER}")
 message("* Shaders will be included in the binary: ${INCLUDE_SOURCE}")
 if(INCLUDE_SOURCE)

@@ -81,7 +81,7 @@ endif(NOT FFMPEG_SWSCALE_FOUND)
 
 message("==================================================")
 message("* slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
-message("  (Can be adjusted with the INSTALL_PREFIX variable (not CMAKE_INSTALL_PREFIX). Default is ${SV_INST_DIR}.)")
+message("  (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path. Default is ${SV_INST_DIR}.)")
 if(NOT QT_LIBRARIES)
 message("x Qt4 libraries could not be found.")
 endif(NOT QT_LIBRARIES)
