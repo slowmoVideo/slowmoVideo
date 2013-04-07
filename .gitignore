@@ -19,3 +19,5 @@ qtcreator*
 
 material/*.blend1
 material/*.blend2
+
+.DS_Store
