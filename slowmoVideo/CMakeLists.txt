@@ -8,7 +8,7 @@ project(slowmoVideo)
 ### Compiler options ###
 
 # To compile with clang:
-#set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
@@ -49,9 +49,11 @@ else(NOT MSYS)
     # Handled by MingwCrossEnv.cmake to avoid errors like:
     # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
 endif(NOT MSYS)
-include_directories(${FFMPEG_INCLUDE_DIR})
-include_directories("/usr/include/ffmpeg/")
-link_directories(${FFMPEG_LIBRARY_DIR})
+#include_directories(${FFMPEG_INCLUDE_DIR})
+#include_directories("/usr/include/ffmpeg/")
+#link_directories(${FFMPEG_LIBRARY_DIR})
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -iquote ${FFMPEG_INCLUDE_DIR}")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -iquote ${FFMPEG_LIBRARY_DIR}")
 
 find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
