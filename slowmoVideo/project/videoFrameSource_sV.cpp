@@ -123,7 +123,7 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     QStringList args;
     args << "-i" << m_inFile.fileName();
     args << "-f" << "image2";
-    args << "-qscale" << "0";
+    args << "-qscale" << "1";
 
     if (frameSize == FrameSize_Small) {
         int w = m_videoInfo->width;
