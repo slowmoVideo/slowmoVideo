@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "libgui/combinedShortcuts.h"
+#include "../libgui/combinedShortcuts.h"
 
 #include <QMainWindow>
 #include <QSettings>

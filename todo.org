@@ -8,6 +8,9 @@
 - [ ] Help texts
 - [ ] Lock mode for replay speed
 
+* Flow Editor [/]
+- [ ] Alphabetic loading: Change file naming (%03d instead of %d e.g.)
+
 * File loading [0/2]
 - [ ] Skip defect image files
   - [ ] Maybe: Run a checker thread (image size, validity) in the background

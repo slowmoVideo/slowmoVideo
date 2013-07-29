@@ -11,10 +11,10 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "project/node_sV.h"
-#include "project/nodeList_sV.h"
-#include "project/project_sV.h"
-#include "project/tag_sV.h"
+#include "../project/node_sV.h"
+#include "../project/nodeList_sV.h"
+#include "../project/project_sV.h"
+#include "../project/tag_sV.h"
 
 #include <QWidget>
 #include <QList>

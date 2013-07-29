@@ -36,7 +36,7 @@
   <customwidget>
    <class>ImageDisplay</class>
    <extends>QFrame</extends>
-   <header>imageDisplay.h</header>
+   <header>libgui/imageDisplay.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

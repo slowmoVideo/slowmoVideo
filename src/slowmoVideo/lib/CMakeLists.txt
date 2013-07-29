@@ -60,6 +60,3 @@ add_library(sVflow  STATIC ${LIB_SRC_FLOW})
 add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
 target_link_libraries(sVvis  sVflow ${QT_LIBRARIES})
 
-
-install(TARGETS sVflow DESTINATION "lib/${CMAKE_PROJECT_NAME}")
-install(FILES ${HEADERS} DESTINATION "include/${CMAKE_PROJECT_NAME}")
