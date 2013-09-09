@@ -17,6 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 QRegExp VideoFrameSource_sV::regexFrameNumber("frame=\\s*(\\d+)");
 
+/// \todo Check QProcess::exitCode() to find out if ffmpeg worked or not
 VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename)
 throw(FrameSourceError) :
     AbstractFrameSource_sV(project),
@@ -123,7 +124,6 @@ void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *
     QStringList args;
     args << "-i" << m_inFile.fileName();
     args << "-f" << "image2";
-    args << "-qscale" << "1";
 
     if (frameSize == FrameSize_Small) {
         int w = m_videoInfo->width;
