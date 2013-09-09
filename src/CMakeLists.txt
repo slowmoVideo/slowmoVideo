@@ -13,7 +13,7 @@ set (CMAKE_BUILD_TYPE Release)
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 if(CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
