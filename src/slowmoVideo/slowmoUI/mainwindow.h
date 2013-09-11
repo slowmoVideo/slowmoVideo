@@ -15,8 +15,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "frameMonitor.h"
 #include "renderPreview.h"
 #include "dialogues/flowExaminer.h"
-#include "project/project_sV.h"
-#include "libgui/combinedShortcuts.h"
+#include "../project/project_sV.h"
+#include "../libgui/combinedShortcuts.h"
 
 namespace Ui {
     class MainWindow;

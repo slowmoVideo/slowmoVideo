@@ -1,0 +1,332 @@
+cmake_minimum_required(VERSION 2.6)
+
+project(slowmoVideo)
+
+set (CMAKE_BUILD_TYPE Release)
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -DNDEBUG_GL -mtune=corei7")
+
+
+
+### Compiler options ###
+
+# To compile with clang:
+#set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
+if(CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
+endif(CMAKE_TOOLCHAIN_FILE)
+
+
+### CMake Configuration ###
+option (ENABLE_TESTS "Build the unit tests" TRUE)
+set(ADDITIONAL_LIBS "")
+if(MSYS)
+  message(STATUS "MSYS system detected.")
+  include("${PROJECT_SOURCE_DIR}/cmake/MingwCrossEnv.cmake")
+endif(MSYS)
+
+
+### Find packages ###
+
+set(CMAKE_MODULE_PATH
+  ${slowmoVideo_SOURCE_DIR}/cmake
+)
+
+include(cmake/macros.cmake)
+
+SET(QT_USE_QTXML TRUE)
+SET(QT_USE_QTTEST TRUE)
+SET(QT_USE_QTSCRIPT TRUE)
+find_package(Qt4)
+include(${QT_USE_FILE})
+include_directories(${QT_INCLUDES})
+
+
+if(NOT MSYS)
+	find_package(FFMPEG)
+else(NOT MSYS)
+    # Handled by MingwCrossEnv.cmake to avoid errors like:
+    # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
+endif(NOT MSYS)
+include_directories(${FFMPEG_INCLUDE_DIR})
+include_directories("/usr/include/ffmpeg/")
+link_directories(${FFMPEG_LIBRARY_DIR})
+
+find_package(OpenCV)
+include_directories(${OPENCV_INCLUDE_DIRS})
+
+
+
+
+
+### Set up libraries ###
+if(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS_OPT} ${OpenCV_EXTRA_LIBS_OPT} ${ADDITIONAL_LIBS})
+else(MSYS)
+    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS} ${ADDITIONAL_LIBS})
+endif(MSYS)
+
+
+### Information output
+set(BUILD_SLOWMO "NO")
+if(QT_LIBRARIES AND FFMPEG_FOUND)
+set(BUILD_SLOWMO "YES")
+endif(QT_LIBRARIES AND FFMPEG_FOUND)
+if(NOT FFMPEG_SWSCALE_FOUND)
+  if(CMAKE_TOOLCHAIN_FILE)
+
+  else(CMAKE_TOOLCHAIN_FILE)
+  set(BUILD_SLOWMO "NO")
+  endif(CMAKE_TOOLCHAIN_FILE)
+endif(NOT FFMPEG_SWSCALE_FOUND)
+
+
+
+
+
+## Include projects to build ##
+
+include_directories(slowmoVideo/tr)
+add_subdirectory(slowmoVideo/lib)
+add_subdirectory(slowmoVideo/libgui)
+add_subdirectory(slowmoVideo/project)
+add_subdirectory(slowmoVideo/slowmoCLI)
+add_subdirectory(slowmoVideo/slowmoUI)
+add_subdirectory(slowmoVideo/slowmoFlowEdit)
+add_subdirectory(slowmoVideo/slowmoInfo)
+add_subdirectory(slowmoVideo/slowmoRenderer)
+add_subdirectory(slowmoVideo/visualizeFlow)
+if(ENABLE_TESTS)
+add_subdirectory(slowmoVideo/test)
+add_subdirectory(slowmoVideo/unittests)
+endif(ENABLE_TESTS)
+
+##### SV END #####
+
+
+
+
+
+##### V3D START #####
+
+if(WIN32)
+set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
+endif(WIN32)
+
+set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
+find_package(OpenGL)
+find_package(GLEW)
+find_package(GLUT)
+find_package(SDL)
+find_package(JPEG)
+find_package(PNG)
+find_package(ZLIB)
+
+# Windows: Try to find libraries that could not be found manually in the libs/ directory.
+if(WIN32)
+	if(NOT ZLIB_FOUND)
+		FIND_PATH(ZLIB_INCLUDE_DIR zlib.h
+			PATHS ${PROJECT_SOURCE_DIR}/libs/include
+		)
+		find_library(ZLIB_LIBRARY NAMES zlib PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+		if(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+			set(ZLIB_FOUND TRUE)
+		endif(ZLIB_INCLUDE_DIR AND ZLIB_LIBRARY)
+		message(STATUS "Manual search for zlib: ${ZLIB_LIBRARY} in ${ZLIB_INCLUDE_DIR}")
+	endif(NOT ZLIB_FOUND)
+	
+	if(NOT PNG_FOUND)
+		find_path(PNG_INCLUDE_DIR png.h PATHS ${PROJECT_SOURCE_DIR}/libs/include)
+		find_library(PNG_LIBRARIES libpng PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+		if(PNG_INCLUDE_DIR AND PNG_LIBRARIES)
+			set(PNG_FOUND TRUE)
+		endif(PNG_INCLUDE_DIR AND PNG_LIBRARIES)
+		message(STATUS "Manual search for png: ${PNG_LIBRARIES} in ${PNG_INCLUDE_DIR}")
+	endif(NOT PNG_FOUND)
+	
+	if(NOT GLUT_FOUND)
+		find_path(GLUT_LIBRARY_DIR NAMES GL/glut.h PATHS ${PROJECT_SOURCE_DIR}/libs/include)
+		find_library(GLUT_LIBRARIES glut32 PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+		if(GLUT_LIBRARY_DIR AND GLUT_LIBRARIES)
+			set(GLUT_FOUND TRUE)
+		endif(GLUT_LIBRARY_DIR AND GLUT_LIBRARIES)
+		message(STATUS "Manual search for GLUT: ${GLUT_LIBRARIES} in ${GLUT_LIBRARY_DIR}")
+	endif(NOT GLUT_FOUND)
+
+	if(NOT JPEG_FOUND)
+		FIND_PATH(JPEG_INCLUDE_DIR jpeglib.h PATHS ${PROJECT_SOURCE_DIR}/libs/include)
+
+		SET(JPEG_NAMES ${JPEG_NAMES} jpeg)
+		FIND_LIBRARY(JPEG_LIBRARY NAMES ${JPEG_NAMES} PATHS ${PROJECT_SOURCE_DIR}/libs/lib)
+		if(JPEG_INCLUDE_DIR AND JPEG_LIBRARY)
+			set(JPEG_FOUND TRUE)
+		endif(JPEG_INCLUDE_DIR AND JPEG_LIBRARY)
+		message(STATUS "Manual search for JPEG: ${JPEG_LIBRARY} in ${JPEG_INCLUDE_DIR}")
+	endif(NOT JPEG_FOUND)
+endif(WIN32)
+
+
+set(BUILD_FLOW_BUILDER "NO")
+if(OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
+	set(BUILD_FLOW_BUILDER "YES")
+endif(OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
+
+set(INCLUDE_SOURCE "YES")
+if(DISABLE_INCLUDE_SOURCE)
+	set(INCLUDE_SOURCE "NO")
+add_definitions(-DDISABLE_INCLUDE_SOURCE)
+endif(DISABLE_INCLUDE_SOURCE)
+
+
+if (BUILD_FLOW_BUILDER)
+    include_directories(${OPENGL_INCLUDE_DIR})
+    include_directories(${SDL_INCLUDE_DIR})
+    include_directories(${GLUT_INCLUDE_DIR})
+    include_directories(${GLEW_INCLUDE_DIR})
+    include_directories(${JPEG_INCLUDE_DIR})
+    include_directories(${ZLIB_INCLUDE_DIR})
+    include_directories(${PNG_INCLUDE_DIR})
+
+
+    set (V3D_DIR ${CMAKE_CURRENT_SOURCE_DIR}/V3D)
+    set (V3D_INCLUDE_DIRS ${V3D_DIR}/.)
+
+    include (V3D/Config/v3d_macros.cmake)
+    include_directories(${V3D_INCLUDE_DIRS} ${EXTRA_INC_DIRS})
+
+    add_definitions(-DDISABLE_REDEFINITIONS)
+    #--------------------------------------------------
+    enable_feature (V3DLIB_ENABLE_LIBJPEG)
+    enable_feature (V3DLIB_ENABLE_LIBPNG)
+    enable_feature_libraries (V3DLIB_ENABLE_LIBJPEG ${JPEG_LIBRARIES})
+    enable_feature_libraries (V3DLIB_ENABLE_LIBPNG ${PNG_LIBRARIES})
+
+    enable_feature (V3DLIB_ENABLE_GPGPU)
+    enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${OPENGL_LIBRARIES})
+    enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLEW_LIBRARIES})
+    enable_feature_libraries (V3DLIB_ENABLE_GPGPU ${GLUT_glut_LIBRARY})
+    #--------------------------------------------------
+
+
+    include_directories(V3D/Config)
+
+    set (GL_SRC
+        V3D/GL/glsl_shaders.cpp
+        V3D/GL/v3d_gpubase.cpp
+        V3D/GL/v3d_gpuflow.cpp
+        V3D/GL/v3d_gpucolorflow.cpp
+        V3D/GL/v3d_gpupyramid.cpp
+    )
+
+    set (ALL_SRC
+        ${GL_SRC}
+        V3D/Config/config.h
+        
+        V3D/Base/v3d_image.cpp
+        V3D/Base/v3d_imageprocessing.h
+        V3D/Base/v3d_exception.h
+        V3D/Base/v3d_timer.h
+        V3D/Base/v3d_serialization.h
+        V3D/Base/v3d_utilities.h
+        V3D/Math/v3d_linear.h
+        V3D/Math/v3d_linearbase.h
+    )
+
+    add_library(V3D ${ALL_SRC})
+    target_link_libraries(V3D ${GLEW_LIBRARIES})
+    #install(TARGETS V3D DESTINATION lib)
+    add_subdirectory(V3D/Apps)
+endif (BUILD_FLOW_BUILDER)
+
+##### V3D END #####
+
+
+
+
+
+message("")
+message("======================V3D============================")
+message("* (info) Installation prefix: ${CMAKE_INSTALL_PREFIX}.")
+message("         (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path.  Default: ${SV_INST_DIR}.)")
+message("* (info) Shaders will be included in the binary: ${INCLUDE_SOURCE}")
+if(INCLUDE_SOURCE)
+	message("         (Can be disabled with the cmake flag -DDISABLE_INCLUDE_SOURCE)")
+endif(INCLUDE_SOURCE)
+
+
+if(NOT OPENGL_FOUND)
+	message("* OpenGL could not be found.")
+else(NOT OPENGL_FOUND)
+	message("* (ok) OpenGL found in ${OPENGL_INCLUDE_DIR}: ${OPENGL_LIBRARIES}")
+endif(NOT OPENGL_FOUND)
+
+if(NOT GLUT_FOUND)
+	message("* GLUT could not be found.")
+else(NOT GLUT_FOUND)
+	message("* (ok) GLUT found in ${GLUT_INCLUDE_DIR}: ${GLUT_LIBRARIES}")
+endif(NOT GLUT_FOUND)
+
+if(NOT GLEW_FOUND)
+	message("* GLEW could not be found.")
+else(NOT GLEW_FOUND)
+	message("* (ok) GLEW found at ${GLEW_INCLUDE_DIR}")
+endif(NOT GLEW_FOUND)
+
+if(NOT SDL_FOUND)
+	message("* SDL could not be found.")
+else(NOT SDL_FOUND)
+	message("* (ok) SDL found in ${SDL_INCLUDE_DIR}")
+endif(NOT SDL_FOUND)
+
+if(NOT JPEG_FOUND)
+	message("* JPEG libraries could not be found.")
+else(NOT JPEG_FOUND)
+	message("* (ok) JPEG libraries found at ${JPEG_INCLUDE_DIR}: ${JPEG_LIBRARIES}")
+endif(NOT JPEG_FOUND)
+
+if(NOT PNG_FOUND)
+	message("* PNG libraries could not be found.")
+else(NOT PNG_FOUND)
+	message("* (ok) PNG libraries found at ${PNG_INCLUDE_DIR}")
+endif(NOT PNG_FOUND)
+
+message("* V3D will be built:                        ---${BUILD_FLOW_BUILDER}---")
+
+
+message("==================slowmoVideo========================")
+message("* (info) slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
+message("         (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path. Default is ${SV_INST_DIR}.)")
+if(NOT QT_LIBRARIES)
+    message("x Qt4 libraries could not be found.")
+endif(NOT QT_LIBRARIES)
+if(NOT FFMPEG_FOUND)
+    message("x ffmpeg libraries could not be found.")
+else(NOT FFMPEG_FOUND)
+    message("* (ok) ffmpeg found at ${FFMPEG_LIBRARY_DIR}")
+endif(NOT FFMPEG_FOUND)
+if(NOT FFMPEG_SWSCALE_FOUND)
+    message("x libswscale could not be found.")
+endif(NOT FFMPEG_SWSCALE_FOUND)
+if(NOT OpenCV_VERSION)
+    message("x OpenCV could not be found.")
+else(NOT OpenCV_VERSION)
+    message("* (ok) OpenCV ${OpenCV_VERSION} found at ${OPENCV_LIB_DIR}.")
+endif(NOT OpenCV_VERSION)
+message("* slowmoVideo will be built:                ---${BUILD_SLOWMO}---")
+message("=======================END===========================")
+message("")
+
+
+if(NOT BUILD_SLOWMO)
+    message(WARNING "Cannot build slowmoVideo, please install the missing packages first.")
+endif(NOT BUILD_SLOWMO)
+
+if(NOT BUILD_FLOW_BUILDER)
+    message(WARNING "Cannot build V3D.")
+endif(NOT BUILD_FLOW_BUILDER)
+
+

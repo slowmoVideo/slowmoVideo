@@ -1,5 +1,5 @@
 
-include_directories(${slowmoVideo_SOURCE_DIR})
+include_directories(..)
 
 set(SRCS
     rendererMain.cpp
