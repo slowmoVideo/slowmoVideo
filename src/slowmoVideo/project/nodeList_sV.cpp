@@ -34,29 +34,37 @@ void NodeList_sV::setMaxY(qreal time)
     m_maxY = time;
 }
 
-qreal NodeList_sV::startTime() const
+qreal NodeList_sV::startTime(bool useMoved) const
 {
     if (m_list.length() > 0) {
-        return m_list[0].xUnmoved();
+        if (useMoved) {
+            return m_list[0].x();
+        } else {
+            return m_list[0].xUnmoved();
+        }
     } else {
 //        qDebug() << "No start time available (no nodes)";
         return 0;
     }
 }
-qreal NodeList_sV::endTime() const
+qreal NodeList_sV::endTime(bool useMoved) const
 {
     if (m_list.length() > 0) {
-        return m_list[m_list.length()-1].xUnmoved();
+        if (useMoved) {
+            return m_list[m_list.length()-1].x();
+        } else {
+            return m_list[m_list.length()-1].xUnmoved();
+        }
     } else {
 //        qDebug() << "No end time available (no nodes)";
         return 0;
     }
 }
-bool NodeList_sV::isInsideCurve(qreal targetTime) const
+bool NodeList_sV::isInsideCurve(qreal targetTime, bool useMoved) const
 {
     return m_list.size() >= 2  &&
-            startTime() <= targetTime &&
-            targetTime <= endTime();
+            startTime(useMoved) <= targetTime &&
+            targetTime <= endTime(useMoved);
 }
 qreal NodeList_sV::totalTime() const
 {

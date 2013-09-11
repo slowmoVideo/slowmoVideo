@@ -49,7 +49,7 @@ QString CanvasTools::outputTimeLabel(Canvas *canvas, Node_sV &time)
 
 QString CanvasTools::outputSpeedLabel(Node_sV &time, Project_sV *project)
 {
-    if (!project->nodes()->isInsideCurve(time.x())) {
+    if (!project->nodes()->isInsideCurve(time.x(), true)) {
         return "";
     }
 
