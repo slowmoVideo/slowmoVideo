@@ -6,8 +6,18 @@
 - [X] Always display some units (user feedback when scrolling)
 - [ ] Customize grid: Replay speed (e.g. 1x, 0.5x, etc.)
 - [ ] Help texts
+- [ ] Lock mode for replay speed
+
+* Flow Editor [/]
+- [ ] Alphabetic loading: Change file naming (%03d instead of %d e.g.)
 
 * File loading [0/2]
 - [ ] Skip defect image files
   - [ ] Maybe: Run a checker thread (image size, validity) in the background
 - [ ] Project loading speed for big files
+
+* General [0/1]
+- [ ] Ensure slowmoRenderer terminates
+
+* Windows [0/1]
+- [ ] Rendering: Check if directory exists (/tmp/...)
