@@ -117,7 +117,6 @@ if(WIN32)
 set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
 endif(WIN32)
 
-set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/Config) 
 find_package(OpenGL)
 find_package(GLEW)
 find_package(GLUT)
