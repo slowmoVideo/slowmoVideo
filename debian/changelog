@@ -1,0 +1,65 @@
+slowmovideo (0.3.3-1~saucy1) saucy; urgency=low
+
+  * Initial release for saucy
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Mon, 21 Oct 2013 10:16:03 +0200
+
+slowmovideo (0.3.3-1~raring1) raring; urgency=low
+
+  * FlowBuilder (GPU computation) was missing from package: this is now fixed
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Thu, 12 Sep 2013 14:32:21 +0200
+
+slowmovideo (0.3.3-1~precise1) precise; urgency=low
+
+  * fixes an issue in the dependencies
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Wed, 11 Sep 2013 14:42:57 +0200
+
+slowmovideo (0.3.2-1~precise1) precise; urgency=low
+
+  * previous try to add GPU computation failed. This should be fixed now thanks to simpleCmake branch from Simon.
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Tue, 10 Sep 2013 10:51:39 +0200
+
+slowmovideo (0.3.1-6~precise1) precise; urgency=low
+
+  * FlowBuilder (GPU computation) was missing from package: this is now fixed
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Mon, 10 Jun 2013 13:28:25 +0200
+
+slowmovideo (0.3.1-5~precise1) precise; urgency=low
+
+  * Fixing bad release version for precise
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Tue, 07 May 2013 08:30:31 +0200
+
+slowmovideo (0.3.1-5~raring1) raring; urgency=low
+
+  * Initial release for raring
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Tue, 07 May 2013 08:29:14 +0200
+
+slowmovideo (0.3.1-4~raring1) precise; urgency=low
+
+  * Initial release for raring
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Tue, 07 May 2013 08:15:32 +0200
+
+slowmovideo (0.3.1-4~quantal1) quantal; urgency=low
+
+  * Initial release for quantal
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Thu, 18 Apr 2013 14:36:33 +0200
+
+slowmovideo (0.3.1-3) precise; urgency=low
+
+  * add menu entry
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Wed, 17 Apr 2013 10:24:05 +0200
+
+slowmovideo (0.3.1-2) precise; urgency=low
+
+  * Initial release 
+
+ -- Benoit Rousselle <brousselle@gmail.com>  Tue, 26 Mar 2013 09:43:19 +0100

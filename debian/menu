@@ -1,0 +1,2 @@
+?package(slowmovideo):needs="X11" section="Applications/Graphics"\
+  title="slowmovideo" command="/usr/bin/slowmoUI"
