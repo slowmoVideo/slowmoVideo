@@ -5,6 +5,7 @@ set(SRCS
     test.cpp
 )
 
+include_directories(${FFMPEG_INCLUDE_PATHS})
 add_executable(Test ${SRCS})
 target_link_libraries(Test sVproj ${EXTERNAL_LIBS})
 

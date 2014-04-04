@@ -38,5 +38,6 @@ set(SRCS_MOC
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
+include_directories(${FFMPEG_INCLUDE_PATHS})
 add_library(sVproj STATIC ${SRCS_PROJ} ${MOC_OUT})
 target_link_libraries(sVproj sV sVinfo sVflow sVencode ${EXTERNAL_LIBS})

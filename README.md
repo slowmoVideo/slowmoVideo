@@ -28,6 +28,8 @@ Compiling slowmoVideo for Windows using MXE on Linux:
     `cmake .. -DCMAKE_TOOLCHAIN_FILE=/PATH_TO_MXE/usr/i686-pc-mingw32/share/cmake/mxe-conf.cmake`
 5.  Compile!
 
+### Building for MacOS
+take a look here : http://vald70.free.fr/?p=197
 
 #### Notes
 Additionally to slowmoVideo, ffmpeg.exe (32-bit build, static) is required.

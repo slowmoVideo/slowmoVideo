@@ -4,6 +4,29 @@
 # http://www.cmake.org/pipermail/cmake/2008-September/023908.html
 
 
+if(APPLE)
+	set(BUNDLE "slowmoUI")
+	set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/slowmoVideo/slowmoUI/res")
+        message( "OS X build" )
+        set(MACOSX_BUNDLE_INFO_STRING "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_BUNDLE_VERSION "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+        set(MACOSX_BUNDLE_ICON_FILE "slowmoUI.icns")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+        set(MACOSX_BUNDLE_BUNDLE_NAME "${BUNDLE}")
+
+        set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${BUNDLE}.app/Contents/Resources")
+        set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${MACOSX_BUNDLE_RESOURCES})
+        execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MACOSX_BUNDLE_ICON} ${MACOSX_BUNDLE_RESOURCES})
+        #set_target_properties(slowmoVideo PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "slowmoUI")
+
+        message(STATUS "Bundle will be : ${MACOSX_BUNDLE} =>  ${PROJECT_NAME} ")
+endif()
+
+
 include_directories(${slowmoVideo_SOURCE_DIR})
 
 set(SRCS
@@ -76,7 +99,13 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
-add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
+add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 target_link_libraries(slowmoUI sVproj sVvis sVgui ${EXTERNAL_LIBS})
 
-install(TARGETS slowmoUI DESTINATION bin)
+install(TARGETS slowmoUI DESTINATION ${DEST})
+if (APPLE)
+       include(DeployQt4)
+#       install_qt4_executable(slowmoUI.app "" ""  )
+	
+endif()
+
