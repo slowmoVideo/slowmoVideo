@@ -40,7 +40,7 @@ set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
 )
 
-set(DEST ".")
+set(DEST "bin")
 
 include(cmake/macros.cmake)
 

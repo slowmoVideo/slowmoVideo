@@ -54,7 +54,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="105"/>
         <source>&amp;Delete node</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer le noeud</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="106"/>
@@ -64,12 +64,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="107"/>
         <source>&amp;Delete tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer le tag</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="108"/>
         <source>&amp;Rename tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Renomer le  tag</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="109"/>
@@ -79,12 +79,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="118"/>
         <source>&amp;Linear curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Courbe Lineaire</translation>
     </message>
     <message utf8="true">
         <location filename="../slowmoUI/canvas.cpp" line="119"/>
         <source>&amp;Bézier curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Courbe de Bezier</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="123"/>
@@ -119,7 +119,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="800"/>
         <source>Node %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Noeud %1</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="803"/>
@@ -154,7 +154,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="1087"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Temps</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="1153"/>
@@ -549,7 +550,7 @@ Move nodes: [Ctrl]  Drag</source>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="45"/>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="58"/>
@@ -564,22 +565,22 @@ Move nodes: [Ctrl]  Drag</source>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="83"/>
         <source>Video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Source du Media</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="99"/>
         <source>Video information:</source>
-        <translation type="unfinished"></translation>
+        <translation>Information du Media</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="128"/>
         <source>Input video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video en entrée</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="138"/>
         <source>Image source</source>
-        <translation type="unfinished"></translation>
+        <translation>Source d&apos;image</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="150"/>
@@ -604,17 +605,17 @@ Move nodes: [Ctrl]  Drag</source>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="234"/>
         <source>Project Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Répertoire du projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="247"/>
         <source>Project Filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="257"/>
         <source>.sVproj</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.ui" line="264"/>
@@ -680,7 +681,7 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="22"/>
         <source>Binary locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Localisation des executables</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="31"/>
@@ -691,7 +692,7 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="67"/>
         <source>Flow method</source>
-        <translation type="unfinished"></translation>
+        <translation>Méthode d&apos;évaluation du flux optique</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="73"/>
@@ -706,7 +707,7 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="121"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.ui" line="128"/>
@@ -716,7 +717,7 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/preferencesDialog.cpp" line="20"/>
         <source>flowBuilder binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>localisation de l&apos;executable flowBuilder</translation>
     </message>
 </context>
 <context>
