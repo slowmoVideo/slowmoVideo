@@ -165,7 +165,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="1153"/>
         <source>Speed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse:</translation>
     </message>
 </context>
 <context>
@@ -173,7 +173,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoFlowEdit/flowEditCanvas.ui" line="77"/>
         <source>Values at mouse position</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeurs à la position de la sourie</translation>
     </message>
 </context>
 <context>
@@ -181,7 +181,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/dialogues/flowExaminer.ui" line="95"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
 </context>
 <context>
@@ -202,7 +202,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../libgui/imageDisplay.cpp" line="32"/>
         <source>Export image</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter l&apos;image</translation>
     </message>
     <message>
         <location filename="../libgui/imageDisplay.cpp" line="241"/>
@@ -215,17 +215,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../project/imagesFrameSource_sV.cpp" line="53"/>
         <source>No images selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas d&apos;image selectionnée.</translation>
     </message>
     <message>
         <location filename="../project/imagesFrameSource_sV.cpp" line="58"/>
         <source>Image %1 is not of the same size (%2) as the first image (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;image %1 n&apos;est pas la même taile (%2) que la première image (%3).</translation>
     </message>
     <message>
         <location filename="../project/imagesFrameSource_sV.cpp" line="94"/>
         <source>Creating preview images from the input images</source>
-        <translation type="unfinished"></translation>
+        <translation>Création des images de previsualisation à partir des images d&apos;entrée</translation>
     </message>
     <message>
         <location filename="../project/imagesFrameSource_sV.cpp" line="99"/>
@@ -249,49 +249,49 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="28"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="40"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="50"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="55"/>
         <location filename="../slowmoUI/mainwindow.cpp" line="131"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="60"/>
         <location filename="../slowmoUI/mainwindow.cpp" line="128"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="65"/>
         <source>Next file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier suivant</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="70"/>
         <source>Previous file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier précedent</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="78"/>
         <source>Amplify colours</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplifier les couleurs</translation>
     </message>
     <message>
         <location filename="../slowmoFlowEdit/mainwindow.ui" line="83"/>
         <source>Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Racourcits</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="14"/>
@@ -301,72 +301,72 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="28"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="46"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aide</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="53"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;Vue</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="60"/>
         <source>&amp;Project</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="80"/>
         <source>&amp;Render</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Rendu</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="85"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Préferences</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="90"/>
         <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sauver</translation>
     </message>
     <message utf8="true">
         <location filename="../slowmoUI/mainwindow.ui" line="95"/>
         <source>Save &amp;as …</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver &amp;comme</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="100"/>
         <source>&amp;Open</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ouvrir</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="105"/>
         <source>&amp;Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Raccourcits</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="110"/>
         <source>&amp;About</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;A propos</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="115"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Quiter</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="120"/>
         <source>Render &amp;preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Generer une &amp;prévisualisation</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="125"/>
         <source>E&amp;xamine flow</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;xaminer le flux</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="128"/>
@@ -376,12 +376,12 @@ p, li { white-space: pre-wrap; }
     <message utf8="true">
         <location filename="../slowmoUI/mainwindow.ui" line="133"/>
         <source>&amp;New …</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Nouveau</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="138"/>
         <source>&amp;Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Préférences</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.ui" line="143"/>
@@ -416,22 +416,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="129"/>
         <source>New project</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="130"/>
         <source>Open project</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="132"/>
         <source>Save as ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver comme</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="133"/>
         <source>Abort move</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler le mouvement</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="134"/>
@@ -730,7 +730,7 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.ui" line="28"/>
         <source>Current Task</source>
-        <translation type="unfinished"></translation>
+        <translation>Tache courante</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.ui" line="42"/>
@@ -740,38 +740,38 @@ Size: %3×%4
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.ui" line="82"/>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.ui" line="89"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="40"/>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="41"/>
         <source>(Finished) </source>
-        <translation type="unfinished"></translation>
+        <translation>(Finit)</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="62"/>
         <source>Aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulé</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="73"/>
         <source>Task finished in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tache terminé en %1.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="75"/>
         <source>Task finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tache terminé.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/progressDialog.cpp" line="77"/>
         <source>(Finished) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>(Fini) %1</translation>
     </message>
 </context>
 <context>
