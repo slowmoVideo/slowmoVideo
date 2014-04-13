@@ -45,7 +45,7 @@ void FlowSourceOpenCV_sV::createDirectories()
 
 
 
-
+// TODO: check usage of cflowmap ? create a branch ?
 void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
                     double, const Scalar& color, std::string flowname )
 {
@@ -83,7 +83,8 @@ void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
             cv::Scalar col = cv::Scalar(offset + fxy.x*scale, offset + fxy.y*scale, offset);
             //line(cflowmap, Point(x,y), Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
             //     color);
-            circle(cflowmap, Point(x,y), 0, col, -1);
+            //TODO: usefullness ?
+            //circle(cflowmap, Point(x,y), 0, col, -1);
 
             if (fabs(fxy.x) > max_flow) max_flow = fabs(fxy.x);
             if (fabs(fxy.y) > max_flow) max_flow = fabs(fxy.y);
@@ -126,6 +127,8 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
 //        namedWindow("flow", 1);
 
+		qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
+		
         prevgray = imread(prevpath.toStdString(), 0);
         gray = imread(path.toStdString(), 0);
 

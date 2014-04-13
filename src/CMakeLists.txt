@@ -6,15 +6,19 @@ set (CMAKE_BUILD_TYPE Release)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -DNDEBUG_GL -mtune=corei7")
 
-
+set(PROJECT_VERSION_MAJOR "0")
+set(PROJECT_VERSION_MINOR "3")
+set(PROJECT_VERSION_PATCH "1")
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 ### Compiler options ###
 
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 if(CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
   set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
@@ -36,6 +40,8 @@ set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
 )
 
+set(DEST "bin")
+
 include(cmake/macros.cmake)
 
 SET(QT_USE_QTXML TRUE)
@@ -52,9 +58,10 @@ else(NOT MSYS)
     # Handled by MingwCrossEnv.cmake to avoid errors like:
     # libavformat.a(avisynth.o):avisynth.c:(.text+0x6b): undefined reference to `AVIStreamRelease@4'
 endif(NOT MSYS)
-include_directories(${FFMPEG_INCLUDE_DIR})
-include_directories("/usr/include/ffmpeg/")
-link_directories(${FFMPEG_LIBRARY_DIR})
+# not here anymore
+#include_directories(${FFMPEG_INCLUDE_DIR})
+#include_directories("/usr/include/ffmpeg/")
+#link_directories(${FFMPEG_LIBRARY_DIR})
 
 find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
@@ -67,7 +74,7 @@ include_directories(${OPENCV_INCLUDE_DIRS})
 if(MSYS)
     set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS_OPT} ${OpenCV_EXTRA_LIBS_OPT} ${ADDITIONAL_LIBS})
 else(MSYS)
-    set(EXTERNAL_LIBS ${FFMPEG_LIBRARIES} ${QT_LIBRARIES} ${OpenCV_LIBS} ${ADDITIONAL_LIBS})
+    set(EXTERNAL_LIBS ${QT_LIBRARIES} ${OpenCV_LIBS} ${ADDITIONAL_LIBS} ${FFMPEG_LIBRARIES})
 endif(MSYS)
 
 
@@ -120,7 +127,6 @@ endif(WIN32)
 find_package(OpenGL)
 find_package(GLEW)
 find_package(GLUT)
-find_package(SDL)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
@@ -170,9 +176,9 @@ endif(WIN32)
 
 
 set(BUILD_FLOW_BUILDER "NO")
-if(OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
+if(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
 	set(BUILD_FLOW_BUILDER "YES")
-endif(OPENGL_FOUND AND SDL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
+endif(OPENGL_FOUND AND GLUT_FOUND AND GLEW_FOUND AND JPEG_FOUND AND PNG_FOUND)
 
 set(INCLUDE_SOURCE "YES")
 if(DISABLE_INCLUDE_SOURCE)
@@ -183,7 +189,6 @@ endif(DISABLE_INCLUDE_SOURCE)
 
 if (BUILD_FLOW_BUILDER)
     include_directories(${OPENGL_INCLUDE_DIR})
-    include_directories(${SDL_INCLUDE_DIR})
     include_directories(${GLUT_INCLUDE_DIR})
     include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${JPEG_INCLUDE_DIR})
@@ -274,12 +279,6 @@ if(NOT GLEW_FOUND)
 else(NOT GLEW_FOUND)
 	message("* (ok) GLEW found at ${GLEW_INCLUDE_DIR}")
 endif(NOT GLEW_FOUND)
-
-if(NOT SDL_FOUND)
-	message("* SDL could not be found.")
-else(NOT SDL_FOUND)
-	message("* (ok) SDL found in ${SDL_INCLUDE_DIR}")
-endif(NOT SDL_FOUND)
 
 if(NOT JPEG_FOUND)
 	message("* JPEG libraries could not be found.")

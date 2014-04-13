@@ -37,6 +37,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     b &= connect(ui->bBuildFlow, SIGNAL(clicked()), this, SLOT(slotBrowseFlow()));
     b &= connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
     b &= connect(&m_flowMethodGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFlowMethod()));
+    b &= connect(ui->bFFmpeg, SIGNAL(clicked()), this, SLOT(slotBrowseFfmpeg()));
     Q_ASSERT(b);
 
     if (!FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
@@ -107,5 +108,17 @@ void PreferencesDialog::slotBrowseFlow()
     if (dialog.exec() == QDialog::Accepted) {
         ui->buildFlow->setText(dialog.selectedFiles().at(0));
         slotValidateFlowBinary();
+    }
+}
+
+void PreferencesDialog::slotBrowseFfmpeg()
+{
+    QFileDialog dialog;
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setDirectory(QFileInfo(ui->ffmpeg->text()).absolutePath());
+    if (dialog.exec() == QDialog::Accepted) {
+        ui->ffmpeg->setText(dialog.selectedFiles().at(0));
+        //slotValidateFffmpegBinary();
     }
 }

@@ -122,3 +122,10 @@ IF ( ${INC_SUCCESS} EQUAL ${LIST_SIZE_} )
 ENDIF ( ${INC_SUCCESS} EQUAL ${LIST_SIZE_} )
 
 string(REPLACE "/usr/include/" "" FFMPEG_INCLUDE_DIR "${FFMPEG_INCLUDE_DIR}")
+
+# On OS X we ffmpeg libraries depend on VideoDecodeAcceleration and CoreVideo frameworks
+IF (APPLE)
+    SET(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} "-framework CoreFoundation -framework QuartzCore -framework VideoDecodeAcceleration -liconv -lbz2 -lz")
+ENDIF()
+
+

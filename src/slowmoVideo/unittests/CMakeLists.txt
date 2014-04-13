@@ -25,5 +25,6 @@ set(SRCS_MOC
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
+include_directories(${FFMPEG_INCLUDE_PATHS})
 add_executable(UnitTests ${SRCS} ${MOC_OUT})
 target_link_libraries(UnitTests sVproj ${EXTERNAL_LIBS})

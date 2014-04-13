@@ -45,7 +45,7 @@ set(HEADERS
 
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
-
+include_directories(${FFMPEG_INCLUDE_PATHS})
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
 
