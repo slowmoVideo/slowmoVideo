@@ -1,5 +1,6 @@
 #include "projectPreferences_sV.h"
 #include <QtCore/QDir>
+#include <QDesktopServices>
 
 ProjectPreferences_sV::ProjectPreferences_sV() :
     m_tagAxis(TagAxis_Source),
@@ -13,7 +14,7 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
-    m_videoFilename("/tmp/rendered.mpg"),
+    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mpg"),
     m_flowV3DLambda(20.0)
 {
 }
