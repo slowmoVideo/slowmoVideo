@@ -20,6 +20,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0, QApplication::UnicodeUTF8));
 #endif
 
+// TODO: qcombox box instead ?
     m_flowMethodGroup.addButton(ui->methodOCV);
     m_flowMethodGroup.addButton(ui->methodV3D);
     m_flowMethodGroup.setExclusive(true);

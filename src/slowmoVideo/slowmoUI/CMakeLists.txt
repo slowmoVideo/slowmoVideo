@@ -78,7 +78,7 @@ if(APPLE)
 	SET_SOURCE_FILES_PROPERTIES(
 	   ${MACOSX_BUNDLE_ICON} 
 	    PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        message(STATUS "Bundle will be : ${MACOSX_BUNDLE} =>  ${PROJECT_NAME} ")
+        message(STATUS "slowmoUI Bundle will be : ${MACOSX_BUNDLE} ")
 
 	set( SRCS ${SRCS} ${MACOSX_BUNDLE_ICON} )
 
