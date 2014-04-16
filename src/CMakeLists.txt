@@ -3,8 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 project(slowmoVideo)
 
 set (CMAKE_BUILD_TYPE Release)
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -DNDEBUG_GL -mtune=corei7")
+#set(CMAKE_BUILD_TYPE Debug)
 
 set(PROJECT_VERSION_MAJOR "0")
 set(PROJECT_VERSION_MINOR "3")
@@ -13,12 +12,15 @@ set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT
 
 ### Compiler options ###
 
+if (APPLE)
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
-#set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
+endif()
+
 if(CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
   set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DMXE")
