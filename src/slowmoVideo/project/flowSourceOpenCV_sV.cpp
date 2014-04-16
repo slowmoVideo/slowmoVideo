@@ -46,7 +46,7 @@ void FlowSourceOpenCV_sV::createDirectories()
 
 
 // TODO: check usage of cflowmap ? create a branch ?
-void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
+void drawOptFlowMap(const Mat& flow,  int step,
                     double, const Scalar& color, std::string flowname )
 {
 
@@ -59,38 +59,16 @@ void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
 
   float max_flow = 0.0;
 
-  FlowField_sV flowField(cflowmap.cols, cflowmap.rows);
+  FlowField_sV flowField(flow.cols, flow.rows);
 
-    for(int y = 0; y < cflowmap.rows; y += step)
-        for(int x = 0; x < cflowmap.cols; x += step)
+    for(int y = 0; y < flow.rows; y += step)
+        for(int x = 0; x < flow.cols; x += step)
         {
             const Point2f& fxyo = flow.at<Point2f>(y, x);
 
             flowField.setX(x, y, fxyo.x);
             flowField.setY(x, y, fxyo.y);
-
-            Point2f& fxy = log_flow.at<Point2f>(y, x);
-            const Point2f& fxyn = log_flow_neg.at<Point2f>(y, x);
-
-            if (fxyo.x < 0) {
-              fxy.x = -fxyn.x;
-            }
-            if (fxyo.y < 0) {
-              fxy.y = -fxyn.y;
-            }
-
-
-            cv::Scalar col = cv::Scalar(offset + fxy.x*scale, offset + fxy.y*scale, offset);
-            //line(cflowmap, Point(x,y), Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
-            //     color);
-            //TODO: usefullness ?
-            //circle(cflowmap, Point(x,y), 0, col, -1);
-
-            if (fabs(fxy.x) > max_flow) max_flow = fabs(fxy.x);
-            if (fabs(fxy.y) > max_flow) max_flow = fabs(fxy.y);
         }
-
-  std::cout << max_flow << " max flow" << std::endl;
 
   FlowRW_sV::save(flowname, &flowField);
 }
@@ -158,9 +136,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                     polySigma, //1.2,
                     flags //0
                     );
-                cvtColor(prevgray, cflow, CV_GRAY2BGR);
+                //cvtColor(prevgray, cflow, CV_GRAY2BGR);
                 //drawOptFlowMap(flow, cflow, 16, 1.5, CV_RGB(0, 255, 0));
-                drawOptFlowMap(flow, cflow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
+                drawOptFlowMap(flow,  1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
                 //imshow("flow", cflow);
                 //imwrite(argv[4],cflow);
             } else {
