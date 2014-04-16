@@ -59,6 +59,9 @@
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
   </action>
   <action name="actionNext">
    <property name="text">
