@@ -62,7 +62,7 @@ void Project_sV::init()
 {
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
-    m_flowSource = new FlowSourceV3D_sV(this);
+    m_flowSource = 0; // leak ? new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
 
     QSettings settings;

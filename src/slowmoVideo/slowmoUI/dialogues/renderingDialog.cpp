@@ -22,6 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QButtonGroup>
 #include <QFileDialog>
+#include <QSettings> // TODO: better
 
 RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QDialog(parent),
@@ -50,6 +51,24 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     // Optical flow
     ui->lambda->setValue(m_project->preferences()->flowV3DLambda());
 
+    ui->flowMethod->clear();
+    ui->flowMethod->addItem(tr("GPU GL V3D"),QVariant(1));
+    ui->flowMethod->addItem(tr("OpenCV-Farnback (cpu)"),QVariant(2));
+    ui->flowMethod->addItem(tr("OpenCV (OpenCL)"),QVariant(3));
+    ui->flowMethod->addItem(tr("OpenCV (CUDA)"),QVariant(4));
+
+	QSettings settings; //TODO: better define in project ?
+	int index = ui->flowMethod->findText(settings.value("preferences/flowMethod", "V3D").toString());
+	if ( index != -1 ) { // -1 for not found	
+  			ui->flowMethod->setCurrentIndex(index);
+	} else {
+		// default to opencv
+		ui->flowMethod->setCurrentIndex(1);
+	}
+	qDebug() << "found index : "<< index << "for : " <<settings.value("preferences/flowMethod", "V3D").toString() ;
+	//  connect( this->ui.comboBox, SIGNAL( activated(int) ), this, SLOT(comboBox_Activated()) );
+	
+	
     // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
     ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
@@ -128,7 +147,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     Q_ASSERT(b);
 
     // Restore rendering start/end
-    int index;
+    //int index;
     index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
     if (index >= 0) {
         ui->cbStartTag->setCurrentIndex(index);
@@ -442,6 +461,12 @@ void RenderingDialog::slotTagIndexChanged()
     }
 }
 
+#if 0
+void MainWindow::comboBox_Activated()
+{
+  std::cout << "Activated " << this->ui.comboBox->currentIndex() << std::endl;
+}
+#endif
 
 
 
