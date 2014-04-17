@@ -146,6 +146,9 @@
    <property name="text">
     <string>&amp;Preferences</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
   </action>
   <action name="actionZoomIn">
    <property name="text">
