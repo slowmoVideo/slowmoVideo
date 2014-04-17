@@ -127,6 +127,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
 //        namedWindow("flow", 1);
 
+		qDebug() << "Building flow for left frame " << prevpath << " to right frame " << path ;
 		qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
 		
         prevgray = imread(prevpath.toStdString(), 0);
@@ -138,14 +139,16 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         {
 
             if( prevgray.data ) {
-                const float pyrScale = 0.5;
-                const float levels = 3;
-                const float winsize = 15;
-                const float iterations = 8;
-                const float polyN = 5;
-                const float polySigma = 1.2;
-                const int flags = 0;
                 // TBD need sliders for all these parameters
+	      const int levels = 3; // 5
+            const int winsize = 15; // 13
+            const int iterations = 8; // 10
+
+            const double polySigma = 1.2;
+            const double pyrScale = 0.5;
+            const int polyN = 5;
+            const int flags = 0;
+
                 calcOpticalFlowFarneback(
                     prevgray, gray,
                     //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
