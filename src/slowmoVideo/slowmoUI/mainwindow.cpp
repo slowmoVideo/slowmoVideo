@@ -328,6 +328,7 @@ void MainWindow::loadProject(Project_sV *project)
     Q_ASSERT(b);
 
     m_project->frameSource()->initialize();
+    
 }
 void MainWindow::slotLoadProjectDialog()
 {
@@ -581,6 +582,8 @@ void MainWindow::slotCloseFrameSourceProgress()
     if (m_progressDialog != NULL) {
         m_progressDialog->close();
     }
+    //is right place ? should we check ?
+    m_project->buildCacheFlowSource();
 }
 
 

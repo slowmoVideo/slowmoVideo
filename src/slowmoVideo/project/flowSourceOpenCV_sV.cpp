@@ -172,22 +172,23 @@ void FlowSourceOpenCV_sV::buildFlowForwardCache(FrameSize frameSize) throw(FlowB
 	for(frame=0;frame<lastFrame;frame++) {
 		    QString flowFileName(flowPath(frame, frame+1, frameSize));
 
+		qDebug() << "Building flow for left frame " << frame << " to right frame " << frame+1 << "; Size: " << frameSize;
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
 
-        QTime time;
-        time.start();
+        //QTime time;
+        //time.start();
 
         
         QString prevpath = project()->frameSource()->framePath(frame, frameSize);
         QString path = project()->frameSource()->framePath(frame+1, frameSize);
 
-		qDebug() << "Building flow for left frame " << frame << " to right frame " << frame+1 << "; Size: " << frameSize;
 		
 		//FlowField_sV *forwardFlow = pr->requestFlow(frame, frame+1, frameSize);
 		
-		qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
 		}
+	//qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
+	qDebug() << "Optical flow built for " << flowFileName;
 	}
 	
 }

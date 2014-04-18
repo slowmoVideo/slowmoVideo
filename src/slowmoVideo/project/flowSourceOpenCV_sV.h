@@ -24,7 +24,7 @@ public:
     virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const;
 
-	void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
+    virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
 	
 public slots:
     virtual void slotUpdateProjectDir();

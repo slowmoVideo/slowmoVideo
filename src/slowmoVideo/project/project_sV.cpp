@@ -393,3 +393,14 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
     return list;
 }
 
+void Project_sV::buildCacheFlowSource()
+{
+    Q_ASSERT(m_flowSource != NULL);
+
+    qDebug() << "Creating cached FlowSources ";
+    // TODO: test/check better place ?
+    // we should do it for each size/each way
+    // use threading here
+    flowSource()->buildFlowForwardCache(FrameSize_Orig);
+}
+

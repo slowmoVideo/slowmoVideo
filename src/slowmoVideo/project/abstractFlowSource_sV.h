@@ -27,6 +27,8 @@ public:
     /** \return The path to the flow file for the given frames */
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
+    virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)  = 0;
+
 public slots:
     /**
       \fn slotUpdateProjectDir()
