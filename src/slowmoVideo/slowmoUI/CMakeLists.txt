@@ -110,6 +110,13 @@ if(APPLE)
   configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
   set_target_properties(${PROGNAME} PROPERTIES
                         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+
+  #ADD_CUSTOM_COMMAND(TARGET slowmoUI
+  #  POST_BUILD
+  #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
+  #  COMMENT "Updating Info.plist"
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+
 endif()
 
 install(TARGETS ${slowmoUI}

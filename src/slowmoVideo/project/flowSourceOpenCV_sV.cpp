@@ -42,11 +42,7 @@ void FlowSourceOpenCV_sV::createDirectories()
     m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
-
-
-
-// TODO: check usage of cflowmap ? create a branch ?
-void drawOptFlowMap(const Mat& flow,  int step,
+void drawOptFlowMap(const Mat& flow, int step,
                     double, const Scalar& color, std::string flowname )
 {
 
@@ -105,7 +101,6 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
 //        namedWindow("flow", 1);
 
-		qDebug() << "Building flow for left frame " << prevpath << " to right frame " << path ;
 		qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
 		
         prevgray = imread(prevpath.toStdString(), 0);
@@ -117,16 +112,14 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         {
 
             if( prevgray.data ) {
+                const float pyrScale = 0.5;
+                const float levels = 3;
+                const float winsize = 15;
+                const float iterations = 8;
+                const float polyN = 5;
+                const float polySigma = 1.2;
+                const int flags = 0;
                 // TBD need sliders for all these parameters
-	      const int levels = 3; // 5
-            const int winsize = 15; // 13
-            const int iterations = 8; // 10
-
-            const double polySigma = 1.2;
-            const double pyrScale = 0.5;
-            const int polyN = 5;
-            const int flags = 0;
-
                 calcOpticalFlowFarneback(
                     prevgray, gray,
                     //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
@@ -139,9 +132,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                     polySigma, //1.2,
                     flags //0
                     );
-                //cvtColor(prevgray, cflow, CV_GRAY2BGR);
+                cvtColor(prevgray, cflow, CV_GRAY2BGR);
                 //drawOptFlowMap(flow, cflow, 16, 1.5, CV_RGB(0, 255, 0));
-                drawOptFlowMap(flow,  1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
+                drawOptFlowMap(flow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
                 //imshow("flow", cflow);
                 //imwrite(argv[4],cflow);
             } else {
@@ -165,3 +158,36 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
 
 
+/* 
+ * prebuilt the flow files
+ */
+void FlowSourceOpenCV_sV::buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)
+{
+	int lastFrame = project()->frameSource()->framesCount();
+	int frame;
+	Mat prevgray, gray, flow;
+	
+	qDebug() << "Pre Building froward flow for Size: " << frameSize;
+	
+	for(frame=0;frame<lastFrame;frame++) {
+		    QString flowFileName(flowPath(frame, frame+1, frameSize));
+
+    /// \todo Check if size is equal
+    if (!QFile(flowFileName).exists()) {
+
+        QTime time;
+        time.start();
+
+        
+        QString prevpath = project()->frameSource()->framePath(frame, frameSize);
+        QString path = project()->frameSource()->framePath(frame+1, frameSize);
+
+		qDebug() << "Building flow for left frame " << frame << " to right frame " << frame+1 << "; Size: " << frameSize;
+		
+		//FlowField_sV *forwardFlow = pr->requestFlow(frame, frame+1, frameSize);
+		
+		qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
+		}
+	}
+	
+}
