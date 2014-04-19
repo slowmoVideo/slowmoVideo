@@ -119,14 +119,14 @@ if(APPLE)
 
 endif()
 
-install(TARGETS ${slowmoUI}
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
+#install(TARGETS ${slowmoUI}
+#        BUNDLE DESTINATION . COMPONENT Runtime
+#        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
 if (APPLE)
 	install(TARGETS slowmoUI DESTINATION ".")
        include(DeployQt4)
-       install_qt4_executable(slowmoUI.app "" ""  )
+       install_qt4_executable(slowmoUI.app "qjpeg"  )
 	
 else()
 	install(TARGETS slowmoUI DESTINATION ${DEST})
