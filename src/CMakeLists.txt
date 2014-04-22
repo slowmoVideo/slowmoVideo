@@ -65,6 +65,11 @@ endif(NOT MSYS)
 #include_directories("/usr/include/ffmpeg/")
 #link_directories(${FFMPEG_LIBRARY_DIR})
 
+if (APPLE)
+	find_package(QTKIT)
+	message(STATUS "QTKIT find at ${QTKIT_LIBRARY} ")
+endif()
+	
 find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
