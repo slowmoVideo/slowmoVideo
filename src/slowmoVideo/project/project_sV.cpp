@@ -25,6 +25,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
+#include "work_flow.h"
+
 #include <cmath>
 
 #include <QDebug>
@@ -90,6 +92,15 @@ Project_sV::~Project_sV()
     delete m_nodes;
     delete m_renderTask;
     delete m_shutterFunctions;
+    
+#if 0
+        // should check this
+    worker->abort();
+    thread->wait();
+    qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
+    delete thread;
+    delete worker;
+#endif
 }
 
 void Project_sV::reloadFlowSource()
@@ -401,6 +412,24 @@ void Project_sV::buildCacheFlowSource()
     // TODO: test/check better place ?
     // we should do it for each size/each way
     // use threading here
-//to test    flowSource()->buildFlowForwardCache(FrameSize_Orig);
+    //flowSource()->buildFlowForwardCache(FrameSize_Orig);
+    /*
+     * create some worker thread to handle the work
+     */
+    thread = new QThread();
+    worker = new WorkerFlow();
+    worker->setFrameSize(FrameSize_Orig);
+    
+    worker->moveToThread(thread);
+    //connect(worker, SIGNAL(valueChanged(QString)), ui->label, SLOT(setText(QString)));
+    connect(worker, SIGNAL(workFlowRequested()), thread, SLOT(start()));
+    connect(thread, SIGNAL(started()), worker, SLOT(doWorkFlow()));
+    connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
+    
+    // let's start
+    thread->wait(); // If the thread is not running, this will immediately return.
+    
+    worker->requestWork();
+
 }
 
