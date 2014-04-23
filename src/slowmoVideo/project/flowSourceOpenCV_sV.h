@@ -13,10 +13,13 @@ the Free Software Foundation, either version 3 of the License, or
 #define FLOWSOURCEOPENCV_SV_H
 
 #include "abstractFlowSource_sV.h"
+
 #include <QtCore/QDir>
 
 class FlowSourceOpenCV_sV : public AbstractFlowSource_sV
 {
+ 
+    
 public:
     FlowSourceOpenCV_sV(Project_sV *project);
     ~FlowSourceOpenCV_sV() {}
@@ -26,15 +29,17 @@ public:
 
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
 	
+    
 public slots:
     virtual void slotUpdateProjectDir();
 
-
+  
 private:
     QDir m_dirFlowSmall;
     QDir m_dirFlowOrig;
 
     void createDirectories();
+   
 };
 
 #endif // FLOWSOURCEOPENCV_SV_H

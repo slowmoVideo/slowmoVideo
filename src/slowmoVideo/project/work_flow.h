@@ -31,6 +31,8 @@ public:
      * set running size
      */
     void setFrameSize(FrameSize _frameSize);
+    void setProjetc(Project_sV *_project);
+    
 private:
     /**
      *  Process is aborted when true
@@ -49,6 +51,11 @@ private:
      * which size do we create
      */
     FrameSize frameSize;
+    
+    /*
+     * which project is concern
+     */
+    Project_sV *project;
     
 signals:
     /**
