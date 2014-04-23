@@ -25,7 +25,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
+#if 0
 #include "work_flow.h"
+#endif
 
 #include <cmath>
 
@@ -413,6 +415,7 @@ void Project_sV::buildCacheFlowSource()
     // we should do it for each size/each way
     // use threading here
     //flowSource()->buildFlowForwardCache(FrameSize_Orig);
+#if 0
     /*
      * create some worker thread to handle the work
      */
@@ -430,6 +433,6 @@ void Project_sV::buildCacheFlowSource()
     thread->wait(); // If the thread is not running, this will immediately return.
     
     worker->requestWork();
-
+#endif
 }
 
