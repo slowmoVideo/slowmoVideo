@@ -53,6 +53,10 @@ find_package(Qt4)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
+if (APPLE)
+option (USE_QTKIT "Build the QTKit encoder" ON)
+endif()
+
 
 if(NOT MSYS)
 	find_package(FFMPEG)
@@ -65,7 +69,7 @@ endif(NOT MSYS)
 #include_directories("/usr/include/ffmpeg/")
 #link_directories(${FFMPEG_LIBRARY_DIR})
 
-if (APPLE)
+if (APPLE AND USE_QTKIT)
 	find_package(QTKIT)
 	message(STATUS "QTKIT find at ${QTKIT_LIBRARY} ")
 endif()
