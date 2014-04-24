@@ -82,7 +82,6 @@ NSImage *toNSImage(const QImage& InImage)
 
 VideoQT::VideoQT(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename)
 {
-        fprintf(stderr, "initialize QT object %d %d.\n",height,width);
     NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
     movieFPS = fps;
     mMovie = nil;
@@ -91,7 +90,6 @@ VideoQT::VideoQT(int width,int height,double fps,const char *vcodec,const char* 
     codecSpec = nil;
     qualitySpec = nil;
 
-        fprintf(stderr, "initialize QT object %d %d.\n",mHeight,mWidth);
     
     NSDictionary *codec = [NSDictionary dictionaryWithObjectsAndKeys:
                            @"avc1", @"h264",
@@ -158,10 +156,8 @@ VideoQT::VideoQT(int width,int height,double fps,const char *vcodec,const char* 
 int VideoQT::writeFrame(const QImage& frame)
 {
     NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
-    fprintf(stderr,"VideoQT::writeFrame\n"); 
 #if 1
     NSImage* nsimage =toNSImage(frame);
-    fprintf(stderr,"VideoQT::writeFrame - create Image\n"); 
 #else
     NSBitmapImageRep* imageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:&imagedata
                                                                          pixelsWide:width
@@ -182,14 +178,12 @@ int VideoQT::writeFrame(const QImage& frame)
     [mMovie addImage:nsimage
         forDuration:duration
      withAttributes:imageAttributes];
-    fprintf(stderr,"VideoQT::writeFrame - add Image\n"); 
     
     if (![mMovie updateMovieFile]) {
         fprintf(stderr, "Didn't successfully update movie file. \n" );
 	return 1;
     }
 
-    fprintf(stderr,"VideoQT::writeFrame - update Image\n"); 
     
     //[imageRep release];
     [nsimage release];
@@ -213,7 +207,6 @@ VideoQT::~VideoQT()
 
 VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps)
 {
-	fprintf(stderr,"createQT writer\n");
 	VideoQT*  driver=  new VideoQT(width,height,fps,0,0,filename);
 	return driver;
 }

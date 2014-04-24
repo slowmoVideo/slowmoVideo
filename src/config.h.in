@@ -1,0 +1,9 @@
+/*
+ * compile time/plateform define
+*/
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#cmakedefine USE_QTKIT
+
+#endif // CONFIG_H
