@@ -6,7 +6,7 @@ VideoWriter* CreateVideoWriter( const char* filename, int width, int height,doub
 	return driver;
 }
 
-int WriteFrame( VideoWriter* writer, const QImage* frame)
+int WriteFrame( VideoWriter* writer, const QImage& frame)
 {
     return writer ? writer->writeFrame(frame) : 0;
 }

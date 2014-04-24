@@ -53,10 +53,7 @@ find_package(Qt4)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
-if (APPLE)
-option (USE_QTKIT "Build the QTKit encoder" ON)
-endif()
-
+set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
 
 if(NOT MSYS)
 	find_package(FFMPEG)
@@ -77,7 +74,8 @@ endif()
 find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
-
+# for config.h
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
 
@@ -339,4 +337,5 @@ if(NOT BUILD_FLOW_BUILDER)
     message(WARNING "Cannot build V3D.")
 endif(NOT BUILD_FLOW_BUILDER)
 
+configure_file(config.h.in config.h)
 

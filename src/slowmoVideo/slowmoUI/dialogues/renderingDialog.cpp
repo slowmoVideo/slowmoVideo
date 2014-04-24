@@ -7,6 +7,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
+#include "config.h"
 
 #include "renderingDialog.h"
 #include "ui_renderingDialog.h"
@@ -17,7 +18,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/projectPreferences_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
+#ifdef USE_QTKIT
+#include "project/new_videoRenderTarget.h"
+#else
 #include "project/videoRenderTarget_sV.h"
+#endif
 #include "project/emptyFrameSource_sV.h"
 
 #include <QButtonGroup>
@@ -201,10 +206,19 @@ RenderTask_sV* RenderingDialog::buildTask()
             renderTarget->setTargetDir(imagesOutputDir);
             task->setRenderTarget(renderTarget);
         } else if (ui->radioVideo->isChecked()) {
+	#ifdef USE_QTKIT
+	#warning "using QTKit version"
+            newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
+            renderTarget->setTargetFile(ui->videoOutputFile->text());
+            renderTarget->setVcodec(ui->vcodec->text());
+            task->setRenderTarget(renderTarget);
+	#else
+	#error "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
             renderTarget->setTargetFile(ui->videoOutputFile->text());
             renderTarget->setVcodec(ui->vcodec->text());
             task->setRenderTarget(renderTarget);
+	#endif
         } else {
             qDebug() << "Render target is neither images nor video. Not implemented?";
             Q_ASSERT(false);

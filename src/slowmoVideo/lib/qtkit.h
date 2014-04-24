@@ -23,7 +23,7 @@ public:
     VideoQT(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename);
     ~VideoQT();
     
-    int writeFrame(const QImage* frame);
+    int writeFrame(const QImage& frame);
 
 };
 

@@ -46,8 +46,12 @@ set(HEADERS
 set(LIB_SRC_ENCODE
   macros_sV.h
   qtkit.h
+  video_enc.h
+  ffmpeg_writer.h
   ffmpegEncode_sV.c
+  ffmpeg_writer.cpp
   qtkit.mm
+  video_enc.cpp
 )
 
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")

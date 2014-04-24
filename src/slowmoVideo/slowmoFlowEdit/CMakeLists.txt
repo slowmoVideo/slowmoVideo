@@ -53,7 +53,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoFlowEdit)
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/libgui)
 
 add_executable(slowmoFlowEdit WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT})
-target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis ${EXTERNAL_LIBS})
+target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis)
 
 install(TARGETS slowmoFlowEdit
         BUNDLE DESTINATION . COMPONENT Runtime

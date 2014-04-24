@@ -2,6 +2,8 @@
 #include <QtCore/QDir>
 #include <QDesktopServices>
 
+#include "config.h"
+
 ProjectPreferences_sV::ProjectPreferences_sV() :
     m_tagAxis(TagAxis_Source),
     m_viewport_t0(0, 0),
@@ -14,7 +16,11 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
-    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mpg"),
+#ifdef USE_QTKIT
+    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mov"),
+#else
+    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mp4"),
+#endif
     m_flowV3DLambda(20.0)
 {
 }
