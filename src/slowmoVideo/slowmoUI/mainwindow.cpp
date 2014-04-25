@@ -176,7 +176,7 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     m_wCanvas->showHelp(show);
     settings.sync();
 
-
+   
     if (!projectPath.isEmpty()) {
         loadProject(projectPath);
     }
@@ -211,11 +211,31 @@ MainWindow::~MainWindow()
     }
 }
 
+bool MainWindow::okToContinue()
+{
+    if (isWindowModified()) {
+        int r = QMessageBox::warning(this, tr("slowmoUI"),
+                        tr("The document has been modified.\n"
+                           "Do you want to save your changes?"),
+                        QMessageBox::Yes | QMessageBox::No
+                        | QMessageBox::Cancel);
+        if (r == QMessageBox::Yes) {
+            slotSaveProjectDialog();
+            return true;
+        } else if (r == QMessageBox::Cancel) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    m_settings.setValue("geometry", saveGeometry());
-    m_settings.setValue("windowState", saveState());
-    QMainWindow::closeEvent(e);
+	if (okToContinue()) {
+	    m_settings.setValue("geometry", saveGeometry());
+    	m_settings.setValue("windowState", saveState());
+	    QMainWindow::closeEvent(e);
+	}
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *e)
@@ -295,13 +315,14 @@ void MainWindow::slotNewProject()
             loadProject(project);
 
             m_wCanvas->showHelp(true);
-
+			setWindowModified(true);
 
         } catch (FrameSourceError &err) {
             QMessageBox(QMessageBox::Warning, "Frame source error", err.message()).exec();
         }
     }
 }
+
 void MainWindow::loadProject(Project_sV *project)
 {
     Q_ASSERT(project != NULL);
@@ -332,13 +353,15 @@ void MainWindow::loadProject(Project_sV *project)
 }
 void MainWindow::slotLoadProjectDialog()
 {
-    QString dir = m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString();
-    QString file = QFileDialog::getOpenFileName(this, tr("Load Project"), dir, tr("slowmoVideo projects (*.sVproj)"));
+	if (okToContinue()) {
+	    QString dir = m_settings.value("directories/lastOpenedProject", QDir::current().absolutePath()).toString();
+    	QString file = QFileDialog::getOpenFileName(this, tr("Load Project"), dir, tr("slowmoVideo projects (*.sVproj)"));
 
-    if (!file.isEmpty()) {
-        qDebug() << file;
-        loadProject(QFileInfo(file).absoluteFilePath());
-    }
+	    if (!file.isEmpty()) {
+    	    qDebug() << file;
+        	loadProject(QFileInfo(file).absoluteFilePath());
+	    }
+	}
 }
 
 void MainWindow::loadProject(QString path)
@@ -359,6 +382,7 @@ void MainWindow::loadProject(QString path)
         QMessageBox(QMessageBox::Warning, tr("Error"), err.message()).exec();
     }
 }
+
 
 void MainWindow::slotSaveProject(QString filename)
 {
@@ -440,13 +464,15 @@ void MainWindow::slotUpdateRenderPreview()
                                        m_project->preferences()->renderFPS(), NULL)
                                    );
 }
+
+
 void MainWindow::updateWindowTitle()
 {
     QString project(tr("empty project"));
     if (m_projectPath.length() > 0) {
-        project = m_projectPath;
+        project = m_projectPath;        
     }
-    setWindowTitle(QString("slowmo UI (%1)").arg(project));
+    setWindowTitle(QString("slowmo UI (%1) [*]").arg(project));
 }
 
 
