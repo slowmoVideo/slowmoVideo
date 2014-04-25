@@ -131,7 +131,14 @@ string(REPLACE "/usr/include/" "" FFMPEG_INCLUDE_DIR "${FFMPEG_INCLUDE_DIR}")
 
 # add libx264 ...
 # todo: better find ...
-SET(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} "/Users/val/Documents/Sources/slowlib/lib/libx264.a" )
+FIND_LIBRARY(LIB_X264 NAMES x264 PATHS ENV ${X264_LIBRARY_DIR} )
+message(STATUS "x264 found in: ${LIB_X264}" )
+
+IF ( LIB_X264 )
+	SET(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} ${LIB_X264} )
+ELSE()
+	SET(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} "/Volumes/externe/Documents/Sources/slowlib/lib/libx264.a" )
+ENDIF()
 
 # On OS X we ffmpeg libraries depend on VideoDecodeAcceleration and CoreVideo frameworks
 IF (APPLE)
