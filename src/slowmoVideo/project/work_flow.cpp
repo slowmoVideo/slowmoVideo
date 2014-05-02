@@ -2,6 +2,17 @@
  * precalculate optical flow
  */
 
+#include "flowSourceOpenCV_sV.h"
+#include "project_sV.h"
+#include "abstractFrameSource_sV.h"
+#include "../lib/flowRW_sV.h"
+#include "../lib/flowField_sV.h"
+
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
+
 #include "work_flow.h"
 #include <QTimer>
 #include <QEventLoop>
@@ -9,11 +20,19 @@
 #include <QThread>
 #include <QDebug>
 
+using namespace cv;
+
+extern void drawOptFlowMap(const Mat& flow, int step,
+                         double, const Scalar& color, std::string flowname );
+
+
+
 WorkerFlow::WorkerFlow(QObject *parent) :
 QObject(parent)
 {
     _working =false;
     _abort = false;
+    
 }
 
 void WorkerFlow::requestWork()
@@ -24,7 +43,7 @@ void WorkerFlow::requestWork()
     qDebug()<<"OpticalFlow worker start in Thread "<<thread()->currentThreadId();
     mutex.unlock();
     
-    emit workRequested();
+    emit workFlowRequested();
 }
 
 void WorkerFlow::abort()
@@ -37,15 +56,37 @@ void WorkerFlow::abort()
     mutex.unlock();
 }
 
-void setFrameSize(FrameSize _frameSize)
+//TODO: should get an object Flow...
+void WorkerFlow::setFrameSize(FrameSize _frameSize)
 {
     frameSize = _frameSize;
 }
 
-void setProjetc(Project_sV *_project)
+void WorkerFlow::setProject(Project_sV *_project)
 {
     project = _project;
 }
+
+//TODO: better function for this ... (
+// common with flowSourceOpenCv ?
+const QString WorkerFlow::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
+{
+    QDir dir;
+    if (frameSize == FrameSize_Orig) {
+        dir = m_dirFlowOrig;
+    } else {
+        dir = m_dirFlowSmall;
+    }
+    QString direction;
+    if (leftFrame < rightFrame) {
+        direction = "forward";
+    } else {
+        direction = "backward";
+    }
+    
+    return dir.absoluteFilePath(QString("ocv-%1-%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
+}
+
 
 void WorkerFlow::doWorkFlow()
 {
@@ -58,6 +99,11 @@ void WorkerFlow::doWorkFlow()
     
     qDebug() << "Pre Building forward flow for Size: " << frameSize;
     
+    //TODO:
+    m_dirFlowSmall = project->getDirectory("cache/oFlowSmall");
+    m_dirFlowOrig = project->getDirectory("cache/oFlowOrig");
+
+
     // load first frame
     QString prevpath = project->frameSource()->framePath(frame, frameSize);
     prevgray = imread(prevpath.toStdString(), 0);
@@ -124,7 +170,7 @@ void WorkerFlow::doWorkFlow()
         }
         //qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
         // Once we're done waiting, value is updated
-        emit valueChanged(QString::number(i));
+        emit valueChanged(QString::number(frame));
         
     } /* for */
     

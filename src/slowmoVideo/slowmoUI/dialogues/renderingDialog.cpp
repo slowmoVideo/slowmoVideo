@@ -55,7 +55,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     // Optical flow
     ui->lambda->setValue(m_project->preferences()->flowV3DLambda());
-
+#if 0
     ui->flowMethod->clear();
     ui->flowMethod->addItem(tr("GPU GL V3D"),QVariant(1));
     ui->flowMethod->addItem(tr("OpenCV-Farnback (cpu)"),QVariant(2));
@@ -73,7 +73,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 	qDebug() << "found index : "<< index << "for : " <<settings.value("preferences/flowMethod", "V3D").toString() ;
 	//  connect( this->ui.comboBox, SIGNAL( activated(int) ), this, SLOT(comboBox_Activated()) );
 	
-	
+#endif
+    
     // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
     ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
@@ -152,7 +153,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     Q_ASSERT(b);
 
     // Restore rendering start/end
-    //int index;
+    int index;
     index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
     if (index >= 0) {
         ui->cbStartTag->setCurrentIndex(index);

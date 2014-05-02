@@ -52,6 +52,9 @@ public:
     virtual const Fps_sV* fps() const = 0;
     double maxTime() const throw(Div0Exception);
 
+    //TODO: add a qcache here ...
+    //  QCache<int,QImage> frames;
+    // use it in frameAt
     /**
       \fn frameAt()
       \return The frame at the given position, as image. Fails

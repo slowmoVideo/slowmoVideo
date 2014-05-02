@@ -26,6 +26,7 @@ set(SRCS_PROJ
   motionBlur_sV.cpp
   canvasObject_sV.h
   new_videoRenderTarget.cpp
+  work_flow.cpp
 )
 
 set(SRCS_MOC

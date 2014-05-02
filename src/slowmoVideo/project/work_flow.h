@@ -5,6 +5,8 @@
 #ifndef WORKERFLOW_H
 #define WORKERFLOW_H
 
+#include "project_sV.h"
+
 #include <QObject>
 #include <QMutex>
 
@@ -31,8 +33,9 @@ public:
      * set running size
      */
     void setFrameSize(FrameSize _frameSize);
-    void setProjetc(Project_sV *_project);
+    void setProject(Project_sV *_project);
     
+
 private:
     /**
      *  Process is aborted when true
@@ -57,6 +60,12 @@ private:
      */
     Project_sV *project;
     
+    const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
+    
+    QDir m_dirFlowSmall;
+    QDir m_dirFlowOrig;
+
+
 signals:
     /**
      * This signal is emitted when the Worker request to Work
