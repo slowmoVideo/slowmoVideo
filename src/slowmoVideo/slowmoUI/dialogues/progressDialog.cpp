@@ -9,6 +9,8 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
     ui(new Ui::ProgressDialog)
 {
     ui->setupUi(this);
+    // alas this make window transparent !
+    //setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowStaysOnTopHint);
 
     bool b = true;
     b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));

@@ -25,6 +25,7 @@ set(SRCS_PROJ
   shutterFunctionList_sV.cpp
   motionBlur_sV.cpp
   canvasObject_sV.h
+  new_videoRenderTarget.cpp
 )
 
 set(SRCS_MOC

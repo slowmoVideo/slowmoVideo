@@ -16,6 +16,7 @@ if (APPLE)
 # To compile with clang:
 #set(CMAKE_CXX_COMPILER "clang++")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
@@ -52,6 +53,7 @@ find_package(Qt4)
 include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
+set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
 
 if(NOT MSYS)
 	find_package(FFMPEG)
@@ -64,10 +66,16 @@ endif(NOT MSYS)
 #include_directories("/usr/include/ffmpeg/")
 #link_directories(${FFMPEG_LIBRARY_DIR})
 
+if (APPLE AND USE_QTKIT)
+	find_package(QTKIT)
+	message(STATUS "QTKIT find at ${QTKIT_LIBRARY} ")
+endif()
+	
 find_package(OpenCV)
 include_directories(${OPENCV_INCLUDE_DIRS})
 
-
+# for config.h
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
 
@@ -329,4 +337,5 @@ if(NOT BUILD_FLOW_BUILDER)
     message(WARNING "Cannot build V3D.")
 endif(NOT BUILD_FLOW_BUILDER)
 
+configure_file(config.h.in config.h)
 

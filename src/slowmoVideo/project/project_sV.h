@@ -122,6 +122,8 @@ public:
     /// Reload the flow source in case the user changed the default (preferred) method.
     void reloadFlowSource();
 
+    // prebuilt the need optical flow files
+    void buildCacheFlowSource();
 
 
 private:

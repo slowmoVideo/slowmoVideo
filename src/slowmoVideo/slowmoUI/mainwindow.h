@@ -93,13 +93,13 @@ private:
 
     QThread m_rendererThread;
 
-
-    void loadProject(QString path);
+	void loadProject(QString path);
     void loadProject(Project_sV *project);
     void resetDialogs();
     void updateWindowTitle();
-
-private slots:
+	bool okToContinue();
+	
+	private slots:
     void slotShortcutUsed(int id);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
@@ -123,7 +123,8 @@ private slots:
     void slotShowAboutDialog();
     void slotUpdateRenderPreview();
 
-
+	
+	
 signals:
     void deleteNodes();
     void setMode(const Canvas::ToolMode mode);

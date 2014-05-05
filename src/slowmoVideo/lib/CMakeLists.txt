@@ -43,6 +43,17 @@ set(HEADERS
 )
 
 
+set(LIB_SRC_ENCODE
+  macros_sV.h
+  qtkit.h
+  video_enc.h
+  ffmpeg_writer.h
+  ffmpegEncode_sV.c
+  ffmpeg_writer.cpp
+  qtkit.mm
+  video_enc.cpp
+)
+
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
@@ -52,7 +63,7 @@ target_link_libraries(sV  ${QT_LIBRARIES})
 add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode  STATIC ffmpegEncode_sV.c macros_sV.h)
+add_library(sVencode  STATIC ${LIB_SRC_ENCODE})
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 
 add_library(sVflow  STATIC ${LIB_SRC_FLOW})

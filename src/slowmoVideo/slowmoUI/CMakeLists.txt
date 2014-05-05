@@ -102,27 +102,31 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
 
-
+link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
-target_link_libraries(slowmoUI sVproj sVvis sVgui ${EXTERNAL_LIBS})
+target_link_libraries(slowmoUI sVproj sVvis sVgui )
 
 if(APPLE)
   configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
   set_target_properties(${PROGNAME} PROPERTIES
                         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-  # add post command update Info.plist
-  ADD_CUSTOM_COMMAND( TARGET ${PROGNAME} POST_BUILD COMMAND cp ARGS Info.plist ${CMAKE_CURRENT_BINARY_DIR}/${PROGNAME}.app/Contents)	
+  #ADD_CUSTOM_COMMAND(TARGET slowmoUI
+  #  POST_BUILD
+  #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
+  #  COMMENT "Updating Info.plist"
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+
 endif()
 
-install(TARGETS ${slowmoUI}
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
+#install(TARGETS ${slowmoUI}
+#        BUNDLE DESTINATION . COMPONENT Runtime
+#        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
-if (APPLE)
-	install(TARGETS slowmoUI DESTINATION ".")
-       include(DeployQt4)
-       install_qt4_executable(slowmoUI.app "" ""  )
-
+if (APPLE OR WIN32)
+       install(TARGETS slowmoUI DESTINATION ".")
+       include(DeployQt4) # 2.8.7 or later
+       set( PLUGINS qjpeg;qtiff )
+       install_qt4_executable(slowmoUI.app "${PLUGINS}"  )
 else()
 	install(TARGETS slowmoUI DESTINATION ${DEST})
 endif()

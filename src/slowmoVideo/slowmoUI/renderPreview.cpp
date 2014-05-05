@@ -93,7 +93,7 @@ void RenderPreview::slotUpdateImage()
 {
     qDebug() << "Updating preview image now. Saving as /tmp/renderPreview.jpg."; ///< \todo do not save anymore
     ui->imageDisplay->loadImage(m_future.result());
-    ui->imageDisplay->image().save("/tmp/renderPreview.jpg");
+    ui->imageDisplay->image().save(QDir::tempPath () + "/renderPreview.jpg");
     repaint();
     notify(tr("Preview rendering finished."));
 }
