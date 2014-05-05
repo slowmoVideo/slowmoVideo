@@ -2,9 +2,22 @@
  * class to export a movie using ffmpeg
 */
 
+#ifndef _FFMPEG_WRITER
+#define _FFMPEG_WRITER
+
 #include <QImage>
 
 #include "video_enc.h"
+
+// Against the «UINT64_C not declared» message.
+// See: http://code.google.com/p/ffmpegsource/issues/detail?id=11
+#ifdef __cplusplus
+ #define __STDC_CONSTANT_MACROS
+ #ifdef _STDINT_H
+  #undef _STDINT_H
+ #endif
+ # include <stdint.h>
+#endif
 
 extern "C" {
 // ffmpeg libs
@@ -28,3 +41,4 @@ public:
 
 };
 
+#endif // _FFMPEG_WRITER
