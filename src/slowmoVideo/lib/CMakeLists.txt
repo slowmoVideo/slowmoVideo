@@ -2,7 +2,7 @@
 # http://www.itk.org/pipermail/insight-users/2007-November/024141.html
 # http://www.linux-magazin.de/Heft-Abo/Ausgaben/2007/02/Mal-ausspannen
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 
 set(LIB_SRC_BASE
   defs_sV.cpp
@@ -63,6 +63,7 @@ endif()
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
+include_directories(${Qt5Core_INCLUDE_DIRS})
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
 

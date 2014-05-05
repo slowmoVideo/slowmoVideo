@@ -9,7 +9,7 @@ set(SRCS_MOC
 )
 
 
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 
 include_directories(${CMAKE_BINARY_DIR}/libgui)

@@ -92,11 +92,11 @@ include_directories(..)
 
 # Embed images in the binary
 set(SRC_RES resources.qrc)
-qt4_add_resources(RES_OUT ${SRC_RES})
+qt_add_resources(RES_OUT ${SRC_RES})
 
 # Generate header files from the .ui files
-qt4_wrap_ui(UI_H_OUT ${SRCS_UI})
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_ui(UI_H_OUT ${SRCS_UI})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)

@@ -21,8 +21,8 @@ set(SRCS_MOC
     shortcutListDialog.h
 )
 
-qt4_wrap_ui(UI_H_OUT ${SRCS_UI})
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_ui(UI_H_OUT ${SRCS_UI})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 if(APPLE)
         set(BUNDLE "slowmoFlowEdit")

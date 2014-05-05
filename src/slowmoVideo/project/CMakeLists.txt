@@ -37,7 +37,7 @@ set(SRCS_MOC
   emptyFrameSource_sV.h
 )
 
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
 add_library(sVproj STATIC ${SRCS_PROJ} ${MOC_OUT})
