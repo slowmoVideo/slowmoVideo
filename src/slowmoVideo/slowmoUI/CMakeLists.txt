@@ -110,7 +110,6 @@ if(APPLE)
   configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
   set_target_properties(${PROGNAME} PROPERTIES
                         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-
   #ADD_CUSTOM_COMMAND(TARGET slowmoUI
   #  POST_BUILD
   #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
@@ -128,7 +127,6 @@ if (APPLE OR WIN32)
        include(DeployQt4) # 2.8.7 or later
        set( PLUGINS qjpeg;qtiff )
        install_qt4_executable(slowmoUI.app "${PLUGINS}"  )
-	
 else()
 	install(TARGETS slowmoUI DESTINATION ${DEST})
 endif()

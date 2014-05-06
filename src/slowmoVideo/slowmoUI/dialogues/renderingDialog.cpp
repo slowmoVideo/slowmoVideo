@@ -214,7 +214,7 @@ RenderTask_sV* RenderingDialog::buildTask()
             renderTarget->setVcodec(ui->vcodec->text());
             task->setRenderTarget(renderTarget);
 	#else
-	#error "should not use this"
+	#warning "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
             renderTarget->setTargetFile(ui->videoOutputFile->text());
             renderTarget->setVcodec(ui->vcodec->text());

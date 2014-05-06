@@ -45,14 +45,20 @@ set(HEADERS
 
 set(LIB_SRC_ENCODE
   macros_sV.h
-  qtkit.h
   video_enc.h
   ffmpeg_writer.h
   ffmpegEncode_sV.c
   ffmpeg_writer.cpp
-  qtkit.mm
   video_enc.cpp
 )
+
+if (APPLE AND USE_QTKIT)
+set(LIB_SRC_ENCODE
+	${LIB_SRC_ENCODE}
+	qtkit.h
+	qtkit.mm
+)
+endif()
 
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 

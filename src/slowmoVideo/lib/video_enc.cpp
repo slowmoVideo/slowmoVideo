@@ -1,8 +1,14 @@
+#include "config.h"
+
 #include "video_enc.h"
 
 VideoWriter* CreateVideoWriter( const char* filename, int width, int height,double fps)
 {
+#ifdef USE_QTKIT
 	VideoWriter* driver= CreateVideoWriter_QT(filename,width, height,fps);
+#else
+	VideoWriter* driver= CreateVideoWriter_FFMPEG(filename,width, height,fps);
+#endif
 	return driver;
 }
 
