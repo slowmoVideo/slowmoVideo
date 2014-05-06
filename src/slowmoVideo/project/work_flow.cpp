@@ -56,6 +56,7 @@ void WorkerFlow::abort()
     mutex.unlock();
 }
 
+
 //TODO: should get an object Flow...
 void WorkerFlow::setFrameSize(FrameSize _frameSize)
 {
@@ -67,6 +68,13 @@ void WorkerFlow::setProject(Project_sV *_project)
     project = _project;
 }
 
+
+void WorkerFlow::setFlowSource(AbstractFlowSource_sV* _flowsource)
+{
+    flowSource = _flowsource;
+}
+
+#if 0
 //TODO: better function for this ... (
 // common with flowSourceOpenCv ?
 const QString WorkerFlow::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
@@ -86,6 +94,7 @@ const QString WorkerFlow::flowPath(const uint leftFrame, const uint rightFrame, 
     
     return dir.absoluteFilePath(QString("ocv-%1-%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
 }
+#endif
 
 
 void WorkerFlow::doWorkFlow()
@@ -99,10 +108,11 @@ void WorkerFlow::doWorkFlow()
     
     qDebug() << "Pre Building forward flow for Size: " << frameSize;
     
+#if 0
     //TODO:
     m_dirFlowSmall = project->getDirectory("cache/oFlowSmall");
     m_dirFlowOrig = project->getDirectory("cache/oFlowOrig");
-
+#endif
 
     // load first frame
     QString prevpath = project->frameSource()->framePath(frame, frameSize);
@@ -131,7 +141,7 @@ void WorkerFlow::doWorkFlow()
             break;
         }
         
-        QString flowFileName(flowPath(frame, frame+1, frameSize));
+        QString flowFileName(flowSource->flowPath(frame, frame+1, frameSize));
         
         qDebug() << "Building flow for left frame " << frame << " to right frame " << frame+1 << "; Size: " << frameSize;
         /// \todo Check if size is equal

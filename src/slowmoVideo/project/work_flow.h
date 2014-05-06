@@ -35,6 +35,7 @@ public:
     void setFrameSize(FrameSize _frameSize);
     void setProject(Project_sV *_project);
     
+    void setFlowSource(AbstractFlowSource_sV* _flowsource);
 
 private:
     /**
@@ -51,6 +52,11 @@ private:
     QMutex mutex;
     
     /**
+     * which source flow
+     */
+    AbstractFlowSource_sV* flowSource;
+    
+    /**
      * which size do we create
      */
     FrameSize frameSize;
@@ -60,11 +66,13 @@ private:
      */
     Project_sV *project;
     
+#if 0
     const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
     
     QDir m_dirFlowSmall;
     QDir m_dirFlowOrig;
-
+#endif
+    
 
 signals:
     /**
