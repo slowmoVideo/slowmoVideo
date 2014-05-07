@@ -96,7 +96,7 @@ const QString WorkerFlow::flowPath(const uint leftFrame, const uint rightFrame, 
 }
 #endif
 
-
+//TODO: call abstractflow source method
 void WorkerFlow::doWorkFlow()
 {
     qDebug()<<"Starting OpticalFlow process in Thread "<<thread()->currentThreadId();

@@ -36,6 +36,7 @@ set(SRCS_MOC
   imagesFrameSource_sV.h
   videoFrameSource_sV.h
   emptyFrameSource_sV.h
+  work_flow.h
 )
 
 qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})

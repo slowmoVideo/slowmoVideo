@@ -419,7 +419,7 @@ void eatSample(VideoOut_sV *video)
 
         if (cc->coded_frame->pts != AV_NOPTS_VALUE) {
             pkt.pts = av_rescale_q(cc->coded_frame->pts, cc->time_base, video->streamV->time_base);
-            printf("pkt.pts is %ld.\n", pkt.pts);
+            printf("pkt.pts is %lld.\n", pkt.pts);
         }
         if(cc->coded_frame->key_frame) {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,30,2)
