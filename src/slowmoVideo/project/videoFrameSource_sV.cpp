@@ -95,7 +95,16 @@ const Fps_sV* VideoFrameSource_sV::fps() const
 }
 QImage VideoFrameSource_sV::frameAt(const uint frame, const FrameSize frameSize)
 {
-    return QImage(framePath(frame, frameSize));
+    // TODO:
+#if 0
+     if(frameCache.contains(frame))
+     return frameCache[frame];
+#endif
+    QImage _frame = QImage(framePath(frame, frameSize));
+    /*
+     frameCache.insert(key, _frame);
+     */
+    return _frame;
 }
 const QString VideoFrameSource_sV::videoFile() const
 {
