@@ -6,7 +6,7 @@
 
 #include "video_enc.h"
 #include "ffmpeg_writer.h"
-#include "ffmpegEncode_sV.h"
+//#include "ffmpegEncode_sV.h"
 #include "defs_sV.hpp"
     
 VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename)
@@ -38,7 +38,7 @@ VideoFFMPEG::~VideoFFMPEG()
     
 int VideoFFMPEG::writeFrame(const QImage& frame)
 {
-	eatARGB(m_videoOut, frame.bits());
+	return eatARGB(m_videoOut, frame.bits());
 }
 
 
