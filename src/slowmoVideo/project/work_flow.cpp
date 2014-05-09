@@ -74,28 +74,6 @@ void WorkerFlow::setFlowSource(AbstractFlowSource_sV* _flowsource)
     flowSource = _flowsource;
 }
 
-#if 0
-//TODO: better function for this ... (
-// common with flowSourceOpenCv ?
-const QString WorkerFlow::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
-{
-    QDir dir;
-    if (frameSize == FrameSize_Orig) {
-        dir = m_dirFlowOrig;
-    } else {
-        dir = m_dirFlowSmall;
-    }
-    QString direction;
-    if (leftFrame < rightFrame) {
-        direction = "forward";
-    } else {
-        direction = "backward";
-    }
-    
-    return dir.absoluteFilePath(QString("ocv-%1-%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
-}
-#endif
-
 //TODO: call abstractflow source method
 void WorkerFlow::doWorkFlow()
 {

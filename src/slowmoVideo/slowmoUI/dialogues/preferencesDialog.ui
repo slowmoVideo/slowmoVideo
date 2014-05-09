@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>220</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -86,6 +86,17 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="precalcFlow">
+       <property name="text">
+        <string>Use background thread for Optical Flow</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">
