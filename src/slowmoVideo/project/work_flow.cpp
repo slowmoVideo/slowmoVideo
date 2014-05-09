@@ -108,12 +108,6 @@ void WorkerFlow::doWorkFlow()
     
     qDebug() << "Pre Building forward flow for Size: " << frameSize;
     
-#if 0
-    //TODO:
-    m_dirFlowSmall = project->getDirectory("cache/oFlowSmall");
-    m_dirFlowOrig = project->getDirectory("cache/oFlowOrig");
-#endif
-
     // load first frame
     QString prevpath = project->frameSource()->framePath(frame, frameSize);
     prevgray = imread(prevpath.toStdString(), 0);
@@ -158,7 +152,7 @@ void WorkerFlow::doWorkFlow()
             // use previous flow info
             //if (frame!=0)
             //    flags |= OPTFLOW_USE_INITIAL_FLOW;
-            
+#if 0            
             calcOpticalFlowFarneback(
                                      prevgray, gray,
                                      flow,
@@ -172,6 +166,10 @@ void WorkerFlow::doWorkFlow()
                                      );
             // save result
             drawOptFlowMap(flow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
+#else
+	// test the work horse
+            qDebug() << "dummy Optical flow built for " << flowFileName;
+#endif
             std::swap(prevgray, gray);
             qDebug() << "Optical flow built for " << flowFileName;
             

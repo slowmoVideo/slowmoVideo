@@ -407,6 +407,31 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
     return list;
 }
 
+#if 0
+// start an opticalflow on a thread...
+void Project_sV::startFlow(int threadid,size)
+{
+    thread[1] = new QThread();
+    worker[1] = new WorkerFlow();
+
+    // set on what to work ...
+    worker[1]->setFrameSize(FrameSize_Small);
+    worker[1]->setProject(this);
+    worker[1]->setFlowSource(flowSource());
+
+    worker[1]->moveToThread(thread[1]);
+    //connect(worker, SIGNAL(valueChanged(QString)), ui->label, SLOT(setText(QString)));
+    connect(worker[1], SIGNAL(workFlowRequested()), thread[1], SLOT(start()));
+    connect(thread[1], SIGNAL(started()), worker[1], SLOT(doWorkFlow()));
+    connect(worker[1], SIGNAL(finished()), thread[1], SLOT(quit()), Qt::DirectConnection);
+
+    // let's start
+    thread[1]->wait(); // If the thread is not running, this will immediately return.
+
+    worker[1]->requestWork();
+}
+#endif
+
 void Project_sV::buildCacheFlowSource()
 {
     Q_ASSERT(m_flowSource != NULL);
@@ -420,24 +445,46 @@ void Project_sV::buildCacheFlowSource()
     /*
      * create some worker thread to handle the work
      */
-    thread = new QThread();
-    worker = new WorkerFlow();
+    thread[0] = new QThread();
+    worker[0] = new WorkerFlow();
     
     // set on what to work ...
-    worker->setFrameSize(FrameSize_Orig);
-    worker->setProject(this);
-    worker->setFlowSource(flowSource());
+    worker[0]->setFrameSize(FrameSize_Orig);
+    worker[0]->setProject(this);
+    worker[0]->setFlowSource(flowSource());
     
-    worker->moveToThread(thread);
+    worker[0]->moveToThread(thread[0]);
     //connect(worker, SIGNAL(valueChanged(QString)), ui->label, SLOT(setText(QString)));
-    connect(worker, SIGNAL(workFlowRequested()), thread, SLOT(start()));
-    connect(thread, SIGNAL(started()), worker, SLOT(doWorkFlow()));
-    connect(worker, SIGNAL(finished()), thread, SLOT(quit()), Qt::DirectConnection);
+    connect(worker[0], SIGNAL(workFlowRequested()), thread[0], SLOT(start()));
+    connect(thread[0], SIGNAL(started()), worker[0], SLOT(doWorkFlow()));
+    connect(worker[0], SIGNAL(finished()), thread[0], SLOT(quit()), Qt::DirectConnection);
     
     // let's start
-    thread->wait(); // If the thread is not running, this will immediately return.
+    thread[0]->wait(); // If the thread is not running, this will immediately return.
     
-    worker->requestWork();
+    worker[0]->requestWork();
 #endif
+#if 1
+// another thread ?
+    thread[1] = new QThread();
+    worker[1] = new WorkerFlow();
+
+    // set on what to work ...
+    worker[1]->setFrameSize(FrameSize_Small);
+    worker[1]->setProject(this);
+    worker[1]->setFlowSource(flowSource());
+
+    worker[1]->moveToThread(thread[1]);
+    //connect(worker, SIGNAL(valueChanged(QString)), ui->label, SLOT(setText(QString)));
+    connect(worker[1], SIGNAL(workFlowRequested()), thread[1], SLOT(start()));
+    connect(thread[1], SIGNAL(started()), worker[1], SLOT(doWorkFlow()));
+    connect(worker[1], SIGNAL(finished()), thread[1], SLOT(quit()), Qt::DirectConnection);
+
+    // let's start
+    thread[1]->wait(); // If the thread is not running, this will immediately return.
+
+    worker[1]->requestWork();
+#endif
+
 }
 

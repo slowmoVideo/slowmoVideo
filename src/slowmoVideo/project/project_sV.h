@@ -151,11 +151,11 @@ private:
     /**
      * @brief Thread object which will let us manipulate the running thread
      */
-    QThread *thread;
+    QThread *thread[4];
     /**
      * @brief Object which contains methods that should be runned in another thread
      */
-    WorkerFlow *worker;
+    WorkerFlow *worker[4];
 
     
 private:
