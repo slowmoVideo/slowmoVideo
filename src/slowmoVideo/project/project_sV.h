@@ -163,6 +163,8 @@ private:
     /// and constantly switch to OpenCV
     int m_v3dFailCounter;
 
+    // launch a worker thread for optical flow
+    void startFlow(int threadid,const FrameSize frameSize);
 };
 
 #endif // PROJECT_SV_H

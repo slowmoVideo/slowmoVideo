@@ -32,6 +32,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
         ui->methodOCV->setChecked(true);
     }
 
+    // state of threading
+    bool precalc = m_settings.value("preferences/precalcFlow", true).toBool();
+    if (precalc)
+        ui->precalcFlow->setChecked(true);
+    else
+        ui->precalcFlow->setChecked(false);
+    
     bool b = true;
     b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
     b &= connect(ui->bCancel, SIGNAL(clicked()), this, SLOT(reject()));
@@ -59,24 +66,35 @@ void PreferencesDialog::accept()
     if (FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         m_settings.setValue("binaries/v3dFlowBuilder", ui->buildFlow->text());
     }
-
+    
     // Flow method
     QString method("OpenCV-Farnback");
     if (ui->methodV3D->isChecked()) {
         method = "V3D";
     }
     m_settings.setValue("preferences/flowMethod", method);
-
+    
+    // thread calc
+    bool precalc = true;
+    
+    
+    if (ui->precalcFlow->isChecked()) {
+        precalc = true;
+    } else
+        precalc = false;
+    m_settings.setValue("preferences/precalcFlow", precalc
+                        );
+    
     // ffmpeg location
     if (AvconvInfo::testAvconvExecutable(ui->ffmpeg->text())) {
         m_settings.setValue("binaries/ffmpeg", ui->ffmpeg->text());
     } else {
         qDebug() << "Not a valid ffmpeg/avconv executable: " << ui->ffmpeg->text();
     }
-
+    
     // Store the values right now
     m_settings.sync();
-
+    
     QDialog::accept();
 }
 
