@@ -123,7 +123,7 @@ private:
     void slotShowAboutDialog();
     void slotUpdateRenderPreview();
 
-	
+	void slotShowFlowEditWindow();
 	
 signals:
     void deleteNodes();

@@ -94,6 +94,9 @@
        <property name="text">
         <string>Use background thread for Optical Flow</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>

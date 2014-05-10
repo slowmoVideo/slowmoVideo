@@ -54,6 +54,8 @@
     </property>
     <addaction name="actionZoomIn"/>
     <addaction name="actionZoomOut"/>
+    <addaction name="separator"/>
+    <addaction name="actionEdit_Flow"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -158,6 +160,14 @@
   <action name="actionZoomOut">
    <property name="text">
     <string>Zoom &amp;out</string>
+   </property>
+  </action>
+  <action name="actionEdit_Flow">
+   <property name="text">
+    <string>Edit Optical Flow</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit Optical Flow</string>
    </property>
   </action>
  </widget>

@@ -166,6 +166,8 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     b &= connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
 
+    b &= connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
+    
     Q_ASSERT(b);
 
     updateWindowTitle();
@@ -612,4 +614,10 @@ void MainWindow::slotCloseFrameSourceProgress()
     m_project->buildCacheFlowSource();
 }
 
+// display the optical flow editor
+void MainWindow::slotShowFlowEditWindow()
+{
+//TODO: show window
+    qDebug() << "slotShowFlowEditWindow: No Yet Implemented";
+}
 
