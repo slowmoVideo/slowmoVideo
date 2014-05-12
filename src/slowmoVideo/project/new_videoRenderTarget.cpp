@@ -48,7 +48,7 @@ void newVideoRenderTarget::openRenderTarget() throw(Error_sV)
     writer = CreateVideoWriter(m_filename.toStdString().c_str(),
     	renderTask()->resolution().width(),
     	renderTask()->resolution().height(),
-    	renderTask()->fps().fps());
+    	renderTask()->fps().fps(),1);
     
    
     if (writer == 0) {

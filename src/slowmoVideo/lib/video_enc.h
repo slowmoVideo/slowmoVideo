@@ -14,7 +14,7 @@ public:
     virtual int writeFrame(const QImage& frame) = 0;
 };
 
-VideoWriter* CreateVideoWriter( const char* filename, int width,int height,double fps);
+VideoWriter* CreateVideoWriter( const char* filename, int width,int height,double fps,int use_qt);
 void ReleaseVideoWriter( VideoWriter** pwriter );
 int WriteFrame( VideoWriter* writer, const QImage& frame);
 

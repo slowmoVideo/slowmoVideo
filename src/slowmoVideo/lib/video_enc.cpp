@@ -2,7 +2,7 @@
 
 #include "video_enc.h"
 
-VideoWriter* CreateVideoWriter( const char* filename, int width, int height,double fps)
+VideoWriter* CreateVideoWriter( const char* filename, int width, int height,double fps,int use_qt)
 {
 #ifdef USE_QTKIT
 	VideoWriter* driver= CreateVideoWriter_QT(filename,width, height,fps);

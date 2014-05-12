@@ -73,3 +73,4 @@ QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }
 
 float& ProjectPreferences_sV::flowV3DLambda() { return m_flowV3DLambda; }
 
+bool& ProjectPreferences_sV::renderFormat() { return m_renderFormat;};

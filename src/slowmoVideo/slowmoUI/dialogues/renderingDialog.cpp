@@ -292,6 +292,8 @@ void RenderingDialog::slotSaveSettings()
     const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
     const float fps = ui->cbFps->currentText().toFloat();
 
+	const bool use_qt = ui->use_qt->isChecked();
+	
     m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
     m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
     m_project->preferences()->flowV3DLambda() = ui->lambda->value();
@@ -328,7 +330,8 @@ void RenderingDialog::slotSaveSettings()
     m_project->preferences()->renderFrameSize() = size;
     m_project->preferences()->renderFPS() = fps;
     m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
-
+	m_project->preferences()->renderFormat() = use_qt;
+	
     accept();
 }
 
