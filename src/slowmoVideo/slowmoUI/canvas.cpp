@@ -94,6 +94,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     this->setMouseTracking(true);
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
+    setFocusPolicy(Qt::StrongFocus);
 
     m_states.prevMousePos = QPoint(0,0);
     m_states.contextmenuMouseTime = QPointF(0,0);
@@ -693,6 +694,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
             }
 
         } else if (m_mode == ToolMode_Move) {
+        	qDebug() << "in mode ToolMode_Move";
             if (!m_states.moveAborted) {
                 m_nodes->shift(convertCanvasToTime(m_states.initialMousePos).x(), diff.x());
             }
@@ -845,6 +847,45 @@ void Canvas::leaveEvent(QEvent *)
 {
     m_mouseWithinWidget = false;
     repaint();
+}
+
+void Canvas::keyPressEvent(QKeyEvent *event)
+{
+	if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+        const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
+        
+        if (!m_states.nodesMoved) {
+            qDebug() << "should be Moving node " << node;
+            
+            
+            //qDebug() << "keyPressEvent : " << event->text();
+	        
+        	
+            switch (event->key()) {
+                case Qt::Key_Up:
+                    qDebug() << "key up";
+                    m_states.prevMousePos += QPoint(0,1);
+                    break;
+                case Qt::Key_Down:
+                    qDebug() << "key down";
+                    m_states.prevMousePos += QPoint(0,-1);
+                    break;
+                case Qt::Key_Right:
+                    qDebug() << "key right";
+                    m_states.prevMousePos += QPoint(1,0);
+                    break;
+                case Qt::Key_Left:
+                    qDebug() << "key left";
+                    m_states.prevMousePos += QPoint(-1,0);
+                    break;
+            }
+            Node_sV diff = convertCanvasToTime(m_states.prevMousePos) - convertCanvasToTime(m_states.initialMousePos);
+            //qDebug() << m_states.initialMousePos << "to" << m_states.prevMousePos << "; Diff: " << diff;
+            
+        }
+        //event->ignore();
+	}
+	QWidget::keyPressEvent(event);
 }
 
 void Canvas::wheelEvent(QWheelEvent *e)

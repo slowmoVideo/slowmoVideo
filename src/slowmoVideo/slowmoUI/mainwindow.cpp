@@ -619,5 +619,9 @@ void MainWindow::slotShowFlowEditWindow()
 {
 //TODO: show window
     qDebug() << "slotShowFlowEditWindow: No Yet Implemented";
+    #if 0
+    m_canvas = new FlowEditCanvas(this);
+    m_canvas->show();
+    #endif
 }
 

@@ -126,6 +126,7 @@ protected:
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
+    void keyPressEvent(QKeyEvent *event);
     void leaveEvent(QEvent *);
     void contextMenuEvent(QContextMenuEvent *);
 
