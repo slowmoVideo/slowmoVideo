@@ -164,7 +164,7 @@ private:
     int m_v3dFailCounter;
 
     // launch a worker thread for optical flow
-    void startFlow(int threadid,const FrameSize frameSize);
+    void startFlow(int threadid,const FrameSize frameSize,int direction);
 };
 
 #endif // PROJECT_SV_H

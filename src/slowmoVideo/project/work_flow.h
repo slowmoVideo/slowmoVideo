@@ -37,6 +37,8 @@ public:
     
     void setFlowSource(AbstractFlowSource_sV* _flowsource);
 
+	void setDirection(int _forward) { forward = _forward;};
+	
 private:
     /**
      *  Process is aborted when true
@@ -66,6 +68,7 @@ private:
      */
     Project_sV *project;
     
+    int forward;
 #if 0
     const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
     

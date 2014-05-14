@@ -12,6 +12,7 @@ set(SRCS
   mainwindow.cpp
   canvas.cpp
   canvasTools.cpp
+  flowEditCanvas.cpp
   frameMonitor.cpp
   renderPreview.cpp
   dialogues/newProjectDialog.cpp
@@ -31,6 +32,7 @@ set(SRCS_UI
   canvas.ui
   frameMonitor.ui
   renderPreview.ui
+  flowEditCanvas.ui
   dialogues/newProjectDialog.ui
   dialogues/preferencesDialog.ui
   dialogues/projectPreferencesDialog.ui
@@ -46,6 +48,7 @@ set(SRCS_MOC
   mainwindow.h
   canvas.h
   frameMonitor.h
+  flowEditCanvas.h
   renderPreview.h
   dialogues/newProjectDialog.h
   dialogues/preferencesDialog.h

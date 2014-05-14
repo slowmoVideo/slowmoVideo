@@ -79,9 +79,20 @@ void WorkerFlow::doWorkFlow()
 {
     qDebug()<<"Starting OpticalFlow process in Thread "<<thread()->currentThreadId();
     
+    int lastFrame;
+    int frame;
+    int startFrame;
+    
     /* out of loop work */
-    int lastFrame = project->frameSource()->framesCount();
-    int frame = 0;
+    if (forward) {
+    	qDebug() << "forward flow";
+    	lastFrame = project->frameSource()->framesCount();
+    	startFrame = frame = 0;
+    } else {
+    	qDebug() << "backward flow";
+    	startFrame = frame = project->frameSource()->framesCount();
+    	lastFrame = 0;
+    }
     Mat prevgray, gray, flow;
     
     qDebug() << "Pre Building forward flow for Size: " << frameSize;
@@ -100,7 +111,7 @@ void WorkerFlow::doWorkFlow()
     int flags = 0;
     
     /* real workhorse */
-    for(frame=0;frame<lastFrame;frame++) {
+    for(frame=startFrame;frame<lastFrame;frame++) {
         
         
         // Checks if the process should be aborted

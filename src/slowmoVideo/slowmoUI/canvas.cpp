@@ -863,19 +863,19 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         	
             switch (event->key()) {
                 case Qt::Key_Up:
-                    qDebug() << "key up";
+                    //qDebug() << "key up";
                     m_states.prevMousePos += QPoint(0,1);
                     break;
                 case Qt::Key_Down:
-                    qDebug() << "key down";
+                    //qDebug() << "key down";
                     m_states.prevMousePos += QPoint(0,-1);
                     break;
                 case Qt::Key_Right:
-                    qDebug() << "key right";
+                    //qDebug() << "key right";
                     m_states.prevMousePos += QPoint(1,0);
                     break;
                 case Qt::Key_Left:
-                    qDebug() << "key left";
+                    //qDebug() << "key left";
                     m_states.prevMousePos += QPoint(-1,0);
                     break;
             }
@@ -884,7 +884,40 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             m_nodes->moveSelected(diff);
             //TODO: update other windows ?
             //TODO: confirm move ?
+            // from mouserelease
+        
+            
+            // from mouse move ?
+            // Emit the source time at the mouse position
+            emit signalMouseInputTimeChanged(
+                                             convertCanvasToTime(m_states.prevMousePos).y()
+                                             * m_project->frameSource()->fps()->fps()
+                                             );
+            
+            // Emit the source time at the intersection of the out time and the curve
+            qreal timeOut = convertCanvasToTime(m_states.prevMousePos).x();
+            if (m_nodes->size() > 1 && m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
+                
+#ifdef DEBUG_C
+                std::cout.precision(32);
+                std::cout << "start: " << m_nodes->startTime() << ", out: " << timeOut << ", end: " << m_nodes->endTime() << std::endl;
+#endif
+                
+                if (m_nodes->find(timeOut) >= 0) {
+                    emit signalMouseCurveSrcTimeChanged(
+                                                        m_nodes->sourceTime(timeOut)
+                                                        * m_project->frameSource()->fps()->fps());
+                }
+                
+                    m_nodes->confirmMove();
+            qDebug() << "key Move confirmed.";
+            emit nodesChanged();
+            
             repaint();
+            }
+
+            
+            
         }
         //event->ignore();
 	}

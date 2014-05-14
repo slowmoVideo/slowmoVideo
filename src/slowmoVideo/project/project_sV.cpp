@@ -409,7 +409,7 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
 }
 
 // start an opticalflow on a thread...
-void Project_sV::startFlow(int threadid,const FrameSize frameSize)
+void Project_sV::startFlow(int threadid,const FrameSize frameSize,int direction)
 {
     thread[threadid] = new QThread();
     worker[threadid] = new WorkerFlow();
@@ -417,6 +417,7 @@ void Project_sV::startFlow(int threadid,const FrameSize frameSize)
     // set on what to work ...
     worker[threadid]->setFrameSize(frameSize);
     worker[threadid]->setProject(this);
+    worker[threadid]->setDirection(direction);
     worker[threadid]->setFlowSource(flowSource());
     
     worker[threadid]->moveToThread(thread[threadid]);
@@ -445,8 +446,10 @@ void Project_sV::buildCacheFlowSource()
         // use threading here
         //flowSource()->buildFlowForwardCache(FrameSize_Orig);
         
-        startFlow(0,FrameSize_Orig);
-        startFlow(1,FrameSize_Small);
+        startFlow(0,FrameSize_Small,0);
+        startFlow(1,FrameSize_Small,1);
+        startFlow(2,FrameSize_Orig,0);
+        startFlow(3,FrameSize_Orig,1);
         
     }
     
