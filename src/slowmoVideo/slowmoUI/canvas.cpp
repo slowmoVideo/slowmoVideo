@@ -881,7 +881,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             }
             Node_sV diff = convertCanvasToTime(m_states.prevMousePos) - convertCanvasToTime(m_states.initialMousePos);
             //qDebug() << m_states.initialMousePos << "to" << m_states.prevMousePos << "; Diff: " << diff;
-            
+            m_nodes->moveSelected(diff);
+            //TODO: update other windows ?
+            //TODO: confirm move ?
+            repaint();
         }
         //event->ignore();
 	}

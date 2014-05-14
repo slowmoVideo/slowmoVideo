@@ -96,6 +96,7 @@ Project_sV::~Project_sV()
     delete m_renderTask;
     delete m_shutterFunctions;
     
+    //TODO:
 #if 0
         // should check this
     worker->abort();

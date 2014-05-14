@@ -298,6 +298,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->outbufV = av_malloc(video->outbufSizeV);
 
     video->picture = avcodec_alloc_frame();
+            //TODO: replace by: av_frame_alloc(); ?
     avpicture_alloc((AVPicture*)video->picture, video->streamV->codec->pix_fmt,
                     video->streamV->codec->width, video->streamV->codec->height);
     if (!video->picture) {
@@ -351,6 +352,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
     } else {
         /* encode the image */
         video->outSize = avcodec_encode_video(cc, video->outbufV, video->outbufSizeV, video->picture);
+        //TODO: check usage of avcodec_encode_video2 ?
         /* if zero size, it means the image was buffered */
         if (video->outSize > 0) {
             AVPacket pkt;

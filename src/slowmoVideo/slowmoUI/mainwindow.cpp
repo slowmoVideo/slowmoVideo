@@ -24,6 +24,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/abstractFrameSource_sV.h"
 #include "project/projectPreferences_sV.h"
 
+// for editing optical flow
+#include "slowmoFlowEdit/flowEditCanvas.h"
+
 #include <QtCore>
 #include <QObject>
 #include <QDockWidget>
@@ -620,6 +623,7 @@ void MainWindow::slotShowFlowEditWindow()
 //TODO: show window
     qDebug() << "slotShowFlowEditWindow: No Yet Implemented";
     #if 0
+    FlowEditCanvas* m_canvas;
     m_canvas = new FlowEditCanvas(this);
     m_canvas->show();
     #endif
