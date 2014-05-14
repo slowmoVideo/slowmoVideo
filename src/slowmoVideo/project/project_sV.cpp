@@ -49,6 +49,12 @@ Project_sV::Project_sV() :
     m_projDir(QDir::temp())
 {
     init();
+    
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	worker[tid]=0;
+    	thread[tid]=0;    
+    }
 }
 
 Project_sV::Project_sV(QString projectDir) :
@@ -101,10 +107,20 @@ Project_sV::~Project_sV()
         // should check this
     worker->abort();
     thread->wait();
-    qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
-    delete thread;
-    delete worker;
-#endif
+    #endif
+    
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	if (worker[tid]!=0) {
+    	worker[tid]->abort();
+    	thread[tid]->wait();    
+    	
+    	//qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
+    	
+    	delete worker[tid];
+    	delete thread[tid];
+    	}
+    }
 }
 
 void Project_sV::reloadFlowSource()
