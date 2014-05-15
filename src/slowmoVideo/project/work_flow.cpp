@@ -74,6 +74,7 @@ void WorkerFlow::setFlowSource(AbstractFlowSource_sV* _flowsource)
     flowSource = _flowsource;
 }
 
+
 //TODO: call abstractflow source method
 void WorkerFlow::doWorkFlow()
 {
@@ -82,16 +83,19 @@ void WorkerFlow::doWorkFlow()
     int lastFrame;
     int frame;
     int startFrame;
+    int next = 0;
+    int nextFrame;
     
     /* out of loop work */
+    lastFrame = project->frameSource()->framesCount();
+    startFrame = frame = 0;
+
     if (forward) {
     	qDebug() << "forward flow";
-    	lastFrame = project->frameSource()->framesCount();
-    	startFrame = frame = 0;
+        next = 1;
     } else {
     	qDebug() << "backward flow";
-    	startFrame = frame = project->frameSource()->framesCount();
-    	lastFrame = 0;
+        next = -1;
     }
     Mat prevgray, gray, flow;
     
@@ -111,7 +115,7 @@ void WorkerFlow::doWorkFlow()
     int flags = 0;
     
     /* real workhorse */
-    for(frame=startFrame;frame<lastFrame;frame++) {
+    for(frame=0;frame<lastFrame;frame++) {
         
         
         // Checks if the process should be aborted
@@ -124,9 +128,11 @@ void WorkerFlow::doWorkFlow()
             break;
         }
         
-        QString flowFileName(flowSource->flowPath(frame, frame+1, frameSize));
+        nextFrame = frame + next;
         
-        qDebug() << "Building flow for left frame " << frame << " to right frame " << frame+1 << "; Size: " << frameSize;
+        QString flowFileName(flowSource->flowPath(frame, nextFrame, frameSize));
+        
+        qDebug() << "Building flow for left frame " << frame << " to right frame " << nextFrame << "; Size: " << frameSize;
         /// \todo Check if size is equal
         if (!QFile(flowFileName).exists()) {
             
@@ -134,7 +140,7 @@ void WorkerFlow::doWorkFlow()
             //time.start();
             
             QString prevpath = project->frameSource()->framePath(frame, frameSize);
-            QString path = project->frameSource()->framePath(frame+1, frameSize);
+            QString path = project->frameSource()->framePath(nextFrame, frameSize);
             
             gray = imread(path.toStdString(), 0);
             
@@ -163,7 +169,7 @@ void WorkerFlow::doWorkFlow()
             qDebug() << "Optical flow built for " << flowFileName;
             
         } else {
-            qDebug().nospace() << "Re-using existing flow image for left frame " << frame << " to right frame " << frame+1 << ": " << flowFileName;
+            qDebug().nospace() << "Re-using existing flow image for left frame " << frame << " to right frame " << nextFrame << ": " << flowFileName;
         }
         //qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
         // Once we're done waiting, value is updated
