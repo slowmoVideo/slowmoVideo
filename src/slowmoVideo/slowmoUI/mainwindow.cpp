@@ -617,7 +617,25 @@ void MainWindow::slotCloseFrameSourceProgress()
     m_project->buildCacheFlowSource();
 }
 
-// display the optical flow editor
+#if 0
+/**
+ *  load a flow file in edit window
+ *
+ *  @param filename <#filename description#>
+ */
+void MainWindow::loadFlow(QString filename)
+{
+    if (QFileInfo(filename).exists()) {
+        m_canvas->slotLoadFlow(filename);
+        m_lastFlowFile = filename;
+        updateTitle();
+    }
+}
+#endif
+
+/**
+ *  display the optical flow editor
+ */
 void MainWindow::slotShowFlowEditWindow()
 {
 //TODO: show window
@@ -627,5 +645,6 @@ void MainWindow::slotShowFlowEditWindow()
     m_canvas = new FlowEditCanvas(this);
     m_canvas->show();
     #endif
+    
 }
 
