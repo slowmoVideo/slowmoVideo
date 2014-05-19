@@ -93,14 +93,6 @@ void Project_sV::init()
 
 Project_sV::~Project_sV()
 {
-    delete m_preferences;
-    delete m_frameSource;
-    delete m_flowSource;
-    delete m_motionBlur;
-    delete m_tags;
-    delete m_nodes;
-    delete m_renderTask;
-    delete m_shutterFunctions;
     
     //TODO:
 #if 0
@@ -121,6 +113,15 @@ Project_sV::~Project_sV()
     	delete thread[tid];
     	}
     }
+
+    delete m_renderTask;
+    delete m_preferences;
+    delete m_frameSource;
+    delete m_flowSource;
+    delete m_motionBlur;
+    delete m_tags;
+    delete m_nodes;
+    delete m_shutterFunctions;
 }
 
 void Project_sV::reloadFlowSource()
