@@ -59,7 +59,8 @@ VideoInfoSV getInfo(const char filename[])
 
     AVCodecContext *pCodecContext;
     int videoStream = -1;
-    for (int i = 0; i < pFormatContext->nb_streams; i++) {
+    int i;
+    for (i = 0; i < pFormatContext->nb_streams; i++) {
 #if LIBAVCODEC_VERSION_INT < (52<<16 | 64<<8 | 0)
         if (pFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO) {
 #else

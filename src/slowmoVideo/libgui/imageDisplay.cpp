@@ -21,6 +21,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <cmath>
 
+bool& operator&=(bool& a_res, const QMetaObject::Connection& a_res2)
+{
+    a_res = (a_res & static_cast<bool>(a_res2));
+    return a_res;
+}
+
 ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     QFrame(parent, f),
     m_scale(1)

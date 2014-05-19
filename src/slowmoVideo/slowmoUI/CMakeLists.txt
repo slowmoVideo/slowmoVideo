@@ -122,6 +122,28 @@ endif()
 #        BUNDLE DESTINATION . COMPONENT Runtime
 #        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
+if (UNIX)
+# create desktop file for KDE/Gnome
+# desktop file section
+	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"
+		"#!/usr/bin/env xdg-open
+		[Desktop Entry]
+		Type=Application
+		Comment=Slow Motion Video
+		Exec=${CMAKE_INSTALL_PREFIX}/bin/slowmoUI
+		GenericName=slowmoVideo
+		Icon=${CMAKE_INSTALL_PREFIX}/icons/slowmotion.png
+		MimeType=
+		Name=slowmoUI
+		Terminal=false
+		Categories=Application;Qt;Video\n")
+
+	install ( FILES icons/slowmoUI.png DESTINATION share/icons )
+	install ( FILES ${PROJECT_BINARY_DIR}/slowmoUI.desktop DESTINATION share/applications
+		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
+endif()
+
 if (APPLE OR WIN32)
        install(TARGETS slowmoUI DESTINATION ".")
        include(DeployQt4) # 2.8.7 or later

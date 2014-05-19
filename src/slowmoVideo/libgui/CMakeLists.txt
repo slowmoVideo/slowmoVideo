@@ -12,6 +12,8 @@ set(SRCS_MOC
 qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 
+include_directories(${Qt5Gui_INCLUDE_DIRS})
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/libgui)
 
 add_library(sVgui STATIC ${SRCS} ${MOC_OUT})

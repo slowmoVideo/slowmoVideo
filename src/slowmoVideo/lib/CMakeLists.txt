@@ -64,6 +64,7 @@ message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
 include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${Qt5Gui_INCLUDE_DIRS})
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
 
