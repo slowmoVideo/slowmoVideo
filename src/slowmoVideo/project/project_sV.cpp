@@ -93,27 +93,19 @@ void Project_sV::init()
 
 Project_sV::~Project_sV()
 {
-    
-    //TODO:
-#if 0
-        // should check this
-    worker->abort();
-    thread->wait();
-    #endif
-    
     int tid;
     for(tid=0;tid<4;tid++) {
     	if (worker[tid]!=0) {
-    	worker[tid]->abort();
-    	thread[tid]->wait();    
-    	
-    	//qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
-    	
-    	delete worker[tid];
-    	delete thread[tid];
+            worker[tid]->abort();
+            thread[tid]->wait();
+            
+            //qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
+            
+            delete worker[tid];
+            delete thread[tid];
     	}
     }
-
+    
     delete m_renderTask;
     delete m_preferences;
     delete m_frameSource;
@@ -425,7 +417,13 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
     return list;
 }
 
-// start an opticalflow on a thread...
+/**
+ *  start an optical flow on a thread
+ *
+ *  @param threadid  the thread on which to run our flow
+ *  @param frameSize size of frame for calcul (small/orig)
+ *  @param direction flow direction
+ */
 void Project_sV::startFlow(int threadid,const FrameSize frameSize,int direction)
 {
     thread[threadid] = new QThread();
@@ -449,7 +447,9 @@ void Project_sV::startFlow(int threadid,const FrameSize frameSize,int direction)
     worker[threadid]->requestWork();
 }
 
-
+/**
+ *  prebuild the optical flow using threading
+ */
 void Project_sV::buildCacheFlowSource()
 {
     Q_ASSERT(m_flowSource != NULL);

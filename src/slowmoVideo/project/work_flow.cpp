@@ -76,6 +76,10 @@ void WorkerFlow::setFlowSource(AbstractFlowSource_sV* _flowsource)
 
 
 //TODO: call abstractflow source method
+/**
+ *  doWorkFlow
+ * call optical flow on each frame
+ */
 void WorkerFlow::doWorkFlow()
 {
     qDebug()<<"Starting OpticalFlow process in Thread "<<thread()->currentThreadId();
@@ -106,12 +110,14 @@ void WorkerFlow::doWorkFlow()
     prevgray = imread(prevpath.toStdString(), 0);
     
     // TODO: need sliders for all these parameters
-    const float pyrScale = 0.5; // classical pyr
-    const float levels = 3;
-    const float winsize = 15;
-    const float iterations = 8;
-    const float polyN = 5;
-    const float polySigma = 1.2;
+    
+    const int levels = 3;
+    const int winsize = 15;
+    const int iterations = 8;
+    
+    const double polySigma = 1.2;
+    const double pyrScale = 0.5; // classical pyr
+    const int polyN = 5;
     int flags = 0;
     
     /* real workhorse */

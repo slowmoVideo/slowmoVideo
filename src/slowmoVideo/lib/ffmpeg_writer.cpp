@@ -28,6 +28,10 @@ VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,cons
             width, height,
             fps * width * height,
             m_fps.den, m_fps.num);
+    if (worked != 0) {
+        //TODO: better here 
+        fprintf(stderr,"cannot create FFMPEG encoder\n");
+    }
 }
 
 VideoFFMPEG::~VideoFFMPEG()
