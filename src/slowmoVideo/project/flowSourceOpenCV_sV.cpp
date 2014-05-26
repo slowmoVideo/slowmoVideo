@@ -18,14 +18,106 @@ the Free Software Foundation, either version 3 of the License, or
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+// ?
+#include "opencv2/gpu/gpumat.hpp"
+
+#include "opencv2/ocl/ocl.hpp" 
+
 #include <QtCore/QTime>
 #include <iostream>
 #include <fstream>
+
+#include <QList>
+ 
 using namespace cv;
+//using namespace cv::ocl; 
+//using namespace cv::gpu;
+
+#if 1
+/*
+ * check if GPU support cudo or opencl
+*/
+void check_gpu()
+{
+        qDebug() << "check GPU" ;
+        int num_devices = gpu::getCudaEnabledDeviceCount();
+        qDebug() << "CUDA support : " << num_devices << "found";
+        if (num_devices >= 1) {
+                for (int i = 0; i < num_devices; ++i) {
+                gpu::printShortCudaDeviceInfo(i);
+
+                gpu::DeviceInfo dev_info(i);
+                if (!dev_info.isCompatible()) {
+            std::cerr << "GPU module isn't built for GPU #" << i << " ("
+                 << dev_info.name() << ", CC " << dev_info.majorVersion()
+                 << dev_info.minorVersion() << "\n";
+        } /* if */
+        } /* for */
+    } /* CUDA devices */
+
+        qDebug() << "OpenCL support";
+        ocl::PlatformsInfo platforms;
+        ocl::getOpenCLPlatforms(platforms);
+
+        for(size_t i=0;i<platforms.size();i++) {
+                std::cerr << "plateform : " << platforms[i]->platformName <<  " vendor: " << platforms[i]->platformVendor << "\n";
+        }
+
+        ocl::DevicesInfo devInfo;
+        int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+        if (res != 0) {
+        for(size_t i = 0 ; i < devInfo.size() ;i++) {
+            std::cerr << "Device : " << i << " " << devInfo[i]->deviceName << " is present" << std::endl;
+        }
+
+       //ocl::getOpenCLDevices(DevicesInfo& devices, int deviceType = CVCL_DEVICE_TYPE_GPU,
+        //        const PlatformInfo* platform = NULL);
+
+		}
+        qDebug() << "end OpenCL support";
+}
+
+// return 1 if we support OpenCL
+int isOCLsupported()
+{
+	ocl::PlatformsInfo platforms;
+    int res = ocl::getOpenCLPlatforms(platforms);	
+    return res;
+}
+
+// return a list of supported OpenCl device
+QList<QString> oclFillDevices(void)
+{
+	  ocl::PlatformsInfo platforms;
+      ocl::getOpenCLPlatforms(platforms);
+
+      ocl::DevicesInfo devInfo;
+      int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+      
+      QList<QString> device_list;
+      
+      for(size_t i = 0 ; i < devInfo.size() ;i++) {
+            std::cerr << "Device : " << i << " " << devInfo[i]->deviceName << " is present" << std::endl;
+            device_list.insert(i,QString::fromStdString(devInfo[i]->deviceName));
+      }
+      return device_list;
+}
+
+#else
+void check_gpu() {
+	qDebug() << "no OpenCL support";
+}
+
+int isOCLsupported() 
+{
+	return 0;
+}
+#endif // OpenCL
 
 FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
     AbstractFlowSource_sV(project)
 {
+	check_gpu();
     createDirectories();
 }
 

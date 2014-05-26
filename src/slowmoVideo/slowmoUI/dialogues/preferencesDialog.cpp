@@ -8,6 +8,10 @@
 #include <QtCore/QProcess>
 #include <QtGui/QFileDialog>
 
+//TODO: header ?
+int isOCLsupported();
+QList<QString> oclFillDevices(void);
+
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PreferencesDialog)
@@ -23,15 +27,30 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 // TODO: qcombox box instead ?
     m_flowMethodGroup.addButton(ui->methodOCV);
     m_flowMethodGroup.addButton(ui->methodV3D);
+    m_flowMethodGroup.addButton(ui->methodOCL);
     m_flowMethodGroup.setExclusive(true);
 
-    QString method = m_settings.value("preferences/flowMethod", "V3D").toString();
+    QString method = m_settings.value("preferences/flowMethod", "OCL").toString();
+    qDebug() << "method is : " << method;
+    int ocl_support = isOCLsupported();
+    if (ocl_support)  {
+    	ui->methodOCL->setEnabled(true);
+    	// add OpenCL devices
+    	QList<QString> ocldevices = oclFillDevices();
+        ui->ocl_device->addItems(ocldevices);    
+    }
+    else
+    	ui->methodOCL->setEnabled(false);
     if ("V3D" == method) {
         ui->methodV3D->setChecked(true);
+    } 
+    if ("OCL" == method) {
+        ui->methodOCL->setChecked(true);
+        //qDebug() << "setting OCL";
     } else {
-        ui->methodOCV->setChecked(true);
+        	ui->methodOCV->setChecked(true);
     }
-
+	
     // state of threading
     bool precalc = m_settings.value("preferences/precalcFlow", true).toBool();
     if (precalc)
@@ -72,6 +91,14 @@ void PreferencesDialog::accept()
     if (ui->methodV3D->isChecked()) {
         method = "V3D";
     }
+    if (ui->methodOCL->isChecked()) {
+        method = "OCL";
+        //TODO: maybe need to use text version ?
+        int dev = ui->ocl_device->currentIndex();
+        qDebug() << "driver choosen is : " << dev;
+        m_settings.setValue("preferences/oclDriver", dev);
+    }
+    qDebug() << "saving method  : " << method;
     m_settings.setValue("preferences/flowMethod", method);
     
     // thread calc
@@ -101,6 +128,7 @@ void PreferencesDialog::accept()
 void PreferencesDialog::slotUpdateFlowMethod()
 {
 }
+
 void PreferencesDialog::slotUpdateFfmpeg()
 {
     m_settings.setValue("binaries/ffmpeg", ui->ffmpeg->text());
@@ -114,7 +142,7 @@ void PreferencesDialog::slotValidateFlowBinary()
     } else {
         ui->buildFlow->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colBad.name()));
         ui->methodV3D->setEnabled(false);
-        ui->methodOCV->setChecked(true);
+        //ui->methodOCV->setChecked(true);
     }
 }
 

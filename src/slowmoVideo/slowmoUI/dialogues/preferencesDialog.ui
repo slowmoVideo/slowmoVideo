@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>294</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,6 +83,20 @@
          <bool>true</bool>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QRadioButton" name="methodOCL">
+          <property name="text">
+           <string>OpenCV with OpenCL</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="ocl_device"/>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
