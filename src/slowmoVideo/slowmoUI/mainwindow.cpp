@@ -563,19 +563,16 @@ void MainWindow::slotShowRenderDialog()
             m_renderProgressDialog->disconnect();
         }
 
-        bool b = true;
-        b &= connect(task, SIGNAL(signalNewTask(QString,int)), m_renderProgressDialog, SLOT(slotNextTask(QString,int)));
-        b &= connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
-        b &= connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
-        b &= connect(task, SIGNAL(signalRenderingFinished(QString)), m_renderProgressDialog, SLOT(slotAllTasksFinished(QString)));
-        b &= connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
-        b &= connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
-        b &= connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
-        b &= connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
-        b &= connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
-        // TODO continue/abort
-        Q_ASSERT(b);
-
+        connect(task, SIGNAL(signalNewTask(QString,int)), m_renderProgressDialog, SLOT(slotNextTask(QString,int)));
+        connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
+        connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
+        connect(task, SIGNAL(signalRenderingFinished(QString)), m_renderProgressDialog, SLOT(slotAllTasksFinished(QString)));
+        connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
+        connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
+        connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
+        connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
+        connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
+        
         m_renderProgressDialog->show();
 
         emit signalRendererContinue();

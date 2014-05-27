@@ -864,11 +864,11 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             switch (event->key()) {
                 case Qt::Key_Up:
                     //qDebug() << "key up";
-                    m_states.prevMousePos += QPoint(0,1);
+                    m_states.prevMousePos += QPoint(0,-1);
                     break;
                 case Qt::Key_Down:
                     //qDebug() << "key down";
-                    m_states.prevMousePos += QPoint(0,-1);
+                    m_states.prevMousePos += QPoint(0,1);
                     break;
                 case Qt::Key_Right:
                     //qDebug() << "key right";
@@ -880,7 +880,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                     break;
             }
             Node_sV diff = convertCanvasToTime(m_states.prevMousePos) - convertCanvasToTime(m_states.initialMousePos);
-            //qDebug() << m_states.initialMousePos << "to" << m_states.prevMousePos << "; Diff: " << diff;
+            qDebug() << m_states.initialMousePos << "to" << m_states.prevMousePos << "; Diff: " << diff;
             m_nodes->moveSelected(diff);
             //TODO: update other windows ?
             //TODO: confirm move ?

@@ -100,7 +100,7 @@ QList<QString> oclFillDevices(void)
       ocl::getOpenCLPlatforms(platforms);
 
       ocl::DevicesInfo devInfo;
-      int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+      cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
       
       QList<QString> device_list;
       
@@ -144,8 +144,13 @@ void FlowSourceOpenCV_sV::createDirectories()
     m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
-void drawOptFlowMap(const Mat& flow, int step,
-                    double, const Scalar& color, std::string flowname )
+/**
+ *  create a optical flow file
+ *
+ *  @param flow     optical flow to save
+ *  @param flowname file name for optical flow
+ */
+void drawOptFlowMap(const Mat& flow, std::string flowname )
 {
 
   //cv::Mat log_flow, log_flow_neg;
@@ -156,9 +161,8 @@ void drawOptFlowMap(const Mat& flow, int step,
 
   FlowField_sV flowField(flow.cols, flow.rows);
 
-    for(int y = 0; y < flow.rows; y += step)
-        for(int x = 0; x < flow.cols; x += step)
-        {
+    for(int y = 0; y < flow.rows; y++)
+        for(int x = 0; x < flow.cols; x++) {
             const Point2f& fxyo = flow.at<Point2f>(y, x);
 
             flowField.setX(x, y, fxyo.x);
@@ -236,7 +240,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                                          );
                 //cvtColor(prevgray, cflow, CV_GRAY2BGR);
                 //drawOptFlowMap(flow, cflow, 16, 1.5, CV_RGB(0, 255, 0));
-                drawOptFlowMap(flow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
+                drawOptFlowMap(flow, flowFileName.toStdString());
                 //imshow("flow", cflow);
                 //imwrite(argv[4],cflow);
             } else {
@@ -316,7 +320,7 @@ void FlowSourceOpenCV_sV::buildFlowForwardCache(FrameSize frameSize) throw(FlowB
                                      flags //0 OPTFLOW_USE_INITIAL_FLOW
                                      );
             // save result
-            drawOptFlowMap(flow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
+            drawOptFlowMap(flow, flowFileName.toStdString());
             std::swap(prevgray, gray);
             qDebug() << "Optical flow built for " << flowFileName;
             

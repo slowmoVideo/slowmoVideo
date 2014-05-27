@@ -39,7 +39,7 @@ private:
     QDir m_dirFlowOrig;
 
     void createDirectories();
-   
+    
 };
 
 #endif // FLOWSOURCEOPENCV_SV_H
