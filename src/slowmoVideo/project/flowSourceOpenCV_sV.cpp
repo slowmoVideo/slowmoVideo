@@ -34,9 +34,9 @@ using namespace cv;
 //using namespace cv::gpu;
 
 #if 1
-/*
- * check if GPU support cudo or opencl
-*/
+/**
+ *  list GPU support for OpenCV
+ */
 void check_gpu()
 {
         qDebug() << "check GPU" ;
@@ -77,7 +77,11 @@ void check_gpu()
         qDebug() << "end OpenCL support";
 }
 
-// return 1 if we support OpenCL
+/**
+ *  check if OpenCV as OpenCL support
+ *
+ *  @return 1 if support
+ */
 int isOCLsupported()
 {
 	ocl::PlatformsInfo platforms;
@@ -85,7 +89,11 @@ int isOCLsupported()
     return res;
 }
 
-// return a list of supported OpenCl device
+/**
+ *  return a list of supported OpenCL devices
+ *
+ *  @return list of devices
+ */
 QList<QString> oclFillDevices(void)
 {
 	  ocl::PlatformsInfo platforms;
@@ -117,7 +125,9 @@ int isOCLsupported()
 FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
     AbstractFlowSource_sV(project)
 {
-	check_gpu();
+	// for debugging OpenCL support
+    check_gpu();
+    
     createDirectories();
 }
 
@@ -138,10 +148,10 @@ void drawOptFlowMap(const Mat& flow, int step,
                     double, const Scalar& color, std::string flowname )
 {
 
-  cv::Mat log_flow, log_flow_neg;
+  //cv::Mat log_flow, log_flow_neg;
   //log_flow = cv::abs( flow/3.0 );
-  cv::log(cv::abs(flow)*3 + 1, log_flow);
-  cv::log(cv::abs(flow*(-1.0))*3 + 1, log_flow_neg);
+  //cv::log(cv::abs(flow)*3 + 1, log_flow);
+  //cv::log(cv::abs(flow*(-1.0))*3 + 1, log_flow_neg);
  
 
   FlowField_sV flowField(flow.cols, flow.rows);
@@ -202,14 +212,16 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         {
             
             if( prevgray.data ) {
-                const float pyrScale = 0.5;
-                const float levels = 3;
-                const float winsize = 15;
-                const float iterations = 8;
-                const float polyN = 5;
-                const float polySigma = 1.2;
-                const int flags = 0;
                 // TBD need sliders for all these parameters
+                const int levels = 3; // 5
+                const int winsize = 15; // 13
+                const int iterations = 8; // 10
+                
+                const double polySigma = 1.2;
+                const double pyrScale = 0.5;
+                const int polyN = 5;
+                const int flags = 0;
+                
                 calcOpticalFlowFarneback(
                                          prevgray, gray,
                                          //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
@@ -257,20 +269,21 @@ void FlowSourceOpenCV_sV::buildFlowForwardCache(FrameSize frameSize) throw(FlowB
 	int frame = 0;
 	Mat prevgray, gray, flow;
 	
-	qDebug() << "Pre Building froward flow for Size: " << frameSize;
+	qDebug() << "Pre Building forward flow for Size: " << frameSize;
 	
     // load first frame
     QString prevpath = project()->frameSource()->framePath(frame, frameSize);
     prevgray = imread(prevpath.toStdString(), 0);
     
     // TODO: need sliders for all these parameters
-    const float pyrScale = 0.5; // classical pyr
-    const float levels = 3;
-    const float winsize = 15;
-    const float iterations = 8;
-    const float polyN = 5;
-    const float polySigma = 1.2;
-    int flags = 0;
+    const int levels = 3; // 5
+    const int winsize = 15; // 13
+    const int iterations = 8; // 10
+    
+    const double polySigma = 1.2;
+    const double pyrScale = 0.5;
+    const int polyN = 5;
+    const int flags = 0;
     
 	for(frame=0;frame<lastFrame;frame++) {
         QString flowFileName(flowPath(frame, frame+1, frameSize));
@@ -288,8 +301,8 @@ void FlowSourceOpenCV_sV::buildFlowForwardCache(FrameSize frameSize) throw(FlowB
             gray = imread(path.toStdString(), 0);
             
             // use previous flow info
-            if (frame!=0)
-                flags |= OPTFLOW_USE_INITIAL_FLOW;
+            //if (frame!=0)
+            //    flags |= OPTFLOW_USE_INITIAL_FLOW;
             
             calcOpticalFlowFarneback(
                                      prevgray, gray,

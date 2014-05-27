@@ -47,6 +47,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     if ("OCL" == method) {
         ui->methodOCL->setChecked(true);
         //qDebug() << "setting OCL";
+        // restore selected device for OpenCL
+        int dev = m_settings.value("preferences/oclDriver", 0).toInt();
+        ui->ocl_device->setCurrentIndex(dev);
     } else {
         	ui->methodOCV->setChecked(true);
     }
