@@ -210,16 +210,13 @@ RenderTask_sV* RenderingDialog::buildTask()
 	#ifdef USE_QTKIT
 	#warning "using QTKit version"
             newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
-            renderTarget->setTargetFile(ui->videoOutputFile->text());
-            renderTarget->setVcodec(ui->vcodec->text());
-            task->setRenderTarget(renderTarget);
-	#else
+    #else
 	#warning "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
-            renderTarget->setTargetFile(ui->videoOutputFile->text());
-            renderTarget->setVcodec(ui->vcodec->text());
-            task->setRenderTarget(renderTarget);
 	#endif
+			renderTarget->setTargetFile(ui->videoOutputFile->text());
+            renderTarget->setVcodec(ui->vcodec->text());
+			task->setRenderTarget(renderTarget);
         } else {
             qDebug() << "Render target is neither images nor video. Not implemented?";
             Q_ASSERT(false);

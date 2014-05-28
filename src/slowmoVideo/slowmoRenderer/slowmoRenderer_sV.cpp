@@ -7,6 +7,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
+#include "config.h"
 
 #include "slowmoRenderer_sV.h"
 
@@ -15,7 +16,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/xmlProjectRW_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
+#ifdef USE_QTKIT
+#include "project/new_videoRenderTarget.h"
+#else
 #include "project/videoRenderTarget_sV.h"
+#endif
 #include "project/flowSourceV3D_sV.h"
 
 #include <iostream>
@@ -87,10 +92,16 @@ void SlowmoRenderer_sV::setFps(double fps)
 
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
 {
+#ifdef USE_QTKIT
+	#warning "using QTKit version"
+    newVideoRenderTarget *vrt = new newVideoRenderTarget(m_project->renderTask());     
+#else
+	#warning "should not use this"
     VideoRenderTarget_sV *vrt = new VideoRenderTarget_sV(m_project->renderTask());
+#endif
     vrt->setTargetFile(QString(filename));
     vrt->setVcodec(QString(codec));
-    m_project->renderTask()->setRenderTarget(vrt);
+    m_project->renderTask()->setRenderTarget(vrt); 
     m_renderTargetSet = true;
 }
 
