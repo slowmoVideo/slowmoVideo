@@ -38,9 +38,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_cs.addShortcut("s-s", SAVE, "Save");
     m_cs.addShortcut("j", PREV, "Previous file");
     m_cs.addShortcut("k", NEXT, "Next file");
-    m_cs.addShortcut("b-1", BOOST1, "No amplification");
-    m_cs.addShortcut("b-2", BOOST2, "Low amplification");
-    m_cs.addShortcut("b-3", BOOST3, "High amplification (details best visible)");
+    //m_cs.addShortcut("b-1", BOOST1, "No amplification");
+    //m_cs.addShortcut("b-2", BOOST2, "Low amplification");
+    //m_cs.addShortcut("b-3", BOOST3, "High amplification (details best visible)");
     m_cs.addShortcut("q-q", QUIT, "Quit");
     m_cs.addShortcut("h-h", HELP, "Show shortcut dialog");
 
@@ -211,6 +211,7 @@ void MainWindow::amplify(float val)
 
 void MainWindow::slotShortcutUsed(int id)
 {
+/*
     if (id == BOOST1) {
         qDebug() << "Amplify 1";
         amplify(1);
@@ -220,7 +221,9 @@ void MainWindow::slotShortcutUsed(int id)
     } else if (id == BOOST3) {
         qDebug() << "Amplify 3";
         amplify(9);
-    } else if (id == PREV) {
+    } else 
+    */
+    if (id == PREV) {
         slotPrevFile();
     } else if (id == NEXT) {
         slotNextFile();

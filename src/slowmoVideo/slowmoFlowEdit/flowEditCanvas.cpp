@@ -30,7 +30,9 @@ FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
     bool b = true;
     b &= connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
     b &= connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
+    b &= connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
     Q_ASSERT(b);
+    
 }
 
 FlowEditCanvas::~FlowEditCanvas()
@@ -42,10 +44,20 @@ float FlowEditCanvas::amplification() const
 {
     return m_boost;
 }
+
 void FlowEditCanvas::setAmplification(float val)
 {
+	//qDebug() << "setAmplification: " << val;
     Q_ASSERT(val > 0);
     m_boost = val;
+    repaintFlow();
+}
+
+void FlowEditCanvas::newAmplification(int val)
+{
+	//qDebug() << "newAmplification: " << val;
+    Q_ASSERT(val > 0);
+    m_boost = (float)val;
     repaintFlow();
 }
 
@@ -61,11 +73,13 @@ void FlowEditCanvas::repaintFlow()
 void FlowEditCanvas::slotRectDrawn(QRectF imageRect)
 {
     qDebug() << "Rect drawn: " << imageRect;
+    if (m_flowField != NULL) {
     Kernel_sV k(8, 8);
     k.gauss();
     FlowTools_sV::deleteRect(*m_flowField, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
     FlowTools_sV::refill(*m_flowField, k, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
     repaintFlow();
+    }
 }
 
 void FlowEditCanvas::slotLoadFlow(QString filename)

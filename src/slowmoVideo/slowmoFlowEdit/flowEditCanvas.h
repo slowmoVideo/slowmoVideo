@@ -30,11 +30,13 @@ public:
 
     void setAmplification(float val);
     float amplification() const;
-
+	
+	
 public slots:
     void slotLoadFlow(QString filename);
     void slotSaveFlow(QString filename = QString());
-
+	void newAmplification(int val);
+	
 private:
     Ui::FlowEditCanvas *ui;
 
