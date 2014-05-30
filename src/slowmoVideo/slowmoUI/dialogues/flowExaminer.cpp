@@ -6,6 +6,7 @@
 
 #include <QtCore/QDebug>
 #include <QtGui/QPainter>
+#include <QKeyEvent>
 
 FlowExaminer::FlowExaminer(Project_sV *project, QWidget *parent) :
     QDialog(parent),
@@ -18,11 +19,11 @@ FlowExaminer::FlowExaminer(Project_sV *project, QWidget *parent) :
 //    ui->leftFrame->trackMouse(true);
 //    ui->rightFrame->trackMouse(true);
 
-    bool b = true;
-    b &= connect(ui->leftFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
-    b &= connect(ui->rightFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
-    b &= connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
-    Q_ASSERT(b);
+    connect(ui->leftFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
+    connect(ui->rightFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
+    connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
+    
+    connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
 }
 
 FlowExaminer::~FlowExaminer()
@@ -39,6 +40,7 @@ FlowExaminer::~FlowExaminer()
 /// \todo Make flow visualization configurable
 void FlowExaminer::examine(int leftFrame)
 {
+	frame = leftFrame;
     if (m_flowLR != NULL) {
         delete m_flowLR;
         m_flowLR = NULL;
@@ -52,12 +54,21 @@ void FlowExaminer::examine(int leftFrame)
         m_flowRL = m_project->requestFlow(leftFrame+1, leftFrame, FrameSize_Orig);
         ui->leftFrame->loadImage(m_project->frameSource()->frameAt(leftFrame, FrameSize_Orig));
         ui->rightFrame->loadImage(m_project->frameSource()->frameAt(leftFrame+1, FrameSize_Orig));
-        ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR, FlowVisualization_sV::HSV));
-        ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL, FlowVisualization_sV::HSV));
+        ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR, FlowVisualization_sV::HSV,m_boost));
+        ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL, FlowVisualization_sV::HSV,m_boost));
     } catch (FlowBuildingError &err) { }
 
     repaint();
 }
+
+void FlowExaminer::newAmplification(int val)
+{
+	//qDebug() << "newAmplification: " << val;
+    Q_ASSERT(val > 0);
+    m_boost = (float)val;
+    repaint();
+}
+
 
 /// \todo Show vectors etc.
 void FlowExaminer::slotMouseMoved(float x, float y)
@@ -97,4 +108,45 @@ void FlowExaminer::slotMouseMoved(float x, float y)
         qDebug() << "Unknown sender!";
         Q_ASSERT(false);
     }
+}
+
+void FlowExaminer::keyPressEvent(QKeyEvent *event)
+{
+	//qDebug() << "keypressed : " << event->key();
+	switch (event->key()) {
+                case Qt::Key_Up:
+                    qDebug() << "key up";
+                    //m_states.prevMousePos += QPoint(0,-1);
+                    break;
+                case Qt::Key_Down:
+                    qDebug() << "key down";
+                    //m_states.prevMousePos += QPoint(0,1);
+                    break;
+                case Qt::Key_Right:
+                    qDebug() << "key right";
+                    //m_states.prevMousePos += QPoint(1,0);
+                    frame++;
+                    break;
+                case Qt::Key_Left:
+                    qDebug() << "key left";
+                    //m_states.prevMousePos += QPoint(-1,0);
+                    frame--;
+                    break;
+            }
+	QWidget::keyPressEvent(event);
+	repaint();
+}
+
+void FlowExaminer::wheelEvent(QWheelEvent *event)
+{
+	int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+
+     if (event->orientation() == Qt::Horizontal) {
+         qDebug() << "wheel : horiz " << numSteps;
+     } else {
+         qDebug() << "wheel : vert " << numSteps;
+     }
+     qDebug() << "in wheel";
+     event->accept();
 }

@@ -639,14 +639,15 @@ void MainWindow::slotShowFlowEditWindow()
     qDebug() << "slotShowFlowEditWindow: No Yet Implemented";
     #if 1
     FlowEditCanvas* m_canvas;
-    m_canvas = new FlowEditCanvas(this);
+    m_canvas = new FlowEditCanvas(0);
     m_canvas->show();
     #endif
+#if 0
     // dock it
     QDockWidget *m_wflowMonitorDock = new QDockWidget(tr("Flow monitor"), this);
     m_wflowMonitorDock->setWidget(m_canvas);
     m_wflowMonitorDock->setObjectName("flowMonitor");
     addDockWidget(Qt::TopDockWidgetArea, m_wflowMonitorDock);
-    
+#endif 
 }
 

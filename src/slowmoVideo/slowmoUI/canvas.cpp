@@ -676,6 +676,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                                 diff.setY(0);
                             }
                         }
+                        qDebug() << "move selected";
                         m_nodes->moveSelected(diff);
                     }
                 }
@@ -694,7 +695,6 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
             }
 
         } else if (m_mode == ToolMode_Move) {
-        	qDebug() << "in mode ToolMode_Move";
             if (!m_states.moveAborted) {
                 m_nodes->shift(convertCanvasToTime(m_states.initialMousePos).x(), diff.x());
             }
@@ -854,39 +854,38 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 	if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
         const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
         
+        //qDebug() << "node : " << node->x() << "," << node->y();
+        qDebug() << "canvas node : " << convertTimeToCanvas(*node);
+        //qDebug() << "mouse " << m_states.prevMousePos << " vs " << m_states.initialMousePos;
         if (!m_states.nodesMoved) {
             qDebug() << "should be Moving node " << node;
+        	Node_sV diff;
             
-            
-            //qDebug() << "keyPressEvent : " << event->text();
-	        
-        	
             switch (event->key()) {
                 case Qt::Key_Up:
                     //qDebug() << "key up";
-                    m_states.prevMousePos += QPoint(0,-1);
+                    diff = convertCanvasToTime(QPoint(0,-1))-convertCanvasToTime(QPoint(0,0));
                     break;
                 case Qt::Key_Down:
                     //qDebug() << "key down";
-                    m_states.prevMousePos += QPoint(0,1);
+                    diff = convertCanvasToTime(QPoint(0,1))-convertCanvasToTime(QPoint(0,0));
                     break;
                 case Qt::Key_Right:
                     //qDebug() << "key right";
-                    m_states.prevMousePos += QPoint(1,0);
+                    diff = convertCanvasToTime(QPoint(1,0))-convertCanvasToTime(QPoint(0,0));
                     break;
                 case Qt::Key_Left:
                     //qDebug() << "key left";
-                    m_states.prevMousePos += QPoint(-1,0);
+                    diff = convertCanvasToTime(QPoint(-1,0))-convertCanvasToTime(QPoint(0,0));
                     break;
             }
-            Node_sV diff = convertCanvasToTime(m_states.prevMousePos) - convertCanvasToTime(m_states.initialMousePos);
-            qDebug() << m_states.initialMousePos << "to" << m_states.prevMousePos << "; Diff: " << diff;
+            //qDebug() << "moving of " << diff;
             m_nodes->moveSelected(diff);
             //TODO: update other windows ?
             //TODO: confirm move ?
             // from mouserelease
-        
             
+#if 0
             // from mouse move ?
             // Emit the source time at the mouse position
             emit signalMouseInputTimeChanged(
@@ -908,16 +907,16 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                                                         m_nodes->sourceTime(timeOut)
                                                         * m_project->frameSource()->fps()->fps());
                 }
-                
-                    m_nodes->confirmMove();
-            qDebug() << "key Move confirmed.";
-            emit nodesChanged();
-            
-            repaint();
             }
-
+#endif // mouse ?
             
-            
+            /*if (m_states.countsAsMove()) */{
+                m_nodes->confirmMove();
+                //qDebug() << "key Move confirmed.";
+                emit nodesChanged();
+                
+                repaint();
+            }                                  
         }
         //event->ignore();
 	}

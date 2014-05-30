@@ -26,8 +26,19 @@ private:
     FlowField_sV *m_flowLR;
     FlowField_sV *m_flowRL;
 
+	// current frame
+	int frame;
+	// color flow amplification
+	float m_boost;
 private slots:
     void slotMouseMoved(float x, float y);
+    
+public slots:
+	void newAmplification(int val);
+	
+protected:
+	void wheelEvent(QWheelEvent *);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // FLOWEXAMINER_H
