@@ -885,16 +885,23 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             //TODO: confirm move ?
             // from mouserelease
             
-#if 0
+             /*if (m_states.countsAsMove()) */{
+                m_nodes->confirmMove();
+                //qDebug() << "key Move confirmed.";
+                emit nodesChanged();
+                
+                repaint();
+            }                        
+#if 1
             // from mouse move ?
             // Emit the source time at the mouse position
-            emit signalMouseInputTimeChanged(
-                                             convertCanvasToTime(m_states.prevMousePos).y()
+            emit signalMouseInputTimeChanged(node->y()
                                              * m_project->frameSource()->fps()->fps()
                                              );
             
+            //TODO: get right time !
             // Emit the source time at the intersection of the out time and the curve
-            qreal timeOut = convertCanvasToTime(m_states.prevMousePos).x();
+            qreal timeOut = node->x();
             if (m_nodes->size() > 1 && m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
                 
 #ifdef DEBUG_C
@@ -904,19 +911,13 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                 
                 if (m_nodes->find(timeOut) >= 0) {
                     emit signalMouseCurveSrcTimeChanged(
-                                                        m_nodes->sourceTime(timeOut)
+                                                        timeOut/*m_nodes->sourceTime(timeOut)*/
                                                         * m_project->frameSource()->fps()->fps());
                 }
             }
 #endif // mouse ?
             
-            /*if (m_states.countsAsMove()) */{
-                m_nodes->confirmMove();
-                //qDebug() << "key Move confirmed.";
-                emit nodesChanged();
-                
-                repaint();
-            }                                  
+                     
         }
         //event->ignore();
 	}
