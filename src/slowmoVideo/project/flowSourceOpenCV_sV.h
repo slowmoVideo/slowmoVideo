@@ -16,6 +16,14 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QDir>
 
+#include "opencv2/video/tracking.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+// ?
+#include "opencv2/gpu/gpumat.hpp"
+
+#include "opencv2/ocl/ocl.hpp"
+
 class FlowSourceOpenCV_sV : public AbstractFlowSource_sV
 {
  
@@ -29,6 +37,7 @@ public:
 
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
 	
+    void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);
     
 public slots:
     virtual void slotUpdateProjectDir();
@@ -39,6 +48,9 @@ private:
     QDir m_dirFlowOrig;
 
     void createDirectories();
+    
+    // optical flow
+    cv::ocl::FarnebackOpticalFlow farn;
     
 };
 
