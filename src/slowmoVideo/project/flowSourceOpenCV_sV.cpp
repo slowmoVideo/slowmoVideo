@@ -33,6 +33,7 @@ using namespace cv;
 //using namespace cv::ocl; 
 //using namespace cv::gpu;
 
+
 #if 1
 /**
  *  list GPU support for OpenCV
@@ -172,6 +173,15 @@ void drawOptFlowMap(const Mat& flow, std::string flowname )
   FlowRW_sV::save(flowname, &flowField);
 }
 
+/**
+ *  build path of flow file
+ *
+ *  @param leftFrame  left frame for flow
+ *  @param rightFrame right frame
+ *  @param frameSize  resolution (small/orig)
+ *
+ *  @return name of flow file
+ */
 const QString FlowSourceOpenCV_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
 {
     QDir dir;
@@ -189,6 +199,53 @@ const QString FlowSourceOpenCV_sV::flowPath(const uint leftFrame, const uint rig
 
     return dir.absoluteFilePath(QString("ocv-%1-%2-%3.sVflow").arg(direction).arg(leftFrame).arg(rightFrame));
 }
+
+/**
+ *  setup parameter value for flow algorithm
+ *
+ *  @param levels    number of pyramide level
+ *  @param winsize   windows size
+ *  @param polySigma sigma
+ *  @param pyrScale  pyramide scale
+ *  @param polyN     <#polyN description#>
+ */
+void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,const double polySigma,
+                                           const double pyrScale,
+                                           const int polyN)
+{
+#if 0
+    // TBD need sliders for all these parameters
+    const int levels = 3; // 5
+    const int winsize = 15; // 13
+   
+    const double polySigma = 1.2;
+    const double pyrScale = 0.5;
+    const int polyN = 5;
+    const int flags = 0;
+
+#endif
+    farn.pyrScale = pyrScale;
+    farn.polyN = polyN;
+    farn.polySigma = polySigma;
+    farn.flags = 0;
+    
+    farn.numLevels = levels;
+    farn.winSize = winsize;
+}
+
+#if 0
+cv::ocl::oclMat d_flowx, d_flowy;
+farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
+    
+
+
+cv::calcOpticalFlowFarneback(
+                             frame0, frame1, flow, farn.pyrScale, farn.numLevels, farn.winSize,
+                             farn.numIters, farn.polyN, farn.polySigma, farn.flags);
+
+}
+
+#endif
 
 FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
@@ -214,29 +271,22 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         //cvtColor(l2, gray, CV_BGR2GRAY);
         
         {
+             const int iterations = 8; // 10
+            setupOpticalFlow(3,15,1.2,0.5,5);
             
             if( prevgray.data ) {
-                // TBD need sliders for all these parameters
-                const int levels = 3; // 5
-                const int winsize = 15; // 13
-                const int iterations = 8; // 10
-                
-                const double polySigma = 1.2;
-                const double pyrScale = 0.5;
-                const int polyN = 5;
-                const int flags = 0;
                 
                 calcOpticalFlowFarneback(
                                          prevgray, gray,
                                          //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
                                          flow,
-                                         pyrScale, //0.5,
-                                         levels, //3,
-                                         winsize, //15,
+                                         farn.pyrScale, //0.5,
+                                         farn.numLevels, //3,
+                                         farn.winSize, //15,
                                          iterations, //3,
-                                         polyN, //5,
-                                         polySigma, //1.2,
-                                         flags //0
+                                         farn.polyN, //5,
+                                         farn.polySigma, //1.2,
+                                         farn.flags //0
                                          );
                 //cvtColor(prevgray, cflow, CV_GRAY2BGR);
                 //drawOptFlowMap(flow, cflow, 16, 1.5, CV_RGB(0, 255, 0));
