@@ -48,7 +48,8 @@ public slots:
 private:
     QDir m_dirFlowSmall;
     QDir m_dirFlowOrig;
-
+	int use_gpu;
+	
     void createDirectories();
     
     // optical flow
