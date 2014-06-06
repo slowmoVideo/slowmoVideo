@@ -76,12 +76,20 @@ void Project_sV::init()
     m_flowSource = 0; // leak ? new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
 
+#if 0
     QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QString method = settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        if ("OCL" == method) {
+        	qDebug() << "setting OCL";
+        }
     }
+#else
+	reloadFlowSource();
+#endif
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
@@ -122,12 +130,23 @@ void Project_sV::reloadFlowSource()
 
     delete m_flowSource;
 
-    QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QSettings m_settings;
+    QString method = m_settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        if ("OCL" == method) {
+        	qDebug() << "using OCL for OpenCV";
+        	FlowSourceOpenCV_sV *ocv;
+        	if ((ocv = dynamic_cast<FlowSourceOpenCV_sV*>(m_flowSource)) != NULL) {
+        		int dev = m_settings.value("preferences/oclDriver", 0).toInt();
+        		//qDebug() << "using OCL device : " << dev << "for rendering";
+        		ocv->initGPUDevice(dev);
+        	}
+        }
     }
+    
 }
 
 void Project_sV::setProjectDir(QString projectDir)

@@ -39,6 +39,8 @@ public:
 	
     void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);
     
+    void initGPUDevice(int dev);
+    
 public slots:
     virtual void slotUpdateProjectDir();
 

@@ -44,7 +44,6 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
         m_sizeSmall = m_sizeSmall/2;
     }
 
-
     createDirectories();
 }
 

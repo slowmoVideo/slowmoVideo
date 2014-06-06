@@ -132,6 +132,19 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
     createDirectories();
 }
 
+void FlowSourceOpenCV_sV::initGPUDevice(int dev)
+{
+	qDebug() << "using OCL device : " << dev << "for rendering";
+	ocl::PlatformsInfo platforms;
+    ocl::getOpenCLPlatforms(platforms);
+    
+    ocl::DevicesInfo devInfo;
+    cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+      
+    ocl::setDevice(devInfo[dev]);
+    std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
+}
+        		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
 {
     m_dirFlowSmall.rmdir(".");
