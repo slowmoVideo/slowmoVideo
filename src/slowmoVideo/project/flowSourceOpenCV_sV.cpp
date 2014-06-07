@@ -128,10 +128,25 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 {
 	// for debugging OpenCL support
     check_gpu();
+    use_gpu = 0; // default do not use GPU
     
     createDirectories();
 }
 
+void FlowSourceOpenCV_sV::initGPUDevice(int dev)
+{
+	qDebug() << "using OCL device : " << dev << "for rendering";
+	use_gpu = 1;
+	ocl::PlatformsInfo platforms;
+    ocl::getOpenCLPlatforms(platforms);
+    
+    ocl::DevicesInfo devInfo;
+    cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+      
+    ocl::setDevice(devInfo[dev]);
+    std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
+}
+        		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
 {
     m_dirFlowSmall.rmdir(".");
@@ -234,14 +249,26 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
 }
 
 #if 0
-cv::ocl::oclMat d_flowx, d_flowy;
-farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
-    
+// use case of OCL    
+    cv::ocl::oclMat d_flowx, d_flowy;
+    farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
 
+    cv::Mat flow;
+    if (useInitFlow)
+    {
+        cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
+        cv::merge(flowxy, 2, flow);
 
-cv::calcOpticalFlowFarneback(
-                             frame0, frame1, flow, farn.pyrScale, farn.numLevels, farn.winSize,
-                             farn.numIters, farn.polyN, farn.polySigma, farn.flags);
+        farn.flags |= cv::OPTFLOW_USE_INITIAL_FLOW;
+        farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
+    }
+
+    cv::calcOpticalFlowFarneback(
+        frame0, frame1, flow, farn.pyrScale, farn.numLevels, farn.winSize,
+        farn.numIters, farn.polyN, farn.polySigma, farn.flags);
+
+    std::vector<cv::Mat> flowxy;
+    cv::split(flow, flowxy);
 
 }
 

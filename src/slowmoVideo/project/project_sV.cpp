@@ -76,12 +76,20 @@ void Project_sV::init()
     m_flowSource = 0; // leak ? new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
 
+#if 0
     QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QString method = settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        if ("OCL" == method) {
+        	qDebug() << "setting OCL";
+        }
     }
+#else
+	reloadFlowSource();
+#endif
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
@@ -118,16 +126,28 @@ Project_sV::~Project_sV()
 
 void Project_sV::reloadFlowSource()
 {
-    Q_ASSERT(m_flowSource != NULL);
+    //Q_ASSERT(m_flowSource != NULL);
 
-    delete m_flowSource;
+    if (m_flowSource != 0)
+        delete m_flowSource;
 
-    QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QSettings m_settings;
+    QString method = m_settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        if ("OCL" == method) {
+        	qDebug() << "using OCL for OpenCV";
+        	FlowSourceOpenCV_sV *ocv;
+        	if ((ocv = dynamic_cast<FlowSourceOpenCV_sV*>(m_flowSource)) != NULL) {
+        		int dev = m_settings.value("preferences/oclDriver", 0).toInt();
+        		//qDebug() << "using OCL device : " << dev << "for rendering";
+        		ocv->initGPUDevice(dev);
+        	}
+        }
     }
+    
 }
 
 void Project_sV::setProjectDir(QString projectDir)
@@ -452,12 +472,12 @@ void Project_sV::startFlow(int threadid,const FrameSize frameSize,int direction)
  */
 void Project_sV::buildCacheFlowSource()
 {
-    Q_ASSERT(m_flowSource != NULL);
-    
+
     QSettings settings;
     bool precalc = settings.value("preferences/precalcFlow", true).toBool();
-    if (precalc) {
+    if (precalc && (m_flowSource != NULL)) {
         qDebug() << "Creating cached FlowSources ";
+        Q_ASSERT(m_flowSource != NULL);
         // TODO: test/check better place ?
         // we should do it for each size/each way
         // use threading here
@@ -469,6 +489,6 @@ void Project_sV::buildCacheFlowSource()
         startFlow(3,FrameSize_Orig,1);
         
     }
-    
+
 }
 
