@@ -278,11 +278,6 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 {
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
     
-    if (flowCache.contains(flowFileName)) {
-    	qDebug().nospace() << "existing flow image is in cache";
-    	return (flowCache.object(flowFileName));
-    }
-    
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
         
@@ -338,9 +333,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     }
     
     try {
-    	FlowField_sV* field = FlowRW_sV::load(flowFileName.toStdString());
-    	flowCache.insert(flowFileName,field);
-        return field;
+    	return FlowRW_sV::load(flowFileName.toStdString());
     } catch (FlowRW_sV::FlowRWError &err) {
         throw FlowBuildingError(err.message.c_str());
     }

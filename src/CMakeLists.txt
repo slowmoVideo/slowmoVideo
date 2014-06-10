@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 project(slowmoVideo)
 
-set (CMAKE_BUILD_TYPE Release)
-#set(CMAKE_BUILD_TYPE Debug)
+#set (CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 set(PROJECT_VERSION_MAJOR "0")
 set(PROJECT_VERSION_MINOR "3")
@@ -19,7 +19,7 @@ if (APPLE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 endif()
 
 if(CMAKE_TOOLCHAIN_FILE)
@@ -54,6 +54,7 @@ include(${QT_USE_FILE})
 include_directories(${QT_INCLUDES})
 
 set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
+set (USE_FFMPEG ON CACHE BOOL "Build with the FFMPEG encoder")
 
 if(NOT MSYS)
 	find_package(FFMPEG)

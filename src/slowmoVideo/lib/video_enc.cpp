@@ -6,7 +6,8 @@ VideoWriter* CreateVideoWriter( const char* filename, int width, int height,doub
 {
 #ifdef USE_QTKIT
 	VideoWriter* driver= CreateVideoWriter_QT(filename,width, height,fps);
-#else
+#endif
+#ifdef USE_FFMPEG
 	VideoWriter* driver= CreateVideoWriter_FFMPEG(filename,width, height,fps);
 #endif
 	return driver;

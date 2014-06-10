@@ -676,7 +676,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                                 diff.setY(0);
                             }
                         }
-                        qDebug() << "move selected";
+                        //qDebug() << "move selected";
                         m_nodes->moveSelected(diff);
                     }
                 }

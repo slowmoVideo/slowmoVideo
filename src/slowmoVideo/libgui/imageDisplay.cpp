@@ -125,6 +125,7 @@ void ImageDisplay::mousePressEvent(QMouseEvent *e)
 
 void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
 {
+
     if (e->buttons().testFlag(Qt::LeftButton)) {
         m_states.manhattan += (e->pos()-m_states.mousePrevPos).manhattanLength();
     }

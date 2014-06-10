@@ -56,7 +56,7 @@ public:
     /*
      * add a qcache here for perf loading
      */
-    QCache<int,QImage> frameCache;
+    QCache<QString,QImage> frameCache;
     // use it in frameAt
     /**
       \fn frameAt()

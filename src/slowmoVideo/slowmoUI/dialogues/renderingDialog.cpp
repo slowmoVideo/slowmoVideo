@@ -18,7 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/projectPreferences_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
-#ifdef USE_QTKIT
+#ifdef USE_FFMPEG
 #include "project/new_videoRenderTarget.h"
 #else
 #include "project/videoRenderTarget_sV.h"
@@ -174,6 +174,11 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->timeEnd->setPlaceholderText(QVariant(m_project->nodes()->endTime()).toString());
 #endif
 
+#ifndef USE_QTKIT
+     ui->use_qt->setChecked(false);
+     ui->use_qt->setEnabled(false);
+#endif
+
     slotUpdateRenderTarget();
     slotSectionModeChanged();
 }
@@ -207,7 +212,7 @@ RenderTask_sV* RenderingDialog::buildTask()
             renderTarget->setTargetDir(imagesOutputDir);
             task->setRenderTarget(renderTarget);
         } else if (ui->radioVideo->isChecked()) {
-	#ifdef USE_QTKIT
+	#ifdef USE_FFMPEG
 	#warning "using QTKit version"
             newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
     #else
