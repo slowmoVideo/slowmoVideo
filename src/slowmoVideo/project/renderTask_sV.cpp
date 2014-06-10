@@ -116,6 +116,8 @@ void RenderTask_sV::slotContinueRendering()
 
 void RenderTask_sV::slotRenderFrom(qreal time)
 {
+	qDebug() << "slotRenderFrom " << time;
+	
     if (m_renderTarget == NULL) {
         m_stopRendering = true;
         emit signalRenderingAborted(tr("No rendering target given! Aborting rendering."));
@@ -167,6 +169,7 @@ void RenderTask_sV::slotRenderFrom(qreal time)
         qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
     }
     if (!m_stopRendering) {
+    	qDebug() << "invoking ... target " << m_nextFrameTime;
         QMetaObject::invokeMethod(this, "slotRenderFrom", m_connectionType, Q_ARG(qreal, m_nextFrameTime));
     }
 }
