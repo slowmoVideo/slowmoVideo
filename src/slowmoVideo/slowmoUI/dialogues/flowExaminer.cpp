@@ -18,11 +18,9 @@ FlowExaminer::FlowExaminer(Project_sV *project, QWidget *parent) :
 //    ui->leftFrame->trackMouse(true);
 //    ui->rightFrame->trackMouse(true);
 
-    bool b = true;
-    b &= connect(ui->leftFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
-    b &= connect(ui->rightFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
-    b &= connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
-    Q_ASSERT(b);
+    connect(ui->leftFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
+    connect(ui->rightFrame, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotMouseMoved(float,float)));
+    connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 FlowExaminer::~FlowExaminer()

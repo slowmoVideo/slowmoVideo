@@ -55,12 +55,11 @@ if (NOT FORCE_QT4)
 		 set(USE_QT TRUE)
 		 # go on with other packages
 		 find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script)
-if (Qt5_POSITION_INDEPENDENT_CODE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
+		if (Qt5_POSITION_INDEPENDENT_CODE)
+			set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+		endif(Qt5_POSITION_INDEPENDENT_CODE)
 #		 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
 #		    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
- 
 
 		 include_directories(${Qt5Core_INCLUDES}) 
 		 include_directories(${Qt5Widgets_INCLUDES}) 
@@ -89,7 +88,7 @@ endif()
 		     qt5_add_translation(${ARGN})
 		 endmacro()
 	 endif(Qt5Core_FOUND)
-endif(FORCE_QT4)
+endif(NOT FORCE_QT4)
 
 #old qt4 ...
 if(NOT Qt5Core_FOUND) 

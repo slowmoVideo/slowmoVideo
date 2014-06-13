@@ -21,12 +21,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <cmath>
 
-bool& operator&=(bool& a_res, const QMetaObject::Connection& a_res2)
-{
-    a_res = (a_res & static_cast<bool>(a_res2));
-    return a_res;
-}
-
 ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     QFrame(parent, f),
     m_scale(1)
@@ -37,10 +31,8 @@ ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
 
     m_aExportImage = new QAction(tr("Export image"), this);
 
-    bool b = true;
-    b &= connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
-    b &= connect(m_aExportImage, SIGNAL(triggered()), this, SLOT(slotExportImage()));
-    Q_ASSERT(b);
+    connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
+    connect(m_aExportImage, SIGNAL(triggered()), this, SLOT(slotExportImage()));
 
     setContentsMargins(5, 5, 5, 5);
 }

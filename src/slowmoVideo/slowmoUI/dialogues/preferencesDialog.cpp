@@ -15,14 +15,17 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
     ui->ffmpeg->setText(m_settings.value("binaries/ffmpeg", "ffmpeg").toString());
-
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #if QT_VERSION >= 0x040700
     ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0, QApplication::UnicodeUTF8));
 #endif
+#else
+    ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0));
+#endif
 
 // TODO: qcombox box instead ?
-    m_flowMethodGroup.addButton(ui->methodOCV);
-    m_flowMethodGroup.addButton(ui->methodV3D);
+    m_flowMethodGroup.addButton(ui->methodOCV,-1);
+    m_flowMethodGroup.addButton(ui->methodV3D,-1);
     m_flowMethodGroup.setExclusive(true);
 
     QString method = m_settings.value("preferences/flowMethod", "V3D").toString();
@@ -32,14 +35,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
         ui->methodOCV->setChecked(true);
     }
 
-    bool b = true;
-    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
-    b &= connect(ui->bCancel, SIGNAL(clicked()), this, SLOT(reject()));
-    b &= connect(ui->bBuildFlow, SIGNAL(clicked()), this, SLOT(slotBrowseFlow()));
-    b &= connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
-    b &= connect(&m_flowMethodGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFlowMethod()));
-    b &= connect(ui->bFFmpeg, SIGNAL(clicked()), this, SLOT(slotBrowseFfmpeg()));
-    Q_ASSERT(b);
+    connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->bCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->bBuildFlow, SIGNAL(clicked()), this, SLOT(slotBrowseFlow()));
+    connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
+    connect(&m_flowMethodGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFlowMethod()));
+    connect(ui->bFFmpeg, SIGNAL(clicked()), this, SLOT(slotBrowseFfmpeg()));
 
     if (!FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         FlowSourceV3D_sV::correctFlowBinaryLocation();

@@ -129,27 +129,25 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
         ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
     }
 
-    bool b = true;
-    b &= connect(m_targetGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateRenderTarget()));
-    b &= connect(m_sectionGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotSectionModeChanged()));
-    b &= connect(ui->timeStart, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
-    b &= connect(ui->timeEnd, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    connect(m_targetGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateRenderTarget()));
+    connect(m_sectionGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotSectionModeChanged()));
+    connect(ui->timeStart, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    connect(ui->timeEnd, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
 
-    b &= connect(ui->cbStartTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
-    b &= connect(ui->cbEndTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
+    connect(ui->cbStartTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
+    connect(ui->cbEndTag, SIGNAL(currentIndexChanged(int)), this, SLOT(slotTagIndexChanged()));
 
-    b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
-    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
-    b &= connect(ui->bSave, SIGNAL(clicked()), this, SLOT(slotSaveSettings()));
+    connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->bSave, SIGNAL(clicked()), this, SLOT(slotSaveSettings()));
 
-    b &= connect(ui->cbFps, SIGNAL(editTextChanged(QString)), this, SLOT(slotValidate()));
+    connect(ui->cbFps, SIGNAL(editTextChanged(QString)), this, SLOT(slotValidate()));
 
-    b &= connect(ui->imagesOutputDir, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
-    b &= connect(ui->imagesFilenamePattern, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
-    b &= connect(ui->videoOutputFile, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
-    b &= connect(ui->bImagesBrowseDir, SIGNAL(clicked()), this, SLOT(slotBrowseImagesDir()));
-    b &= connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
-    Q_ASSERT(b);
+    connect(ui->imagesOutputDir, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    connect(ui->imagesFilenamePattern, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    connect(ui->videoOutputFile, SIGNAL(textChanged(QString)), this, SLOT(slotValidate()));
+    connect(ui->bImagesBrowseDir, SIGNAL(clicked()), this, SLOT(slotBrowseImagesDir()));
+    connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
 
     // Restore rendering start/end
     //int index;

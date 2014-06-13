@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainter>
 #include <QtGui/QMainWindow>
 #include <QtGui/QStatusBar>
+#include <QtConcurrent>
 
 RenderPreview::RenderPreview(Project_sV *project, QWidget *parent) :
     QWidget(parent),
@@ -31,9 +32,7 @@ RenderPreview::RenderPreview(Project_sV *project, QWidget *parent) :
     ui->info->setVisible(m_parentMainWindow == NULL);
     ui->info->clear();
 
-
-    bool b = true;
-    b &= connect(&m_futureWatcher, SIGNAL(finished()), this, SLOT(slotUpdateImage()));
+    connect(&m_futureWatcher, SIGNAL(finished()), this, SLOT(slotUpdateImage()));
 }
 
 RenderPreview::~RenderPreview()

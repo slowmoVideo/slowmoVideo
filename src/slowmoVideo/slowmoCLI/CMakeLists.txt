@@ -4,7 +4,7 @@ set(SOURCES_MAIN
   main.cpp
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 
 set(SOURCES_VINFO
   videoInfo.cpp

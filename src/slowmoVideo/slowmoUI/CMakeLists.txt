@@ -104,6 +104,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
 link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
+qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
 target_link_libraries(slowmoUI sVproj sVvis sVgui )
 
 if(APPLE)
@@ -138,7 +139,8 @@ if (UNIX)
 		Terminal=false
 		Categories=Application;Qt;Video\n")
 
-	install ( FILES icons/slowmoUI.png DESTINATION share/icons )
+	#install ( FILES icons/slowmoUI.png DESTINATION share/icons )
+	install ( FILES res/AppIcon.png DESTINATION share/icons )
 	install ( FILES ${PROJECT_BINARY_DIR}/slowmoUI.desktop DESTINATION share/applications
 		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
 )

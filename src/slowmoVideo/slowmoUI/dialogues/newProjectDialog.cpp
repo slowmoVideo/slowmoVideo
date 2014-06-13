@@ -37,19 +37,17 @@ NewProjectDialog::NewProjectDialog(QWidget *parent) :
     ui->projectDir->setText(m_settings.value("directories/lastProjectDir", QDir::current().absolutePath()).toString());
     m_videoInfo.streamsCount = 0;
 
-    bool b = true;
-    b &= connect(ui->browseInputVideo, SIGNAL(clicked()), this, SLOT(slotSelectVideoFile()));
-    b &= connect(ui->browseInputImages, SIGNAL(clicked()), this, SLOT(slotSelectImages()));
-    b &= connect(ui->browseProjectDir, SIGNAL(clicked()), this, SLOT(slotSelectProjectDir()));
-    b &= connect(ui->inputVideo, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateVideoInfo()));
-    b &= connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
-    b &= connect(ui->projectFilename, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
+    connect(ui->browseInputVideo, SIGNAL(clicked()), this, SLOT(slotSelectVideoFile()));
+    connect(ui->browseInputImages, SIGNAL(clicked()), this, SLOT(slotSelectImages()));
+    connect(ui->browseProjectDir, SIGNAL(clicked()), this, SLOT(slotSelectProjectDir()));
+    connect(ui->inputVideo, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateVideoInfo()));
+    connect(ui->projectDir, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
+    connect(ui->projectFilename, SIGNAL(textChanged(QString)), this, SLOT(slotUpdateButtonStates()));
 
-    b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
-    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
 
-    b &= connect(m_buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFrameSourceType()));
-    Q_ASSERT(b);
+    connect(m_buttonGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFrameSourceType()));
 
     slotUpdateImagesInfo();
     slotUpdateVideoInfo();
@@ -106,7 +104,11 @@ void NewProjectDialog::slotSelectVideoFile()
             // No video stream found. Check if the path contains a non-ASCII character and warn if this is the case.
             unsigned char ascii;
             for (int i = 0; i < ui->inputVideo->text().length(); i++) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
                 ascii = ui->inputVideo->text().at(i).toAscii();
+#else
+                ascii = ui->inputVideo->text().at(i).toLatin1();
+#endif
                 if (ascii == 0 || ascii > 0x7f) {
                     ui->txtVideoInfo->appendPlainText(
                                 tr("Character %1 is not an ASCII character. This file path will likely not work with ffmpeg.")

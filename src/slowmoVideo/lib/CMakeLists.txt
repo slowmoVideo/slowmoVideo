@@ -63,19 +63,25 @@ endif()
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
-include_directories(${Qt5Core_INCLUDE_DIRS})
-include_directories(${Qt5Gui_INCLUDE_DIRS})
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES})
+qt_use_modules(sV Core)
+qt_use_modules(sV Gui)
 
 add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
+qt_use_modules(sVinfo Core)
+qt_use_modules(sVinfo Gui)
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
 add_library(sVencode  STATIC ${LIB_SRC_ENCODE})
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
+qt_use_modules(sVencode Core)
+qt_use_modules(sVencode Gui)
 
 add_library(sVflow  STATIC ${LIB_SRC_FLOW})
 
 add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
+qt_use_modules(sVvis Core)
+qt_use_modules(sVvis Gui)
 target_link_libraries(sVvis  sVflow ${QT_LIBRARIES})
 
