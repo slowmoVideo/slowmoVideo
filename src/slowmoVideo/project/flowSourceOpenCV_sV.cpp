@@ -169,12 +169,6 @@ void FlowSourceOpenCV_sV::createDirectories()
 void drawOptFlowMap(const Mat& flow, std::string flowname )
 {
 
-  //cv::Mat log_flow, log_flow_neg;
-  //log_flow = cv::abs( flow/3.0 );
-  //cv::log(cv::abs(flow)*3 + 1, log_flow);
-  //cv::log(cv::abs(flow*(-1.0))*3 + 1, log_flow_neg);
- 
-
   FlowField_sV flowField(flow.cols, flow.rows);
 
     for(int y = 0; y < flow.rows; y++)
@@ -228,17 +222,6 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
                                            const double pyrScale,
                                            const int polyN)
 {
-#if 0
-    // TBD need sliders for all these parameters
-    const int levels = 3; // 5
-    const int winsize = 15; // 13
-   
-    const double polySigma = 1.2;
-    const double pyrScale = 0.5;
-    const int polyN = 5;
-    const int flags = 0;
-
-#endif
     farn.pyrScale = pyrScale;
     farn.polyN = polyN;
     farn.polySigma = polySigma;
@@ -296,10 +279,13 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         
         //cvtColor(l1, prevgray, CV_BGR2GRAY);
         //cvtColor(l2, gray, CV_BGR2GRAY);
+        if (use_gpu) {
+        	qDebug() << "using GPU OCL version";
+        }
         
         {
              const int iterations = 8; // 10
-            setupOpticalFlow(3,15,1.2,0.5,5);
+            //done outside setupOpticalFlow(3,15,1.2,0.5,5);
             
             if( prevgray.data ) {
                 

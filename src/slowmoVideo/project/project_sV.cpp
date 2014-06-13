@@ -137,15 +137,19 @@ void Project_sV::reloadFlowSource()
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        FlowSourceOpenCV_sV *ocv;
+        ocv = dynamic_cast<FlowSourceOpenCV_sV*>(m_flowSource);
         if ("OCL" == method) {
         	qDebug() << "using OCL for OpenCV";
-        	FlowSourceOpenCV_sV *ocv;
-        	if ((ocv = dynamic_cast<FlowSourceOpenCV_sV*>(m_flowSource)) != NULL) {
+        	
+        	if (ocv != NULL) {
         		int dev = m_settings.value("preferences/oclDriver", 0).toInt();
         		//qDebug() << "using OCL device : " << dev << "for rendering";
         		ocv->initGPUDevice(dev);
         	}
         }
+        qDebug() << "initial OpenCV setup";
+        ocv->setupOpticalFlow(3,15,1.2,0.5,5);
     }
     
 }
