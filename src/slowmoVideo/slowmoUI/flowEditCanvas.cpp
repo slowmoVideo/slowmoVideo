@@ -27,11 +27,9 @@ FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
 
     ui->flow->trackMouse(true);
 
-    bool b = true;
-    b &= connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
-    b &= connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
-    b &= connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
-    Q_ASSERT(b);
+    connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
+    connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
+    connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
     
 }
 

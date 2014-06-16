@@ -92,13 +92,11 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
 
             QAction *a = new QAction("&" + w->objectName(), this);
             a->setCheckable(true);
-            bool b = true;
-            b &= connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
+            connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
             // This does not work since it is also emitted e.g. when the window is minimized
             // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
             // Thanks ArGGu^^ for the tip!
-//            b &= connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
-            Q_ASSERT(b);
+//            connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
             a->setChecked(true);
 
             // To uncheck the menu entry when the widget is closed via the (x)
@@ -140,38 +138,36 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     m_cs.addShortcut("t-m", Tool_Move, tr("Move tool"));
     m_cs.addShortcut("t-t", Tag, tr("Insert label (tag)"));
 
-    bool b = true;
-    b &= connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
+    connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
 
-    b &= connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
-    b &= connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
-    b &= connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
-    b &= connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
+    connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
+    connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
+    connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
+    connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
 
-    b &= connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
-    b &= connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
+    connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
+    connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
 
-    b &= connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
+    connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
                  this, SLOT(slotForwardInputPosition(qreal)));
-    b &= connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
+    connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
                  this, SLOT(slotForwardCurveSrcPosition(qreal)));
 
-    b &= connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
-    b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
-    b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
-    b &= connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
-    b &= connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
-    b &= connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
-    b &= connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
-    b &= connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
-    b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
-    b &= connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
-    b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    b &= connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
-
-    b &= connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
     
-    Q_ASSERT(b);
+    connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
+    connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
+    connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
+    connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
+    connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
+    connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
+    connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
+    connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
+
 
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
@@ -348,10 +344,8 @@ void MainWindow::loadProject(Project_sV *project)
         delete projTemp;
     }
 
-    bool b = true;
-    b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
-    b &= connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
-    Q_ASSERT(b);
+    connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
+    connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
 
     m_project->frameSource()->initialize();
     
@@ -549,9 +543,7 @@ void MainWindow::slotShowRenderDialog()
         task->moveToThread(&m_rendererThread);
 
         if (m_project->renderTask() != NULL) {
-            bool b = true;
-            b &= disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
-            Q_ASSERT(b);
+            disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
         }
         m_project->replaceRenderTask(task);
 
@@ -572,7 +564,7 @@ void MainWindow::slotShowRenderDialog()
         connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
         connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
         connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
-        
+
         m_renderProgressDialog->show();
 
         emit signalRendererContinue();
@@ -590,13 +582,11 @@ void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskS
     if (m_progressDialog == NULL) {
         m_progressDialog = new ProgressDialog(this);
         m_progressDialog->setWindowTitle(tr("Frame extraction progress"));
-        bool b = true;
-        b &= connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
-        b &= connect(m_project->frameSource(), SIGNAL(signalTaskProgress(int)), m_progressDialog, SLOT(slotTaskProgress(int)));
-        b &= connect(m_project->frameSource(), SIGNAL(signalTaskItemDescription(QString)), m_progressDialog, SLOT(slotTaskItemDescription(QString)));
-        b &= connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), m_progressDialog, SLOT(slotAllTasksFinished()));
-        b &= connect(m_progressDialog, SIGNAL(signalAbortTask()), m_project->frameSource(), SLOT(slotAbortInitialization()));
-        Q_ASSERT(b);
+        connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
+        connect(m_project->frameSource(), SIGNAL(signalTaskProgress(int)), m_progressDialog, SLOT(slotTaskProgress(int)));
+        connect(m_project->frameSource(), SIGNAL(signalTaskItemDescription(QString)), m_progressDialog, SLOT(slotTaskItemDescription(QString)));
+        connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), m_progressDialog, SLOT(slotAllTasksFinished()));
+        connect(m_progressDialog, SIGNAL(signalAbortTask()), m_project->frameSource(), SLOT(slotAbortInitialization()));
     }
     m_progressDialog->show();
     m_progressDialog->slotNextTask(taskDescription, taskSize);

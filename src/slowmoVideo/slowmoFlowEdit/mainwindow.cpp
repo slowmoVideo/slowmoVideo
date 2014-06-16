@@ -11,12 +11,19 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "flowEditCanvas.h"
-#include "shortcutListDialog.h"
+
+#include <QtCore>
+#include <QObject>
+#include <QMainWindow>
+#include <QtWidgets>
+#include <QSettings>
 
 #include <QtCore/QDebug>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+
+#include "flowEditCanvas.h"
+#include "shortcutListDialog.h"
 
 #define MAX_SEARCH_SHIFT 500
 
@@ -51,15 +58,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionNext->setShortcut(QKeySequence("Ctrl+Right"));
     ui->actionShortcuts->setShortcut(QKeySequence("F1"));
 
-    bool b = true;
-    b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotOpenFlow()));
-    b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveFlow()));
-    b &= connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(slotNextFile()));
-    b &= connect(ui->actionPrev, SIGNAL(triggered()), this, SLOT(slotPrevFile()));
-    b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotShowShortcuts()));
-    b &= connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
-    Q_ASSERT(b);
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotOpenFlow()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveFlow()));
+    connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(slotNextFile()));
+    connect(ui->actionPrev, SIGNAL(triggered()), this, SLOT(slotPrevFile()));
+    connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotShowShortcuts()));
+    connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
 
 
     updateTitle();

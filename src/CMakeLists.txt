@@ -47,11 +47,92 @@ set(DEST "bin")
 
 include(cmake/macros.cmake)
 
-SET(QT_USE_QTXML TRUE)
-SET(QT_USE_QTSCRIPT TRUE)
-find_package(Qt4)
-include(${QT_USE_FILE})
-include_directories(${QT_INCLUDES})
+# search for Qt4
+if (NOT FORCE_QT4)
+         find_package(Qt5Core QUIET)
+         if (Qt5Core_FOUND) 
+                 message(STATUS "Using qt5")
+		 set(USE_QT TRUE)
+		 # go on with other packages
+		 find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script)
+		if (Qt5_POSITION_INDEPENDENT_CODE)
+			set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+		endif(Qt5_POSITION_INDEPENDENT_CODE)
+#		 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+#		    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+
+		 include_directories(${Qt5Core_INCLUDES}) 
+		 include_directories(${Qt5Widgets_INCLUDES}) 
+		 include_directories(${Qt5Gui_INCLUDES}) 
+		 include_directories(${Qt5Xml_INCLUDES}) 
+		 include_directories(${Qt5Script_INCLUDES}) 
+
+		 macro(qt_use_modules)
+		    qt5_use_modules(${ARGN})
+		 endmacro()
+ 
+		 macro(qt_wrap_ui)
+		     qt5_wrap_ui(${ARGN})
+		 endmacro()
+ 
+		 macro(qt_wrap_cpp)
+		     qt5_wrap_cpp(${ARGN})
+		 endmacro()
+ 
+		 macro(qt_add_resources)
+		     qt5_add_resources(${ARGN})
+		 endmacro()
+ 
+		 #find_package(Qt5LinguistTools REQUIRED)
+		 macro(qt_add_translation)
+		     qt5_add_translation(${ARGN})
+		 endmacro()
+	 endif(Qt5Core_FOUND)
+endif(NOT FORCE_QT4)
+
+#old qt4 ...
+if(NOT Qt5Core_FOUND) 
+
+# should replace :
+#SET(QT_USE_QTXML TRUE)
+#SET(QT_USE_QTSCRIPT TRUE)
+#find_package(Qt4)
+#include(${QT_USE_FILE})
+#include_directories(${QT_INCLUDES})
+
+     message(STATUS "Could not find Qt5, searching for Qt4 instead...")
+ 
+     set(NEEDED_QT4_COMPONENTS "QtCore" "QtXml" "QtGui" "QtScript") 
+ 
+     find_package(Qt4 REQUIRED COMPONENTS ${NEEDED_QT4_COMPONENTS})
+
+     macro(qt_use_modules)
+ 
+     endmacro()
+ 
+     macro(qt_wrap_ui)
+         qt4_wrap_ui(${ARGN})
+     endmacro()
+ 
+     macro(qt_wrap_cpp)
+         qt4_wrap_cpp(${ARGN})
+     endmacro()
+ 
+     macro(qt_add_resources)
+         qt4_add_resources(${ARGN})
+     endmacro()
+ 
+     macro(qt_add_translation)
+         qt4_add_translation(${ARGN})
+     endmacro()
+ 
+     include(${QT_USE_FILE})
+     add_definitions(${QT_DEFINITIONS})
+ 
+     set(USE_QT TRUE)
+endif()
+
+message("Qt libraries found at : ${Qt5Gui_LIBRARIES} /  ${QT_LIBRARIES}" )
 
 set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
 set (USE_FFMPEG ON CACHE BOOL "Build with the FFMPEG encoder")
@@ -90,9 +171,11 @@ endif(MSYS)
 
 ### Information output
 set(BUILD_SLOWMO "NO")
-if(QT_LIBRARIES AND FFMPEG_FOUND)
+#if(QT_LIBRARIES AND FFMPEG_FOUND)
+if(USE_QT AND FFMPEG_FOUND)
 set(BUILD_SLOWMO "YES")
-endif(QT_LIBRARIES AND FFMPEG_FOUND)
+#endif(QT_LIBRARIES AND FFMPEG_FOUND)
+endif()
 if(NOT FFMPEG_SWSCALE_FOUND)
   if(CMAKE_TOOLCHAIN_FILE)
 
@@ -309,9 +392,11 @@ message("* V3D will be built:                        ---${BUILD_FLOW_BUILDER}---
 message("==================slowmoVideo========================")
 message("* (info) slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
 message("         (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path. Default is ${SV_INST_DIR}.)")
-if(NOT QT_LIBRARIES)
-    message("x Qt4 libraries could not be found.")
-endif(NOT QT_LIBRARIES)
+#if(NOT QT_LIBRARIES)
+if (NOT USE_QT)
+    message("QT5 nor Qt4 libraries could not be found.")
+#endif(NOT QT_LIBRARIES)
+endif(NOT USE_QT)
 if(NOT FFMPEG_FOUND)
     message("x ffmpeg libraries could not be found.")
 else(NOT FFMPEG_FOUND)

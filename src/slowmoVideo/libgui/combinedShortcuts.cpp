@@ -19,9 +19,7 @@ CombinedShortcuts::CombinedShortcuts(QWidget *parent) :
     m_parent(parent),
     m_signalMapper(parent)
 {
-    bool b = true;
-    b &= connect(&m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(slotShortcutUsed(QString)));
-    Q_ASSERT(b);
+    connect(&m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(slotShortcutUsed(QString)));
 }
 CombinedShortcuts::~CombinedShortcuts()
 {
@@ -81,8 +79,7 @@ void CombinedShortcuts::addShortcutKey(QString key)
         m_signalMapper.setMapping(qshortcut, key);
 
         // Connect shortcut to the signal mapper
-        bool b = connect(qshortcut, SIGNAL(activated()), &m_signalMapper, SLOT(map()));
-        Q_ASSERT(b);
+        connect(qshortcut, SIGNAL(activated()), &m_signalMapper, SLOT(map()));
     }
 }
 

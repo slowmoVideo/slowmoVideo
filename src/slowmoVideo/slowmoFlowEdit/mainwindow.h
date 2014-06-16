@@ -11,15 +11,17 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../libgui/combinedShortcuts.h"
-
-#include <QMainWindow>
-#include <QSettings>
-
 class FlowEditCanvas;
 namespace Ui {
     class MainWindow;
 }
+
+
+#include <QMainWindow>
+#include <QtWidgets>
+#include <QSettings>
+
+#include "../libgui/combinedShortcuts.h"
 
 class MainWindow : public QMainWindow
 {

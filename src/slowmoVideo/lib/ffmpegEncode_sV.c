@@ -261,7 +261,8 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
             // Check if non-ASCII characters are present in the file path
             char nonAscii = 0;
-            for (int i = 0; i < strlen(video->filename); i++) {
+	    int i;
+            for (i = 0; i < strlen(video->filename); i++) {
                 if ((unsigned short)video->filename[i] > 0x7f) {
                     fprintf(stderr, "Contains non-ASCII character: %c (%d)\n", video->filename[i], (unsigned char)video->filename[i]);
                     nonAscii = 1;
@@ -459,7 +460,8 @@ void finish(VideoOut_sV *video)
     }
 
     /* free the streams */
-    for(int i = 0; i < video->fc->nb_streams; i++) {
+    int i;
+    for(i = 0; i < video->fc->nb_streams; i++) {
         av_freep(&video->fc->streams[i]->codec);
         av_freep(&video->fc->streams[i]);
     }

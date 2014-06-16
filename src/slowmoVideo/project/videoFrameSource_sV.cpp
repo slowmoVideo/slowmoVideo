@@ -47,9 +47,7 @@ throw(FrameSourceError) :
     m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
 
-    bool b = true;
-    b &= connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
-    Q_ASSERT(b);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
 }
 VideoFrameSource_sV::~VideoFrameSource_sV()
 {
@@ -127,7 +125,11 @@ const QString VideoFrameSource_sV::framePath(const uint frame, const FrameSize f
     }
 
     // ffmpeg numbering starts with 1, therefore add 1 to the frame number
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     return QString("%1/frame%2.png").arg(dir).arg(frame+1, 5, 10, QChar::fromAscii('0'));
+#else
+    return QString("%1/frame%2.png").arg(dir).arg(frame+1, 5, 10, QChar::fromLatin1('0'));
+#endif
 }
 
 void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *process)
@@ -206,9 +208,7 @@ void VideoFrameSource_sV::slotExtractSmallFrames()
         m_ffmpeg->terminate();
 
         disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
-        bool b = true;
-        b &= connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotExtractOrigFrames()));
-        Q_ASSERT(b);
+        connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotExtractOrigFrames()));
 
         extractFramesFor(FrameSize_Small, m_ffmpeg);
 
@@ -231,9 +231,7 @@ void VideoFrameSource_sV::slotExtractOrigFrames()
         m_ffmpeg->terminate();
 
         disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
-        bool b = true;
-        b &= connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotInitializationFinished()));
-        Q_ASSERT(b);
+        connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotInitializationFinished()));
 
         extractFramesFor(FrameSize_Orig, m_ffmpeg);
 
