@@ -15,7 +15,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore>
 #include <QObject>
 #include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QtWidgets>
+#endif
 #include <QSettings>
 
 #include <QtCore/QDebug>

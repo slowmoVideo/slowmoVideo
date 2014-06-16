@@ -24,9 +24,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QDebug>
 #include <QTextStream>
+#if 0
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <QXmlQuery>
 #endif // qt5 
+#endif
 
 
 int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Error_sV)

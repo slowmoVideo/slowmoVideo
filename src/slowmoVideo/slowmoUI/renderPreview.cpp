@@ -18,7 +18,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainter>
 #include <QtGui/QMainWindow>
 #include <QtGui/QStatusBar>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QtConcurrent>
+#endif
 
 RenderPreview::RenderPreview(Project_sV *project, QWidget *parent) :
     QWidget(parent),
