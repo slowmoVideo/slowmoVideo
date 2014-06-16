@@ -173,7 +173,7 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
 
     QSettings settings;
-    bool show = settings.value("ui/displayHelp", true).toBool();
+    bool show = settings.value("ui/displayHelp", false).toBool();
     m_wCanvas->showHelp(show);
     settings.sync();
 
