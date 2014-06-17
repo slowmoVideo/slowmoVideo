@@ -65,14 +65,16 @@ void check_gpu()
         }
 
         ocl::DevicesInfo devInfo;
+#if 0
         int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+#else
+        int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_GPU);
+#endif
         if (res != 0) {
         for(size_t i = 0 ; i < devInfo.size() ;i++) {
             std::cerr << "Device : " << i << " " << devInfo[i]->deviceName << " is present" << std::endl;
         }
-
-       //ocl::getOpenCLDevices(DevicesInfo& devices, int deviceType = CVCL_DEVICE_TYPE_GPU,
-        //        const PlatformInfo* platform = NULL);
+            
 
 		}
         qDebug() << "end OpenCL support";
@@ -229,6 +231,9 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
     
     farn.numLevels = levels;
     farn.winSize = winsize;
+    
+    //const int iterations = 8; // 10
+    farn.numIters = 8;
 }
 
 #if 0
@@ -279,33 +284,39 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         
         //cvtColor(l1, prevgray, CV_BGR2GRAY);
         //cvtColor(l2, gray, CV_BGR2GRAY);
-        if (use_gpu) {
-        	qDebug() << "using GPU OCL version";
-        }
+        
         
         {
-             const int iterations = 8; // 10
+             //const int iterations = 8; // 10
             //done outside setupOpticalFlow(3,15,1.2,0.5,5);
             
             if( prevgray.data ) {
                 
-                calcOpticalFlowFarneback(
+                if (use_gpu) {
+        			qDebug() << "using GPU OCL version";
+        			
+        			cv::ocl::oclMat d_flowx, d_flowy;
+    				farn(ocl::oclMat(prevgray), ocl::oclMat(gray), d_flowx, d_flowy);
+    
+    				cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
+    				cv::merge(flowxy, 2, flow);
+    				
+        		} else {
+                	calcOpticalFlowFarneback(
                                          prevgray, gray,
                                          //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
                                          flow,
                                          farn.pyrScale, //0.5,
                                          farn.numLevels, //3,
                                          farn.winSize, //15,
-                                         iterations, //3,
+                                         farn.numIters, //3,
                                          farn.polyN, //5,
                                          farn.polySigma, //1.2,
                                          farn.flags //0
                                          );
-                //cvtColor(prevgray, cflow, CV_GRAY2BGR);
-                //drawOptFlowMap(flow, cflow, 16, 1.5, CV_RGB(0, 255, 0));
-                drawOptFlowMap(flow, flowFileName.toStdString());
-                //imshow("flow", cflow);
-                //imwrite(argv[4],cflow);
+                
+                }
+                drawOptFlowMap(flow, flowFileName.toStdString());              
             } else {
                 qDebug() << "imread: Could not read image " << prevpath;
                 throw FlowBuildingError(QString("imread: Could not read image " + prevpath));
