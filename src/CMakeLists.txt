@@ -48,8 +48,6 @@ set(CMAKE_MODULE_PATH
 # Extra security for windows environment as well.
 if (DEFINED ENV{QTDIR})
     set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
-else ()
-    message (FATAL_ERROR "ERROR: Environment variable QTDIR is not set. Please locate your Qt folder.")
 endif ()
 
 set(DEST "bin")
