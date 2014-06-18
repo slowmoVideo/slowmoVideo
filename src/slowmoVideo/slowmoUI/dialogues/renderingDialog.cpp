@@ -19,7 +19,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
 #ifdef USE_FFMPEG
+#if 0
 #include "project/new_videoRenderTarget.h"
+#else
+#include "project/exportVideoRenderTarget.h"
+#endif
 #else
 #include "project/videoRenderTarget_sV.h"
 #endif
@@ -212,7 +216,12 @@ RenderTask_sV* RenderingDialog::buildTask()
         } else if (ui->radioVideo->isChecked()) {
 	#ifdef USE_FFMPEG
 	#warning "using QTKit version"
+#if 0
             newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
+#else
+	#warning "using dummy version"
+            exportVideoRenderTarget *renderTarget = new exportVideoRenderTarget(task);
+#endif
     #else
 	#warning "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);

@@ -26,9 +26,24 @@ exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask
 #endif
      m_targetDir = QDir::temp();
 
+qDebug() << "  target dir " << m_targetDir;
+
     m_filenamePattern = "rendered-%1.png";
 }
 
+exportVideoRenderTarget::~exportVideoRenderTarget()
+{
+    
+}
+
+void exportVideoRenderTarget::setTargetFile(const QString &filename)
+{
+    m_filename = filename;
+}
+void exportVideoRenderTarget::setVcodec(const QString &codec)
+{
+    m_vcodec = codec;
+}
 
 void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int frameNumber)
 {
@@ -50,12 +65,15 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
     }
 }
 
-void exportVideoRenderTarget::exportRenderTarget() throw(Error_sV)
+void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 {
-	qDebug() << "exporting temporary frame to Video";
-	openRenderTarget();
+	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec;
+	//openRenderTarget();
 // loop throught frame ?
-	closeRenderTarget();
+	//closeRenderTarget();
 }
+
+  
+
 
 
