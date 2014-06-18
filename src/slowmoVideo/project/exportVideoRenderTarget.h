@@ -39,11 +39,6 @@ public:
     void openRenderTarget() throw(Error_sV);
     void closeRenderTarget() throw(Error_sV);
 
-    //TODO: is it needed ?
-    // for png temp export 
-    void setTargetDir(const QDir dir);
-    bool setFilenamePattern(const QString pattern);
-
 public slots:
     void slotConsumeFrame(const QImage &image, const int frameNumber);
 

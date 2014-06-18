@@ -11,14 +11,14 @@ the Free Software Foundation, either version 3 of the License, or
 #include "exportVideoRenderTarget.h"
 
 #include <QtCore/QDebug>
-//TODO QT5?
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QTemporaryDir> 
+#endif
 
 exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask) :
     AbstractRenderTarget_sV(parentRenderTask)
 {
-//TODO: better ?
-#if 1
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     QTemporaryDir tempDir("slowmovideo");
     if (tempDir.isValid()) 
     	m_targetDir = QDir(tempDir.path());
@@ -29,24 +29,6 @@ exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask
     m_filenamePattern = "rendered-%1.png";
 }
 
-void exportVideoRenderTarget::setTargetDir(const QDir dir)
-{
-    m_targetDir = dir;
-}
-
-bool exportVideoRenderTarget::setFilenamePattern(const QString pattern)
-{
-//TODO: 
-#if 0
-    if (pattern.contains("%1")) {
-        m_filenamePattern = pattern;
-        return true;
-    }
-    return false;
-#else
-    return true;
-#endif
-}
 
 void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int frameNumber)
 {
@@ -67,4 +49,13 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
         qDebug() << "  Saved frame number " << frameNumber << " to " << path;
     }
 }
+
+void exportVideoRenderTarget::exportRenderTarget() throw(Error_sV)
+{
+	qDebug() << "exporting temporary frame to Video";
+	openRenderTarget();
+// loop throught frame ?
+	closeRenderTarget();
+}
+
 
