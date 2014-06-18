@@ -43,6 +43,15 @@ set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
 )
 
+# Check if environment variable QTDIR is set.
+# needed for Qt5
+# Extra security for windows environment as well.
+if (DEFINED ENV{QTDIR})
+    set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
+else ()
+    message (FATAL_ERROR "ERROR: Environment variable QTDIR is not set. Please locate your Qt folder.")
+endif ()
+
 set(DEST "bin")
 
 include(cmake/macros.cmake)

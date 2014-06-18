@@ -36,8 +36,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
-#include <QtGui/QMenu>
-#include <QtGui/QInputDialog>
+#include <QMenu>
+#include <QInputDialog>
 
 
 

@@ -16,8 +16,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore>
 #include <QtGui/QPainter>
-#include <QtGui/QMainWindow>
-#include <QtGui/QStatusBar>
+#include <QMainWindow>
+#include <QStatusBar>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QtConcurrent>
 #endif

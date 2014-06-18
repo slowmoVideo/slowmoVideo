@@ -32,7 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QDockWidget>
 #include <QDebug>
 #include <QMessageBox>
-#include <QtGui/QStatusBar>
+#include <QStatusBar>
 
 #include <QDir>
 #include <QFileDialog>

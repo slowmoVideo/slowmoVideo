@@ -21,8 +21,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QSettings>
 
 #include <QtCore/QDebug>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "flowEditCanvas.h"
 #include "shortcutListDialog.h"

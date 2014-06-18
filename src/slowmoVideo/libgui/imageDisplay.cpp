@@ -11,10 +11,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "imageDisplay.h"
 #include <QtCore/QDebug>
 #include <QtGui/QPainter>
-#include <QtGui/QMenu>
-#include <QtGui/QFileDialog>
-#include <QtGui/QContextMenuEvent>
+#include <QMenu>
+#include <QFileDialog>
+#include <QContextMenuEvent>
 
+#include <QAction>
 #include <QApplication>
 #include <QtCore/QSettings>
 #include <QtCore/QFileInfo>

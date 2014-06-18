@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QtCore/QSettings>
-#include <QtGui/QButtonGroup>
+#include <QButtonGroup>
 
 namespace Ui {
     class PreferencesDialog;

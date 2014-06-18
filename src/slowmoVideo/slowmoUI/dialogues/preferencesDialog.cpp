@@ -6,7 +6,7 @@
 #include "lib/avconvInfo_sV.h"
 #include "../../project/videoFrameSource_sV.h"
 #include <QtCore/QProcess>
-#include <QtGui/QFileDialog>
+#include <QFileDialog>
 
 //TODO: header ?
 int isOCLsupported();

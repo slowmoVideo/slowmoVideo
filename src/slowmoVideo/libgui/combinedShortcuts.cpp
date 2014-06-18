@@ -10,7 +10,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "combinedShortcuts.h"
 
-#include <QtGui/QShortcut>
+#include <QShortcut>
 
 #define DEBUG
 #include <QDebug>

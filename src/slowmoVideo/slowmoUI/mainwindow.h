@@ -22,7 +22,7 @@ namespace Ui {
     class MainWindow;
 }
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QtCore/QMap>
 #include <QtCore/QList>
 #include <QtCore/QTime>
