@@ -1,5 +1,6 @@
 /*
  * precalculate optical flow
+ * 2014 Valery Brasseur <vbrasseur@gmail.com>
  */
 
 #include "flowSourceOpenCV_sV.h"

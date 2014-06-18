@@ -1,5 +1,6 @@
 /*
  precalculate optical flow
+* 2014 Valery Brasseur <vbrasseur@gmail.com>
 */
 
 #ifndef WORKERFLOW_H
