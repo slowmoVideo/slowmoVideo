@@ -31,8 +31,9 @@ throw(FrameSourceError) :
     }
 
     m_videoInfo = new VideoInfoSV();
-
+    // use copy constructor 
     *m_videoInfo = getInfo(filename.toStdString().c_str());
+
     if (m_videoInfo->streamsCount <= 0) {
         qDebug() << "Video info is invalid: " << filename;
         throw FrameSourceError(tr("Video is invalid, no streams found in %1").arg(filename));
