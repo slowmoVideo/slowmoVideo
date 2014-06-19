@@ -37,6 +37,10 @@ ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
     Q_ASSERT(b);
 
     setContentsMargins(5, 5, 5, 5);
+
+    m_states.mouseInitialImagePos = QPointF(0.0,0.0);
+    m_states.mousePrevPos = QPoint(0,0);
+    m_states.manhattan = 0;
 }
 ImageDisplay::~ImageDisplay()
 {
