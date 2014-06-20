@@ -1,3 +1,5 @@
+### Building for MacOS
+
 here, I will describe how to build slowmoVideo for OSX from scratch.
 you will need of course *Xcode* and *command line tools*, with *cmake*
 will need some dependencies :
