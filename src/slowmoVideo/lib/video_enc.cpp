@@ -22,6 +22,11 @@ int WriteFrame( VideoWriter* writer, const QImage& frame)
     return writer ? writer->writeFrame(frame) : 0;
 }
 
+int exportFrames(VideoWriter* writer,const char* filepattern)
+{
+    return writer ? writer->exportFrames(filepattern) : 0;
+}
+
 void ReleaseVideoWriter( VideoWriter** pwriter )
 {
     if( pwriter && *pwriter ) {

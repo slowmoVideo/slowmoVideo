@@ -31,8 +31,8 @@ class VideoFFMPEG : public VideoWriter {
     int mWidth;
     double movieFPS;
 
-	QString m_filename;
-	QString m_vcodec;
+	 char* m_filename;
+	 char* m_vcodec;
     VideoOut_sV *m_videoOut;
     
 public:
@@ -40,7 +40,7 @@ public:
     ~VideoFFMPEG();
     
     int writeFrame(const QImage& frame);
-
+    int exportFrames(const char* filepattern);
 };
 
 #endif // _FFMPEG_WRITER
