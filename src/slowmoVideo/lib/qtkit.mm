@@ -5,6 +5,12 @@
 #include "qtkit.h"
 #include "video_enc.h"
 
+#include <QtCore/QCoreApplication>
+#include <QDebug>
+#include <QtCore/QSettings>
+#include <QImage>
+
+
 // tools for qt 4.8
 // convert pixamp <-> nsimage
 static void drawImageReleaseData (void *info, const void *, size_t)
@@ -191,6 +197,43 @@ int VideoQT::writeFrame(const QImage& frame)
     return 0;
 }
 
+int VideoQT::exportFrames(QString filepattern)
+{
+	NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
+	NSString *inputPath;
+    NSArray *imageFiles;
+    NSError *err;
+    NSImage *image;
+    
+    NSString *fullFilename;
+        
+	qDebug() << "exporting frame from : " << filepattern << " to " << destPath;
+
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+    inputPath = [[NSURL fileURLWithPath:[[NSString stringWithUTF8String:filepattern.toStdString().c_str()]
+                    stringByExpandingTildeInPath]] path];
+                    
+    imageFiles = [fileManager contentsOfDirectoryAtPath:inputPath error:&err];
+    imageFiles = [imageFiles sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
+    
+     for (NSString *file in imageFiles) {
+        fullFilename = [inputPath stringByAppendingPathComponent:file];
+        if ([[fullFilename pathExtension] caseInsensitiveCompare:@"jpeg"] == NSOrderedSame ||
+            [[fullFilename pathExtension] caseInsensitiveCompare:@"png"] == NSOrderedSame ||
+            [[fullFilename pathExtension] caseInsensitiveCompare:@"jpg"] == NSOrderedSame) {
+            NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
+            image = [[NSImage alloc] initWithContentsOfFile:fullFilename];
+        
+        
+            [image release];
+            [innerPool release];
+        }
+    }
+    
+    [localpool drain];
+    return 0;
+}
+
 //
 // close the movie file
 VideoQT::~VideoQT()
@@ -205,7 +248,7 @@ VideoQT::~VideoQT()
     [localpool drain];
 }
 
-VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps)
+VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps,const char* codec)
 {
 	VideoQT*  driver=  new VideoQT(width,height,fps,0,0,filename);
 	return driver;
