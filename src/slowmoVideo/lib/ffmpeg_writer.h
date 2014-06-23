@@ -40,7 +40,7 @@ public:
     ~VideoFFMPEG();
     
     int writeFrame(const QImage& frame);
-    int exportFrames(const char* filepattern);
+    int exportFrames(QString filepattern);
 };
 
 #endif // _FFMPEG_WRITER

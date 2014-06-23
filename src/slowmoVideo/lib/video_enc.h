@@ -12,20 +12,20 @@ class VideoWriter
 public:
     virtual ~VideoWriter() {};
     virtual int writeFrame(const QImage& frame) = 0;
-    virtual int exportFrames(const char* filepattern) = 0;
+    virtual int exportFrames(QString filepattern) = 0;
 };
 
-VideoWriter* CreateVideoWriter( const char* filename, int width,int height,double fps,int use_qt);
+VideoWriter* CreateVideoWriter( const char* filename, int width,int height,double fps,int use_qt,const char* codec);
 void ReleaseVideoWriter( VideoWriter** pwriter );
 int WriteFrame( VideoWriter* writer, const QImage& frame);
-int exportFrames(VideoWriter* pwriter,const char* filepattern);
+int exportFrames(VideoWriter* pwriter,QString filepattern);
 
 /* lib dependant ... */
 
 
-VideoWriter* CreateVideoWriter_FFMPEG(const char* filename, int width,int height,double fps);
+VideoWriter* CreateVideoWriter_FFMPEG(const char* filename, int width,int height,double fps,const char* codec);
 
-VideoWriter* CreateVideoWriter_QT ( const char* filename, int width,int height,double fps);
+VideoWriter* CreateVideoWriter_QT ( const char* filename, int width,int height,double fps,const char* codec);
 
 #endif /* _VID_W_H */
 

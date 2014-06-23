@@ -1,7 +1,9 @@
 /*
  * class to export a movie using ffmpeg
 */
-
+#include <QtCore/QCoreApplication>
+#include <QtCore/QProcess>
+#include <QtCore/QSettings>
 #include <QImage>
 
 #include "video_enc.h"
@@ -17,10 +19,13 @@ VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,cons
 	if (vcodec != 0)
 		m_vcodec = strdup(vcodec);
 	else 
-		m_vcodec = 0;
+		m_vcodec = strdup("libx264 -b:v 5000k ");;
 	
 	Fps_sV m_fps(fps);
 	movieFPS = fps;
+	mHeight = height;
+	mWidth = width;
+
 #if 0	
 	char *pcodec = NULL;
     if (m_vcodec.length() > 0) {
@@ -42,6 +47,8 @@ VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,cons
 
 VideoFFMPEG::~VideoFFMPEG()
 {
+	//TODO:
+	//m_dirFramesOrig.rmdir(".");
 	free(m_vcodec);
 	free(m_filename);
 	free(m_videoOut);
@@ -53,32 +60,43 @@ int VideoFFMPEG::writeFrame(const QImage& frame)
 	return eatARGB(m_videoOut, frame.bits());
 }
 
-int VideoFFMPEG::exportFrames(const char* filepattern)
+int VideoFFMPEG::exportFrames(QString filepattern)
 {
-	char exec_cmd[1024];
+	QSettings settings;
 
-	fprintf(stderr,"exporting frame from [%s] to %s\n",filepattern,m_filename);
-	// should use preferences for getting ffmpeg path
-	// TODO: more args parameters :
-	// fps, w x h
-        // codec ...
-	snprintf(exec_cmd,sizeof(exec_cmd),
-		"ffmpeg -f image2 -i \"%s\" -r %f -vcodec libx264 -b:v 5000k -s 1920×1080 %s",
-		filepattern,movieFPS,
-		m_filename);
-#if 0
-QProcess process;
-process.start("gedit", QStringList() << "/home/oDx/Documents/a.txt");
-#endif
+	qDebug() << "exporting frame from : " << filepattern << " to " << m_filename;
 
-	fprintf(stderr,"command is : %s\n",exec_cmd);
+	QStringList args;
+
+	args << "-f" << "image2";
+	args << "-i" << filepattern;
+	args << "-r" << QString::number(movieFPS);
+	args << "-vcodec" << m_vcodec;
+	args << "-s" << QString("%1x%2").arg(QString::number(mWidth), QString::number(mHeight));
+	args << m_filename;
+   
+        qDebug() << "Arguments: " << args;
+
+	QProcess process;
+	process.start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
+	if (!process.waitForStarted()) {
+		qDebug() << "can't start encoding !";
+		return 1;
+	}
+
+	process.waitForFinished();
+	qDebug() << process.readAllStandardOutput();
+    	qDebug() << process.readAllStandardError();
+	process.terminate();
+	qDebug() << process.exitStatus();
+
 	return 0;
 }
 
 
-VideoWriter* CreateVideoWriter_FFMPEG( const char* filename, int width, int height, double fps)
+VideoWriter* CreateVideoWriter_FFMPEG( const char* filename, int width, int height, double fps, const char *codec)
 {
-        VideoFFMPEG*  driver=  new VideoFFMPEG	(width,height,fps,0,0,filename);
+        VideoFFMPEG*  driver=  new VideoFFMPEG	(width,height,fps,codec,0,filename);
         return driver;
 }
 

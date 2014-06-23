@@ -24,7 +24,8 @@ exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask
     AbstractRenderTarget_sV(parentRenderTask)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    QTemporaryDir tempDir("slowmovideo");
+    //QTemporaryDir tempDir("slowmovideo");
+    QTemporaryDir tempDir;; // use default
     if (tempDir.isValid()) 
     	m_targetDir = QDir(tempDir.path());
     else 
@@ -38,7 +39,8 @@ qDebug() << "  target dir " << m_targetDir;
 
 exportVideoRenderTarget::~exportVideoRenderTarget()
 {
-    
+	// QT bug ?
+ 	m_targetDir.rmdir(".");
 }
 
 void exportVideoRenderTarget::setTargetFile(const QString &filename)
@@ -78,7 +80,7 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 	writer = CreateVideoWriter(m_filename.toStdString().c_str(),
     		renderTask()->resolution().width(),
     		renderTask()->resolution().height(),
-    		renderTask()->fps().fps(),1);
+    		renderTask()->fps().fps(),1,m_vcodec.toStdString().c_str());
     
    
     if (writer == 0) {
