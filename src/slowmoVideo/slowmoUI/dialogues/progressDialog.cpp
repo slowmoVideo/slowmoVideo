@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QtCore/QDebug>
 
+#include "notificator.h"
+
 ProgressDialog::ProgressDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ProgressDialog)
@@ -75,4 +77,9 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
         slotTaskItemDescription(tr("Task finished."));
     }
     setWindowTitle(tr("(Finished) %1").arg(windowTitle()));
+// display OS notification
+    Notificator* notif;
+    notif = new Notificator("simple");
+
+    notif->notify(Notificator::Information, tr("(Finished) %1").arg(windowTitle()), tr("Task finished in %1.").arg(timePassed));
 }

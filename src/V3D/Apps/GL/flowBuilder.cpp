@@ -8,6 +8,10 @@
 
 #include <iostream>
 
+#include <OpenGL/gl.h>
+#include <OpenGL/CGLTypes.h>
+#include <OpenGL/OpenGL.h>
+
 #include <GL/glew.h>
 #ifdef __APPLE__
 #include <glut.h>
@@ -308,6 +312,16 @@ int main( int argc, char** argv)
       cerr << "Error, couldn't open window" << std::endl;
       return -1;
    }
+
+#ifdef __APPLE__
+   CGLContextObj ctx = CGLGetCurrentContext();
+   char *vendor = (char*)glGetString(GL_VENDOR);
+   printf("vendor: %s\n",vendor);
+
+   CGLSetVirtualScreen(ctx, 1); // second GPU ?
+   vendor = (char*)glGetString(GL_VENDOR);
+   printf("vendor: %s\n",vendor);
+#endif
 
    glutDisplayFunc(drawscene);
    glutMainLoop();

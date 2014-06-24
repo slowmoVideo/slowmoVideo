@@ -27,6 +27,15 @@ set(SRCS
   dialogues/aboutDialog.cpp
 )
 
+# notification
+if (APPLE)
+set(SRCS
+        ${SRCS}
+        notificator.cpp
+        macnotificationhandler.mm
+)
+endif()
+
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
@@ -62,6 +71,14 @@ set(SRCS_MOC
   dialogues/aboutDialog.h
 )
 
+# notification
+if (APPLE)
+set(SRCS_MOC
+        ${SRCS_MOC}
+        notificator.h
+        macnotificationhandler.h
+)
+endif()
 
 if(APPLE)
 	set(BUNDLE "slowmoUI")
