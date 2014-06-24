@@ -208,11 +208,13 @@ int VideoQT::exportFrames(QString filepattern)
     NSString *fullFilename;
         
 	qDebug() << "exporting frame from : " << filepattern << " to " << destPath;
-
+	NSLog(@"export to @%", destPath);
+	
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-    inputPath = [[NSURL fileURLWithPath:[[NSString stringWithUTF8String:filepattern.toStdString().c_str()]
+    NSString* inputdir = [[NSURL fileURLWithPath:[[NSString stringWithUTF8String:filepattern.toStdString().c_str()]
                     stringByExpandingTildeInPath]] path];
-                    
+    inputPath = [inputdir  stringByDeletingLastPathComponent];
+                
     imageFiles = [fileManager contentsOfDirectoryAtPath:inputPath error:&err];
     imageFiles = [imageFiles sortedArrayUsingSelector:@selector(localizedStandardCompare:)];
     
@@ -224,7 +226,16 @@ int VideoQT::exportFrames(QString filepattern)
             NSAutoreleasePool *innerPool = [[NSAutoreleasePool alloc] init];
             image = [[NSImage alloc] initWithContentsOfFile:fullFilename];
         
-        
+        	//NSLog(@"adding %@",fullFilename);
+        	
+        	[mMovie addImage:image
+       			 forDuration:duration
+     			  withAttributes:imageAttributes];
+    
+    		if (![mMovie updateMovieFile]) {
+        			fprintf(stderr, "Didn't successfully update movie file. \n" );
+					return 1;
+			}
             [image release];
             [innerPool release];
         }
