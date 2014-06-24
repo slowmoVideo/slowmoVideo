@@ -25,10 +25,16 @@ set(SRCS_PROJ
   shutterFunctionList_sV.cpp
   motionBlur_sV.cpp
   canvasObject_sV.h
-  new_videoRenderTarget.cpp
   exportVideoRenderTarget.cpp
   work_flow.cpp
 )
+
+if (OLD_FFMPEG)
+set(SRCS_PROJ
+	${SRCS_PROJ}
+  new_videoRenderTarget.cpp
+)
+endif()
 
 set(SRCS_MOC
   project_sV.h

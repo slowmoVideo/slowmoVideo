@@ -57,7 +57,9 @@ VideoFFMPEG::~VideoFFMPEG()
     
 int VideoFFMPEG::writeFrame(const QImage& frame)
 {
+#if 0
 	return eatARGB(m_videoOut, frame.bits());
+#endif
 }
 
 int VideoFFMPEG::exportFrames(QString filepattern)

@@ -219,7 +219,7 @@ RenderTask_sV* RenderingDialog::buildTask()
 #if 0
             newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
 #else
-	#warning "using dummy version"
+	#warning "using fork version"
             exportVideoRenderTarget *renderTarget = new exportVideoRenderTarget(task);
 #endif
     #else

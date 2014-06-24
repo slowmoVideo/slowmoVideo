@@ -47,10 +47,16 @@ set(LIB_SRC_ENCODE
   macros_sV.h
   video_enc.h
   ffmpeg_writer.h
-  ffmpegEncode_sV.c
   ffmpeg_writer.cpp
   video_enc.cpp
 )
+
+if (OLD_FFMPEG)
+set(LIB_SRC_ENCODE
+	${LIB_SRC_ENCODE}
+	  ffmpegEncode_sV.c
+)
+endif()
 
 if (APPLE AND USE_QTKIT)
 set(LIB_SRC_ENCODE

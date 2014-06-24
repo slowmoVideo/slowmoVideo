@@ -16,11 +16,17 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/xmlProjectRW_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
+
 #ifdef USE_FFMPEG
+#if 0
 #include "project/new_videoRenderTarget.h"
+#else
+#include "project/exportVideoRenderTarget.h"
+#endif
 #else
 #include "project/videoRenderTarget_sV.h"
 #endif
+
 #include "project/flowSourceV3D_sV.h"
 
 #include <iostream>
@@ -91,8 +97,13 @@ void SlowmoRenderer_sV::setFps(double fps)
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
 {
 #ifdef USE_FFMPEG
+#if 0
 	#warning "using QTKit version"
-    newVideoRenderTarget *vrt = new newVideoRenderTarget(m_project->renderTask());     
+    newVideoRenderTarget *vrt = new newVideoRenderTarget(m_project->renderTask()); 
+#else
+    #warning "using fork version"
+    exportVideoRenderTarget *vrt = new exportVideoRenderTarget(m_project->renderTask());    
+#endif
 #else
 	#warning "should not use this"
     VideoRenderTarget_sV *vrt = new VideoRenderTarget_sV(m_project->renderTask());
