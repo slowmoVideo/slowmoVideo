@@ -81,5 +81,5 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
     Notificator* notif;
     notif = new Notificator("simple");
 
-    notif->notify(Notificator::Information, tr("(Finished) %1").arg(windowTitle()), tr("Task finished in %1.").arg(timePassed));
+    notif->notify(Notificator::Information, windowTitle(), tr("Task finished in %1.").arg(timePassed));
 }
