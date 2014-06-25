@@ -41,6 +41,10 @@ VideoInfoSV getInfo(const char filename[])
     if ((ret = avformat_open_input(&pFormatContext, filename, NULL, NULL)) != 0) {
 #endif
         printf("Could not open file %s.\n", filename);
+	avformat_close_input(&pFormatContext);
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_deinit();
+#endif
         return info;
     }
 #if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(53,9,0)
@@ -49,6 +53,10 @@ VideoInfoSV getInfo(const char filename[])
     if (avformat_find_stream_info(pFormatContext, NULL) < 0) {
 #endif
         printf("No stream information found.\n");
+	avformat_close_input(&pFormatContext);
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_deinit();
+#endif
         return info;
     }
 #if LIBAVFORMAT_VERSION_MAJOR < 53
@@ -82,7 +90,11 @@ VideoInfoSV getInfo(const char filename[])
         }
     }
 
-    av_free(pFormatContext);
+    avformat_close_input(&pFormatContext);
+   // av_free(pFormatContext);
+#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53,19,0)
+    avformat_network_deinit();
+#endif
     return info;
 }
 
