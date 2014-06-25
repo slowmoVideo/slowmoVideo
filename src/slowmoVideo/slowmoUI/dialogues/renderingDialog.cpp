@@ -222,6 +222,11 @@ RenderTask_sV* RenderingDialog::buildTask()
 	#warning "using fork version"
             exportVideoRenderTarget *renderTarget = new exportVideoRenderTarget(task);
 #endif
+			const bool use_qt = ui->use_qt->isChecked();
+			if (!use_qt) {
+				qDebug() << "using classical FFMPEG";
+				renderTarget->setQT(0);
+			}
     #else
 	#warning "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);

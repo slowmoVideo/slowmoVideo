@@ -36,8 +36,9 @@ public:
     void setVcodec(const QString& codec);
 
     void closeRenderTarget() throw(Error_sV);
- 	
 
+	void setQT(int use) { use_qt = use;};
+		
 public slots:
     void slotConsumeFrame(const QImage &image, const int frameNumber);
 
@@ -48,7 +49,8 @@ private:
 
     int m_width;
     int m_height;
-
+	int use_qt;
+	
     // png temp
     QDir m_targetDir;
     QString m_filenamePattern;

@@ -35,6 +35,8 @@ exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask
 qDebug() << "  target dir " << m_targetDir;
 
     m_filenamePattern = "rendered-%1.png";
+    
+    use_qt = 1;
 }
 
 exportVideoRenderTarget::~exportVideoRenderTarget()
@@ -80,7 +82,7 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 	writer = CreateVideoWriter(m_filename.toStdString().c_str(),
     		renderTask()->resolution().width(),
     		renderTask()->resolution().height(),
-    		renderTask()->fps().fps(),1,m_vcodec.toStdString().c_str());
+    		renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
     
    
     if (writer == 0) {
