@@ -306,7 +306,10 @@ int main( int argc, char** argv)
 #ifdef USE_RAW_X11
    drawscene(); 
 #else
-   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+   glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+//   glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
+//   glutInitContextProfile(GLUT_CORE_PROFILE);
+
 
    if (!glutCreateWindow("GPU TV-L1 Optic Flow")) {
       cerr << "Error, couldn't open window" << std::endl;
@@ -316,11 +319,17 @@ int main( int argc, char** argv)
 #ifdef __APPLE__
    CGLContextObj ctx = CGLGetCurrentContext();
    char *vendor = (char*)glGetString(GL_VENDOR);
+   char *renderer = (char*)glGetString(GL_RENDERER);
+   char *version = (char*)glGetString(GL_VERSION);
    printf("vendor: %s\n",vendor);
+   fprintf(stderr,"%s\n%s\n", 
+        renderer,  // e.g. Intel HD Graphics 3000 OpenGL Engine
+        version    // e.g. 3.2 INTEL-8.0.61
+        );
 
-   CGLSetVirtualScreen(ctx, 1); // second GPU ?
-   vendor = (char*)glGetString(GL_VENDOR);
-   printf("vendor: %s\n",vendor);
+//   CGLSetVirtualScreen(ctx, 1); // second GPU ?
+//   vendor = (char*)glGetString(GL_VENDOR);
+//   printf("vendor: %s\n",vendor);
 #endif
 
    glutDisplayFunc(drawscene);
