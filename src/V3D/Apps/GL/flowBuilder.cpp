@@ -8,13 +8,15 @@
 
 #include <iostream>
 
-#include <OpenGL/gl.h>
-#include <OpenGL/CGLTypes.h>
-#include <OpenGL/OpenGL.h>
 
 #include <GL/glew.h>
 #ifdef __APPLE__
 #include <glut.h>
+
+#include <OpenGL/gl.h>
+#include <OpenGL/CGLTypes.h>
+#include <OpenGL/OpenGL.h>
+
 #elif defined(_WIN32)
 #include <GL/glut.h>
 #else

@@ -25,13 +25,13 @@ set(SRCS
   dialogues/flowExaminer.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
+        notificator.cpp
 )
 
 # notification
 if (APPLE)
 set(SRCS
         ${SRCS}
-        notificator.cpp
         macnotificationhandler.mm
 )
 endif()
@@ -69,13 +69,13 @@ set(SRCS_MOC
   dialogues/flowExaminer.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
+        notificator.h
 )
 
 # notification
 if (APPLE)
 set(SRCS_MOC
         ${SRCS_MOC}
-        notificator.h
         macnotificationhandler.h
 )
 endif()
