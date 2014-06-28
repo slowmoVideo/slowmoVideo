@@ -13,6 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project_sV.h"
 #include "abstractFrameSource_sV.h"
 #include "../lib/flowRW_sV.h"
+#include "../lib/flowField_sV.h"
 
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -44,10 +45,11 @@ void FlowSourceOpenCV_sV::createDirectories()
 
 
 
-
+// TODO: check usage of cflowmap ? create a branch ?
 void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
                     double, const Scalar& color, std::string flowname )
 {
+
   cv::Mat log_flow, log_flow_neg;
   //log_flow = cv::abs( flow/3.0 );
   cv::log(cv::abs(flow)*3 + 1, log_flow);
@@ -57,25 +59,15 @@ void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
 
   float max_flow = 0.0;
 
-  const std::string m_magicNumber = "flow_sV";
-  const char m_version = 1;
-  const int width = cflowmap.cols;
-  const int height = cflowmap.rows;
-
-  // make an sVflow file like  FlowRW_sV::save()
-  std::ofstream file(flowname.c_str(), std::ios_base::out|std::ios_base::binary);
-  file.write((char*) m_magicNumber.c_str(), m_magicNumber.length()*sizeof(char));
-  file.write((char*) &m_version, sizeof(char));
-  file.write((char*) &width, sizeof(int));
-  file.write((char*) &height, sizeof(int));
+  FlowField_sV flowField(cflowmap.cols, cflowmap.rows);
 
     for(int y = 0; y < cflowmap.rows; y += step)
         for(int x = 0; x < cflowmap.cols; x += step)
         {
             const Point2f& fxyo = flow.at<Point2f>(y, x);
 
-            file.write((char*) &fxyo.x, sizeof(float));
-            file.write((char*) &fxyo.y, sizeof(float));
+            flowField.setX(x, y, fxyo.x);
+            flowField.setY(x, y, fxyo.y);
 
             Point2f& fxy = log_flow.at<Point2f>(y, x);
             const Point2f& fxyn = log_flow_neg.at<Point2f>(y, x);
@@ -91,13 +83,16 @@ void drawOptFlowMap(const Mat& flow, Mat& cflowmap, int step,
             cv::Scalar col = cv::Scalar(offset + fxy.x*scale, offset + fxy.y*scale, offset);
             //line(cflowmap, Point(x,y), Point(cvRound(x+fxy.x), cvRound(y+fxy.y)),
             //     color);
-            circle(cflowmap, Point(x,y), 0, col, -1);
+            //TODO: usefullness ?
+            //circle(cflowmap, Point(x,y), 0, col, -1);
 
             if (fabs(fxy.x) > max_flow) max_flow = fabs(fxy.x);
             if (fabs(fxy.y) > max_flow) max_flow = fabs(fxy.y);
         }
 
   std::cout << max_flow << " max flow" << std::endl;
+
+  FlowRW_sV::save(flowname, &flowField);
 }
 
 const QString FlowSourceOpenCV_sV::flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const
@@ -128,18 +123,21 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         time.start();
 
         Mat prevgray, gray, flow, cflow;
+        QString prevpath = project()->frameSource()->framePath(leftFrame, frameSize);
+        QString path = project()->frameSource()->framePath(rightFrame, frameSize);
 //        namedWindow("flow", 1);
 
-        prevgray = imread(project()->frameSource()->framePath(leftFrame, frameSize).toStdString(), 0);
-        gray = imread(project()->frameSource()->framePath(rightFrame, frameSize).toStdString(), 0);
+		qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
+		
+        prevgray = imread(prevpath.toStdString(), 0);
+        gray = imread(path.toStdString(), 0);
 
         //cvtColor(l1, prevgray, CV_BGR2GRAY);
         //cvtColor(l2, gray, CV_BGR2GRAY);
 
         {
 
-            if( prevgray.data )
-            {
+            if( prevgray.data ) {
                 const float pyrScale = 0.5;
                 const float levels = 3;
                 const float winsize = 15;
@@ -165,6 +163,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                 drawOptFlowMap(flow, cflow, 1, 1.5, CV_RGB(0, 255, 0), flowFileName.toStdString());
                 //imshow("flow", cflow);
                 //imwrite(argv[4],cflow);
+            } else {
+                qDebug() << "imread: Could not read image " << prevpath;
+                throw FlowBuildingError(QString("imread: Could not read image " + prevpath));
             }
         }
 

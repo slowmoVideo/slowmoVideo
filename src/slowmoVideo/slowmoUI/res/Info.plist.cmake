@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+		<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>sVproj</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+			<key>CFBundleTypeName</key>
+			<string>slowmoVideo Project File</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>XML</string>
+		</dict>‹
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>${PROGNAME}</string>
+	<key>CFBundleGetInfoString</key>
+	<string>${MACOSX_BUNDLE_INFO_STRING}</string>
+	<key>CFBundleIconFile</key>
+	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+	<key>CFBundleName</key>
+	<string>${BUNDLE}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+</dict>
+</plist>

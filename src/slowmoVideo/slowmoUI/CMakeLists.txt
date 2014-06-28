@@ -4,6 +4,7 @@
 # http://www.cmake.org/pipermail/cmake/2008-September/023908.html
 
 
+
 include_directories(${slowmoVideo_SOURCE_DIR})
 
 set(SRCS
@@ -59,6 +60,30 @@ set(SRCS_MOC
 )
 
 
+if(APPLE)
+	set(BUNDLE "slowmoUI")
+	set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/slowmoVideo/slowmoUI/res")
+        message( "OS X build" )
+        set(MACOSX_BUNDLE_INFO_STRING "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_BUNDLE_VERSION "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_LONG_VERSION_STRING "${BUNDLE} ${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+        set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+        set(MACOSX_BUNDLE_ICON_FILE "slowmoUI.icns")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+        set(MACOSX_BUNDLE_BUNDLE_NAME "${BUNDLE}")
+
+        set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${BUNDLE}.app/Contents/Resources")
+        set(MACOSX_BUNDLE_ICON "${ICONS_DIR}/${MACOSX_BUNDLE_ICON_FILE}")
+	SET_SOURCE_FILES_PROPERTIES(
+	   ${MACOSX_BUNDLE_ICON} 
+	    PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+        message(STATUS "Bundle will be : ${MACOSX_BUNDLE} =>  ${PROJECT_NAME} ")
+
+	set( SRCS ${SRCS} ${MACOSX_BUNDLE_ICON} )
+
+endif()
+
 # Without these includes the promoted widgets fail to compile
 # since the headers are not found. (For whatever reason.)
 include_directories(dialogues)
@@ -76,7 +101,27 @@ qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
-add_executable(slowmoUI ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
+
+
+add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 target_link_libraries(slowmoUI sVproj sVvis sVgui ${EXTERNAL_LIBS})
 
-install(TARGETS slowmoUI DESTINATION bin)
+if(APPLE)
+  configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+  set_target_properties(${PROGNAME} PROPERTIES
+                        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+endif()
+
+install(TARGETS ${slowmoUI}
+        BUNDLE DESTINATION . COMPONENT Runtime
+        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
+
+if (APPLE)
+	install(TARGETS slowmoUI DESTINATION ".")
+       include(DeployQt4)
+       install_qt4_executable(slowmoUI.app "" ""  )
+	
+else()
+	install(TARGETS slowmoUI DESTINATION ${DEST})
+endif()
+

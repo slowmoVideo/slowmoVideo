@@ -11,5 +11,5 @@ if(V3DLIB_ENABLE_GPGPU)
   )
 endif (V3DLIB_ENABLE_GPGPU)
 
-install(TARGETS slowmoFlowBuilder DESTINATION bin)
+install(TARGETS slowmoFlowBuilder DESTINATION ${DEST})
 
