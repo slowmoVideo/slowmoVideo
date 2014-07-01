@@ -69,7 +69,6 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
         m_project->replaceRenderTask(task);
         task->renderPreferences().setFps(24);
         task->setTimeRange(m_start, m_end);
-        task->setQtConnectionType(Qt::AutoConnection);
 
         connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
         connect(m_project->renderTask(), SIGNAL(signalTaskProgress(int)), this, SLOT(slotProgressInfo(int)));
