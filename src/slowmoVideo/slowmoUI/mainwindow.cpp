@@ -197,6 +197,10 @@ MainWindow::~MainWindow()
         delete m_project;
     }
 
+	// shoudl check task ?
+	m_rendererThread.quit();
+	m_rendererThread.wait();
+	
     if (m_progressDialog != NULL) {
         delete m_progressDialog;
     }
@@ -563,11 +567,22 @@ void MainWindow::slotShowRenderDialog()
         connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
         connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
         connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
-        connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
+        //connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
 
+		connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
+    	connect(&m_rendererThread, SIGNAL(started()), task, SLOT(slotContinueRendering()));
+    	//TODO: connect(task, SIGNAL(finished()), m_rendererThread, SLOT(quit()), Qt::DirectConnection);
+    	//connect(workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    	// let's start
+    	m_rendererThread.wait(); // If the thread is not running, this will immediately return.
+    
+    	
+    
         m_renderProgressDialog->show();
 
-        emit signalRendererContinue();
+        //emit signalRendererContinue();
+        //m_rendererThread.exec ();
+        task->requestWork();
         m_rendererThread.start();
 
     }
