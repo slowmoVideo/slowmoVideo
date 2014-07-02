@@ -21,7 +21,6 @@ RenderTask_sV::RenderTask_sV(Project_sV *project) :
 m_project(project),
 m_renderTarget(NULL),
 m_renderTimeElapsed(0),
-m_initialized(false),
 m_stopRendering(false),
 m_prevTime(-1)
 {
@@ -95,7 +94,10 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
-
+/*
+ * this is the real workhorse.
+ * maybe we should not call this directly, but instead from doWork ?
+ */
 void RenderTask_sV::slotContinueRendering()
 {
     //qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();   
@@ -114,7 +116,13 @@ void RenderTask_sV::slotContinueRendering()
     
     Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5) == framesBefore);
     
-    m_renderTarget->openRenderTarget();
+    try {
+    	m_renderTarget->openRenderTarget();
+    } catch (Error_sV &err) {
+            m_stopRendering = true;
+            emit signalRenderingAborted(tr("Rendering aborted.") + " " + err.message());
+            return;
+    }
     
     // render loop
     // TODO: add more threading here
@@ -125,7 +133,10 @@ void RenderTask_sV::slotContinueRendering()
         mutex.unlock();
         
         if (abort) {
+        	// user stop the process
             qDebug()<<"Aborting Rendering process in Thread "<<thread()->currentThreadId();
+            emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+        	qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
             break;
         }
         

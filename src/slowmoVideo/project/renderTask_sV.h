@@ -69,7 +69,6 @@ private:
     QTime m_stopwatch;
     int m_renderTimeElapsed;
 
-    bool m_initialized;
     bool m_stopRendering; //  Process is aborted when true
     qreal m_nextFrameTime;
 
