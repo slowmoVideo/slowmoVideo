@@ -98,9 +98,10 @@ QSize RenderTask_sV::resolution()
 
 void RenderTask_sV::slotContinueRendering()
 {
-    qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();
-    
+    //qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();   
     /* real workhorse */
+    emit signalNewTask(trUtf8("Rendering Slow-Mo …"), int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
+    
     //TODO: initialize
     m_stopwatch.start();
     
@@ -114,6 +115,7 @@ void RenderTask_sV::slotContinueRendering()
     Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5) == framesBefore);
     
     m_renderTarget->openRenderTarget();
+    
     // render loop
     // TODO: add more threading here
     while(m_nextFrameTime<m_timeEnd) {
@@ -133,11 +135,14 @@ void RenderTask_sV::slotContinueRendering()
         
         qDebug() << "Rendering frame number " << outputFrame << " @" << m_nextFrameTime << " from source time " << srcTime;
         emit signalItemDesc(tr("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
-                            .arg(outputFrame).arg(m_nextFrameTime).arg(srcTime).arg(srcTime*m_project->frameSource()->fps()->fps()));
-        
-        
+                            .arg( QString::number(outputFrame),QString::number(m_nextFrameTime),
+                                  QString::number(srcTime),
+                                  QString::number(srcTime*m_project->frameSource()->fps()->fps())
+                             ) );
+           
         //emit valueChanged(QString::number(m_nextFrameTime));
         emit signalTaskProgress( (m_nextFrameTime-m_timeStart) * m_prefs.fps().fps() );
+        
         m_nextFrameTime = m_nextFrameTime + 1/m_prefs.fps().fps();
         
     } /* while */
@@ -154,5 +159,5 @@ void RenderTask_sV::slotContinueRendering()
     emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
     qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
     
-    qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
+    //qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
 }

@@ -95,8 +95,8 @@ signals:
     void signalRenderingStopped(QString renderTime);
     void signalRenderingFinished(QString renderTime);
     void signalRenderingAborted(QString reason);
-    
-    //void signalFrameRendered(qreal time, int frameNumber);
+       
+    void signalNewTask(QString desc, int taskSize);
     
 public slots:
     void slotContinueRendering();
