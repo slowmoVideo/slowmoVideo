@@ -18,20 +18,20 @@
 #include "../lib/defs_sV.hpp"
 
 RenderTask_sV::RenderTask_sV(Project_sV *project) :
-    m_project(project),
-    m_renderTarget(NULL),
-    m_renderTimeElapsed(0),
-    m_initialized(false),
-    m_stopRendering(false),
-    m_prevTime(-1)
+m_project(project),
+m_renderTarget(NULL),
+m_renderTimeElapsed(0),
+m_initialized(false),
+m_stopRendering(false),
+m_prevTime(-1)
 {
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
-
+    
     m_nextFrameTime = m_project->nodes()->startTime();
-
+    
     _working =false;
-
+    
 }
 
 //TODO:
@@ -51,12 +51,13 @@ void RenderTask_sV::requestWork()
     emit workFlowRequested();
 }
 
-void RenderTask_sV::abort()
+
+void RenderTask_sV::slotStopRendering()
 {
     mutex.lock();
     if (_working) {
         m_stopRendering = true;
-        qDebug()<<"OpticalFlow worker aborting in Thread "<<thread()->currentThreadId();
+        qDebug()<<"rendering aborting in Thread "<<thread()->currentThreadId();
     }
     mutex.unlock();
 }
@@ -64,7 +65,7 @@ void RenderTask_sV::abort()
 void RenderTask_sV::setRenderTarget(AbstractRenderTarget_sV *renderTarget)
 {
     Q_ASSERT(renderTarget != NULL);
-
+    
     if (m_renderTarget != NULL && m_renderTarget != renderTarget) {
         delete m_renderTarget;
     }
@@ -76,7 +77,7 @@ void RenderTask_sV::setTimeRange(qreal start, qreal end)
     Q_ASSERT(start <= end);
     Q_ASSERT(start >= m_project->nodes()->startTime());
     Q_ASSERT(end <= m_project->nodes()->endTime());
-
+    
     m_timeStart = start;
     m_timeEnd = end;
 }
@@ -94,27 +95,28 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
-void RenderTask_sV::slotStopRendering()
-{
-    m_stopRendering = true;
-}
 
-//TODO: call abstractflow source method
-/**
- *  doWorkFlow
- * call optical flow on each frame
- */
 void RenderTask_sV::slotContinueRendering()
 {
-    qDebug()<<"Starting OpticalFlow process in Thread "<<thread()->currentThreadId();
+    qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();
     
     /* real workhorse */
-   //TODO: initialize
-   m_nextFrameTime=m_timeStart;
-
-   // render loop 
-   // TODO: add more threading here
-   while(m_nextFrameTime<m_timeEnd) {
+    //TODO: initialize
+    m_stopwatch.start();
+    
+    m_nextFrameTime=m_timeStart;
+    
+    int framesBefore;
+    qreal snapped = m_project->snapToOutFrame(m_nextFrameTime, false, m_prefs.fps(), &framesBefore);
+    qDebug() << "Frame snapping in from " << m_nextFrameTime << " to " << snapped;
+    m_nextFrameTime = snapped;
+    
+    Q_ASSERT(int((m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5) == framesBefore);
+    
+    m_renderTarget->openRenderTarget();
+    // render loop
+    // TODO: add more threading here
+    while(m_nextFrameTime<m_timeEnd) {
         // Checks if the process should be aborted
         mutex.lock();
         bool abort = m_stopRendering;
@@ -124,15 +126,19 @@ void RenderTask_sV::slotContinueRendering()
             qDebug()<<"Aborting Rendering process in Thread "<<thread()->currentThreadId();
             break;
         }
-       
-	// do the work 
-	int outputFrame = (m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5;
-
-	qDebug() << "rendering at time " << m_nextFrameTime;
-
-        emit valueChanged(QString::number(m_nextFrameTime));
-	//TODO: emit signalTaskProgress( (time-m_timeStart) * m_prefs.fps().fps() );
-	m_nextFrameTime = m_nextFrameTime + 1/m_prefs.fps().fps();
+        
+        // do the work
+        int outputFrame = (m_nextFrameTime - m_project->nodes()->startTime()) * m_prefs.fps().fps() + .5;
+        qreal srcTime = m_project->nodes()->sourceTime(m_nextFrameTime);
+        
+        qDebug() << "Rendering frame number " << outputFrame << " @" << m_nextFrameTime << " from source time " << srcTime;
+        emit signalItemDesc(tr("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
+                            .arg(outputFrame).arg(m_nextFrameTime).arg(srcTime).arg(srcTime*m_project->frameSource()->fps()->fps()));
+        
+        
+        //emit valueChanged(QString::number(m_nextFrameTime));
+        emit signalTaskProgress( (m_nextFrameTime-m_timeStart) * m_prefs.fps().fps() );
+        m_nextFrameTime = m_nextFrameTime + 1/m_prefs.fps().fps();
         
     } /* while */
     
@@ -141,15 +147,12 @@ void RenderTask_sV::slotContinueRendering()
     mutex.lock();
     _working = false;
     mutex.unlock();
-
-   //TODO: closing rendering project
-   m_renderTarget->closeRenderTarget();
-   m_renderTimeElapsed += m_stopwatch.elapsed();
-   //TODO: check emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
-   qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
-
-    qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
     
-    // the finished signal is sent
-    emit finished();
+    //TODO: closing rendering project
+    m_renderTarget->closeRenderTarget();
+    m_renderTimeElapsed += m_stopwatch.elapsed();
+    emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+    qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
+    
+    qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
 }

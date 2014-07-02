@@ -81,14 +81,22 @@ signals:
      * requestWork()
      */
     void workFlowRequested();
+  
     /**
-     * This signal is emitted when counted value is changed (every sec)
+     *  signal rendering progression
      */
-    void valueChanged(const QString &value);
+    void signalItemDesc(QString desc);
+    void signalTaskProgress(int value);
+    
     /**
      * This signal is emitted when process is finished (or being aborted)
      */
-    void finished();
+    void signalRenderingContinued();
+    void signalRenderingStopped(QString renderTime);
+    void signalRenderingFinished(QString renderTime);
+    void signalRenderingAborted(QString reason);
+    
+    //void signalFrameRendered(qreal time, int frameNumber);
     
 public slots:
     void slotContinueRendering();

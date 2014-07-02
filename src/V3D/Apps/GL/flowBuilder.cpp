@@ -308,8 +308,8 @@ int main( int argc, char** argv)
 #ifdef USE_RAW_X11
    drawscene(); 
 #else
-   //glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-   glutInitDisplayMode( GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+   glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+   //glutInitDisplayMode( GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 //   glutInitContextVersion(3,2); /* or later versions, core was introduced only with 3.2 */
 //   glutInitContextProfile(GLUT_CORE_PROFILE);
 
