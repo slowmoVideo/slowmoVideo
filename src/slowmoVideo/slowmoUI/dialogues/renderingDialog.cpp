@@ -32,6 +32,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QSettings> // TODO: better
+#include <QMessageBox>
 
 RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QDialog(parent),
@@ -231,6 +232,20 @@ RenderTask_sV* RenderingDialog::buildTask()
 	#warning "should not use this"
             VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
 	#endif
+			// check if file exist
+			QFile filetest(ui->videoOutputFile->text());
+			if (filetest.exists()) {
+				int r = QMessageBox::warning(this, tr("slowmoUI"),
+                        tr("The file already exist.\n"
+                           "Do you want to overwrite it ?"),
+                        QMessageBox::Yes | QMessageBox::No);
+                if (r == QMessageBox::Yes) {
+            		filetest.remove();
+        		} else {
+        			//TODO:  maybe should delete task ?
+            		return 0;
+        		}				
+			}
 			renderTarget->setTargetFile(ui->videoOutputFile->text());
             renderTarget->setVcodec(ui->vcodec->text());
 			task->setRenderTarget(renderTarget);

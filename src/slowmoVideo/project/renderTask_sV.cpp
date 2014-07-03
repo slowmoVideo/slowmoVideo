@@ -180,6 +180,7 @@ void RenderTask_sV::slotContinueRendering()
     mutex.unlock();
     
     //TODO: closing rendering project
+    qDebug() << "Rendering : exporting";
     m_renderTarget->closeRenderTarget();
     m_renderTimeElapsed += m_stopwatch.elapsed();
     emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
