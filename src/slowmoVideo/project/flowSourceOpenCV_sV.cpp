@@ -137,6 +137,10 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 
 void FlowSourceOpenCV_sV::initGPUDevice(int dev)
 {
+   if (dev == -1) {
+	qDebug() << "bad OCL device : " << dev << "for rendering not using it !";
+	use_gpu = 0;
+   } else {
 	qDebug() << "using OCL device : " << dev << "for rendering";
 	use_gpu = 1;
 	ocl::PlatformsInfo platforms;
@@ -147,6 +151,7 @@ void FlowSourceOpenCV_sV::initGPUDevice(int dev)
       
     ocl::setDevice(devInfo[dev]);
     std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
+  }
 }
         		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()

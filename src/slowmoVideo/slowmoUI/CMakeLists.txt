@@ -104,28 +104,6 @@ if(APPLE)
 
 endif()
 
-if (LINUX) 
-	# desktop file section
-	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"
-	"#!/usr/bin/env xdg-open
-	[Desktop Entry]
-	Type=Application
-	Comment=Slow Motion Video
-	Exec=${CMAKE_INSTALL_PREFIX}/bin/slowmoUI
-	GenericName=slowmoVideo
-	Icon=${CMAKE_INSTALL_PREFIX}/share/icons/slowmotion.png
-	MimeType=
-	Name=slowmoUI
-	Terminal=false
-	Categories=Application;Qt;Video\n")
-
-	install ( FILES res/slowmotion.png DESTINATION share/icons )
-	install ( FILES ${PROJECT_BINARY_DIR}/slowmoUI.desktop DESTINATION share/applications
-		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-	)
-endif()
-
-
 # Without these includes the promoted widgets fail to compile
 # since the headers are not found. (For whatever reason.)
 include_directories(dialogues)
@@ -169,17 +147,17 @@ if (UNIX)
 # create desktop file for KDE/Gnome
 # desktop file section
 	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"
-		"#!/usr/bin/env xdg-open
-		[Desktop Entry]
-		Type=Application
-		Comment=Slow Motion Video
-		Exec=${CMAKE_INSTALL_PREFIX}/bin/slowmoUI
-		GenericName=slowmoVideo
-		Icon=${CMAKE_INSTALL_PREFIX}/icons/slowmotion.png
-		MimeType=
-		Name=slowmoUI
-		Terminal=false
-		Categories=Application;Qt;Video\n")
+"#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Comment=Slow Motion Video
+Exec=${CMAKE_INSTALL_PREFIX}/bin/slowmoUI
+GenericName=slowmoVideo
+Icon=${CMAKE_INSTALL_PREFIX}/share/icons/AppIcon.png
+MimeType=
+Name=slowmoUI
+Terminal=false
+Categories=Qt;AudioVideo;Video;\n")
 
 	#install ( FILES icons/slowmoUI.png DESTINATION share/icons )
 	install ( FILES res/AppIcon.png DESTINATION share/icons )
