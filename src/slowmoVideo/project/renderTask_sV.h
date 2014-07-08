@@ -48,6 +48,8 @@ public:
 
     RenderPreferences_sV& renderPreferences() { return m_prefs; }
     
+    void updateProgress();
+    
 private:
     /**
      *  true when Worker is doing work

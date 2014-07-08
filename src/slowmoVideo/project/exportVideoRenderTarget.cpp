@@ -89,7 +89,8 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
         throw Error_sV(QObject::tr("Video could not be prepared .\n"));
     }
 	// loop throught frame ?
-	// TODO: 
+	// TODO:
+    renderTask()->updateProgress();
 	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str());
 	ReleaseVideoWriter( &writer );
 }

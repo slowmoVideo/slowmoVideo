@@ -57,8 +57,11 @@ VideoFFMPEG::~VideoFFMPEG()
     
 int VideoFFMPEG::writeFrame(const QImage& frame)
 {
+    //TODO: check this
 #if 0
 	return eatARGB(m_videoOut, frame.bits());
+#else
+    return 0;
 #endif
 }
 

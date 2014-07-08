@@ -6,7 +6,7 @@
 #include "abstractRenderTarget_sV.h"
 #include "emptyFrameSource_sV.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QImage>
 #include <QMetaObject>
 #include <QTimer>
@@ -45,12 +45,19 @@ void RenderTask_sV::requestWork()
     mutex.lock();
     _working = true;
     m_stopRendering = false;
-    qDebug()<<"OpticalFlow worker start in Thread "<<thread()->currentThreadId();
+    qDebug()<<"rendering worker start in Thread "<<thread()->currentThreadId();
     mutex.unlock();
     
     emit workFlowRequested();
 }
 
+/**
+ *  update progress dialog from outside
+ */
+void RenderTask_sV::updateProgress()
+{
+    emit signalTaskProgress( 100 );
+}
 
 void RenderTask_sV::slotStopRendering()
 {
@@ -96,8 +103,9 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
-/*
- * this is the real workhorse.
+
+/**
+ *  this is the real workhorse.
  * maybe we should not call this directly, but instead from doWork ?
  */
 void RenderTask_sV::slotContinueRendering()
@@ -181,6 +189,7 @@ void RenderTask_sV::slotContinueRendering()
     
     //TODO: closing rendering project
     qDebug() << "Rendering : exporting";
+    emit signalItemDesc(tr("Rendering : exporting"));
     m_renderTarget->closeRenderTarget();
     m_renderTimeElapsed += m_stopwatch.elapsed();
     emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
