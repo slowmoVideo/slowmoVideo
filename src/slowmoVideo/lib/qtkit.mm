@@ -11,6 +11,8 @@
 #include <QImage>
 
 
+#pragma mark - cocoa bridge
+
 // tools for qt 4.8
 // convert pixamp <-> nsimage
 static void drawImageReleaseData (void *info, const void *, size_t)
@@ -68,6 +70,8 @@ NSImage *toNSImage(const QImage& InImage)
 
 // end of tools
 
+
+#pragma mark -
 
 /* TODO :
  "-fps: Frames per second for final movie can be anywhere between 0.1 and 60.0.\n"
@@ -197,6 +201,8 @@ int VideoQT::writeFrame(const QImage& frame)
     return 0;
 }
 
+#pragma mark - 
+
 int VideoQT::exportFrames(QString filepattern)
 {
 	NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
@@ -258,6 +264,8 @@ VideoQT::~VideoQT()
     // TODO: [destPath release];
     [localpool drain];
 }
+
+#pragma mark -  C/C++ bridge
 
 VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps,const char* codec)
 {

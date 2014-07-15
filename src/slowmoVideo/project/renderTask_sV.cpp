@@ -51,6 +51,8 @@ void RenderTask_sV::requestWork()
     emit workFlowRequested();
 }
 
+#pragma mark - progress
+
 /**
  *  update progress dialog from outside
  */
@@ -58,6 +60,8 @@ void RenderTask_sV::updateProgress()
 {
     emit signalTaskProgress( 100 );
 }
+
+#pragma mark - set/get task
 
 void RenderTask_sV::slotStopRendering()
 {
@@ -103,6 +107,8 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
+
+#pragma mark - rendering
 
 /**
  *  this is the real workhorse.
