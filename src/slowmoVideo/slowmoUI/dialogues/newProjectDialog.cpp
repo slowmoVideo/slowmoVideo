@@ -205,7 +205,12 @@ void NewProjectDialog::slotUpdateButtonStates()
 
     if (ui->radioVideo->isChecked()) {
         // Validate the video file
+#if 0
+	// ubuntu can't handle mp4 correctly ?
         if (m_videoInfo.streamsCount > 0 && m_videoInfo.framesCount > 0) {
+#else
+        if (m_videoInfo.streamsCount > 0) {
+#endif
             ui->inputVideo->setStyleSheet(QString("QLineEdit { background-color: %1; }").arg(Colours_sV::colOk.name()));
             m_inputFile = ui->inputVideo->text();
         } else {

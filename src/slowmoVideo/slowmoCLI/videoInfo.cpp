@@ -2,9 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
-extern "C" {
-    #include "../lib/videoInfo_sV.h"
-}
+#include "../lib/videoInfo_sV.h"
 
 void printUsage(const char progName[])
 {

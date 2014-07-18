@@ -15,9 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "nodeList_sV.h"
 #include "renderPreferences_sV.h"
 #include "../lib/defs_sV.hpp"
-extern "C" {
 #include "../lib/videoInfo_sV.h"
-}
 
 
 #include <QtCore/QObject>

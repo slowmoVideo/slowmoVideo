@@ -97,6 +97,13 @@ void Project_sV::init()
     m_renderTask = NULL;
 
     m_v3dFailCounter = 0;
+
+    /* better here ? */
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	worker[tid]=0;
+    	thread[tid]=0;    
+    }
 }
 
 Project_sV::~Project_sV()
