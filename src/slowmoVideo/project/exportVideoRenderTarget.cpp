@@ -79,7 +79,7 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 	VideoWriter* writer;;
 
 	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec;
-	writer = CreateVideoWriter(m_filename.toStdString().c_str(),
+	writer = CreateVideoWriter(m_filename.toStdString().c_str(), renderTask,
     		renderTask()->resolution().width(),
     		renderTask()->resolution().height(),
     		renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
@@ -90,7 +90,7 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
     }
 	// loop throught frame ?
 	// TODO:
-    renderTask()->updateProgress();
+    //renderTask()->updateProgress();
 	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str());
 	ReleaseVideoWriter( &writer );
 }
