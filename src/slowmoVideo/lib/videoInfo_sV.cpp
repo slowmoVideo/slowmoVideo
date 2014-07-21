@@ -43,9 +43,13 @@ VideoInfoSV getInfo(const char filename[])
   
      // Example of output from 0.7 and up releases
     // Stream #0:0: Video: mpeg4 (Simple Profile) (DX50 / 0x30355844), yuv420p, 400x240 [SAR 1:1 DAR 5:3], 23 tbr, 23 tbn, 23 tbc    
+    //  Duration: 00:00:11.13, start: 0.000000, bitrate: 6338 kb/s
+    // Stream #0.0(eng): Video: mpeg4 (Main Profile), yuv420p, 1280x720 [PAR 1:1 DAR 16:9], 6309 kb/s, 30.69 fps, 90k tbn, 300 tbc
+
     qDebug() << "output : " << videoInfo;
     
     // find the source resolution
+    //QRegExp rx("Stream.*Video:.*(([0-9]{2,5})x([0-9]{2,5}))");
     QRegExp rx("Stream.*Video:.*([1-9][0-9]*)x([1-9][0-9]*).*");
     //QRegExp rx("Stream.*Video:.*(\\d{2,})x(\\d{2,}).*");
     //rx.setMinimal(true);
@@ -53,11 +57,12 @@ VideoInfoSV getInfo(const char filename[])
         fprintf(stderr,"Could not find size.\n");
         return info;
     }
- 
+
     info.width = rx.cap(1).toInt();
     info.height = rx.cap(2).toInt();
   
     // find the duration
+    //rx.setPattern("Duration: (([0-9]+):([0-9]{2}):([0-9]{2}).([0-9]+))");
     rx.setPattern("Duration: ([0-9]*):([0-9]*):([0-9]*\\.[0-9]*)");
     if (-1 == rx.indexIn(videoInfo)) {
         fprintf(stderr,"Could not find duration of stream.\n");
@@ -71,10 +76,16 @@ VideoInfoSV getInfo(const char filename[])
     duration = 3600*hours + 60*minutes + seconds;
 
     // container rate
-    rx = QRegExp("Video:.*, ([0-9]*\\.?[0-9]+) tbn");
+    rx = QRegExp("([0-9\\.]+) (fps|tb\(r\))");
     rx.setMinimal(true);
     if (rx.indexIn(videoInfo) !=-1)  {
-            videorate = rx.cap(1).toDouble();
+        videorate = rx.cap(1).toDouble();
+    } else {
+	rx = QRegExp("Video:.*, ([0-9]*\\.?[0-9]+) tbn");
+	rx.setMinimal(true);
+	if (rx.indexIn(videoInfo) !=-1)  {
+		videorate = rx.cap(1).toDouble();
+	}
     }
     
     info.framesCount = duration * videorate;
