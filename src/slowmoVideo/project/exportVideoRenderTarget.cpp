@@ -37,12 +37,14 @@ qDebug() << "  target dir " << m_targetDir;
     m_filenamePattern = "rendered-%1.png";
     
     use_qt = 1;
+    first = 0;
 }
 
 exportVideoRenderTarget::~exportVideoRenderTarget()
 {
 	// QT bug ?
- 	m_targetDir.rmdir(".");
+	qDebug() << "should remove dir : " << m_targetDir;
+ 	m_targetDir.removeRecursively();
 }
 
 void exportVideoRenderTarget::setTargetFile(const QString &filename)
@@ -72,17 +74,25 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
     } else {
         qDebug() << "  Saved frame number " << frameNumber << " to " << path;
     }
+    if (first == 0)
+	first = frameNumber + 1;
 }
 
 void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 {	
 	VideoWriter* writer;;
 
-	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec;
-	writer = CreateVideoWriter(m_filename.toStdString().c_str(),
-    		renderTask()->resolution().width(),
-    		renderTask()->resolution().height(),
-    		renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
+	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec << "starting at " << first;
+	if (m_vcodec.isEmpty()) 
+		writer = CreateVideoWriter(m_filename.toStdString().c_str(),
+			renderTask()->resolution().width(),
+			renderTask()->resolution().height(),
+			renderTask()->fps().fps(),use_qt,0);
+	else
+		writer = CreateVideoWriter(m_filename.toStdString().c_str(),
+			renderTask()->resolution().width(),
+			renderTask()->resolution().height(),
+			renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
     
    
     if (writer == 0) {
@@ -90,7 +100,7 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
     }
 	// loop throught frame ?
 	// TODO: 
-	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str());
+	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str(),first);
 	ReleaseVideoWriter( &writer );
 }
 

@@ -19,7 +19,7 @@ VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,cons
 	if (vcodec != 0)
 		m_vcodec = strdup(vcodec);
 	else 
-		m_vcodec = strdup("libx264 -b:v 5000k ");;
+		m_vcodec = strdup("libx264"); // -b:v 5000k
 	
 	Fps_sV m_fps(fps);
 	movieFPS = fps;
@@ -59,10 +59,12 @@ int VideoFFMPEG::writeFrame(const QImage& frame)
 {
 #if 0
 	return eatARGB(m_videoOut, frame.bits());
+#else
+	return (-1);
 #endif
 }
 
-int VideoFFMPEG::exportFrames(QString filepattern)
+int VideoFFMPEG::exportFrames(QString filepattern,int first)
 {
 	QSettings settings;
 
@@ -71,6 +73,8 @@ int VideoFFMPEG::exportFrames(QString filepattern)
 	QStringList args;
 
 	args << "-f" << "image2";
+	if (first != 0)
+		args << "-start_number" << QString::number(first);
 	args << "-i" << filepattern;
 	args << "-r" << QString::number(movieFPS);
 	args << "-vcodec" << m_vcodec;

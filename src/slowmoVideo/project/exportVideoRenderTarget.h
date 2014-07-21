@@ -30,6 +30,8 @@ public:
     exportVideoRenderTarget(RenderTask_sV *parentRenderTask);
     virtual ~exportVideoRenderTarget();
 
+    void openRenderTarget() throw(Error_sV) {} ;
+
     /// openRenderTarget() will throw an error if the target file cannot be opened.
     void setTargetFile(const QString& filename);
     /// Set a custom video codec
@@ -49,7 +51,8 @@ private:
 
     int m_width;
     int m_height;
-	int use_qt;
+	int use_qt; // using QuickTime
+    int first; // first frame to be written
 	
     // png temp
     QDir m_targetDir;

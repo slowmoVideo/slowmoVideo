@@ -12,13 +12,13 @@ class VideoWriter
 public:
     virtual ~VideoWriter() {};
     virtual int writeFrame(const QImage& frame) = 0;
-    virtual int exportFrames(QString filepattern) = 0;
+    virtual int exportFrames(QString filepattern,int first) = 0;
 };
 
 VideoWriter* CreateVideoWriter( const char* filename, int width,int height,double fps,int use_qt,const char* codec);
 void ReleaseVideoWriter( VideoWriter** pwriter );
 int WriteFrame( VideoWriter* writer, const QImage& frame);
-int exportFrames(VideoWriter* pwriter,QString filepattern);
+int exportFrames(VideoWriter* pwriter,QString filepattern,int first);
 
 /* lib dependant ... */
 
