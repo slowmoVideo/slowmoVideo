@@ -24,7 +24,7 @@ public:
     ~VideoQT();
     
     int writeFrame(const QImage& frame);
-	int exportFrames(QString filepattern);
+	int exportFrames(QString filepattern,int first);
 };
 
 

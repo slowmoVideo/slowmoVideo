@@ -197,7 +197,7 @@ int VideoQT::writeFrame(const QImage& frame)
     return 0;
 }
 
-int VideoQT::exportFrames(QString filepattern)
+int VideoQT::exportFrames(QString filepattern,int first)
 {
 	NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
 	NSString *inputPath;

@@ -76,7 +76,7 @@ VideoInfoSV getInfo(const char filename[])
     duration = 3600*hours + 60*minutes + seconds;
 
     // container rate
-    rx = QRegExp("([0-9\\.]+) (fps|tb\(r\))");
+    rx = QRegExp("([0-9\\.]+) fps");
     rx.setMinimal(true);
     if (rx.indexIn(videoInfo) !=-1)  {
         videorate = rx.cap(1).toDouble();

@@ -44,7 +44,11 @@ exportVideoRenderTarget::~exportVideoRenderTarget()
 {
 	// QT bug ?
 	qDebug() << "should remove dir : " << m_targetDir;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
  	m_targetDir.removeRecursively();
+#else
+#warning  removeRecursively not define in QT4
+#endif
 }
 
 void exportVideoRenderTarget::setTargetFile(const QString &filename)
