@@ -65,7 +65,7 @@ int VideoFFMPEG::writeFrame(const QImage& frame)
 #endif
 }
 
-int VideoFFMPEG::exportFrames(QString filepattern)
+int VideoFFMPEG::exportFrames(QString filepattern,RenderTask_sV *progress)
 {
 	QSettings settings;
 

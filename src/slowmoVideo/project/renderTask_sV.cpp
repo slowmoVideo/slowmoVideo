@@ -58,7 +58,8 @@ void RenderTask_sV::requestWork()
  */
 void RenderTask_sV::updateProgress()
 {
-    emit signalTaskProgress( 100 );
+	qDebug() << "updateProgress call";
+    emit signalTaskProgress( 50 );
 }
 
 #pragma mark - set/get task

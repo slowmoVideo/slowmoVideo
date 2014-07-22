@@ -1,15 +1,16 @@
 /*
  * class to export a movie using QuickTime
  */
-
-#include "qtkit.h"
-#include "video_enc.h"
-
 #include <QtCore/QCoreApplication>
 #include <QDebug>
 #include <QtCore/QSettings>
 #include <QImage>
 
+#include "qtkit.h"
+#include "video_enc.h"
+
+
+#include "../project/renderTask_sV.h"
 
 #pragma mark - cocoa bridge
 
@@ -203,7 +204,7 @@ int VideoQT::writeFrame(const QImage& frame)
 
 #pragma mark - 
 
-int VideoQT::exportFrames(QString filepattern)
+int VideoQT::exportFrames(QString filepattern,RenderTask_sV *progress)
 {
 	NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
 	NSString *inputPath;
@@ -242,6 +243,9 @@ int VideoQT::exportFrames(QString filepattern)
         			fprintf(stderr, "Didn't successfully update movie file. \n" );
 					return 1;
 			}
+			
+			// TODO:
+    		progress->updateProgress();
             [image release];
             [innerPool release];
         }

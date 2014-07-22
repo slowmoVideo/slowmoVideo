@@ -22,9 +22,9 @@ int WriteFrame( VideoWriter* writer, const QImage& frame)
     return writer ? writer->writeFrame(frame) : 0;
 }
 
-int exportFrames(VideoWriter* writer,QString filepattern)
+int exportFrames(VideoWriter* writer,QString filepattern,RenderTask_sV *progress)
 {
-    return writer ? writer->exportFrames(filepattern) : 0;
+    return writer ? writer->exportFrames(filepattern,progress) : 0;
 }
 
 void ReleaseVideoWriter( VideoWriter** pwriter )

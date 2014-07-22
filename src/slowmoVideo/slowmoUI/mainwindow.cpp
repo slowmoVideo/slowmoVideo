@@ -8,6 +8,25 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
+#include <QtCore>
+#include <QObject>
+#include <QDockWidget>
+#include <QDebug>
+#include <QMessageBox>
+#include <QStatusBar>
+
+#include <QDir>
+#include <QFileDialog>
+
+#include <QShortcut>
+#include <QSignalMapper>
+#include <QTime>
+#include <QFuture>
+
+#include <QPainter>
+
+#include <functional>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -27,24 +46,7 @@ the Free Software Foundation, either version 3 of the License, or
 // for editing optical flow
 #include "flowEditCanvas.h"
 
-#include <QtCore>
-#include <QObject>
-#include <QDockWidget>
-#include <QDebug>
-#include <QMessageBox>
-#include <QStatusBar>
 
-#include <QDir>
-#include <QFileDialog>
-
-#include <QShortcut>
-#include <QSignalMapper>
-#include <QTime>
-#include <QFuture>
-
-#include <QPainter>
-
-#include <functional>
 
 MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     QMainWindow(parent),

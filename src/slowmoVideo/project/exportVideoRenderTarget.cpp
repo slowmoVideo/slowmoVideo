@@ -20,6 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../lib/video_enc.h"
 
+
 exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask) :
     AbstractRenderTarget_sV(parentRenderTask)
 {
@@ -79,8 +80,8 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 	VideoWriter* writer;;
 
 	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec;
-	writer = CreateVideoWriter(m_filename.toStdString().c_str(), renderTask,
-    		renderTask()->resolution().width(),
+	writer = CreateVideoWriter(m_filename.toStdString().c_str(), 
+		   		renderTask()->resolution().width(),
     		renderTask()->resolution().height(),
     		renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
     
@@ -89,9 +90,8 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
         throw Error_sV(QObject::tr("Video could not be prepared .\n"));
     }
 	// loop throught frame ?
-	// TODO:
-    //renderTask()->updateProgress();
-	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str());
+	
+	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str(),renderTask());
 	ReleaseVideoWriter( &writer );
 }
 

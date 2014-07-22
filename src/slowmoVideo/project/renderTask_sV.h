@@ -13,10 +13,12 @@
 class Project_sV;
 class AbstractRenderTarget_sV;
 
+
+
 #include <QObject>
 #include <QMutex>
 
-class RenderTask_sV : public QObject
+class RenderTask_sV : public QObject 
 {
     Q_OBJECT
     
