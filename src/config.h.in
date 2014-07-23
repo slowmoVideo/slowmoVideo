@@ -5,6 +5,7 @@
 #define CONFIG_H
 
 #cmakedefine USE_QTKIT
+#cmakedefine USE_DBUS
 #cmakedefine USE_FFMPEG
 
 #endif // CONFIG_H

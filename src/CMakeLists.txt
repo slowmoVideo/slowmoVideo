@@ -143,6 +143,7 @@ message("Qt libraries found at : ${Qt5Gui_LIBRARIES} /  ${QT_LIBRARIES}" )
 
 set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
 set (USE_FFMPEG ON CACHE BOOL "Build with the FFMPEG encoder")
+set (USE_DBUS OFF CACHE BOOL "Build with the DBUS notification support")
 
 if(NOT MSYS)
 	find_package(FFMPEG)
