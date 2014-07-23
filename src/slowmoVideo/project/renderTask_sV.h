@@ -50,7 +50,10 @@ public:
 
     RenderPreferences_sV& renderPreferences() { return m_prefs; }
     
-    void updateProgress();
+    void setupProgress(QString desc, int taskSize);
+    void updateProgress(int value);
+    void stepProgress();
+    void updateMessage(QString desc);
     
 private:
     /**
@@ -78,6 +81,8 @@ private:
 
     qreal m_prevTime;
 
+	int currentProgress;
+	
 signals:
     /**
      * This signal is emitted when the Worker request to Work

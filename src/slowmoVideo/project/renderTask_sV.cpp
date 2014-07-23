@@ -40,6 +40,9 @@ RenderTask_sV::~RenderTask_sV()
     if (m_renderTarget != NULL) { delete m_renderTarget; }
 }
 
+/**
+ * let run the thread !
+ */
 void RenderTask_sV::requestWork()
 {
     mutex.lock();
@@ -51,19 +54,9 @@ void RenderTask_sV::requestWork()
     emit workFlowRequested();
 }
 
-#pragma mark - progress
-
 /**
- *  update progress dialog from outside
+ * stop the running thread
  */
-void RenderTask_sV::updateProgress()
-{
-	qDebug() << "updateProgress call";
-    emit signalTaskProgress( 50 );
-}
-
-#pragma mark - set/get task
-
 void RenderTask_sV::slotStopRendering()
 {
 	//qDebug()<<"abort rendering required in Thread "<<thread()->currentThreadId();
@@ -74,6 +67,43 @@ void RenderTask_sV::slotStopRendering()
     }
     mutex.unlock();
 }
+
+#pragma mark - 
+#pragma mark progress dialog
+
+/**
+ * setup the progress dialog
+ */
+void RenderTask_sV::setupProgress(QString desc, int taskSize)
+{
+	//qDebug() << "setup progress call " << desc << " size " << taskSize;
+	emit signalNewTask(desc,taskSize);
+}
+
+/**
+ *  update progress dialog from outside
+ */
+void RenderTask_sV::updateProgress(int value)
+{
+	//qDebug() << "updateProgress call " << value;
+	currentProgress = value;
+    emit signalTaskProgress(value );
+}
+
+void RenderTask_sV::stepProgress()
+{
+	//qDebug() << "stepProgress call ";
+	currentProgress++;
+    emit signalTaskProgress(currentProgress );
+}
+
+void RenderTask_sV::updateMessage(QString desc)
+{
+	emit signalItemDesc(desc);
+}
+
+#pragma mark - 
+#pragma mark set/get task
 
 void RenderTask_sV::setRenderTarget(AbstractRenderTarget_sV *renderTarget)
 {
@@ -109,7 +139,9 @@ QSize RenderTask_sV::resolution()
 }
 
 
-#pragma mark - rendering
+#pragma mark - 
+#pragma mark rendering
+
 
 /**
  *  this is the real workhorse.
@@ -118,8 +150,8 @@ QSize RenderTask_sV::resolution()
 void RenderTask_sV::slotContinueRendering()
 {
     qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();   
-    /* real workhorse */
-    emit signalNewTask(trUtf8("Rendering Slow-Mo …"), int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
+    /* real workhorse, need to account for exporting */
+    setupProgress(trUtf8("Rendering Slow-Mo …"), 2* int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
         
     //TODO: initialize
     m_stopwatch.start();
@@ -164,25 +196,25 @@ void RenderTask_sV::slotContinueRendering()
         qreal srcTime = m_project->nodes()->sourceTime(m_nextFrameTime);
         
         qDebug() << "Rendering frame number " << outputFrame << " @" << m_nextFrameTime << " from source time " << srcTime;
-        emit signalItemDesc(tr("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
+        updateMessage(tr("Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)")
                             .arg( QString::number(outputFrame),QString::number(m_nextFrameTime),
                                   QString::number(srcTime),
                                   QString::number(srcTime*m_project->frameSource()->fps()->fps())
                              ) );
            
-         try {
+    	 try {
                 QImage rendered = m_project->render(m_nextFrameTime, m_prefs);
 
                 m_renderTarget->slotConsumeFrame(rendered, outputFrame);
                 m_nextFrameTime = m_nextFrameTime + 1/m_prefs.fps().fps();
 
-                emit signalTaskProgress( (m_nextFrameTime-m_timeStart) * m_prefs.fps().fps() );
+                updateProgress( (m_nextFrameTime-m_timeStart) * m_prefs.fps().fps() );
                 
             } catch (FlowBuildingError &err) {
                 m_stopRendering = true;
                 emit signalRenderingAborted(err.message());
             } catch (InterpolationError &err) {
-                emit signalItemDesc(err.message());
+                updateMessage(err.message());
             }
         
         
@@ -196,7 +228,7 @@ void RenderTask_sV::slotContinueRendering()
     
     //TODO: closing rendering project
     qDebug() << "Rendering : exporting";
-    emit signalItemDesc(tr("Rendering : exporting"));
+    updateMessage(tr("Rendering : exporting"));
     m_renderTarget->closeRenderTarget();
     m_renderTimeElapsed += m_stopwatch.elapsed();
     emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));

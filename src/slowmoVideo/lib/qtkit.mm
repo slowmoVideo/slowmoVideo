@@ -12,7 +12,8 @@
 
 #include "../project/renderTask_sV.h"
 
-#pragma mark - cocoa bridge
+#pragma mark - 
+#pragma mark cocoa bridge
 
 // tools for qt 4.8
 // convert pixamp <-> nsimage
@@ -245,7 +246,7 @@ int VideoQT::exportFrames(QString filepattern,RenderTask_sV *progress)
 			}
 			
 			// TODO:
-    		progress->updateProgress();
+    		progress->stepProgress();
             [image release];
             [innerPool release];
         }
@@ -269,7 +270,8 @@ VideoQT::~VideoQT()
     [localpool drain];
 }
 
-#pragma mark -  C/C++ bridge
+#pragma mark -  
+#pragma mark C/C++ bridge
 
 VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps,const char* codec)
 {
