@@ -5,12 +5,16 @@
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
 #include <QImage>
-
+#include <QtCore/QRegExp>
+#include <QtCore/QTimer>
+    
 #include "video_enc.h"
 #include "ffmpeg_writer.h"
 //#include "ffmpegEncode_sV.h"
 #include "defs_sV.hpp"
     
+QRegExp VideoFFMPEG::regexFrameNumber("frame=\\s*(\\d+)");
+
 VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename)
 {
 	m_videoOut = (VideoOut_sV*)malloc(sizeof(VideoOut_sV));
@@ -82,22 +86,51 @@ int VideoFFMPEG::exportFrames(QString filepattern,RenderTask_sV *progress)
    
         qDebug() << "Arguments: " << args;
 
-	QProcess process;
-	process.start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
-	if (!process.waitForStarted()) {
+	process = new QProcess();
+	process->start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
+	if (!process->waitForStarted()) {
 		qDebug() << "can't start encoding !";
 		return 1;
 	}
 
-	process.waitForFinished();
-	qDebug() << process.readAllStandardOutput();
-    	qDebug() << process.readAllStandardError();
-	process.terminate();
-	qDebug() << process.exitStatus();
+	// add a timer for reporting progress
+	QTimer *m_timer = new QTimer();
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
+    m_timer->start(100);
+    
+	process->waitForFinished();
+	qDebug() << process->readAllStandardOutput();
+    	qDebug() << process->readAllStandardError();
+	process->terminate();
+	qDebug() << process->exitStatus();
 
+	m_timer->stop();
+	delete m_timer;
+	delete process;
 	return 0;
 }
 
+/**
+ *  Checks the progress of the ffmpeg threads by reading their stderr
+ */
+void VideoFFMPEG::slotProgressUpdate()
+{
+    QRegExp regex(regexFrameNumber);
+    QString s;
+   
+    //m_ffmpegSemaphore.acquire();
+    s = QString(process->readAllStandardError());
+    if (regex.lastIndexIn(s) >= 0) {
+    	qDebug() << "progress update " << regex.cap(1);
+        //emit signalTaskProgress(regex.cap(1).toInt());
+        //emit signalTaskItemDescription(tr("Frame %1 of %2").arg(regex.cap(1)).arg(m_videoInfo->framesCount));
+    }
+    //m_ffmpegSemaphore.release();
+}
+
+
+#pragma mark -
+#pragma mark C bridge
 
 VideoWriter* CreateVideoWriter_FFMPEG( const char* filename, int width, int height, double fps, const char *codec)
 {
