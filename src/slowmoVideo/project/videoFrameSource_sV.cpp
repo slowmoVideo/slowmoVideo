@@ -174,7 +174,9 @@ bool VideoFrameSource_sV::rebuildRequired(const FrameSize frameSize)
     QImage frame = frameAt(0, frameSize);
     needsRebuild |= frame.isNull();
 
-    frame = frameAt(m_videoInfo->framesCount-1, frameSize);
+    //qDebug() << "last frame to check " << m_videoInfo->framesCount-1;
+    // rewind a little bit to account rounding error...
+    frame = frameAt(m_videoInfo->framesCount-10, frameSize);
     needsRebuild |= frame.isNull();
 
     return needsRebuild;

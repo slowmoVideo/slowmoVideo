@@ -97,4 +97,3 @@ VideoInfoSV getInfo(const char filename[])
     info.streamsCount = 1;
     return info;
 }
-
