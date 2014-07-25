@@ -54,6 +54,7 @@ VideoFFMPEG::~VideoFFMPEG()
 	free(m_videoOut);
 }
 
+#pragma mark -
     
 int VideoFFMPEG::writeFrame(const QImage& frame)
 {
@@ -98,6 +99,8 @@ int VideoFFMPEG::exportFrames(QString filepattern,RenderTask_sV *progress)
 	return 0;
 }
 
+#pragma mark -
+#pragma mark C/C++ bridge
 
 VideoWriter* CreateVideoWriter_FFMPEG( const char* filename, int width, int height, double fps, const char *codec)
 {
