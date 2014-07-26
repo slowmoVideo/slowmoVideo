@@ -51,6 +51,12 @@ set(LIB_SRC_ENCODE
   video_enc.cpp
 )
 
+set(SRCS_MOC
+  ffmpeg_writer.h
+)
+
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
+
 if (OLD_FFMPEG)
 set(LIB_SRC_ENCODE
 	${LIB_SRC_ENCODE}
@@ -79,7 +85,7 @@ qt_use_modules(sVinfo Core)
 qt_use_modules(sVinfo Gui)
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode  STATIC ${LIB_SRC_ENCODE})
+add_library(sVencode  STATIC ${LIB_SRC_ENCODE} ${MOC_OUT})
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 qt_use_modules(sVencode Core)
 qt_use_modules(sVencode Gui)
