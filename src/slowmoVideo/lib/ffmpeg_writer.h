@@ -5,6 +5,7 @@
 #ifndef _FFMPEG_WRITER
 #define _FFMPEG_WRITER
 
+#include <QtCore/QProcess>
 #include <QImage>
 
 #include "video_enc.h"
@@ -26,7 +27,10 @@ extern "C" {
 #include "../lib/ffmpegEncode_sV.h"
 }
 
-class VideoFFMPEG : public VideoWriter {
+class VideoFFMPEG : public QObject, public VideoWriter {
+
+    Q_OBJECT
+
     int mHeight;
     int mWidth;
     double movieFPS;
@@ -34,13 +38,19 @@ class VideoFFMPEG : public VideoWriter {
 	 char* m_filename;
 	 char* m_vcodec;
     VideoOut_sV *m_videoOut;
-    
+   
+     QProcess *process; 
 public:
     VideoFFMPEG(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename);
     ~VideoFFMPEG();
     
     int writeFrame(const QImage& frame);
     int exportFrames(QString filepattern,int first);
+
+public slots:
+	void processStarted();
+	void readOutput();
+	void encodingFinished(int);
 };
 
 #endif // _FFMPEG_WRITER

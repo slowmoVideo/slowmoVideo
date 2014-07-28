@@ -49,6 +49,11 @@ VideoFFMPEG::~VideoFFMPEG()
 {
 	//TODO:
 	//m_dirFramesOrig.rmdir(".");
+	if (process->state() == QProcess::Running) {
+		abort();
+		process->waitForFinished();
+	}
+
 	free(m_vcodec);
 	free(m_filename);
 	free(m_videoOut);
@@ -83,22 +88,49 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first)
    
         qDebug() << "Arguments: " << args;
 
-	QProcess process;
-	process.start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
-	if (!process.waitForStarted()) {
+	process = new QProcess;
+
+	//QObject::connect(process, SIGNAL(started()), this, SLOT(processStarted()));
+	QObject::connect(process, SIGNAL(finished(int)), this, SLOT(encodingFinished(int)));
+	QObject::connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readOutput()));
+	QObject::connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readOutput()));
+
+	process->start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
+	if (!process->waitForStarted()) {
 		qDebug() << "can't start encoding !";
 		return 1;
 	}
 
-	process.waitForFinished();
-	qDebug() << process.readAllStandardOutput();
-    	qDebug() << process.readAllStandardError();
-	process.terminate();
-	qDebug() << process.exitStatus();
+	process->waitForFinished();
+	qDebug() << process->readAllStandardOutput();
+    	qDebug() << process->readAllStandardError();
+	process->terminate();
+	qDebug() << process->exitStatus();
 
+	delete process;
 	return 0;
 }
 
+
+void VideoFFMPEG::processStarted()
+{
+	qDebug() << "process started";
+}
+
+void VideoFFMPEG::readOutput()
+{
+	//qDebug() << "process read";
+	QString line = process->readAllStandardOutput();
+	//qDebug() << "got " << line;
+	line = process->readAllStandardError();
+	qDebug() << "got " << line;
+}
+
+void VideoFFMPEG::encodingFinished(int error) 
+{
+	if (error != 0)
+		qDebug() << "process finish with error : " << error;
+}
 
 VideoWriter* CreateVideoWriter_FFMPEG( const char* filename, int width, int height, double fps, const char *codec)
 {
