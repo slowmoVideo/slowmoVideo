@@ -1,15 +1,19 @@
 /*
  * class to export a movie using QuickTime
  */
-
-#include "qtkit.h"
-#include "video_enc.h"
-
 #include <QtCore/QCoreApplication>
 #include <QDebug>
 #include <QtCore/QSettings>
 #include <QImage>
 
+#include "qtkit.h"
+#include "video_enc.h"
+
+
+#include "../project/renderTask_sV.h"
+
+#pragma mark - 
+#pragma mark cocoa bridge
 
 // tools for qt 4.8
 // convert pixamp <-> nsimage
@@ -68,6 +72,8 @@ NSImage *toNSImage(const QImage& InImage)
 
 // end of tools
 
+
+#pragma mark -
 
 /* TODO :
  "-fps: Frames per second for final movie can be anywhere between 0.1 and 60.0.\n"
@@ -197,7 +203,9 @@ int VideoQT::writeFrame(const QImage& frame)
     return 0;
 }
 
-int VideoQT::exportFrames(QString filepattern,int first)
+#pragma mark - 
+
+int VideoQT::exportFrames(QString filepattern,int first,RenderTask_sV *progress)
 {
 	NSAutoreleasePool* localpool = [[NSAutoreleasePool alloc] init];
 	NSString *inputPath;
@@ -236,6 +244,9 @@ int VideoQT::exportFrames(QString filepattern,int first)
         			fprintf(stderr, "Didn't successfully update movie file. \n" );
 					return 1;
 			}
+			
+			// TODO:
+    		progress->stepProgress();
             [image release];
             [innerPool release];
         }
@@ -258,6 +269,9 @@ VideoQT::~VideoQT()
     // TODO: [destPath release];
     [localpool drain];
 }
+
+#pragma mark -  
+#pragma mark C/C++ bridge
 
 VideoWriter* CreateVideoWriter_QT ( const char* filename, int width, int height, double fps,const char* codec)
 {

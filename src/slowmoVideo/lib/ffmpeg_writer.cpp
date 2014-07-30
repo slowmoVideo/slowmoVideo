@@ -5,11 +5,15 @@
 #include <QtCore/QProcess>
 #include <QtCore/QSettings>
 #include <QImage>
-
+#include <QtCore/QRegExp>
+#include <QtCore/QTimer>
+    
 #include "video_enc.h"
 #include "ffmpeg_writer.h"
 //#include "ffmpegEncode_sV.h"
 #include "defs_sV.hpp"
+// for reporting
+#include "../project/renderTask_sV.h"
     
 QRegExp VideoFFMPEG::regexFrameNumber("frame=\\s*(\\d+)");
 
@@ -61,9 +65,11 @@ VideoFFMPEG::~VideoFFMPEG()
 	free(m_videoOut);
 }
 
+#pragma mark -
     
 int VideoFFMPEG::writeFrame(const QImage& frame)
 {
+    //TODO: check this
 #if 0
 	return eatARGB(m_videoOut, frame.bits());
 #else
@@ -71,7 +77,7 @@ int VideoFFMPEG::writeFrame(const QImage& frame)
 #endif
 }
 
-int VideoFFMPEG::exportFrames(QString filepattern,int first)
+int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progress)
 {
 	QSettings settings;
 
@@ -90,8 +96,9 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first)
    
         qDebug() << "Arguments: " << args;
 
+	this->progress = progress;
+	last = 0;
 	process = new QProcess;
-
 	//QObject::connect(process, SIGNAL(started()), this, SLOT(processStarted()));
 	QObject::connect(process, SIGNAL(finished(int)), this, SLOT(encodingFinished(int)));
 	QObject::connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readOutput()));
@@ -114,6 +121,8 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first)
 	return 0;
 }
 
+#pragma mark -
+#pragma mark C bridge
 
 void VideoFFMPEG::processStarted()
 {
@@ -132,6 +141,8 @@ void VideoFFMPEG::readOutput()
     	if (regex.lastIndexIn(line) >= 0) {
         	//emit signalTaskProgress(;);
 		qDebug() << "prog update : " << regex.cap(1).toInt();
+		progress->stepProgress(last-regex.cap(1).toInt());
+		last = last-regex.cap(1).toInt();
     	}
 	//qDebug() << "got " << line;
 }

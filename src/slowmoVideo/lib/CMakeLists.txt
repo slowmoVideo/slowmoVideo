@@ -49,6 +49,12 @@ set(LIB_SRC_ENCODE
   video_enc.cpp
 )
 
+set(SRCS_MOC
+  ffmpeg_writer.h
+)
+
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
+
 if (OLD_FFMPEG)
 set(LIB_SRC_ENCODE
 	${LIB_SRC_ENCODE}

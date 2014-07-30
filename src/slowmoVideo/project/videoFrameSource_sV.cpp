@@ -48,7 +48,7 @@ throw(FrameSourceError) :
     m_ffmpeg = new QProcess(this);
     m_timer = new QTimer(this);
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
+    QObject::connect(m_timer, SIGNAL(timeout()), this, SLOT(slotProgressUpdate()));
 }
 VideoFrameSource_sV::~VideoFrameSource_sV()
 {

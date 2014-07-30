@@ -20,6 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../lib/video_enc.h"
 
+
 exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask) :
     AbstractRenderTarget_sV(parentRenderTask)
 {
@@ -97,14 +98,11 @@ void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
 			renderTask()->resolution().width(),
 			renderTask()->resolution().height(),
 			renderTask()->fps().fps(),use_qt,m_vcodec.toStdString().c_str());
-    
    
     if (writer == 0) {
         throw Error_sV(QObject::tr("Video could not be prepared .\n"));
     }
-	// loop throught frame ?
-	// TODO: 
-	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str(),first);
+	exportFrames(writer, m_targetDir.absoluteFilePath(m_filenamePattern.arg("%05d")).toStdString().c_str(),first,renderTask());
 	ReleaseVideoWriter( &writer );
 }
 
