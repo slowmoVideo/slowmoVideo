@@ -35,11 +35,13 @@ class VideoFFMPEG : public QObject, public VideoWriter {
     int mWidth;
     double movieFPS;
 
-	 char* m_filename;
-	 char* m_vcodec;
+    char* m_filename;
+    char* m_vcodec;
     VideoOut_sV *m_videoOut;
    
-     QProcess *process; 
+    QProcess *process; 
+    static QRegExp regexFrameNumber;
+
 public:
     VideoFFMPEG(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename);
     ~VideoFFMPEG();

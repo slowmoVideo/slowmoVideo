@@ -11,6 +11,8 @@
 //#include "ffmpegEncode_sV.h"
 #include "defs_sV.hpp"
     
+QRegExp VideoFFMPEG::regexFrameNumber("frame=\\s*(\\d+)");
+
 VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,const char* vquality,const char *filename)
 {
 	m_videoOut = (VideoOut_sV*)malloc(sizeof(VideoOut_sV));
@@ -101,7 +103,8 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first)
 		return 1;
 	}
 
-	process->waitForFinished();
+	// warn: default timeout at 30s !
+	process->waitForFinished(-1); // let time goes on !
 	qDebug() << process->readAllStandardOutput();
     	qDebug() << process->readAllStandardError();
 	process->terminate();
@@ -119,11 +122,18 @@ void VideoFFMPEG::processStarted()
 
 void VideoFFMPEG::readOutput()
 {
+	QRegExp regex(regexFrameNumber);
+   
 	//qDebug() << "process read";
 	QString line = process->readAllStandardOutput();
 	//qDebug() << "got " << line;
 	line = process->readAllStandardError();
-	qDebug() << "got " << line;
+ 
+    	if (regex.lastIndexIn(line) >= 0) {
+        	//emit signalTaskProgress(;);
+		qDebug() << "prog update : " << regex.cap(1).toInt();
+    	}
+	//qDebug() << "got " << line;
 }
 
 void VideoFFMPEG::encodingFinished(int error) 
