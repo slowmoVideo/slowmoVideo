@@ -1,0 +1,5 @@
+slowmovideo (0.4-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- vbr <vbrasseur@gmail.com>  Mon, 07 Jul 2014 05:32:32 -0700
