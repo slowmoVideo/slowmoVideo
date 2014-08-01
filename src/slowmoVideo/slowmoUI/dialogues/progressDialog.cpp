@@ -71,8 +71,9 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
 {
     ui->progress->setValue(ui->progress->maximum());
     setWorking(false);
+    QString notifmsg = tr("Task finished in %1.").arg(timePassed);
     if (timePassed.length() > 0) {
-        slotTaskItemDescription(tr("Task finished in %1.").arg(timePassed));
+        slotTaskItemDescription(notifmsg);
     } else {
         slotTaskItemDescription(tr("Task finished."));
     }
@@ -81,5 +82,6 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
     Notificator* notif;
     notif = new Notificator("simple");
 
-    notif->notify(Notificator::Information, windowTitle(), tr("Task finished in %1.").arg(timePassed));
+	
+    notif->notify(Notificator::Information, windowTitle(), notifmsg);
 }

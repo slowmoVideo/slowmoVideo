@@ -23,6 +23,8 @@ FrameMonitor::FrameMonitor(QWidget *parent) :
     ui->setupUi(this);
     m_queue[0] = NULL;
     m_queue[1] = NULL;
+    
+    imgCache.clear();
 }
 
 FrameMonitor::~FrameMonitor()
@@ -64,6 +66,20 @@ void FrameMonitor::paintEvent(QPaintEvent *)
     m_semaphore.release();
 
     if (!image.isNull()) {
-        ui->imageDisplay->loadImage(QImage(image));
+    	// add some better cache mgmt
+    	QImage *_image;
+    	
+    	 if(imgCache.contains(image)) {
+	     	//return *(frameCache.object(path));
+	     	//qDebug() << "cache";
+	     	_image = imgCache.object(image);
+	     } else {
+	     	_image = new QImage(image);
+	     	//qDebug() << "cache store";
+	     	imgCache.insert(image, _image);
+	     }
+	    
+	    if (_image != 0)
+        	ui->imageDisplay->loadImage(*_image);
     }
 }
