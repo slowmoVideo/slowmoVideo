@@ -22,6 +22,7 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPre
         /// Position between two frames, on [0 1]
         const float pos = frame-floor(frame);
 
+	//TODO: use a switch ?
         if (prefs.interpolation == InterpolationType_Twoway) {
             FlowField_sV *forwardFlow = pr->requestFlow(floor(frame), floor(frame)+1, prefs.size);
             FlowField_sV *backwardFlow = pr->requestFlow(floor(frame)+1, floor(frame), prefs.size);
@@ -91,7 +92,14 @@ QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPre
             delete currNext;
             delete currPrev;
 
-        } else {
+        } else if (prefs.interpolation == InterpolationType_None) {
+            qDebug() << "Simple interpolation type!";
+#if 0
+            Interpolate_sV::simpleinterpolate(left, right, pos, out);
+#else
+	    out = left;
+#endif
+	} else {
             qDebug() << "Unsupported interpolation type!";
             Q_ASSERT(false);
         }

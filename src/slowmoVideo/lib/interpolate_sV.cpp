@@ -456,3 +456,20 @@ void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const F
     }
     */
 }
+
+void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, float pos, QImage &output)
+{
+
+  QColor colOut;
+
+    for (int y = 0; y < prev.height(); y++) {
+        for (int x = 0; x < prev.width(); x++) {
+                output.setPixel(x,y, qRgba(
+                                    (qRed(prev.pixel(x,y)) + qRed(right.pixel(x,y)))/2,
+                                    (qGreen(prev.pixel(x,y)) + qGreen(right.pixel(x,y)))/2,
+                                    (qBlue(prev.pixel(x,y)) + qBlue(right.pixel(x,y)))/2,
+                                    (qAlpha(prev.pixel(x,y)) + qAlpha(right.pixel(x,y)))/2
+                                    ));
+	}
+    }
+}

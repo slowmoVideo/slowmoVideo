@@ -67,7 +67,7 @@ enum CurveType { CurveType_Linear = 1, CurveType_Bezier = 2 };
 enum TagAxis { TagAxis_Source = 1, TagAxis_Output = 2 };
 enum InterpolationType { InterpolationType_Forward = 0, InterpolationType_ForwardNew = 1,
                          InterpolationType_Twoway = 10, InterpolationType_TwowayNew = 11,
-                         InterpolationType_Bezier = 20 };
+                         InterpolationType_Bezier = 20 , InterpolationType_None = 30 };
 enum MotionblurType { MotionblurType_Stacking = 0, MotionblurType_Convolving = 10,
                       MotionblurType_Nearest = 20 };
 

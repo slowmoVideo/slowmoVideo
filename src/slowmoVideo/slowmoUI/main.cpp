@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
 
     QString projectPath;
+    qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
 
     const int N = a.arguments().size();

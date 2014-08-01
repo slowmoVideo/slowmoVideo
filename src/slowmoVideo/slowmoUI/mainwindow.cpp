@@ -110,12 +110,9 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
         }
     }
 
-
-
-
-    ui->actionNew->setShortcut(QKeySequence("Ctrl+N"));
-    ui->actionOpen->setShortcut(QKeySequence("Ctrl+O"));
-    ui->actionSave->setShortcut(QKeySequence("Ctrl+S"));
+    ui->actionNew->setShortcut(QKeySequence(QKeySequence::New));
+    ui->actionOpen->setShortcut(QKeySequence(QKeySequence::Open));
+    ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
     ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
     ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
     ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
@@ -123,9 +120,9 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     ui->actionExamineFlow->setShortcut(QKeySequence("Shift+Ctrl+X"));
     ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
     ui->actionAbout->setShortcut(QKeySequence("F1"));
-    ui->actionQuit->setShortcut(QKeySequence("Ctrl+Q"));
-    ui->actionZoomIn->setShortcut(QKeySequence("+"));
-    ui->actionZoomOut->setShortcut(QKeySequence("-"));
+    ui->actionQuit->setShortcut(QKeySequence(QKeySequence::Quit));
+    ui->actionZoomIn->setShortcut(QKeySequence(QKeySequence::ZoomIn));
+    ui->actionZoomOut->setShortcut(QKeySequence(QKeySequence::ZoomOut));
 
     m_cs.addShortcut("h", Help, tr("Show help overlay"));
     m_cs.addShortcut("q-q", Quit, tr("Quit"));

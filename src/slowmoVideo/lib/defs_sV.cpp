@@ -101,8 +101,9 @@ QString toString(const InterpolationType &interpolation)
         return QObject::tr("Two-way interpolation (accurate)");
     case InterpolationType_Bezier:
         return QObject::trUtf8("Bézier interpolation");
+    case InterpolationType_None:
+        return QObject::trUtf8("Simple interpolation");
     default:
-        Q_ASSERT(false);
         return QObject::tr("Unknown interpolation");
     }
 }
