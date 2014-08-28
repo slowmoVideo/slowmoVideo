@@ -178,7 +178,8 @@ void drawOptFlowMap(const Mat& flow, std::string flowname )
 
   FlowField_sV flowField(flow.cols, flow.rows);
 
-    for(int y = 0; y < flow.rows; y++)
+	//qDebug() << "flow is : " << flow.cols << " by " << flow.rows;
+  for(int y = 0; y < flow.rows; y++)
         for(int x = 0; x < flow.cols; x++) {
             const Point2f& fxyo = flow.at<Point2f>(y, x);
 
@@ -277,7 +278,8 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         QTime time;
         time.start();
         
-        Mat prevgray, gray, flow;
+        Mat prevgray, gray;
+        Mat_<Point2f> flow;
         QString prevpath = project()->frameSource()->framePath(leftFrame, frameSize);
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
         //        namedWindow("flow", 1);
@@ -307,6 +309,8 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     				cv::merge(flowxy, 2, flow);
     				
         		} else {
+        		#if 1 // _FARN_
+        			qDebug() << "calcOpticalFlowFarneback";
                 	calcOpticalFlowFarneback(
                                          prevgray, gray,
                                          //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
@@ -319,6 +323,15 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                                          farn.polySigma, //1.2,
                                          farn.flags //0
                                          );
+                #else // test TLV1 ?
+                qDebug() << "calcOpticalFlowDual_TVL1";
+                
+                
+    			Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
+
+ 			    tvl1->calc(prevgray, gray, flow);
+    			
+                #endif
                 
                 }
                 drawOptFlowMap(flow, flowFileName.toStdString());              
