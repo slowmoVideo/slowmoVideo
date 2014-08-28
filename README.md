@@ -29,7 +29,7 @@ Compiling slowmoVideo for Windows using MXE on Linux:
 5.  Compile!
 
 ### Building for MacOS
-take at README.osx for more detailed instruction
+take a look at README.osx for more detailed instruction
 
 #### Notes
 Additionally to slowmoVideo, ffmpeg.exe (32-bit build, static) is required.
