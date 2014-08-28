@@ -24,6 +24,8 @@ FlowExaminer::FlowExaminer(Project_sV *project, QWidget *parent) :
     connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
     
     connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
+    
+    connect(this, SIGNAL(frameChanged()),this, SLOT(updateFlow()));
 }
 
 FlowExaminer::~FlowExaminer()
@@ -41,6 +43,12 @@ FlowExaminer::~FlowExaminer()
 void FlowExaminer::examine(int leftFrame)
 {
 	frame = leftFrame;
+	frame= 0;
+	loadFlow();;
+}
+	
+void FlowExaminer::loadFlow()
+{	
     if (m_flowLR != NULL) {
         delete m_flowLR;
         m_flowLR = NULL;
@@ -50,15 +58,24 @@ void FlowExaminer::examine(int leftFrame)
         m_flowRL = NULL;
     }
     try {
-        m_flowLR = m_project->requestFlow(leftFrame, leftFrame+1, FrameSize_Orig);
-        m_flowRL = m_project->requestFlow(leftFrame+1, leftFrame, FrameSize_Orig);
-        ui->leftFrame->loadImage(m_project->frameSource()->frameAt(leftFrame, FrameSize_Orig));
-        ui->rightFrame->loadImage(m_project->frameSource()->frameAt(leftFrame+1, FrameSize_Orig));
+        m_flowLR = m_project->requestFlow(frame, frame+1, FrameSize_Orig);
+        m_flowRL = m_project->requestFlow(frame+1, frame, FrameSize_Orig);
+        ui->leftFrame->loadImage(m_project->frameSource()->frameAt(frame, FrameSize_Orig));
+        ui->rightFrame->loadImage(m_project->frameSource()->frameAt(frame+1, FrameSize_Orig));        
         ui->leftFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowLR, FlowVisualization_sV::HSV,m_boost));
         ui->rightFlow->loadImage(FlowVisualization_sV::colourizeFlow(m_flowRL, FlowVisualization_sV::HSV,m_boost));
+        emit updateFlow();
     } catch (FlowBuildingError &err) { }
 
-    repaint();
+    //repaint();
+}
+
+void FlowExaminer::updateFlow()
+{
+	ui->leftFrame->update();
+	ui->rightFrame->update();
+	ui->leftFlow->update();
+	ui->rightFlow->update();
 }
 
 void FlowExaminer::newAmplification(int val)
@@ -66,7 +83,8 @@ void FlowExaminer::newAmplification(int val)
 	//qDebug() << "newAmplification: " << val;
     Q_ASSERT(val > 0);
     m_boost = (float)val;
-    repaint();
+    // reload flow with new gain
+    loadFlow();
 }
 
 
@@ -126,15 +144,17 @@ void FlowExaminer::keyPressEvent(QKeyEvent *event)
                     qDebug() << "key right";
                     //m_states.prevMousePos += QPoint(1,0);
                     frame++;
+                    loadFlow();
                     break;
                 case Qt::Key_Left:
                     qDebug() << "key left";
                     //m_states.prevMousePos += QPoint(-1,0);
                     frame--;
+                    loadFlow();
                     break;
             }
 	QWidget::keyPressEvent(event);
-	repaint();
+	//repaint();
 }
 
 void FlowExaminer::wheelEvent(QWheelEvent *event)
