@@ -92,7 +92,7 @@ void RenderTask_sV::updateProgress(int value)
 
 void RenderTask_sV::stepProgress(int step)
 {
-	//qDebug() << "stepProgress call ";
+	//qDebug() << "stepProgress call " << step;
 	currentProgress+=step;
     emit signalTaskProgress(currentProgress );
 }

@@ -140,9 +140,9 @@ void VideoFFMPEG::readOutput()
  
     	if (regex.lastIndexIn(line) >= 0) {
         	//emit signalTaskProgress(;);
-		qDebug() << "prog update : " << regex.cap(1).toInt();
-		progress->stepProgress(last-regex.cap(1).toInt());
-		last = last-regex.cap(1).toInt();
+		//qDebug() << "prog update : " << regex.cap(1).toInt();
+		progress->stepProgress(regex.cap(1).toInt()-last);
+		last = regex.cap(1).toInt();
     	}
 	//qDebug() << "got " << line;
 }
