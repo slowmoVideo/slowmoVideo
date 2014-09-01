@@ -464,12 +464,16 @@ void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, 
 
     for (int y = 0; y < prev.height(); y++) {
         for (int x = 0; x < prev.width(); x++) {
-                output.setPixel(x,y, qRgba(
-                                    (qRed(prev.pixel(x,y)) + qRed(right.pixel(x,y)))/2,
-                                    (qGreen(prev.pixel(x,y)) + qGreen(right.pixel(x,y)))/2,
-                                    (qBlue(prev.pixel(x,y)) + qBlue(right.pixel(x,y)))/2,
-                                    (qAlpha(prev.pixel(x,y)) + qAlpha(right.pixel(x,y)))/2
-                                    ));
-	}
-    }
+                QRgb lt = prev.pixel(x,y);
+                QRgb rt = right.pixel(x,y);
+
+                int red = CLAMP((1-pos)*qRed(lt)+(pos)*qRed(rt),0,255);
+                int green = CLAMP((1-pos)*qGreen(lt)+(pos)*qGreen(rt),0,255);
+                int blue = CLAMP((1-pos)*qBlue(lt)+(pos)*qBlue(rt),0,255);
+
+                QColor out = QColor::fromRgb(red,green,blue);
+                                  
+                output.setPixel(x,y, out.rgb());
+	   } /* for x */
+    } /* for y */
 }
