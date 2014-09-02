@@ -153,6 +153,10 @@ void FlowSourceOpenCV_sV::initGPUDevice(int dev)
     std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
   }
 }
+     
+void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
+	qDebug() << "using Optical Flow Algo : " << algo;
+}
         		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
 {
