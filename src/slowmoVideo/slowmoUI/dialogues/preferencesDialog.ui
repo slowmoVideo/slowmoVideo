@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>536</width>
-    <height>365</height>
+    <height>376</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,21 +68,32 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QRadioButton" name="methodV3D">
-        <property name="text">
-         <string>GPU, V3D (requires flowBuilder and a video card)</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QRadioButton" name="methodV3D">
+          <property name="text">
+           <string>external (GPU, V3D (requires flowBuilder and a video card))</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QRadioButton" name="methodOCV">
-        <property name="text">
-         <string>CPU, OpenCV</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QRadioButton" name="methodOCV">
+          <property name="text">
+           <string>CPU, OpenCV</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="oclAlgo"/>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">

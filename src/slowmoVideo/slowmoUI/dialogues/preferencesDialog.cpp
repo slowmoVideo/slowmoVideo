@@ -55,6 +55,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
         ui->ocl_device->setCurrentIndex(dev);
     } else {
         	ui->methodOCV->setChecked(true);
+        // TODO: for testing
+        ui->oclAlgo->clear();
+        ui->oclAlgo->addItem(tr("Farnback"),QVariant(1));
+        ui->oclAlgo->addItem(tr("Dual TVL1"),QVariant(2));
+        ui->oclAlgo->setCurrentIndex(1);
     }
 	
     // state of threading
