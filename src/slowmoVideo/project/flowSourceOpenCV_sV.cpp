@@ -131,7 +131,7 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 	// for debugging OpenCL support
     check_gpu();
     use_gpu = 0; // default do not use GPU
-    
+    method = 0; // default to Farnback
     createDirectories();
 }
 
@@ -156,6 +156,7 @@ void FlowSourceOpenCV_sV::initGPUDevice(int dev)
      
 void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
 	qDebug() << "using Optical Flow Algo : " << algo;
+    method = algo;
 }
         		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
@@ -298,7 +299,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         
         
         {
-             //const int iterations = 8; // 10
+            //const int iterations = 8; // 10
             //done outside setupOpticalFlow(3,15,1.2,0.5,5);
             
             if( prevgray.data ) {
@@ -308,37 +309,36 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         			
         			cv::ocl::oclMat d_flowx, d_flowy;
     				farn(ocl::oclMat(prevgray), ocl::oclMat(gray), d_flowx, d_flowy);
-    
+                    
     				cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
     				cv::merge(flowxy, 2, flow);
     				
         		} else {
-        		#if 1 // _FARN_
-        			qDebug() << "calcOpticalFlowFarneback";
-                	calcOpticalFlowFarneback(
-                                         prevgray, gray,
-                                         //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
-                                         flow,
-                                         farn.pyrScale, //0.5,
-                                         farn.numLevels, //3,
-                                         farn.winSize, //15,
-                                         farn.numIters, //3,
-                                         farn.polyN, //5,
-                                         farn.polySigma, //1.2,
-                                         farn.flags //0
-                                         );
-                #else // test TLV1 ?
-                qDebug() << "calcOpticalFlowDual_TVL1";
-                
-                
-    			Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
-
- 			    tvl1->calc(prevgray, gray, flow);
-    			
-                #endif
-                
+                    if (method == 0) { // _FARN_
+                        qDebug() << "calcOpticalFlowFarneback";
+                        calcOpticalFlowFarneback(
+                                                 prevgray, gray,
+                                                 //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
+                                                 flow,
+                                                 farn.pyrScale, //0.5,
+                                                 farn.numLevels, //3,
+                                                 farn.winSize, //15,
+                                                 farn.numIters, //3,
+                                                 farn.polyN, //5,
+                                                 farn.polySigma, //1.2,
+                                                 farn.flags //0
+                                                 );
+                    } else { // DualTVL1
+                        qDebug() << "calcOpticalFlowDual_TVL1";
+                        // TODO: put this as instance variable
+                        Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
+                        
+                        tvl1->calc(prevgray, gray, flow);
+                        
+                    }
+                    
                 }
-                drawOptFlowMap(flow, flowFileName.toStdString());              
+                drawOptFlowMap(flow, flowFileName.toStdString());
             } else {
                 qDebug() << "imread: Could not read image " << prevpath;
                 throw FlowBuildingError(QString("imread: Could not read image " + prevpath));

@@ -25,6 +25,7 @@ FrameMonitor::FrameMonitor(QWidget *parent) :
     m_queue[1] = NULL;
     
     imgCache.clear();
+    imgCache.setMaxCost(5000);
 }
 
 FrameMonitor::~FrameMonitor()
@@ -68,7 +69,7 @@ void FrameMonitor::paintEvent(QPaintEvent *)
     if (!image.isNull()) {
     	// add some better cache mgmt
     	QImage *_image;
-    	
+        //qDebug() << "cost : " << imgCache.totalCost();
     	 if(imgCache.contains(image)) {
 	     	//return *(frameCache.object(path));
 	     	//qDebug() << "cache";

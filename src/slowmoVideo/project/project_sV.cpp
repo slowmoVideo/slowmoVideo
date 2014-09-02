@@ -153,10 +153,10 @@ void Project_sV::reloadFlowSource()
         		int dev = m_settings.value("preferences/oclDriver", 0).toInt();
         		//qDebug() << "using OCL device : " << dev << "for rendering";
         		ocv->initGPUDevice(dev);
-        	} else {
-        		int algo = m_settings.value("preferences/oclAlgo", 0).toInt();
-        		ocv->chooseAlgo(algo);
         	}
+        } else {
+            int algo = m_settings.value("preferences/oclAlgo", 0).toInt();
+            ocv->chooseAlgo(algo);
         }
         qDebug() << "initial OpenCV setup";
         ocv->setupOpticalFlow(3,15,1.2,0.5,5);
