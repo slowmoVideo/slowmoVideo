@@ -38,7 +38,8 @@ public:
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
 	
     void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);
-    
+    void setupTVL(double thau,double lambda, double pyrScale, double warp);
+
     void initGPUDevice(int dev);
     void chooseAlgo(int algo);
     

@@ -307,14 +307,15 @@ void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, f
             forward.moveX = flow->x(x, y);
             forward.moveY = flow->y(x, y);
 
-#ifdef INTERPOLATE
+
             posX = x - pos*forward.moveX;
             posY = y - pos*forward.moveY;
-	    posX = CLAMP(posX, 0, Wmax);
-	    posY = CLAMP(posY, 0, Hmax);
-	    colOut = interpolate(left, posX, posY);
+	        posX = CLAMP(posX, 0, Wmax);
+	        posY = CLAMP(posY, 0, Hmax);
+#ifdef INTERPOLATE
+	        colOut = interpolate(left, posX, posY);
 #else
-            colOut = QColor(left.pixel(x - pos*forward.moveX, y - pos*forward.moveY));
+            colOut = QColor(left.pixel(posX, posY));
 #endif
 	    output.setPixel(x,y, colOut.rgb());
 	}

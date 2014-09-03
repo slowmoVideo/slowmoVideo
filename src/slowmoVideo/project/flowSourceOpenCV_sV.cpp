@@ -247,31 +247,10 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
     farn.numIters = 8;
 }
 
-#if 0
-// use case of OCL    
-    cv::ocl::oclMat d_flowx, d_flowy;
-    farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
-
-    cv::Mat flow;
-    if (useInitFlow)
-    {
-        cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
-        cv::merge(flowxy, 2, flow);
-
-        farn.flags |= cv::OPTFLOW_USE_INITIAL_FLOW;
-        farn(oclMat(frame0), oclMat(frame1), d_flowx, d_flowy);
-    }
-
-    cv::calcOpticalFlowFarneback(
-        frame0, frame1, flow, farn.pyrScale, farn.numLevels, farn.winSize,
-        farn.numIters, farn.polyN, farn.polySigma, farn.flags);
-
-    std::vector<cv::Mat> flowxy;
-    cv::split(flow, flowxy);
+void FlowSourceOpenCV_sV::setupTVL(double thau,double lambda, double pyrScale, double warp)
+{
 
 }
-
-#endif
 
 FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
@@ -314,7 +293,20 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     				cv::merge(flowxy, 2, flow);
     				
         		} else {
-                    if (method == 0) { // _FARN_
+                    if (method) { // DualTVL1
+                        qDebug() << "calcOpticalFlowDual_TVL1";
+                        // TODO: put this as instance variable
+                        Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
+                        //setupTVL(0.25,0.15, 5, 10);
+                        // default are 0.25 0.15 5 5
+                        //tlv1_->set("tau", tau_);
+                        //tvl1->set("lambda",0.05);
+                        //alg_->set("lambda", lambda_);
+                        //alg_->set("nscales", nscales_);
+                        //alg_->set("warps", warps_);
+                        tvl1->calc(prevgray, gray, flow);
+
+                    } else { // _FARN_
                         qDebug() << "calcOpticalFlowFarneback";
                         calcOpticalFlowFarneback(
                                                  prevgray, gray,
@@ -328,13 +320,6 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                                                  farn.polySigma, //1.2,
                                                  farn.flags //0
                                                  );
-                    } else { // DualTVL1
-                        qDebug() << "calcOpticalFlowDual_TVL1";
-                        // TODO: put this as instance variable
-                        Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
-                        
-                        tvl1->calc(prevgray, gray, flow);
-                        
                     }
                     
                 }
