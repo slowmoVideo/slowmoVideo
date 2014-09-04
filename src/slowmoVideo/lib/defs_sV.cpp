@@ -102,7 +102,9 @@ QString toString(const InterpolationType &interpolation)
     case InterpolationType_Bezier:
         return QObject::trUtf8("Bézier interpolation");
     case InterpolationType_None:
-        return QObject::trUtf8("Simple interpolation");
+        return QObject::trUtf8("Linear interpolation");
+    case InterpolationType_Nearest:
+        return QObject::trUtf8("Nearest Frame interpolation");
     default:
         return QObject::tr("Unknown interpolation");
     }

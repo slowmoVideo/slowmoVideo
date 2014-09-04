@@ -458,6 +458,9 @@ void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const F
     */
 }
 
+/**
+ * simple linear in time itnerpolation
+ */
 void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, float pos, QImage &output)
 {
 
@@ -477,4 +480,16 @@ void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, 
                 output.setPixel(x,y, out.rgb());
 	   } /* for x */
     } /* for y */
+}
+
+/**
+ * simple nearest frame interoplation
+ */
+void Interpolate_sV::nearestinterpolate(const QImage &prev, const QImage &right, float pos, QImage &output)
+{
+
+    if (pos<0.5) 
+            output = prev;
+    else
+            output = right;  
 }

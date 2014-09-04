@@ -132,6 +132,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     ui->cbInterpolation->addItem(toString(InterpolationType_TwowayNew), QVariant(InterpolationType_TwowayNew));
     ui->cbInterpolation->addItem(toString(InterpolationType_Bezier), QVariant(InterpolationType_Bezier));
     ui->cbInterpolation->addItem(toString(InterpolationType_None), QVariant(InterpolationType_None));
+    ui->cbInterpolation->addItem(toString(InterpolationType_Nearest), QVariant(InterpolationType_Nearest));
     if (ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())) >= 0) {
         ui->cbInterpolation->setCurrentIndex(ui->cbInterpolation->findData(QVariant(m_project->preferences()->renderInterpolationType())));
     }

@@ -107,6 +107,10 @@ throw(FlowBuildingError, InterpolationError)
                 Interpolate_sV::simpleinterpolate(left, right, pos, out);
             }
                 break;
+            case InterpolationType_Nearest: {
+                Interpolate_sV::nearestinterpolate(left, right, pos, out);
+            }
+                break;
             default : {
                 qDebug() << "Unsupported interpolation type!";
                 Q_ASSERT(false);

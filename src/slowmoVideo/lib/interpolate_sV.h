@@ -55,6 +55,8 @@ class Interpolate_sV {
 
 
     static void simpleinterpolate(const QImage& left, const QImage& right, float pos, QImage &output);
+    static void nearestinterpolate(const QImage& left, const QImage& right, float pos, QImage &output);
+    
 private:
     struct Movement {
         float moveX;
