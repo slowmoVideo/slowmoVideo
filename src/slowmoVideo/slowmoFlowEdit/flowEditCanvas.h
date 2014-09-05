@@ -44,11 +44,15 @@ private:
     QString m_flowFilename;
     float m_boost;
 
+    float vx,vy;
+
+    int tool;
     void repaintFlow();
 
 private slots:
     void slotRectDrawn(QRectF imageRect);
     void slotExamineValues(float x, float y);
+    void slotPickValues(float x, float y);
 };
 
 #endif // FLOWEDITCANVAS_H

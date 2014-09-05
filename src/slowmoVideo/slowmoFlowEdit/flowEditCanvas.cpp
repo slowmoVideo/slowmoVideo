@@ -34,7 +34,13 @@ FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
 
     connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
     connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
+    connect(ui->flow, SIGNAL(signalMousePressed(float,float)), this,SLOT(slotPickValues(float,float)));
     connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
+
+    tool= 0;
+    vx = 0.0;
+    vy = 0.0;
+    ui->average->setChecked(true);
 }
 
 FlowEditCanvas::~FlowEditCanvas()
@@ -76,10 +82,27 @@ void FlowEditCanvas::slotRectDrawn(QRectF imageRect)
 {
     qDebug() << "Rect drawn: " << imageRect;
     if (m_flowField != NULL) {
-    Kernel_sV k(8, 8);
-    k.gauss();
-    FlowTools_sV::deleteRect(*m_flowField, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
-    FlowTools_sV::refill(*m_flowField, k, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
+            //TODO: ugly code
+            if (ui->average->isChecked() ) {
+                 // average
+                    qDebug() << "average";
+                    Kernel_sV k(8, 8);
+                    k.gauss();
+                    FlowTools_sV::deleteRect(*m_flowField, 
+                            imageRect.top(), imageRect.left(), 
+                            imageRect.bottom(), imageRect.right());
+                    FlowTools_sV::refill(*m_flowField, k, 
+                        imageRect.top(), imageRect.left(), 
+                        imageRect.bottom(), imageRect.right());
+                    }
+            if (ui->picker->isChecked() ) {
+                    qDebug() << "paint" << vx << " , " << vy;
+                    FlowTools_sV::fillRect(*m_flowField, 
+                            imageRect.top(), imageRect.left(), 
+                            imageRect.bottom(), imageRect.right(), vx, vy);
+                }
+                 
+    
     repaintFlow();
     }
 }
@@ -117,6 +140,21 @@ void FlowEditCanvas::slotExamineValues(float x, float y)
             float dy = m_flowField->y(x,y);
             ui->lblValues->setText(QString("dx/dy: (%1|%2)").arg(dx, 0, 'f', 2).arg(dy, 0, 'f', 2));
             ui->lblPos->setText(QString("(%1|%2)").arg(x).arg(y));
+        }
+    }
+}
+
+void FlowEditCanvas::slotPickValues(float x, float y)
+{
+    if (ui->pick->isChecked()) {
+       qDebug() << "pick value";
+        if (m_flowField != NULL) {
+            if (x >= 0 && y >= 0
+                    && x <= m_flowField->width()-1 && y <= m_flowField->height()-1) {
+                vx = m_flowField->x(x,y);
+                vy = m_flowField->y(x,y);
+                qDebug() << "will fill with : " << vx << " , " << vy;
+            }
         }
     }
 }

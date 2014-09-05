@@ -124,6 +124,9 @@ void ImageDisplay::mousePressEvent(QMouseEvent *e)
     m_states.mouseInitialImagePos = convertCanvasToImage(e->pos());
     m_states.mousePrevPos = e->pos();
     m_states.manhattan = 0;
+
+    QPointF pos = convertCanvasToImage(e->pos());
+    emit signalMousePressed(pos.x(), pos.y());
 }
 
 void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
