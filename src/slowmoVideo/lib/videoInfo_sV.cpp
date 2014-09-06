@@ -85,7 +85,9 @@ VideoInfoSV getInfo(const char filename[])
 	rx.setMinimal(true);
 	if (rx.indexIn(videoInfo) !=-1)  {
 		videorate = rx.cap(1).toDouble();
-	}
+	} else {
+        videorate = 0;
+    }
     }
     
     info.framesCount = duration * videorate;

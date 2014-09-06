@@ -146,7 +146,7 @@ void FlowEditCanvas::slotExamineValues(float x, float y)
 
 void FlowEditCanvas::slotPickValues(float x, float y)
 {
-    if (ui->pick->isChecked()) {
+    if (ui->eyedropper->isChecked()) {
        qDebug() << "pick value";
         if (m_flowField != NULL) {
             if (x >= 0 && y >= 0

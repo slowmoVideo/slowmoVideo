@@ -133,7 +133,7 @@
          <property name="title">
           <string>tool</string>
          </property>
-         <widget class="QRadioButton" name="pick">
+         <widget class="QRadioButton" name="eyedropper">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -143,7 +143,7 @@
            </rect>
           </property>
           <property name="text">
-           <string>pick</string>
+           <string>Eyedropper</string>
           </property>
          </widget>
          <widget class="QRadioButton" name="picker">
