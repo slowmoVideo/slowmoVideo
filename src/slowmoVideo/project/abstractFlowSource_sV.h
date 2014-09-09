@@ -29,6 +29,8 @@ public:
 
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)  = 0;
 
+    virtual void setLambda(double lambda) { m_lambda = lambda;} ;
+
 public slots:
     /**
       \fn slotUpdateProjectDir()
@@ -39,9 +41,11 @@ public slots:
 
 protected:
     Project_sV* project();
-
+    double m_lambda;
+    
 private:
     Project_sV *m_project;
+    
 };
 
 #endif // ABSTRACTFLOWSOURCE_SV_H

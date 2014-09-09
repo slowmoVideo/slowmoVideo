@@ -19,9 +19,8 @@ class FlowSourceV3D_sV : public AbstractFlowSource_sV
 {
 public:
     /** Creates a new flow source using V3D optical flow */
-    FlowSourceV3D_sV(Project_sV *project, float lambda = 10);
+    FlowSourceV3D_sV(Project_sV *project, double lambda = 10);
     ~FlowSourceV3D_sV() {}
-    void setLambda(float lambda);
 
 
     FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
@@ -38,7 +37,7 @@ private:
     QDir m_dirFlowSmall;
     QDir m_dirFlowOrig;
 
-    float m_lambda;
+   
 
     void createDirectories();
 

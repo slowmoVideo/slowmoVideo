@@ -18,6 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/projectPreferences_sV.h"
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
+#include "project/abstractFlowSource_sV.h"
 #ifdef USE_FFMPEG
 #if 0
 #include "project/new_videoRenderTarget.h"
@@ -289,6 +290,10 @@ RenderTask_sV* RenderingDialog::buildTask()
             qDebug() << "No section mode selected?";
             Q_ASSERT(false);
         }
+
+        // set optical flow parameters
+        AbstractFlowSource_sV *flow_algo = m_project->flowSource();
+        flow_algo->setLambda(prefs->flowV3DLambda());
         return task;
     } else {
         return NULL;

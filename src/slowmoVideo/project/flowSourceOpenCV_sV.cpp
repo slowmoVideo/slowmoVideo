@@ -308,6 +308,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
                     } else { // _FARN_
                         qDebug() << "calcOpticalFlowFarneback";
+                        // TODO: check to use prev flow as initial flow ? (flags)
                         calcOpticalFlowFarneback(
                                                  prevgray, gray,
                                                  //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
