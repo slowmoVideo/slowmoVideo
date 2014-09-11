@@ -94,6 +94,10 @@ if (NOT FORCE_QT4)
 		 macro(qt_add_translation)
 		     qt5_add_translation(${ARGN})
 		 endmacro()
+
+		 macro(install_qt_executable)
+			install_qt5_executable(${ARGN})
+		 endmacro()
 	 endif(Qt5Core_FOUND)
 endif(NOT FORCE_QT4)
 
@@ -133,6 +137,10 @@ if(NOT Qt5Core_FOUND)
          qt4_add_translation(${ARGN})
      endmacro()
  
+     macro(install_qt_executable)
+         install_qt4_executable(${ARGN})
+     endmacro()
+
      include(${QT_USE_FILE})
      add_definitions(${QT_DEFINITIONS})
  

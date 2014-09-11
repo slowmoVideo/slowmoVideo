@@ -60,12 +60,14 @@ install(TARGETS slowmoFlowEdit
         BUNDLE DESTINATION . COMPONENT Runtime
         RUNTIME DESTINATION ${DEST} COMPONENT Runtime)
 
-if (APPLE)
         #install(TARGETS slowmoUI DESTINATION ".")
+        #install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
        include(DeployQt4)
-       install_qt4_executable(slowmoUI.app "" ""  )
-
+if (APPLE)
+       install_qt_executable(slowmoFlowEdit.app "" ""  )
+elseif(WIN32)
+       install_qt_executable(slowmoFlowEdit.exe "" ""  )
 else()
-        install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
+       install_qt_executable(slowmoFlowEdit "" ""  )
 endif()
 

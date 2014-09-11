@@ -270,6 +270,13 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         
 		qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
 		
+        // any previous flow file ?
+        QString prevflowFileName(flowPath(leftFrame-1, rightFrame-1, frameSize));
+        if (!QFile(prevflowFileName).exists()) {
+            qDebug() << "will try to use " << prevflowFileName << " as initial flow";
+            // load flow file ,
+        }
+        
         prevgray = imread(prevpath.toStdString(), 0);
         gray = imread(path.toStdString(), 0);
         
