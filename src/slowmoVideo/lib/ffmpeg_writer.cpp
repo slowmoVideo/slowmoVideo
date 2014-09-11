@@ -49,17 +49,19 @@ VideoFFMPEG::VideoFFMPEG(int width,int height,double fps,const char *vcodec,cons
         fprintf(stderr,"cannot create FFMPEG encoder\n");
     }
 #endif
+    process = 0;
 }
 
 VideoFFMPEG::~VideoFFMPEG()
 {
 	//TODO:
 	//m_dirFramesOrig.rmdir(".");
-	if (process->state() == QProcess::Running) {
-		abort();
-		process->waitForFinished();
+	if (process != 0) {
+		if (process->state() == QProcess::Running) {
+			abort();
+			process->waitForFinished();
+		}
 	}
-
 	free(m_vcodec);
 	free(m_filename);
 	free(m_videoOut);
@@ -118,6 +120,7 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 	qDebug() << process->exitStatus();
 
 	delete process;
+	process = 0;
 	return 0;
 }
 
