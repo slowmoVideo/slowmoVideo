@@ -62,7 +62,12 @@ install(TARGETS slowmoFlowEdit
 
         #install(TARGETS slowmoUI DESTINATION ".")
         #install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
-       include(DeployQt4)
+if (Qt5Core_FOUND)
+        include(DeployQt5) # 2.8.7 or later
+else()
+        include(DeployQt4) # 2.8.7 or later
+endif()
+
 if (APPLE)
        install_qt_executable(slowmoFlowEdit.app "" ""  )
 elseif(WIN32)

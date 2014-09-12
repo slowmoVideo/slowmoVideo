@@ -167,7 +167,12 @@ Categories=Qt;AudioVideo;Video;\n")
 endif()
 
 install(TARGETS slowmoUI DESTINATION ".")
-include(DeployQt4) # 2.8.7 or later
+if (Qt5Core_FOUND)
+	include(DeployQt5) # 2.8.7 or later
+else()
+	include(DeployQt4) # 2.8.7 or later
+endif()
+
 #set( PLUGINS "qjpeg;qtiff" )
 set( PLUGINS qjpeg )
 if (APPLE)
