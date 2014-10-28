@@ -490,6 +490,7 @@ void Project_sV::buildCacheFlowSource()
     QSettings settings;
     bool precalc = settings.value("preferences/precalcFlow", true).toBool();
     if (precalc && (m_flowSource != NULL)) {
+#if 0
         qDebug() << "Creating cached FlowSources ";
         Q_ASSERT(m_flowSource != NULL);
         // TODO: test/check better place ?
@@ -501,6 +502,9 @@ void Project_sV::buildCacheFlowSource()
         startFlow(1,FrameSize_Small,1);
         startFlow(2,FrameSize_Orig,0);
         startFlow(3,FrameSize_Orig,1);
+#else
+        qDebug() << "cache flow source disable";
+#endif
         
     }
 
