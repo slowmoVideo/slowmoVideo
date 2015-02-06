@@ -36,8 +36,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
-#include <QtGui/QMenu>
-#include <QtGui/QInputDialog>
+#include <QMenu>
+#include <QInputDialog>
 
 
 
@@ -94,6 +94,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     this->setMouseTracking(true);
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
+    setFocusPolicy(Qt::StrongFocus);
 
     m_states.prevMousePos = QPoint(0,0);
     m_states.contextmenuMouseTime = QPointF(0,0);
@@ -138,26 +139,24 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_handleMapper->setMapping(m_aResetRightHandle, "right");
 
 
-    bool b = true;
-    b &= connect(m_aSnapInNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
-    b &= connect(m_aDeleteNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
-    b &= connect(m_aDeleteTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
-    b &= connect(m_aRenameTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
-    b &= connect(m_aSetTagTime, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
-    b &= connect(m_hackMapper, SIGNAL(mapped(QObject*)), this, SLOT(slotRunAction(QObject*)));
-    b &= connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
-    b &= connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
-    b &= connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
-    b &= connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
-    b &= connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
-    b &= connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
-    b &= connect(m_aCustomSpeed, SIGNAL(triggered()), this, SLOT(slotSetSpeed()));
-    b &= connect(m_speedsMapper, SIGNAL(mapped(QString)), this, SLOT(slotSetSpeed(QString)));
-    b &= connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
+    connect(m_aSnapInNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    connect(m_aDeleteNode, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    connect(m_aDeleteTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    connect(m_aRenameTag, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    connect(m_aSetTagTime, SIGNAL(triggered()), m_hackMapper, SLOT(map()));
+    connect(m_hackMapper, SIGNAL(mapped(QObject*)), this, SLOT(slotRunAction(QObject*)));
+    connect(m_aLinear, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
+    connect(m_aBezier, SIGNAL(triggered()), m_curveTypeMapper, SLOT(map()));
+    connect(m_curveTypeMapper, SIGNAL(mapped(int)), this, SLOT(slotChangeCurveType(int)));
+    connect(m_aResetLeftHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
+    connect(m_aResetRightHandle, SIGNAL(triggered()), m_handleMapper, SLOT(map()));
+    connect(m_handleMapper, SIGNAL(mapped(QString)), this, SLOT(slotResetHandle(QString)));
+    connect(m_aCustomSpeed, SIGNAL(triggered()), this, SLOT(slotSetSpeed()));
+    connect(m_speedsMapper, SIGNAL(mapped(QString)), this, SLOT(slotSetSpeed(QString)));
+    connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
     for (std::vector<QAction*>::iterator it = m_aSpeeds.begin(); it != m_aSpeeds.end(); ++it) {
-        b &= connect(*it, SIGNAL(triggered()), m_speedsMapper, SLOT(map()));
+        connect(*it, SIGNAL(triggered()), m_speedsMapper, SLOT(map()));
     }
-    Q_ASSERT(b);
 }
 
 Canvas::~Canvas()
@@ -675,6 +674,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                                 diff.setY(0);
                             }
                         }
+                        //qDebug() << "move selected";
                         m_nodes->moveSelected(diff);
                     }
                 }
@@ -845,6 +845,81 @@ void Canvas::leaveEvent(QEvent *)
 {
     m_mouseWithinWidget = false;
     repaint();
+}
+
+void Canvas::keyPressEvent(QKeyEvent *event)
+{
+	if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+        const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
+        
+        //qDebug() << "node : " << node->x() << "," << node->y();
+        qDebug() << "canvas node : " << convertTimeToCanvas(*node);
+        //qDebug() << "mouse " << m_states.prevMousePos << " vs " << m_states.initialMousePos;
+        if (!m_states.nodesMoved) {
+            qDebug() << "should be Moving node " << node;
+        	Node_sV diff;
+            
+            switch (event->key()) {
+                case Qt::Key_Up:
+                    //qDebug() << "key up";
+                    diff = convertCanvasToTime(QPoint(0,-1))-convertCanvasToTime(QPoint(0,0));
+                    break;
+                case Qt::Key_Down:
+                    //qDebug() << "key down";
+                    diff = convertCanvasToTime(QPoint(0,1))-convertCanvasToTime(QPoint(0,0));
+                    break;
+                case Qt::Key_Right:
+                    //qDebug() << "key right";
+                    diff = convertCanvasToTime(QPoint(1,0))-convertCanvasToTime(QPoint(0,0));
+                    break;
+                case Qt::Key_Left:
+                    //qDebug() << "key left";
+                    diff = convertCanvasToTime(QPoint(-1,0))-convertCanvasToTime(QPoint(0,0));
+                    break;
+            }
+            //qDebug() << "moving of " << diff;
+            m_nodes->moveSelected(diff);
+            //TODO: update other windows ?
+            //TODO: confirm move ?
+            // from mouserelease
+            
+             /*if (m_states.countsAsMove()) */{
+                m_nodes->confirmMove();
+                //qDebug() << "key Move confirmed.";
+                emit nodesChanged();
+                
+                repaint();
+            }                        
+#if 1
+            // from mouse move ?
+            // Emit the source time at the mouse position
+            emit signalMouseInputTimeChanged(node->y()
+                                             * m_project->frameSource()->fps()->fps()
+                                             );
+            
+            //TODO: get right time !
+            // Emit the source time at the intersection of the out time and the curve
+            qreal timeOut = node->x();
+            if (m_nodes->size() > 1 && m_nodes->startTime() <= timeOut && timeOut <= m_nodes->endTime()) {
+                
+#ifdef DEBUG_C
+                std::cout.precision(32);
+                std::cout << "start: " << m_nodes->startTime() << ", out: " << timeOut << ", end: " << m_nodes->endTime() << std::endl;
+#endif
+                
+                if (m_nodes->find(timeOut) >= 0) {
+                    emit signalMouseCurveSrcTimeChanged(
+                                                        timeOut/*m_nodes->sourceTime(timeOut)*/
+                                                        * m_project->frameSource()->fps()->fps());
+                }
+            }
+#endif // mouse ?
+            
+                     
+        }
+        //event->ignore();
+	}
+	QWidget::keyPressEvent(event);
 }
 
 void Canvas::wheelEvent(QWheelEvent *e)
@@ -1075,7 +1150,7 @@ void Canvas::slotRunAction(QObject *o)
         case TransferObject::ACTION_RENAME:
         {
             bool ok;
-            QString newName = QInputDialog::getText(this, tr("New tag name"), tr("Tag:"), QLineEdit::Normal, tag->description(), &ok);
+            QString newName = QInputDialog::getText(this, tr("New tag name"), tr("Tag:"), QLineEdit::Normal, tag->description(), &ok, 0, Qt::ImhNone );
             if (ok) {
                 tag->setDescription(newName);
             }
@@ -1176,9 +1251,7 @@ void Canvas::slotSetShutterFunction()
 
     if (m_shutterFunctionDialog == NULL) {
         m_shutterFunctionDialog = new ShutterFunctionDialog(m_project, this);
-        bool b = true;
-        b &= connect(this, SIGNAL(nodesChanged()), m_shutterFunctionDialog, SLOT(slotNodesUpdated()));
-        Q_ASSERT(b);
+        connect(this, SIGNAL(nodesChanged()), m_shutterFunctionDialog, SLOT(slotNodesUpdated()));
     }
 
     m_shutterFunctionDialog->setSegment(left);

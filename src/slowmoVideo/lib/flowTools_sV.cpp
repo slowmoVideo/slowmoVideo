@@ -14,6 +14,15 @@ void FlowTools_sV::deleteRect(FlowField_sV &field, int top, int left, int bottom
     }
 }
 
+void FlowTools_sV::fillRect(FlowField_sV &field, int top, int left, int bottom, int right, float vx, float vy)
+{
+    for (int y = top; y <= bottom; y++) {
+        for (int x = left; x <= right; x++) {
+            field.setX(x,y, vx);
+            field.setY(x,y, vy);
+        }
+    }
+}
 void FlowTools_sV::refill(FlowField_sV &field, const Kernel_sV &kernel, int top, int left, int bottom, int right)
 {
     assert(top <= bottom);

@@ -307,14 +307,15 @@ void Interpolate_sV::forwardFlow(const QImage &left, const FlowField_sV *flow, f
             forward.moveX = flow->x(x, y);
             forward.moveY = flow->y(x, y);
 
-#ifdef INTERPOLATE
+
             posX = x - pos*forward.moveX;
             posY = y - pos*forward.moveY;
-	    posX = CLAMP(posX, 0, Wmax);
-	    posY = CLAMP(posY, 0, Hmax);
-	    colOut = interpolate(left, posX, posY);
+	        posX = CLAMP(posX, 0, Wmax);
+	        posY = CLAMP(posY, 0, Hmax);
+#ifdef INTERPOLATE
+	        colOut = interpolate(left, posX, posY);
 #else
-            colOut = QColor(left.pixel(x - pos*forward.moveX, y - pos*forward.moveY));
+            colOut = QColor(left.pixel(posX, posY));
 #endif
 	    output.setPixel(x,y, colOut.rgb());
 	}
@@ -455,4 +456,40 @@ void Interpolate_sV::bezierFlow(const QImage &prev, const QImage &right, const F
         }
     }
     */
+}
+
+/**
+ * simple linear in time itnerpolation
+ */
+void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, float pos, QImage &output)
+{
+
+  QColor colOut;
+
+    for (int y = 0; y < prev.height(); y++) {
+        for (int x = 0; x < prev.width(); x++) {
+                QRgb lt = prev.pixel(x,y);
+                QRgb rt = right.pixel(x,y);
+
+                int red = CLAMP((1-pos)*qRed(lt)+(pos)*qRed(rt),0,255);
+                int green = CLAMP((1-pos)*qGreen(lt)+(pos)*qGreen(rt),0,255);
+                int blue = CLAMP((1-pos)*qBlue(lt)+(pos)*qBlue(rt),0,255);
+
+                QColor out = QColor::fromRgb(red,green,blue);
+                                  
+                output.setPixel(x,y, out.rgb());
+	   } /* for x */
+    } /* for y */
+}
+
+/**
+ * simple nearest frame interoplation
+ */
+void Interpolate_sV::nearestinterpolate(const QImage &prev, const QImage &right, float pos, QImage &output)
+{
+
+    if (pos<0.5) 
+            output = prev;
+    else
+            output = right;  
 }

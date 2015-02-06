@@ -18,7 +18,8 @@ public:
     ~FlowExaminer();
 
     void examine(int leftFrame);
-
+	void loadFlow();
+	
 private:
     Ui::FlowExaminer *ui;
 
@@ -26,8 +27,23 @@ private:
     FlowField_sV *m_flowLR;
     FlowField_sV *m_flowRL;
 
+	// current frame
+	int frame;
+	// color flow amplification
+	float m_boost;
 private slots:
     void slotMouseMoved(float x, float y);
+    void updateFlow();
+    
+public slots:
+	void newAmplification(int val);
+	
+protected:
+	void wheelEvent(QWheelEvent *);
+    void keyPressEvent(QKeyEvent *event);
+    
+signals:
+     void frameChanged();
 };
 
 #endif // FLOWEXAMINER_H

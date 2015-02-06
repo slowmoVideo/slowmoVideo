@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QMap>
 #include <QtCore/QSignalMapper>
 #include <QtCore/QTime>
-#include <QtGui/QWidget>
+//#include <QtWidgets>
 
 class QShortcut;
 

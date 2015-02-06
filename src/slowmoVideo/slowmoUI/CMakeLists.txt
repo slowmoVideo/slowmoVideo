@@ -12,6 +12,7 @@ set(SRCS
   mainwindow.cpp
   canvas.cpp
   canvasTools.cpp
+  flowEditCanvas.cpp
   frameMonitor.cpp
   renderPreview.cpp
   dialogues/newProjectDialog.cpp
@@ -24,13 +25,23 @@ set(SRCS
   dialogues/flowExaminer.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
+        notificator.cpp
 )
+
+# notification
+if (APPLE)
+set(SRCS
+        ${SRCS}
+        macnotificationhandler.mm
+)
+endif()
 
 set(SRCS_UI
   mainwindow.ui
   canvas.ui
   frameMonitor.ui
   renderPreview.ui
+  flowEditCanvas.ui
   dialogues/newProjectDialog.ui
   dialogues/preferencesDialog.ui
   dialogues/projectPreferencesDialog.ui
@@ -46,6 +57,7 @@ set(SRCS_MOC
   mainwindow.h
   canvas.h
   frameMonitor.h
+  flowEditCanvas.h
   renderPreview.h
   dialogues/newProjectDialog.h
   dialogues/preferencesDialog.h
@@ -57,8 +69,16 @@ set(SRCS_MOC
   dialogues/flowExaminer.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
+        notificator.h
 )
 
+# notification
+if (APPLE)
+set(SRCS_MOC
+        ${SRCS_MOC}
+        macnotificationhandler.h
+)
+endif()
 
 if(APPLE)
 	set(BUNDLE "slowmoUI")
@@ -78,7 +98,7 @@ if(APPLE)
 	SET_SOURCE_FILES_PROPERTIES(
 	   ${MACOSX_BUNDLE_ICON} 
 	    PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-        message(STATUS "Bundle will be : ${MACOSX_BUNDLE} =>  ${PROJECT_NAME} ")
+        message(STATUS "slowmoUI Bundle will be : ${MACOSX_BUNDLE} ")
 
 	set( SRCS ${SRCS} ${MACOSX_BUNDLE_ICON} )
 
@@ -92,36 +112,74 @@ include_directories(..)
 
 # Embed images in the binary
 set(SRC_RES resources.qrc)
-qt4_add_resources(RES_OUT ${SRC_RES})
+qt_add_resources(RES_OUT ${SRC_RES})
 
 # Generate header files from the .ui files
-qt4_wrap_ui(UI_H_OUT ${SRCS_UI})
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_ui(UI_H_OUT ${SRCS_UI})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
 
-
+link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
-target_link_libraries(slowmoUI sVproj sVvis sVgui ${EXTERNAL_LIBS})
+qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
+target_link_libraries(slowmoUI sVproj sVvis sVgui )
 
 if(APPLE)
   configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
   set_target_properties(${PROGNAME} PROPERTIES
                         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+  #ADD_CUSTOM_COMMAND(TARGET slowmoUI
+  #  POST_BUILD
+  #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
+  #  COMMENT "Updating Info.plist"
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
+
 endif()
 
-install(TARGETS ${slowmoUI}
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
+#install(TARGETS ${slowmoUI}
+#        BUNDLE DESTINATION . COMPONENT Runtime
+#        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
-if (APPLE)
-	install(TARGETS slowmoUI DESTINATION ".")
-       include(DeployQt4)
-       install_qt4_executable(slowmoUI.app "" ""  )
-	
+if (UNIX)
+# create desktop file for KDE/Gnome
+# desktop file section
+	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"
+"#!/usr/bin/env xdg-open
+[Desktop Entry]
+Type=Application
+Comment=Slow Motion Video
+Exec=${CMAKE_INSTALL_PREFIX}/bin/slowmoUI
+GenericName=slowmoVideo
+Icon=${CMAKE_INSTALL_PREFIX}/share/icons/AppIcon.png
+MimeType=
+Name=slowmoUI
+Terminal=false
+Categories=Qt;AudioVideo;Video;\n")
+
+	#install ( FILES icons/slowmoUI.png DESTINATION share/icons )
+	install ( FILES res/AppIcon.png DESTINATION share/icons )
+	install ( FILES ${PROJECT_BINARY_DIR}/slowmoUI.desktop DESTINATION share/applications
+		PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
+endif()
+
+install(TARGETS slowmoUI DESTINATION ".")
+if (Qt5Core_FOUND)
+	include(DeployQt5) # 2.8.7 or later
 else()
-	install(TARGETS slowmoUI DESTINATION ${DEST})
+	include(DeployQt4) # 2.8.7 or later
+endif()
+
+#set( PLUGINS "qjpeg;qtiff" )
+set( PLUGINS qjpeg )
+if (APPLE)
+       install_qt_executable(slowmoUI.app "${PLUGINS}"  )
+elseif(WIN32)
+       install_qt_executable(slowmoUI.exe "${PLUGINS}"  )
+else()
+       install_qt_executable(slowmoUI "${PLUGINS}"  )
 endif()
 

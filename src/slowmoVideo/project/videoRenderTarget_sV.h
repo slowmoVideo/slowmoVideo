@@ -13,7 +13,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "abstractRenderTarget_sV.h"
 
-class VideoOut_sV;
+struct VideoOut_sV;
 class RenderTask_sV;
 
 /// Produces videos from frames.

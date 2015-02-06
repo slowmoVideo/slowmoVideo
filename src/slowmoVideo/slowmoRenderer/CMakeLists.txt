@@ -8,8 +8,9 @@ set(SRCS
 set(SRCS_MOC
     slowmoRenderer_sV.h
 )
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 add_executable(slowmoRenderer ${SRCS} ${MOC_OUT})
 target_link_libraries(slowmoRenderer sVproj ${EXTERNAL_LIBS})
+qt_use_modules(slowmoRenderer Script Widgets Concurrent Gui  Core )
 install(TARGETS slowmoRenderer DESTINATION ${DEST})

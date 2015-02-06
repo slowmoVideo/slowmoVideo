@@ -30,11 +30,13 @@ public:
 
     void setAmplification(float val);
     float amplification() const;
-
+	
+	
 public slots:
     void slotLoadFlow(QString filename);
     void slotSaveFlow(QString filename = QString());
-
+	void newAmplification(int val);
+	
 private:
     Ui::FlowEditCanvas *ui;
 
@@ -42,11 +44,15 @@ private:
     QString m_flowFilename;
     float m_boost;
 
+    float vx,vy;
+
+    int tool;
     void repaintFlow();
 
 private slots:
     void slotRectDrawn(QRectF imageRect);
     void slotExamineValues(float x, float y);
+    void slotPickValues(float x, float y);
 };
 
 #endif // FLOWEDITCANVAS_H

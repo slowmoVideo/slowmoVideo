@@ -11,12 +11,21 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "flowEditCanvas.h"
-#include "shortcutListDialog.h"
+
+#include <QtCore>
+#include <QObject>
+#include <QMainWindow>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QtWidgets>
+#endif
+#include <QSettings>
 
 #include <QtCore/QDebug>
-#include <QtGui/QFileDialog>
-#include <QtGui/QMessageBox>
+#include <QFileDialog>
+#include <QMessageBox>
+
+#include "flowEditCanvas.h"
+#include "shortcutListDialog.h"
 
 #define MAX_SEARCH_SHIFT 500
 
@@ -38,9 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_cs.addShortcut("s-s", SAVE, "Save");
     m_cs.addShortcut("j", PREV, "Previous file");
     m_cs.addShortcut("k", NEXT, "Next file");
-    m_cs.addShortcut("b-1", BOOST1, "No amplification");
-    m_cs.addShortcut("b-2", BOOST2, "Low amplification");
-    m_cs.addShortcut("b-3", BOOST3, "High amplification (details best visible)");
+    //m_cs.addShortcut("b-1", BOOST1, "No amplification");
+    //m_cs.addShortcut("b-2", BOOST2, "Low amplification");
+    //m_cs.addShortcut("b-3", BOOST3, "High amplification (details best visible)");
     m_cs.addShortcut("q-q", QUIT, "Quit");
     m_cs.addShortcut("h-h", HELP, "Show shortcut dialog");
 
@@ -51,15 +60,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionNext->setShortcut(QKeySequence("Ctrl+Right"));
     ui->actionShortcuts->setShortcut(QKeySequence("F1"));
 
-    bool b = true;
-    b &= connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    b &= connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotOpenFlow()));
-    b &= connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveFlow()));
-    b &= connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(slotNextFile()));
-    b &= connect(ui->actionPrev, SIGNAL(triggered()), this, SLOT(slotPrevFile()));
-    b &= connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotShowShortcuts()));
-    b &= connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
-    Q_ASSERT(b);
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotOpenFlow()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveFlow()));
+    connect(ui->actionNext, SIGNAL(triggered()), this, SLOT(slotNextFile()));
+    connect(ui->actionPrev, SIGNAL(triggered()), this, SLOT(slotPrevFile()));
+    connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotShowShortcuts()));
+    connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
 
 
     updateTitle();
@@ -211,6 +218,7 @@ void MainWindow::amplify(float val)
 
 void MainWindow::slotShortcutUsed(int id)
 {
+/*
     if (id == BOOST1) {
         qDebug() << "Amplify 1";
         amplify(1);
@@ -220,7 +228,9 @@ void MainWindow::slotShortcutUsed(int id)
     } else if (id == BOOST3) {
         qDebug() << "Amplify 3";
         amplify(9);
-    } else if (id == PREV) {
+    } else 
+    */
+    if (id == PREV) {
         slotPrevFile();
     } else if (id == NEXT) {
         slotNextFile();

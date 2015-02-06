@@ -1,0 +1,21 @@
+Source: slowmovideo
+Section: unknown
+Priority: optional
+Maintainer: vbr <vbrasseur@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), cmake, qtbase5-dev
+#todo : libavformat-dev, libopencv-dev, libqt4-dev, freeglut3-dev, libglew1.6-dev, libsdl1.2-dev
+Standards-Version: 3.9.4
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/slowmovideo.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/slowmovideo.git;a=summary
+
+Package: slowmovideo
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: slowmovideo-doc
+Architecture: all
+Description: documentation for slowmovideo
+ <insert long description, indented with spaces>

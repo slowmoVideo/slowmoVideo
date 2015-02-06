@@ -18,11 +18,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QSettings>
 #include <QtCore/QTime>
 
-FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, float lambda) :
-    AbstractFlowSource_sV(project),
-    m_lambda(lambda)
+FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, double lambda) :
+    AbstractFlowSource_sV(project)
 {
     createDirectories();
+    m_lambda = lambda;
 }
 
 void FlowSourceV3D_sV::slotUpdateProjectDir()
@@ -38,10 +38,6 @@ void FlowSourceV3D_sV::createDirectories()
     m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
 
-void FlowSourceV3D_sV::setLambda(float lambda)
-{
-    m_lambda = lambda;
-}
 
 FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {

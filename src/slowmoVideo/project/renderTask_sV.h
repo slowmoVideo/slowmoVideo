@@ -1,11 +1,5 @@
 /*
-This file is part of slowmoVideo.
-Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+* 2014 Valery Brasseur <vbrasseur@gmail.com>
 */
 
 #ifndef RENDERTASK_SV_H
@@ -19,46 +13,35 @@ the Free Software Foundation, either version 3 of the License, or
 class Project_sV;
 class AbstractRenderTarget_sV;
 
-/**
-  \brief Renders a project when started.
-  */
-class RenderTask_sV : public QObject
+
+
+#include <QObject>
+#include <QMutex>
+
+class RenderTask_sV : public QObject 
 {
     Q_OBJECT
+    
 public:
     RenderTask_sV(Project_sV *project);
     ~RenderTask_sV();
 
     /**
-      \fn setRenderTarget()
-      \brief Manages the \c renderTarget pointer (includes destruction).
-      */
+     * Requests the process to start
+     *
+     * It is thread safe as it uses #mutex to protect access to #_working variable.
+     */
+    void requestWork();
     /**
-      \fn setTimeRange(qreal, qreal)
-      \brief Sets the time range (in seconds) for rendering. By default, the whole project is rendered.
-      \todo Accept other formats: f:123 for frames, t:Tag for tags, :start/:end for project start/end
-      */
-    /**
-      \fn setTimeRange(QString, QString)
-      \brief Sets the time range for rendering.
+     *  Requests the process to abort
+     *
+     * It is thread safe as it uses #mutex to protect access to #_abort variable.
+     */
+    void abort();
 
-      Note that setFPS() has to be called \i before this function is called.
-
-      Accepted input format is described in Project_sV::toOutTime().
-      */
-    /**
-      \fn setFPS()
-      Sets the number of frames per second for rendering.
-      */
-    /**
-      \fn setSize()
-      Sets the size to use for rendering.
-      */
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(qreal start, qreal end);
     void setTimeRange(QString start, QString end);
-
-    void setQtConnectionType(Qt::ConnectionType type);
 
     /// Rendered frames per second
     Fps_sV fps() { return m_prefs.fps(); }
@@ -66,25 +49,22 @@ public:
     QSize resolution();
 
     RenderPreferences_sV& renderPreferences() { return m_prefs; }
-
-
-public slots:
-    void slotContinueRendering();
-    void slotStopRendering();
-    // reset?
-
-signals:
-    void signalNewTask(QString desc, int taskSize);
-    void signalItemDesc(QString desc);
-    void signalTaskProgress(int value);
-    void signalRenderingContinued();
-    void signalRenderingStopped(QString renderTime);
-    void signalRenderingFinished(QString renderTime);
-    void signalRenderingAborted(QString reason);
-
-    void signalFrameRendered(qreal time, int frameNumber);
-
+    
+    void setupProgress(QString desc, int taskSize);
+    void updateProgress(int value);
+    void stepProgress(int step=1);
+    void updateMessage(QString desc);
+    
 private:
+    /**
+     *  true when Worker is doing work
+     */
+    bool _working;
+    /**
+     * Protects access to #_abort
+     */
+    QMutex mutex;
+    
     Project_sV *m_project;
     RenderPreferences_sV m_prefs; ///< \todo Set preferences
 
@@ -96,17 +76,42 @@ private:
     QTime m_stopwatch;
     int m_renderTimeElapsed;
 
-    bool m_initialized;
-    bool m_stopRendering;
+    bool m_stopRendering; //  Process is aborted when true
     qreal m_nextFrameTime;
 
     qreal m_prevTime;
 
-    Qt::ConnectionType m_connectionType;
-
-private slots:
-    void slotRenderFrom(qreal time);
+	int currentProgress;
+	
+signals:
+    /**
+     * This signal is emitted when the Worker request to Work
+     * requestWork()
+     */
+    void workFlowRequested();
+  
+    /**
+     *  signal rendering progression
+     */
+    void signalItemDesc(QString desc);
+    void signalTaskProgress(int value);
+    
+    /**
+     * This signal is emitted when process is finished (or being aborted)
+     */
+    void signalRenderingContinued();
+    void signalRenderingStopped(QString renderTime);
+    void signalRenderingFinished(QString renderTime);
+    void signalRenderingAborted(QString reason);
+       
+    void signalNewTask(QString desc, int taskSize);
+    
+public slots:
+    void slotContinueRendering();
+    void slotStopRendering();
+    // was void doWorkFlow();
 
 };
 
 #endif // RENDERTASK_SV_H
+
