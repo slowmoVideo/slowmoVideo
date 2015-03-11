@@ -56,12 +56,14 @@ add_executable(slowmoFlowEdit WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT}
 qt_use_modules(slowmoFlowEdit Widgets Gui  Core )
 target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis)
 
-install(TARGETS slowmoFlowEdit
-        BUNDLE DESTINATION . COMPONENT Runtime
-        RUNTIME DESTINATION ${DEST} COMPONENT Runtime)
+#install(TARGETS slowmoFlowEdit
+#        BUNDLE DESTINATION . COMPONENT Runtime
+#        RUNTIME DESTINATION ${DEST} COMPONENT Runtime)
 
         #install(TARGETS slowmoUI DESTINATION ".")
         #install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
+install(TARGETS slowmoFlowEdit DESTINATION ".")
+
 if (Qt5Core_FOUND)
         include(DeployQt5) # 2.8.7 or later
 else()
