@@ -182,6 +182,6 @@ elseif(WIN32)
        install_qt_executable(slowmoUI.exe "${PLUGINS}"  )
 else()
        install(TARGETS slowmoUI DESTINATION ${DEST})
-       install_qt_executable(slowmoUI "${PLUGINS}"  )
+#       install_qt_executable(slowmoUI "${PLUGINS}"  )
 endif()
 

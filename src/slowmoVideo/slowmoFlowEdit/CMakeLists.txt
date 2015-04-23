@@ -77,6 +77,6 @@ elseif(WIN32)
        install_qt_executable(slowmoFlowEdit.exe "" ""  )
 else()
        install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
-       install_qt_executable(slowmoFlowEdit "" ""  )
+#       install_qt_executable(slowmoFlowEdit "" ""  )
 endif()
 
