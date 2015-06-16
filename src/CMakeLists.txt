@@ -29,7 +29,7 @@ endif(CMAKE_TOOLCHAIN_FILE)
 
 
 ### CMake Configuration ###
-option (ENABLE_TESTS "Build the unit tests" TRUE)
+option (ENABLE_TESTS "Build the unit tests" FALSE)
 set(ADDITIONAL_LIBS "")
 if(MSYS)
   message(STATUS "MSYS system detected.")
@@ -167,6 +167,7 @@ endif(NOT MSYS)
 if (APPLE AND USE_QTKIT)
 	find_package(QTKIT)
 	message(STATUS "QTKIT find at ${QTKIT_LIBRARY} ")
+	set(ADDITIONAL_LIBS "-framework Cocoa -framework QTKit -framework QuartzCore -framework AppKit -framework OpenCL")
 endif()
 	
 find_package(OpenCV)
