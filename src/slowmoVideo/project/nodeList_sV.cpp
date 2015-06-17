@@ -90,14 +90,14 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
         } else {
             if (index >= m_list.size()) {
                 qDebug() << "index " << index << " is > list size: " << m_list.size();
-                Q_ASSERT(false);
+                //Q_ASSERT(false);
             } else {
                 srcTime = m_list[index].y();
             }
         }
     } else {
         qDebug() << "No node before " << targetTime;
-        Q_ASSERT(false);
+        //Q_ASSERT(false);
         if (m_list.size() > 0) {
             srcTime = m_list[0].y();
         }
@@ -608,3 +608,4 @@ QDebug operator<<(QDebug dbg, const NodeList_sV &list)
     }
     return dbg.maybeSpace();
 }
+
