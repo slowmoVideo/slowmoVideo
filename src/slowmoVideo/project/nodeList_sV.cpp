@@ -88,16 +88,19 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
                 srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
             }
         } else {
+	    //TODO:
             if (index >= m_list.size()) {
                 qDebug() << "index " << index << " is > list size: " << m_list.size();
-                Q_ASSERT(false);
+                //Q_ASSERT(false);
             } else {
                 srcTime = m_list[index].y();
             }
         }
     } else {
+	// this seem because no project loaded ?
+	// TODO: how can we check ?
         qDebug() << "No node before " << targetTime;
-        Q_ASSERT(false);
+        //Q_ASSERT(false);
         if (m_list.size() > 0) {
             srcTime = m_list[0].y();
         }
