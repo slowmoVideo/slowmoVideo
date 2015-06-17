@@ -62,7 +62,6 @@ target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis)
 
         #install(TARGETS slowmoUI DESTINATION ".")
         #install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
-install(TARGETS slowmoFlowEdit DESTINATION ".")
 
 if (Qt5Core_FOUND)
         include(DeployQt5) # 2.8.7 or later
@@ -71,10 +70,13 @@ else()
 endif()
 
 if (APPLE)
+       install(TARGETS slowmoFlowEdit DESTINATION ".")
        install_qt_executable(slowmoFlowEdit.app "" ""  )
 elseif(WIN32)
+       install(TARGETS slowmoFlowEdit DESTINATION ".")
        install_qt_executable(slowmoFlowEdit.exe "" ""  )
 else()
-       install_qt_executable(slowmoFlowEdit "" ""  )
+       install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
+#       install_qt_executable(slowmoFlowEdit "" ""  )
 endif()
 
