@@ -29,7 +29,7 @@ endif(CMAKE_TOOLCHAIN_FILE)
 
 
 ### CMake Configuration ###
-option (ENABLE_TESTS "Build the unit tests" TRUE)
+option (ENABLE_TESTS "Build the unit tests" FALSE)
 set(ADDITIONAL_LIBS "")
 if(MSYS)
   message(STATUS "MSYS system detected.")
@@ -149,7 +149,7 @@ endif()
 
 message("Qt libraries found at : ${Qt5Gui_LIBRARIES} /  ${QT_LIBRARIES}" )
 
-set (USE_QTKIT ON CACHE BOOL "Build with the QTKit encoder")
+set (USE_QTKIT OFF CACHE BOOL "Build with the QTKit encoder")
 set (USE_FFMPEG ON CACHE BOOL "Build with the FFMPEG encoder")
 set (USE_DBUS OFF CACHE BOOL "Build with the DBUS notification support")
 
@@ -167,7 +167,7 @@ endif(NOT MSYS)
 if (APPLE AND USE_QTKIT)
 	find_package(QTKIT)
 	message(STATUS "QTKIT find at ${QTKIT_LIBRARY} ")
-	set(ADDITIONAL_LIBS "-framework AppKit")
+	set(ADDITIONAL_LIBS "-framework Cocoa -framework QTKit -framework QuartzCore -framework AppKit -framework OpenCL")
 endif()
 	
 find_package(OpenCV)
