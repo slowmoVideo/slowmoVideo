@@ -744,6 +744,8 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                         if (m_states.initialContextObject == NULL || dynamic_cast<const Node_sV*>(m_states.initialContextObject) == NULL) {
                             if (m_mode == ToolMode_Select) {
                                 Node_sV p = convertCanvasToTime(m_states.initialMousePos);
+                                // TODO: check here for snap to grid ?
+                                //qDebug() << "adding new node ?";
                                 m_nodes->add(p);
                                 emit nodesChanged();
                             } else {
@@ -1023,6 +1025,7 @@ Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
                                                        height()-1 - m_distBottom - p.y()
                                                        ));
     QPointF tFinal = tDelta + m_t0.toQPointF();
+    //qDebug() << "convert: " << tFinal;
     return Node_sV(tFinal.x(), tFinal.y());
 }
 QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const
