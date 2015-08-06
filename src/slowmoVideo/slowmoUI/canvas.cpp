@@ -745,7 +745,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                             if (m_mode == ToolMode_Select) {
                                 Node_sV p = convertCanvasToTime(m_states.initialMousePos);
                                 // TODO: check here for snap to grid ?
-                                //qDebug() << "adding new node ?";
+                                if (QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier) == true) {
+                                    qDebug() << "snap to frame ?";
+                                }
                                 m_nodes->add(p);
                                 emit nodesChanged();
                             } else {
