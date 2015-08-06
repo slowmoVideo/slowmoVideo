@@ -314,6 +314,12 @@ void MainWindow::slotNewProject()
             XmlProjectRW_sV writer;
             
             //qDebug() << "Saving project as " << npd.filename;
+            // check if directory exist ...
+            QDir dir(npd.projectFilename());
+            if (!dir.exists()) {
+                dir.mkpath(".");
+            }
+            
             try {
                 writer.saveProject(project, npd.projectFilename());
                 statusBar()->showMessage(QString(tr("Saved project as: %1")).arg(npd.projectFilename()));
