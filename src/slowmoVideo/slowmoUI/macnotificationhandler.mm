@@ -17,12 +17,15 @@ void MacNotificationHandler::showNotification(const QString &title, const QStrin
         NSString *textMac = [[NSString alloc] initWithUTF8String:cString];
 
         // do everything weak linked (because we will keep <10.8 compatibility)
-        id userNotification = [[NSClassFromString(@"NSUserNotification") alloc] init];
-        [userNotification performSelector:@selector(setTitle:) withObject:titleMac];
-        [userNotification performSelector:@selector(setInformativeText:) withObject:textMac];
-
-        id notificationCenterInstance = [NSClassFromString(@"NSUserNotificationCenter") performSelector:@selector(defaultUserNotificationCenter)];
-        [notificationCenterInstance performSelector:@selector(deliverNotification:) withObject:userNotification];
+        Class userNotification = [[NSClassFromString(@"NSUserNotification") alloc] init];
+        if (userNotification) {
+            [userNotification performSelector:@selector(setTitle:) withObject:titleMac];
+            [userNotification performSelector:@selector(setInformativeText:) withObject:textMac];
+        }
+        
+        Class notificationCenterInstance = [NSClassFromString(@"NSUserNotificationCenter") performSelector:@selector(defaultUserNotificationCenter)];
+        if (notificationCenterInstance)
+            [notificationCenterInstance performSelector:@selector(deliverNotification:) withObject:userNotification];
 
         [titleMac release];
         [textMac release];

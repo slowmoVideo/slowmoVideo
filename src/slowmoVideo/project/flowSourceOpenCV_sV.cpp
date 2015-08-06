@@ -18,7 +18,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-// ?
 // not use #include "opencv2/gpu/gpumat.hpp"
 
 #include "opencv2/ocl/ocl.hpp" 

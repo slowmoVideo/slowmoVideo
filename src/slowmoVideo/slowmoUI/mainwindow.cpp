@@ -312,7 +312,22 @@ void MainWindow::slotNewProject()
 
             // Save project
             XmlProjectRW_sV writer;
-            writer.saveProject(project, npd.projectFilename());
+            
+            //qDebug() << "Saving project as " << npd.filename;
+            // check if directory exist ...
+            QDir dir(npd.projectFilename());
+            if (!dir.exists()) {
+                dir.mkpath(".");
+            }
+            
+            try {
+                writer.saveProject(project, npd.projectFilename());
+                statusBar()->showMessage(QString(tr("Saved project as: %1")).arg(npd.projectFilename()));
+                setWindowModified(false);
+            } catch (Error_sV &err) {
+                QMessageBox(QMessageBox::Warning, tr("Error writing project file"), err.message()).exec();
+            }
+            
             m_projectPath = npd.projectFilename();
 
             project->preferences()->viewport_secRes() = QPointF(400, 400)/project->frameSource()->framesCount()*project->frameSource()->fps()->fps();
