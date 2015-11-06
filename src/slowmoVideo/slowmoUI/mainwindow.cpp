@@ -180,6 +180,13 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     if (!projectPath.isEmpty()) {
         loadProject(projectPath);
     }
+    
+    if (!settings.contains("binaries/ffmpeg")) {
+        qDebug() << "need to find ffmpeg";
+        //TODO: show message box warning
+        PreferencesDialog dialog;
+        dialog.exec();
+    }
 }
 
 MainWindow::~MainWindow()
