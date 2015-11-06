@@ -241,6 +241,7 @@ find_package(GLUT)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
+find_package(X11)
 
 # Windows: Try to find libraries that could not be found manually in the libs/ directory.
 if(WIN32)
@@ -352,7 +353,7 @@ if (BUILD_FLOW_BUILDER)
     )
 
     add_library(V3D ${ALL_SRC})
-    target_link_libraries(V3D ${GLEW_LIBRARIES})
+    target_link_libraries(V3D ${GLEW_LIBRARIES} X11)
     #install(TARGETS V3D DESTINATION lib)
     add_subdirectory(V3D/Apps)
 endif (BUILD_FLOW_BUILDER)
