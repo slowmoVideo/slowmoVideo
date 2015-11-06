@@ -675,7 +675,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                             }
                         }
                         //qDebug() << "move selected";
-                        m_nodes->moveSelected(diff);
+                        bool snap = (e->modifiers() & Qt::ShiftModifier);
+                        //TODO qDebug() << "is snap ? " << snap;
+                        m_nodes->moveSelected(diff,snap);
                     }
                 }
                 m_states.nodesMoved = true;
@@ -726,7 +728,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
     repaint();
 }
 
-void Canvas::mouseReleaseEvent(QMouseEvent *)
+void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_states.initialButtons.testFlag(Qt::LeftButton)) {
         if (!m_states.moveAborted) {
@@ -743,9 +745,13 @@ void Canvas::mouseReleaseEvent(QMouseEvent *)
                         // Try to select a node below the mouse. If there is none, add a point.
                         if (m_states.initialContextObject == NULL || dynamic_cast<const Node_sV*>(m_states.initialContextObject) == NULL) {
                             if (m_mode == ToolMode_Select) {
-                                Node_sV p = convertCanvasToTime(m_states.initialMousePos);
-                                // TODO: check here for snap to grid ?
-                                //qDebug() << "adding new node ?";
+                                // check snap to grid
+                                //qDebug()<< event->modifiers();
+                                bool snap = (event->modifiers() & Qt::ShiftModifier);
+                                //qDebug() << "snap to frame ? " << snap;
+                                
+                                Node_sV p = convertCanvasToTime(m_states.initialMousePos,snap);
+                                //qDebug() << "adding node";
                                 m_nodes->add(p);
                                 emit nodesChanged();
                             } else {
@@ -1015,7 +1021,7 @@ const CanvasObject_sV* Canvas::objectAt(QPoint pos, Qt::KeyboardModifiers modifi
 
 ////////// Conversion Time <--> Screen pixels
 
-Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
+Node_sV Canvas::convertCanvasToTime(const QPoint &p, bool snap) const
 {
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
@@ -1026,6 +1032,9 @@ Node_sV Canvas::convertCanvasToTime(const QPoint &p) const
                                                        ));
     QPointF tFinal = tDelta + m_t0.toQPointF();
     //qDebug() << "convert: " << tFinal;
+    if (snap) {
+        tFinal.setX(int(tFinal.x()));
+    }
     return Node_sV(tFinal.x(), tFinal.y());
 }
 QPoint Canvas::convertTimeToCanvas(const Node_sV &p) const

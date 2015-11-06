@@ -260,7 +260,7 @@ bool NodeList_sV::validate() const
 
 ////////// Moving
 
-void NodeList_sV::moveSelected(const Node_sV &time)
+void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
 {
     qreal maxRMove = 100000;
     qreal maxLMove = -100000;
