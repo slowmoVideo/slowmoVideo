@@ -183,7 +183,9 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     
     if (!settings.contains("binaries/ffmpeg")) {
         qDebug() << "need to find ffmpeg";
-        //TODO: show message box warning
+	QMessageBox::information( this, 
+		"valid FFMPEG not found", "Please choose a working ffmpeg\n" , 
+		QMessageBox::Ok, 0 );
         PreferencesDialog dialog;
         dialog.exec();
     }
