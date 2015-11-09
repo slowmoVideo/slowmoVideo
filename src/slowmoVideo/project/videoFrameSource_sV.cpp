@@ -192,7 +192,7 @@ void VideoFrameSource_sV::locateFFmpeg()
                                   "\n(It is also possible that it took a little long to respond "
                                   "due to high workload, so you might want to try again.)"
                           #ifdef WINDOWS
-                                  "\nPlease download the 32-bit static ffmpeg build from ffmpeg.zeranoe.com "
+                                  "\nPlease download the static ffmpeg build from ffmpeg.zeranoe.com "
                                   "and extract ffmpeg.exe in the same directory as slowmoUI.exe."
                           #endif
                                   ));
