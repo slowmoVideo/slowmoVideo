@@ -136,21 +136,31 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 
 void FlowSourceOpenCV_sV::initGPUDevice(int dev)
 {
-   if (dev == -1) {
-	qDebug() << "bad OCL device : " << dev << "for rendering not using it !";
-	use_gpu = 0;
-   } else {
-	qDebug() << "using OCL device : " << dev << "for rendering";
-	use_gpu = 1;
-	ocl::PlatformsInfo platforms;
-    ocl::getOpenCLPlatforms(platforms);
-    
-    ocl::DevicesInfo devInfo;
-    cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
-      
-    ocl::setDevice(devInfo[dev]);
-    std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
-  }
+    if (dev == -1) {
+        qDebug() << "bad OCL device : " << dev << "for rendering not using it !";
+        use_gpu = 0;
+    } else {
+        qDebug() << "using OCL device : " << dev << "for rendering";
+        int ocl_support = isOCLsupported();
+        if (ocl_support)  {
+            use_gpu = 1;
+            ocl::PlatformsInfo platforms;
+            ocl::getOpenCLPlatforms(platforms);
+            
+            ocl::DevicesInfo devInfo;
+            cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
+            
+            ocl::setDevice(devInfo[dev]);
+            std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
+        } else {
+            qDebug() << "no OCL device : " << dev << "for rendering";
+            //TODO: display warning ?
+            /*QMessageBox::information( this,
+                    "OpenCL not found", "OpenCL not found but configured, please check your preferences\n",                    QMessageBox::Ok, 0 );
+            */
+            use_gpu = 0;
+        }
+    }
 }
      
 void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
