@@ -13,6 +13,28 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDebug>
 #include "mainwindow.h"
 
+//TODO: 
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QFile file(QDate::currentDate().toString("slowmovideo_dd_MM_yyyy.log"));
+ 
+    file.open(QIODevice::Append | QIODevice::Text);
+ 
+    QTextStream out(&file);
+    out << QTime::currentTime().toString("hh:mm:ss.zzz ");
+ 
+    switch (type)
+    {
+    case QtDebugMsg:    out << "DBG"; break;
+    case QtWarningMsg:  out << "WRN"; break;
+    case QtCriticalMsg: out << "CRT"; break;
+    case QtFatalMsg:    out << "FTL"; break;
+    }
+ 
+    out << " slowmovideo " << msg << '\n';
+    out.flush();
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -25,6 +47,15 @@ int main(int argc, char *argv[])
         QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
     }
 #endif
+
+ // Setup debug output system.
+#if QT_VERSION >= 0x050000
+  qInstallMessageHandler(myMessageOutput);
+#else
+  qInstallMsgHandler(myMessageOutput);
+#endif
+
+    //QDebug()<<"starting app"
 
     QApplication a(argc, argv);
 
