@@ -17,6 +17,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
 
+#include "project/videoFrameSource_sV.h"
+#include "project/emptyFrameSource_sV.h"
+#include "project/imagesFrameSource_sV.h"
+
 #ifdef USE_FFMPEG
 #if 0
 #include "project/new_videoRenderTarget.h"
@@ -81,6 +85,49 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
     }
 }
 
+void SlowmoRenderer_sV::create() throw(Error)
+{
+    std::cout << "Standalone Rendering." << std::endl;
+    
+    if (m_project != NULL) {
+        delete m_project;
+        m_project = NULL;
+    }
+    
+    try {
+        //TODO: ? file path
+        m_project = new Project_sV();
+        
+        Node_sV snode;
+
+        snode.setX(0.0);
+        snode.setY(0.0);
+        m_project->nodes()->add(snode);
+        
+        Node_sV enode;
+        
+        enode.setX(1.0);
+        enode.setY(1.0);
+        m_project->nodes()->add(enode);
+
+        
+        RenderTask_sV *task = new RenderTask_sV(m_project);
+        m_project->replaceRenderTask(task);
+        task->renderPreferences().setFps(24);
+        task->setTimeRange(m_start, m_end);
+        
+        connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
+        connect(m_project->renderTask(), SIGNAL(signalTaskProgress(int)), this, SLOT(slotProgressInfo(int)));
+        connect(m_project->renderTask(), SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotFinished(QString)));
+        connect(m_project->renderTask(), SIGNAL(signalRenderingFinished(QString)), this, SLOT(slotFinished(QString)));
+        connect(m_project->renderTask(), SIGNAL(signalRenderingStopped(QString)), this, SLOT(slotFinished(QString)));
+        
+    } catch (Error_sV &err) {
+        throw Error(err.message().toStdString());
+    }
+}
+
+
 void SlowmoRenderer_sV::setTimeRange(QString start, QString end)
 {
     m_start = start;
@@ -93,6 +140,11 @@ void SlowmoRenderer_sV::setFps(double fps)
     m_project->renderTask()->renderPreferences().setFps(fps);
 }
 
+void SlowmoRenderer_sV::setInputTarget(QString inFilename)
+{
+        m_project->loadFrameSource(new VideoFrameSource_sV(m_project, inFilename));
+}
+                                             
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
 {
 #ifdef USE_FFMPEG

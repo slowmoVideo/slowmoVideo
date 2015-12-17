@@ -35,6 +35,7 @@ public:
     ~SlowmoRenderer_sV();
 
     void load(QString filename) throw(Error);
+    void create() throw(Error);
     void start();
     void abort();
 
@@ -42,6 +43,7 @@ public:
     void setFps(double fps);
     void setVideoRenderTarget(QString filename, QString codec);
     void setImagesRenderTarget(QString filenamePattern, QString directory);
+    void setInputTarget(QString inFilename);
     void setInterpolation(InterpolationType interpolation);
     void setMotionblur(MotionblurType motionblur);
     void setSize(bool original);

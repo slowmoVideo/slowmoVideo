@@ -44,6 +44,7 @@ void printHelp()
     std::cout << "slowmoRenderer for slowmoVideo " << Version_sV::version.toStdString() << std::endl
               << myName.toStdString() << " <project>" << std::endl
               << "\t-target [video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
+              << "\t-input video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
               << "\t-size [small|orig] " << std::endl
               << "\t-fps <fps> " << std::endl
               << "\t-start <startTime> -end <endTime> " << std::endl
@@ -89,7 +90,9 @@ int main(int argc, char *argv[])
 
 
 
+    //TODO: args
     renderer.load(args.at(1));
+    //renderer.create();
 
     QString start = ":start";
     QString end = ":end";
@@ -119,6 +122,25 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
+        } else if ("-input" == args.at(next)) {
+            require(2, next, n);
+            next++;
+            if ("video" == args.at(next)) {
+                next++;
+                QString filename = args.at(next++);
+                
+                renderer.setInputTarget(filename);
+                
+            } else if ("images" == args.at(next)) {
+                next++;
+                QString filenamePattern = args.at(next++);
+                QString dir = args.at(next++);
+                //renderer.setImagesRenderTarget(filenamePattern, dir);
+                
+            } else {
+                std::cerr << "Not a valid input: " << args.at(next).toStdString() << std::endl;
+                return -1;
+            }
         } else if ("-size" == args.at(next)) {
             require(1, next, n);
             next++;
