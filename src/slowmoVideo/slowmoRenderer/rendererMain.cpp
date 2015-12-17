@@ -44,7 +44,7 @@ void printHelp()
     std::cout << "slowmoRenderer for slowmoVideo " << Version_sV::version.toStdString() << std::endl
               << myName.toStdString() << " <project>" << std::endl
               << "\t-target [video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
-              << "\t-input video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
+              << "\t-input video <path> | images <filenamePattern> <directory> ] " << std::endl
               << "\t-size [small|orig] " << std::endl
               << "\t-fps <fps> " << std::endl
               << "\t-start <startTime> -end <endTime> " << std::endl
@@ -135,6 +135,7 @@ int main(int argc, char *argv[])
                 next++;
                 QString filenamePattern = args.at(next++);
                 QString dir = args.at(next++);
+                //TODO: pattern ?
                 //renderer.setImagesRenderTarget(filenamePattern, dir);
                 
             } else {
