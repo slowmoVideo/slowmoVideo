@@ -324,7 +324,8 @@ void MainWindow::slotNewProject()
             
             //qDebug() << "Saving project as " << npd.filename;
             // check if directory exist ...
-            QDir dir(npd.projectFilename());
+            QFileInfo projfile(npd.projectFilename());
+            QDir dir(projfile.absoluteDir());
             if (!dir.exists()) {
                 dir.mkpath(".");
             }
