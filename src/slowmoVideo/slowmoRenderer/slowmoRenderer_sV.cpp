@@ -142,7 +142,13 @@ void SlowmoRenderer_sV::setFps(double fps)
 
 void SlowmoRenderer_sV::setInputTarget(QString inFilename)
 {
-        m_project->loadFrameSource(new VideoFrameSource_sV(m_project, inFilename));
+    m_project->loadFrameSource(new VideoFrameSource_sV(m_project, inFilename));
+    
+    connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
+    connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
+    
+    m_project->frameSource()->initialize();
+    
 }
                                              
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)
@@ -237,6 +243,16 @@ bool SlowmoRenderer_sV::isComplete(QString &message) const
         message.append("No render target set.\n");
     }
     return b;
+}
+
+void SlowmoRenderer_sV::slotNewFrameSourceTask(const QString taskDescription, int taskSize)
+{
+     std::cout << "slotNewFrameSourceTask";
+}
+
+void SlowmoRenderer_sV::slotFrameSourceTasksFinished()
+{
+        std::cout << "slotFrameSourceTasksFinished";
 }
 
 

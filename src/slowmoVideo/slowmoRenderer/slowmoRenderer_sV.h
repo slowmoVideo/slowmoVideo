@@ -73,6 +73,10 @@ private slots:
     void slotProgressInfo(int progress);
     void slotTaskSize(QString desc, int size);
     void slotFinished(QString time);
+    
+    void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
+    void slotFrameSourceTasksFinished();
+
 };
 
 
