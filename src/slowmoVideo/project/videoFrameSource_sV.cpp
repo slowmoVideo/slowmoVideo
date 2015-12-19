@@ -282,3 +282,23 @@ void VideoFrameSource_sV::slotProgressUpdate()
     }
     m_ffmpegSemaphore.release();
 }
+
+
+void VideoFrameSource_sV::loadOrigFrames()
+{
+    
+    m_ffmpegSemaphore.acquire();
+    
+    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->terminate();
+    
+    
+    extractFramesFor(FrameSize_Orig, m_ffmpeg);
+    
+    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->terminate();
+    
+    m_ffmpegSemaphore.release();
+    
+    
+}

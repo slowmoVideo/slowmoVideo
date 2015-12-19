@@ -51,6 +51,8 @@ public:
     /** \return The absolute path of the input video file. */
     const QString videoFile() const;
 
+    void loadOrigFrames();
+    
 public slots:
     void slotAbortInitialization();
     void slotUpdateProjectDir();

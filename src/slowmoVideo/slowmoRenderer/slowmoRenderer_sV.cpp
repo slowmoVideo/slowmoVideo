@@ -147,7 +147,8 @@ void SlowmoRenderer_sV::setInputTarget(QString inFilename)
     connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
     connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
     
-    m_project->frameSource()->initialize();
+    //m_project->frameSource()->initialize();
+    m_project->frameSource()->loadOrigFrames();
     
 }
                                              

@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
 
 
     //TODO: args
-    renderer.load(args.at(1));
-    //renderer.create();
+    //renderer.load(args.at(1));
+    renderer.create();
 
     QString start = ":start";
     QString end = ":end";
