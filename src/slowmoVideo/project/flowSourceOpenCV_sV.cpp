@@ -285,7 +285,15 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
             qDebug() << "will try to use " << prevflowFileName << " as initial flow";
             // load flow file ,
         }
-        
+
+	// check if file have been generated !
+	//TODO: maybe better error handling ?
+	if (!QFile(prevpath).exists()) 
+		throw FlowBuildingError(QString("Could not read image " + prevpath));
+
+	if (!QFile(path).exists()) 
+		throw FlowBuildingError(QString("Could not read image " + path));
+
         prevgray = imread(prevpath.toStdString(), 0);
         gray = imread(path.toStdString(), 0);
         

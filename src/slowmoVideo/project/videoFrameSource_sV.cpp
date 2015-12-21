@@ -13,9 +13,13 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QtCore/QProcess>
 #include <QtCore/QTimer>
+#include <QtCore/QTime>
 #include <QtCore/QRegExp>
 
 QRegExp VideoFrameSource_sV::regexFrameNumber("frame=\\s*(\\d+)");
+
+//not sure about that here, means unlimited !
+const int tmout = (-1);
 
 /// \todo Check QProcess::exitCode() to find out if ffmpeg worked or not
 VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename)
@@ -207,7 +211,7 @@ void VideoFrameSource_sV::slotExtractSmallFrames()
 
         m_ffmpegSemaphore.acquire();
 
-        m_ffmpeg->waitForFinished(2000);
+        m_ffmpeg->waitForFinished(tmout);
         m_ffmpeg->terminate();
 
         disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
@@ -230,7 +234,7 @@ void VideoFrameSource_sV::slotExtractOrigFrames()
 
         m_ffmpegSemaphore.acquire();
 
-        m_ffmpeg->waitForFinished(2000);
+        m_ffmpeg->waitForFinished(tmout);
         m_ffmpeg->terminate();
 
         disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
@@ -251,7 +255,7 @@ void VideoFrameSource_sV::slotInitializationFinished()
     emit signalAllTasksFinished();
 
     m_ffmpegSemaphore.acquire();
-    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->waitForFinished(tmout);
     m_ffmpeg->terminate();
     m_ffmpegSemaphore.release();
 
@@ -289,15 +293,19 @@ void VideoFrameSource_sV::loadOrigFrames()
     
     m_ffmpegSemaphore.acquire();
     
-    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->waitForFinished(tmout);
     m_ffmpeg->terminate();
     
+	QTime time;
+        time.start();
     
     extractFramesFor(FrameSize_Orig, m_ffmpeg);
     
-    m_ffmpeg->waitForFinished(2000);
+    m_ffmpeg->waitForFinished(tmout);
     m_ffmpeg->terminate();
-    
+   
+    qDebug() << "ffmpeg in  " << time.elapsed()  << "ms";
+
     m_ffmpegSemaphore.release();
     
     
