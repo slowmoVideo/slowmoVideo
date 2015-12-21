@@ -16,6 +16,7 @@ the Free Software Foundation, either version 3 of the License, or
 //TODO: 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+//	QDir::temp()
     QFile file(QDate::currentDate().toString("slowmovideo_dd_MM_yyyy.log"));
  
     file.open(QIODevice::Append | QIODevice::Text);
