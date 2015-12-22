@@ -37,6 +37,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QSettings>
 #include <QThread>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QTemporaryDir>
+#endif
+
 //#define DEBUG_P
 #ifdef DEBUG_P
 #include <iostream>
@@ -45,9 +49,17 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define MIN_FRAME_DIST .001
 
-Project_sV::Project_sV() :
-    m_projDir(QDir::temp())
+Project_sV::Project_sV()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    //QTemporaryDir tempDir("slowmovideo");
+    QTemporaryDir tempDir;; // use default
+    if (tempDir.isValid())
+        m_projDir = QDir(tempDir.path());
+    else
+#endif
+        m_projDir = QDir::temp();
+    
     init();
     
     int tid;

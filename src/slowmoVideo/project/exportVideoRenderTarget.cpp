@@ -24,6 +24,7 @@ the Free Software Foundation, either version 3 of the License, or
 exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask) :
     AbstractRenderTarget_sV(parentRenderTask)
 {
+    //TODO: should use projectdir to create render dir
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     //QTemporaryDir tempDir("slowmovideo");
     QTemporaryDir tempDir;; // use default
