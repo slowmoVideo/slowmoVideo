@@ -27,8 +27,9 @@ FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, double lambda) :
 
 void FlowSourceV3D_sV::slotUpdateProjectDir()
 {
-    m_dirFlowSmall.rmdir(".");
-    m_dirFlowOrig.rmdir(".");
+    //TODO: check
+    //m_dirFlowSmall.rmdir(".");
+    //m_dirFlowOrig.rmdir(".");
     createDirectories();
 }
 

@@ -170,8 +170,9 @@ void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
         		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
 {
-    m_dirFlowSmall.rmdir(".");
-    m_dirFlowOrig.rmdir(".");
+    //TODO: check if needed ?
+    //m_dirFlowSmall.rmdir(".");
+    //m_dirFlowOrig.rmdir(".");
     createDirectories();
 }
 

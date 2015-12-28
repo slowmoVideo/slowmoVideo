@@ -64,9 +64,10 @@ VideoFrameSource_sV::~VideoFrameSource_sV()
 
 void VideoFrameSource_sV::slotUpdateProjectDir()
 {
+    //TODO: is it really needed ?
     // Delete old directories if they are empty
-    m_dirFramesSmall.rmdir(".");
-    m_dirFramesOrig.rmdir(".");
+    //m_dirFramesSmall.rmdir(".");
+    //m_dirFramesOrig.rmdir(".");
     createDirectories();
 }
 
