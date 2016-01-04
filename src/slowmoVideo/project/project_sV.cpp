@@ -51,6 +51,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 Project_sV::Project_sV()
 {
+
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     //QTemporaryDir tempDir("slowmovideo");
     QTemporaryDir tempDir;; // use default
@@ -69,16 +70,11 @@ Project_sV::Project_sV()
     }
 }
 
-Project_sV::Project_sV(QString projectDir) :
-    m_projDir(projectDir)
+Project_sV::Project_sV(QString projectDir) 
 {
+
     init();
 
-    // Create directory if necessary
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
-    if (!m_projDir.exists()) {
-        m_projDir.mkpath(".");
-    }
 }
 
 void Project_sV::init()
@@ -174,6 +170,15 @@ void Project_sV::reloadFlowSource()
         ocv->setupOpticalFlow(3,15,1.2,0.5,5);
     }
     
+}
+
+void Project_sV::setupProjectDir()
+{
+    qDebug() << "Project directory: " << m_projDir.absolutePath();
+
+    m_frameSource->slotUpdateProjectDir();
+    m_flowSource->slotUpdateProjectDir();
+    m_motionBlur->slotUpdateProjectDir();
 }
 
 void Project_sV::setProjectDir(QString projectDir)

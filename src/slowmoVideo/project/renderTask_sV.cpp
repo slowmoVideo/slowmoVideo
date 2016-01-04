@@ -25,6 +25,8 @@ m_renderTimeElapsed(0),
 m_stopRendering(false),
 m_prevTime(-1)
 {
+    m_project->setupProjectDir();
+
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
     
