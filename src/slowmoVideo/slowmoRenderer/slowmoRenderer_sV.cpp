@@ -128,6 +128,11 @@ void SlowmoRenderer_sV::create() throw(Error)
 }
 
 
+void SlowmoRenderer_sV::setSpeed(double slowfactor)
+{
+	m_project->nodes()->setSpeed(0,slowfactor);
+}
+
 void SlowmoRenderer_sV::setTimeRange(QString start, QString end)
 {
     m_start = start;

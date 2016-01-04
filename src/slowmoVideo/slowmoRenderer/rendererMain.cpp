@@ -22,6 +22,7 @@ SlowmoRenderer_sV renderer;
 
 int terminateCounter = 0;
 
+//TODO: maybe in case of abort we should remove directories ?
 void terminate(int)
 {
     if (terminateCounter == 0) {
@@ -34,6 +35,7 @@ void terminate(int)
     terminateCounter++;
     renderer.abort();
 }
+
 void printProgress(int)
 {
     renderer.printProgress();
@@ -221,7 +223,19 @@ int main(int argc, char *argv[])
             renderer.setV3dLambda(lambda);
             next++;
 
-        } else {
+        } else if ("-slowfactor" == args.at(next)) {
+            require(1, next, n);
+            next++;
+            bool b;
+            double slowfactor = args.at(next).toDouble(&b);
+            if (!b) {
+                std::cerr << "Not a number: " << args.at(next).toStdString() << std::endl;
+                return -1;
+            }
+            std::cerr << "will slow down to : " << slowfactor << std::endl;
+	    renderer.setSpeed(slowfactor);
+            next++;
+	} else {
             std::cout << "Argument not recognized: " << args.at(next).toStdString() << std::endl;
             printHelp();
             return -1;

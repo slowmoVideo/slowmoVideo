@@ -48,6 +48,7 @@ public:
     void setMotionblur(MotionblurType motionblur);
     void setSize(bool original);
     void setV3dLambda(float lambda);
+    void setSpeed(double slowfactor);
 
 
     void printProgress();
