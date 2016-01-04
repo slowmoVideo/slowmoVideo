@@ -42,7 +42,7 @@ void printProgress(int)
 void printHelp()
 {
     std::cout << "slowmoRenderer for slowmoVideo " << Version_sV::version.toStdString() << std::endl
-              << myName.toStdString() << " <project>" << std::endl
+              << myName.toStdString() << " [<project>]" << std::endl
               << "\t-target [video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
               << "\t-input video <path> | images <filenamePattern> <directory> ] " << std::endl
               << "\t-size [small|orig] " << std::endl
@@ -90,15 +90,17 @@ int main(int argc, char *argv[])
 
 
 
-    //TODO: args
-    //renderer.load(args.at(1));
-    renderer.create();
+    int next = 1;
+    if ((args.at(1)).contains("svProj", Qt::CaseInsensitive) ) {
+	    renderer.load(args.at(1));
+	    next = 2;
+    } else 
+	    renderer.create();
 
     QString start = ":start";
     QString end = ":end";
 
     const int n = args.size();
-    int next = 2;
     while (next < n) {
         if ("-target" == args.at(next)) {
             require(3, next, n);
