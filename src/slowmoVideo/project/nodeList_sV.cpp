@@ -444,8 +444,14 @@ void NodeList_sV::fixHandles(int leftIndex)
         m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).leftNodeHandle().y());
     }
 }
-void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
+
+/**
+ * on error return int indicating error type
+ * hint : maybe add error method ?
+ */
+int NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
 {
+    int error = 0;
     int left, right;
     findBySegment(segmentTime, left, right);
     if (left >= 0 && right >= 0) {
@@ -455,9 +461,11 @@ void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
         if (y > m_maxY || y < 0) {
             if (y > m_maxY) {
                 qDebug() << speed << "x speed would shoot over maximum time. Correcting.";
+                error = -1;
                 y = m_maxY;
             } else {
                 qDebug() << speed << "x speed goes below 0. Correcting.";
+                error = -2;
                 y = 0;
             }
             qreal xNew = leftN->x() + (y - leftN->y())/speed;
@@ -466,14 +474,17 @@ void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
                 add(Node_sV(xNew, y));
             } else {
                 qDebug() << "New node would be too close, not adding it.";
+                error = -3;
             }
         } else {
             rightN->setY(y);
         }
     } else {
         qDebug() << "Outside segment.";
+        error = -4;
     }
     validate();
+    return error;
 }
 
 

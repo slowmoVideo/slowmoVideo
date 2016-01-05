@@ -340,6 +340,14 @@ void MainWindow::slotNewProject()
             m_projectPath = npd.projectFilename();
 
             project->preferences()->viewport_secRes() = QPointF(400, 400)/project->frameSource()->framesCount()*project->frameSource()->fps()->fps();
+            
+            /* add a first (default) node */
+            Node_sV snode;
+            
+            snode.setX(0.0);
+            snode.setY(0.0);
+            project->nodes()->add(snode);
+            
             loadProject(project);
 
             m_wCanvas->showHelp(true);

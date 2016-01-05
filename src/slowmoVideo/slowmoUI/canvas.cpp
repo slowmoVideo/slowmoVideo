@@ -38,7 +38,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtGui/QPainterPath>
 #include <QMenu>
 #include <QInputDialog>
-
+#include <QMessageBox>
 
 
 //#define VALIDATE_BEZIER
@@ -1222,10 +1222,35 @@ void Canvas::slotResetHandle(const QString &position)
         qDebug() << "Object at mouse position is " << m_states.initialContextObject << ", cannot reset the handle.";
     }
 }
+
+/**
+ *
+ */
 void Canvas::setCurveSpeed(double speed)
 {
+    QString message;
+    
     qDebug() << "Setting curve to " << speed << "x speed.";
-    m_nodes->setSpeed(convertCanvasToTime(m_states.prevMousePos).x(), speed);
+    int errcode = m_nodes->setSpeed(convertCanvasToTime(m_states.prevMousePos).x(), speed);
+    //TODO: should find a better way ... (try/catch ?)
+    switch (errcode) {
+        case -1:
+            message = tr("x speed would shoot over maximum time. Correcting.");
+            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            break;
+        case -2:
+            message = tr("x speed goes below 0. Correcting.");
+            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            break;
+        case -3:
+            message = tr("New node would be too close, not adding it.");
+            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            break;
+        case -4 :
+            message = tr("Outside segment.");
+            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            break;
+    }
     emit nodesChanged();
     repaint();
 }

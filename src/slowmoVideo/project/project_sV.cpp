@@ -105,7 +105,7 @@ void Project_sV::init()
     m_renderTask = NULL;
 
     m_v3dFailCounter = 0;
-
+    
     /* better here ? */
     int tid;
     for(tid=0;tid<4;tid++) {
@@ -174,7 +174,7 @@ void Project_sV::reloadFlowSource()
 
 void Project_sV::setupProjectDir()
 {
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
+    //qDebug() << "Project directory: " << m_projDir.absolutePath();
 
     m_frameSource->slotUpdateProjectDir();
     m_flowSource->slotUpdateProjectDir();
@@ -189,15 +189,15 @@ void Project_sV::setProjectDir(QString projectDir)
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
-    m_frameSource->slotUpdateProjectDir();
-    m_flowSource->slotUpdateProjectDir();
-    m_motionBlur->slotUpdateProjectDir();
+  
+    setupProjectDir();
 }
 
 void Project_sV::setProjectFilename(QString filename)
 {
     m_projectFilename = filename;
 }
+
 QString Project_sV::projectFilename() const {
     return m_projectFilename;
 }

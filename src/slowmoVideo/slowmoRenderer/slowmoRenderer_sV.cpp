@@ -98,8 +98,9 @@ void SlowmoRenderer_sV::create() throw(Error)
         //TODO: ? file path
         m_project = new Project_sV();
         
+        /* add a first (default) node */
         Node_sV snode;
-
+        
         snode.setX(0.0);
         snode.setY(0.0);
         m_project->nodes()->add(snode);
