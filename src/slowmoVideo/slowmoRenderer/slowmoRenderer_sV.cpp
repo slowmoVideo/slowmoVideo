@@ -51,7 +51,19 @@ SlowmoRenderer_sV::SlowmoRenderer_sV() :
 
 SlowmoRenderer_sV::~SlowmoRenderer_sV()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+        m_project->getProjectDir().removeRecursively();
+#else
+#warning  removeRecursively not define in QT4
+#endif
+
     delete m_project;
+}
+
+void SlowmoRenderer_sV::save(QString filename)
+{
+	XmlProjectRW_sV writer;
+	writer.saveProject(m_project, filename);
 }
 
 void SlowmoRenderer_sV::load(QString filename) throw(Error)
@@ -130,11 +142,12 @@ void SlowmoRenderer_sV::setSpeed(double slowfactor)
        	// linear slope ? 
 	// maybe should calc ?
 	// need to check for video loaded ?
-        enode.setX(m_project->frameSource()->maxTime());
         enode.setY(m_project->frameSource()->maxTime());
+        enode.setX((1/slowfactor)*m_project->frameSource()->maxTime());
         m_project->nodes()->add(enode);
 
-	m_project->nodes()->setSpeed(0,slowfactor);
+	//m_project->nodes()->setSpeed(0,slowfactor);
+	m_project->renderTask()->setTimeRange(m_start, m_end);
 }
 
 void SlowmoRenderer_sV::setTimeRange(QString start, QString end)

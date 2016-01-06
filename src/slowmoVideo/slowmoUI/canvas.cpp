@@ -1235,11 +1235,11 @@ void Canvas::setCurveSpeed(double speed)
     //TODO: should find a better way ... (try/catch ?)
     switch (errcode) {
         case -1:
-            message = tr("x speed would shoot over maximum time. Correcting.");
+            message = tr("%1 x speed would shoot over maximum time. Correcting.").arg(speed);
             QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
         case -2:
-            message = tr("x speed goes below 0. Correcting.");
+            message = tr("%1 x speed goes below 0. Correcting.").arg(speed);
             QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
         case -3:

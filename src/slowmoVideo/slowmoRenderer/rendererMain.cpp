@@ -21,6 +21,7 @@ QString myName;
 SlowmoRenderer_sV renderer;
 
 int terminateCounter = 0;
+int genproj = 0;
 
 //TODO: maybe in case of abort we should remove directories ?
 void terminate(int)
@@ -251,6 +252,9 @@ int main(int argc, char *argv[])
         return 42;
     }
 
-    renderer.start();
+    if (genproj) 
+	renderer.save("test.svProj");
+    else
+	renderer.start();
 
 }

@@ -35,6 +35,7 @@ public:
     ~SlowmoRenderer_sV();
 
     void load(QString filename) throw(Error);
+    void save(QString filename);
     void create() throw(Error);
     void start();
     void abort();
