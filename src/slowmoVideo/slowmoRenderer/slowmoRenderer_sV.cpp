@@ -36,6 +36,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <iostream>
 
 Error::Error(std::string message) :
+    // m_nodes->setMaxY(m_frameSource->maxTime());
     message(message) {}
 
 SlowmoRenderer_sV::SlowmoRenderer_sV() :
@@ -98,24 +99,11 @@ void SlowmoRenderer_sV::create() throw(Error)
         //TODO: ? file path
         m_project = new Project_sV();
         
-        /* add a first (default) node */
-        Node_sV snode;
-        
-        snode.setX(0.0);
-        snode.setY(0.0);
-        m_project->nodes()->add(snode);
-        
-        Node_sV enode;
-        
-        enode.setX(1.0);
-        enode.setY(1.0);
-        m_project->nodes()->add(enode);
-
         
         RenderTask_sV *task = new RenderTask_sV(m_project);
         m_project->replaceRenderTask(task);
         task->renderPreferences().setFps(24);
-        task->setTimeRange(m_start, m_end);
+        //task->setTimeRange(m_start, m_end);
         
         connect(m_project->renderTask(), SIGNAL(signalNewTask(QString,int)), this, SLOT(slotTaskSize(QString,int)));
         connect(m_project->renderTask(), SIGNAL(signalTaskProgress(int)), this, SLOT(slotProgressInfo(int)));
@@ -131,6 +119,21 @@ void SlowmoRenderer_sV::create() throw(Error)
 
 void SlowmoRenderer_sV::setSpeed(double slowfactor)
 {
+        /* add a first (default) node */
+        Node_sV snode;
+        
+        snode.setX(0.0);
+        snode.setY(0.0);
+        m_project->nodes()->add(snode);
+        
+        Node_sV enode;
+       	// linear slope ? 
+	// maybe should calc ?
+	// need to check for video loaded ?
+        enode.setX(m_project->frameSource()->maxTime());
+        enode.setY(m_project->frameSource()->maxTime());
+        m_project->nodes()->add(enode);
+
 	m_project->nodes()->setSpeed(0,slowfactor);
 }
 
@@ -155,7 +158,8 @@ void SlowmoRenderer_sV::setInputTarget(QString inFilename)
     
     //m_project->frameSource()->initialize();
     m_project->frameSource()->loadOrigFrames();
-    
+    // m_nodes->setMaxY(m_frameSource->maxTime());
+//   	std::cerr << "max time : " << m_project->frameSource()->maxTime() << std::endl; 
 }
                                              
 void SlowmoRenderer_sV::setVideoRenderTarget(QString filename, QString codec)

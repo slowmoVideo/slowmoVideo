@@ -1236,19 +1236,19 @@ void Canvas::setCurveSpeed(double speed)
     switch (errcode) {
         case -1:
             message = tr("x speed would shoot over maximum time. Correcting.");
-            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
         case -2:
             message = tr("x speed goes below 0. Correcting.");
-            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
         case -3:
             message = tr("New node would be too close, not adding it.");
-            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
         case -4 :
             message = tr("Outside segment.");
-            QMessageBox(QMessageBox::Warning, tr("Error"), message, QMessageBox::Ok).exec();
+            QMessageBox(QMessageBox::Warning, tr("Warning"), message, QMessageBox::Ok).exec();
             break;
     }
     emit nodesChanged();
