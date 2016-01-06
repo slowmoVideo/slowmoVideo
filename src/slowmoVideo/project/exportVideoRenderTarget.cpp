@@ -48,12 +48,14 @@ qDebug() << "  target dir " << m_targetDir;
 
 exportVideoRenderTarget::~exportVideoRenderTarget()
 {
+#ifdef _DO_NOT_KEEP_TEMP
 	// QT bug ?
 	qDebug() << "should remove dir : " << m_targetDir;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
  	m_targetDir.removeRecursively();
 #else
 #warning  removeRecursively not define in QT4
+#endif
 #endif
 }
 
