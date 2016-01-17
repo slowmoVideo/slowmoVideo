@@ -60,6 +60,8 @@ public:
     ProjectPreferences_sV* preferences() { return m_preferences; }
 
     void setProjectDir(QString projectDir);
+    void setupProjectDir(); // TODO:
+    QDir getProjectDir() { return m_projDir; };
     /** The project filename should be set when saving or loading the project. */
     void setProjectFilename(QString filename);
     /** \return The filename this project was last saved as. */

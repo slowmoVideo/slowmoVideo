@@ -170,13 +170,16 @@ void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
         		
 void FlowSourceOpenCV_sV::slotUpdateProjectDir()
 {
-    m_dirFlowSmall.rmdir(".");
-    m_dirFlowOrig.rmdir(".");
+    //TODO: check if needed ?
+    //qDebug() << "FlowSourceOpenCV_sV::slotUpdateProjectDir()"; 
+    //m_dirFlowSmall.rmdir(".");
+    //m_dirFlowOrig.rmdir(".");
     createDirectories();
 }
 
 void FlowSourceOpenCV_sV::createDirectories()
 {
+    //qDebug() << "FlowSourceOpenCV_sV::createDirectories()"; 
     m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
     m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
 }
@@ -285,7 +288,15 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
             qDebug() << "will try to use " << prevflowFileName << " as initial flow";
             // load flow file ,
         }
-        
+
+	// check if file have been generated !
+	//TODO: maybe better error handling ?
+	if (!QFile(prevpath).exists()) 
+		throw FlowBuildingError(QString("Could not read image " + prevpath));
+
+	if (!QFile(path).exists()) 
+		throw FlowBuildingError(QString("Could not read image " + path));
+
         prevgray = imread(prevpath.toStdString(), 0);
         gray = imread(path.toStdString(), 0);
         

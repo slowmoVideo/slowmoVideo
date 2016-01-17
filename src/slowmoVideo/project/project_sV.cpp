@@ -37,6 +37,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QSettings>
 #include <QThread>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QTemporaryDir>
+#endif
+
 //#define DEBUG_P
 #ifdef DEBUG_P
 #include <iostream>
@@ -45,9 +49,18 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define MIN_FRAME_DIST .001
 
-Project_sV::Project_sV() :
-    m_projDir(QDir::temp())
+Project_sV::Project_sV()
 {
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    //QTemporaryDir tempDir("slowmovideo");
+    QTemporaryDir tempDir;; // use default
+    if (tempDir.isValid())
+        m_projDir = QDir(tempDir.path());
+    else
+#endif
+        m_projDir = QDir::temp();
+    
     init();
     
     int tid;
@@ -57,16 +70,11 @@ Project_sV::Project_sV() :
     }
 }
 
-Project_sV::Project_sV(QString projectDir) :
-    m_projDir(projectDir)
+Project_sV::Project_sV(QString projectDir) 
 {
+
     init();
 
-    // Create directory if necessary
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
-    if (!m_projDir.exists()) {
-        m_projDir.mkpath(".");
-    }
 }
 
 void Project_sV::init()
@@ -97,7 +105,7 @@ void Project_sV::init()
     m_renderTask = NULL;
 
     m_v3dFailCounter = 0;
-
+    
     /* better here ? */
     int tid;
     for(tid=0;tid<4;tid++) {
@@ -164,6 +172,15 @@ void Project_sV::reloadFlowSource()
     
 }
 
+void Project_sV::setupProjectDir()
+{
+    //qDebug() << "Project directory: " << m_projDir.absolutePath();
+
+    m_frameSource->slotUpdateProjectDir();
+    m_flowSource->slotUpdateProjectDir();
+    m_motionBlur->slotUpdateProjectDir();
+}
+
 void Project_sV::setProjectDir(QString projectDir)
 {
     m_projDir = projectDir;
@@ -172,15 +189,15 @@ void Project_sV::setProjectDir(QString projectDir)
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
-    m_frameSource->slotUpdateProjectDir();
-    m_flowSource->slotUpdateProjectDir();
-    m_motionBlur->slotUpdateProjectDir();
+  
+    setupProjectDir();
 }
 
 void Project_sV::setProjectFilename(QString filename)
 {
     m_projectFilename = filename;
 }
+
 QString Project_sV::projectFilename() const {
     return m_projectFilename;
 }

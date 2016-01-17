@@ -6,6 +6,7 @@
 #define RENDERTASK_SV_H
 
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 #include <QtCore/QTime>
 
 #include "renderPreferences_sV.h"
@@ -42,6 +43,8 @@ public:
     void setRenderTarget(AbstractRenderTarget_sV *renderTarget);
     void setTimeRange(qreal start, qreal end);
     void setTimeRange(QString start, QString end);
+
+    QDir getRenderDirectory();
 
     /// Rendered frames per second
     Fps_sV fps() { return m_prefs.fps(); }

@@ -70,6 +70,8 @@ public:
     virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) = 0;
     virtual const QString framePath(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
+    virtual void loadOrigFrames() =0;
+    
 signals:
     /**
       \fn void signalNextTask(const QString taskDescription, int taskSize)

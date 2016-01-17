@@ -25,6 +25,8 @@ m_renderTimeElapsed(0),
 m_stopRendering(false),
 m_prevTime(-1)
 {
+    m_project->setupProjectDir();
+
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
     
@@ -138,6 +140,18 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
+/*
+ * return a suitable dir for rendered frame
+ */
+QDir RenderTask_sV::getRenderDirectory() {
+	//bug using : return m_project->getDirectory("cache/rendered");
+	QDir dir(m_project->getProjectDir().absolutePath() + "/" + "rendered");
+	if (!dir.exists()) {
+		dir.mkpath(".");
+	}
+	return dir;
+
+}
 
 #pragma mark - 
 #pragma mark rendering
