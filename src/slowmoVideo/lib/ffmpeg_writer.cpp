@@ -148,6 +148,8 @@ void VideoFFMPEG::readOutput()
 		last = regex.cap(1).toInt();
     	}
 	//qDebug() << "got " << line;
+    //TODO: may check if we need to stop/cancel here
+    // qprocess->kill() ?
 }
 
 void VideoFFMPEG::encodingFinished(int error) 
