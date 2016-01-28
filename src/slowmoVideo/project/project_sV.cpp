@@ -70,7 +70,7 @@ Project_sV::Project_sV()
     }
 }
 
-Project_sV::Project_sV(QString projectDir) 
+Project_sV::Project_sV(QString projectDir) : m_projDir(projectDir)
 {
 
     init();
