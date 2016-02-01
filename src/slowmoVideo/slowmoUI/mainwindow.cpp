@@ -617,8 +617,8 @@ void MainWindow::slotShowRenderDialog()
             
             //emit signalRendererContinue();
             //m_rendererThread.exec ();
-            task->requestWork();
             m_rendererThread.start();
+            task->requestWork();
         }
     } else {
     	QMessageBox(QMessageBox::Warning, tr("Aborted"), tr("Aborted by user"), QMessageBox::Ok).exec();
