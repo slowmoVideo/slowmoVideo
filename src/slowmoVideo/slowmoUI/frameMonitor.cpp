@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QImage>
 #include <QPainter>
 #include <QDebug>
+#include <QSettings>
 
 FrameMonitor::FrameMonitor(QWidget *parent) :
     QWidget(parent),
@@ -21,6 +22,11 @@ FrameMonitor::FrameMonitor(QWidget *parent) :
     m_semaphore(1)
 {
     ui->setupUi(this);
+    
+    QSettings settings("MyCompany", "MyApp");
+    restoreGeometry(settings.value("myWidget/geometry").toByteArray());
+    //restoreState(settings.value("myWidget/windowState").toByteArray());
+    
     m_queue[0] = NULL;
     m_queue[1] = NULL;
     
@@ -49,6 +55,14 @@ void FrameMonitor::slotLoadImage(const QString &filename)
     }
     m_semaphore.release();
     repaint();
+}
+
+void FrameMonitor::closeEvent(QCloseEvent *event)
+{
+    QSettings settings("MyCompany", "MyApp");
+    settings.setValue("geometry", saveGeometry());
+    //settings.setValue("windowState", saveState());
+    QWidget::closeEvent(event);
 }
 
 void FrameMonitor::paintEvent(QPaintEvent *)

@@ -33,7 +33,7 @@ public:
 
 protected:
     virtual void paintEvent(QPaintEvent *event);
-
+    virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
     void slotLoadImage(const QString &filename);
