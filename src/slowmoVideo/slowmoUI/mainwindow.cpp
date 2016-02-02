@@ -58,9 +58,6 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    restoreGeometry(m_settings.value("geometry").toByteArray());
-    restoreState(m_settings.value("windowState").toByteArray());
-
     m_project = new Project_sV();
 
     m_wCanvas = new Canvas(m_project, this);
@@ -85,6 +82,8 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     m_wRenderPreviewDock->setObjectName("renderPreview");
     addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
 
+   
+    
     // Fill the view menu that allows (de)activating widgets
     QObjectList windowChildren = children();
     QDockWidget *w;
@@ -168,6 +167,7 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
 
 
+    
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
 
@@ -175,6 +175,9 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     bool show = settings.value("ui/displayHelp", false).toBool();
     m_wCanvas->showHelp(show);
     settings.sync();
+
+    restoreGeometry(settings.value("mainwindow/geometry").toByteArray());
+    restoreState(settings.value("mainwindow/windowState").toByteArray());
 
    
     if (!projectPath.isEmpty()) {
@@ -244,9 +247,12 @@ bool MainWindow::okToContinue()
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
+    qDebug() << "closing";
+    m_settings.setValue("mainwindow/geometry", saveGeometry());
+    m_settings.setValue("mainwindow/windowState", saveState());
+    
 	if (okToContinue()) {
-	    m_settings.setValue("geometry", saveGeometry());
-    	m_settings.setValue("windowState", saveState());
+	    
 	    QMainWindow::closeEvent(e);
 	}
 }
@@ -573,16 +579,17 @@ void MainWindow::slotShowFlowExaminerDialog()
 
 void MainWindow::slotShowRenderDialog()
 {
+    if (m_project->renderTask() != NULL) {
+        disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
+    }
+    
     RenderingDialog renderingDialog(m_project, this);
     if (renderingDialog.exec() == QDialog::Accepted) {
         
         RenderTask_sV *task = renderingDialog.buildTask();
         if (task != 0) {
             task->moveToThread(&m_rendererThread);
-            
-            if (m_project->renderTask() != NULL) {
-                disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
-            }
+          
             m_project->replaceRenderTask(task);
             
             if (m_renderProgressDialog == NULL) {
