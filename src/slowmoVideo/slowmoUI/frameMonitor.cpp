@@ -23,8 +23,8 @@ FrameMonitor::FrameMonitor(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    QSettings settings("MyCompany", "MyApp");
-    restoreGeometry(settings.value("myWidget/geometry").toByteArray());
+    //QSettings settings("MyCompany", "MyApp");
+    //restoreGeometry(settings.value("myWidget/geometry").toByteArray());
     //restoreState(settings.value("myWidget/windowState").toByteArray());
     
     m_queue[0] = NULL;
@@ -59,8 +59,9 @@ void FrameMonitor::slotLoadImage(const QString &filename)
 
 void FrameMonitor::closeEvent(QCloseEvent *event)
 {
-    QSettings settings("MyCompany", "MyApp");
-    settings.setValue("geometry", saveGeometry());
+    //TODO:setting ?
+    //QSettings settings("MyCompany", "MyApp");
+    //settings.setValue("geometry", saveGeometry());
     //settings.setValue("windowState", saveState());
     QWidget::closeEvent(event);
 }

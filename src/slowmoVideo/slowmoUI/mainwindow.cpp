@@ -247,12 +247,10 @@ bool MainWindow::okToContinue()
 
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    qDebug() << "closing";
-    m_settings.setValue("mainwindow/geometry", saveGeometry());
-    m_settings.setValue("mainwindow/windowState", saveState());
-    
 	if (okToContinue()) {
-	    
+        qDebug() << "closing";
+        m_settings.setValue("mainwindow/geometry", saveGeometry());
+        m_settings.setValue("mainwindow/windowState", saveState());
 	    QMainWindow::closeEvent(e);
 	}
 }
@@ -496,7 +494,7 @@ void MainWindow::slotForwardInputPosition(qreal frame)
 void MainWindow::slotForwardCurveSrcPosition(qreal frame)
 {
     if (0 <= frame && frame < m_project->frameSource()->framesCount()) {
-        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Orig));
+        m_wCurveMonitor->slotLoadImage(m_project->frameSource()->framePath(qFloor(frame), FrameSize_Small));
     }
 }
 void MainWindow::slotUpdateRenderPreview()
