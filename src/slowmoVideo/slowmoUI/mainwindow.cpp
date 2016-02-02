@@ -583,7 +583,7 @@ void MainWindow::slotShowRenderDialog()
             if (m_project->renderTask() != NULL) {
                 disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
             }
-            m_project->replaceRenderTask(task);
+            //m_project->replaceRenderTask(task);
             
             if (m_renderProgressDialog == NULL) {
                 m_renderProgressDialog = new ProgressDialog(this);
@@ -596,18 +596,18 @@ void MainWindow::slotShowRenderDialog()
             connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
             connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
             connect(task, SIGNAL(signalRenderingFinished(QString)), m_renderProgressDialog, SLOT(slotAllTasksFinished(QString)));
-            connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
+            connect(task, SIGNAL(signalRenderfdcingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
             connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
             connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
             connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
             //connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
             
-            connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
+            //connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
             connect(&m_rendererThread, SIGNAL(started()), task, SLOT(slotContinueRendering()));
 
             connect(task, SIGNAL(signalRenderingFinished(QString)), &m_rendererThread, SLOT(quit()));
 						// done another way ?!
-            //connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLater()));
+            connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLater()));
             
             //connect(&m_rendererThread, &QThread::finished, task, &QObject::deleteLater);
             // let's start

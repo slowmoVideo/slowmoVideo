@@ -215,15 +215,20 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
     m_nodes->setMaxY(m_frameSource->maxTime());
 }
 
+
+//TODO: remove this
 void Project_sV::replaceRenderTask(RenderTask_sV *task)
 {
+    /*
     if (m_renderTask != NULL) {
         m_renderTask->slotStopRendering();
         m_renderTask->deleteLater();
         m_renderTask = NULL;
     }
+     */
     m_renderTask = task;
 }
+
 
 const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists) const
 {
