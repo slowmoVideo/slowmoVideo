@@ -105,10 +105,16 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 	QObject::connect(process, SIGNAL(finished(int)), this, SLOT(encodingFinished(int)));
 	QObject::connect(process,SIGNAL(readyReadStandardOutput()),this,SLOT(readOutput()));
 	QObject::connect(process,SIGNAL(readyReadStandardError()),this,SLOT(readOutput()));
+  QObject::connect(process, SIGNAL(error(QProcess::ProcessError)),
+            this, SLOT(ffmpegError(QProcess::ProcessError)));
+
+  QObject::connect(process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(process_state_changed()));
 
 	process->start(settings.value("binaries/ffmpeg", "ffmpeg").toString(), args);
 	if (!process->waitForStarted()) {
 		qDebug() << "can't start encoding !";
+	  process->deleteLater();
+	  process = 0;
 		return 1;
 	}
 
@@ -117,7 +123,7 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 	qDebug() << process->readAllStandardOutput();
     	qDebug() << process->readAllStandardError();
 	process->terminate();
-	qDebug() << process->exitStatus();
+	qDebug() << "exit : " << process->exitStatus();
 
 	delete process;
 	process = 0;
@@ -126,6 +132,18 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 
 #pragma mark -
 #pragma mark C bridge
+void VideoFFMPEG::process_state_changed()
+{
+    if (process->state() == QProcess::Starting) {
+        qDebug() << "Process is starting up...";
+    }
+    if (process->state() == QProcess::Running) {
+        qDebug() << "Process is now running.";
+    }
+    if (process->state() == QProcess::NotRunning) {
+        qDebug() << "Process is finished running.";
+    }
+}
 
 void VideoFFMPEG::processStarted()
 {
@@ -138,7 +156,7 @@ void VideoFFMPEG::readOutput()
    
 	//qDebug() << "process read";
 	QString line = process->readAllStandardOutput();
-	//qDebug() << "got " << line;
+	//qDebug() << "got [" << line << "]";
 	line = process->readAllStandardError();
  
     	if (regex.lastIndexIn(line) >= 0) {
@@ -148,6 +166,13 @@ void VideoFFMPEG::readOutput()
 		last = regex.cap(1).toInt();
     	}
 	//qDebug() << "got " << line;
+    //TODO: may check if we need to stop/cancel here
+    // qprocess->kill() ?
+}
+
+void VideoFFMPEG::ffmpegError(QProcess::ProcessError error)
+{
+				qDebug() << "ffmpeg finish with error : " << error;
 }
 
 void VideoFFMPEG::encodingFinished(int error) 

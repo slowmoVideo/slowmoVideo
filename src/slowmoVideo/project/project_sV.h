@@ -141,6 +141,7 @@ private:
 
     NodeList_sV *m_nodes;
     QList<Tag_sV> *m_tags;
+    //TODO: remove this
     RenderTask_sV *m_renderTask;
     ShutterFunctionList_sV *m_shutterFunctions;
 
