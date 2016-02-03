@@ -31,6 +31,9 @@ public:
     explicit FrameMonitor(QWidget *parent = 0);
     ~FrameMonitor();
 
+	  void setCacheLimit(int n);
+	  int cacheLimit() { return cache_limit; };
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
     virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
@@ -45,6 +48,7 @@ private:
     QString *m_queue[2];
     
     // for cache mgmt
+	  int cache_limit;
     QCache<QString, QImage> imgCache;
 };
 

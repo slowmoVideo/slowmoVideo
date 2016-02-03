@@ -23,15 +23,11 @@ FrameMonitor::FrameMonitor(QWidget *parent) :
 {
     ui->setupUi(this);
     
-    //QSettings settings("MyCompany", "MyApp");
-    //restoreGeometry(settings.value("myWidget/geometry").toByteArray());
-    //restoreState(settings.value("myWidget/windowState").toByteArray());
-    
     m_queue[0] = NULL;
     m_queue[1] = NULL;
     
     imgCache.clear();
-    imgCache.setMaxCost(5000);
+	  setCacheLimit(10240); // cache size of 10Mb
 }
 
 FrameMonitor::~FrameMonitor()
@@ -39,6 +35,15 @@ FrameMonitor::~FrameMonitor()
     delete ui;
     if (m_queue[0] != NULL) { delete m_queue[0]; }
     if (m_queue[1] != NULL) { delete m_queue[1]; }
+}
+
+/**
+ *  Sets the cache limit to n kilobytes.
+*/
+void FrameMonitor::setCacheLimit(int n)
+{
+		cache_limit = n;
+    imgCache.setMaxCost(1024 * cache_limit);
 }
 
 void FrameMonitor::slotLoadImage(const QString &filename)
@@ -59,10 +64,6 @@ void FrameMonitor::slotLoadImage(const QString &filename)
 
 void FrameMonitor::closeEvent(QCloseEvent *event)
 {
-    //TODO:setting ?
-    //QSettings settings("MyCompany", "MyApp");
-    //settings.setValue("geometry", saveGeometry());
-    //settings.setValue("windowState", saveState());
     QWidget::closeEvent(event);
 }
 
@@ -87,12 +88,18 @@ void FrameMonitor::paintEvent(QPaintEvent *)
         //qDebug() << "cost : " << imgCache.totalCost();
     	 if(imgCache.contains(image)) {
 	     	//return *(frameCache.object(path));
-	     	//qDebug() << "cache";
+	     	//qDebug() << "cache : " << image;
 	     	_image = imgCache.object(image);
 	     } else {
 	     	_image = new QImage(image);
-	     	//qDebug() << "cache store";
-	     	imgCache.insert(image, _image);
+	     	//qDebug() << "cache store : " << image << "cost : " << _image->byteCount();
+		    //TODO: provide a method for that
+	     	bool success = imgCache.insert(image, _image, _image->byteCount());
+		    if ( !success)  {
+					qDebug() << "WARN: memory error";
+				   _image = new QImage(image);
+		    }
+					
 	     }
 	    
 	    if (_image != 0)
