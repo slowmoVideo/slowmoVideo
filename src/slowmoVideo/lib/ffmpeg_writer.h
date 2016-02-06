@@ -57,8 +57,10 @@ public slots:
 	void processStarted();
 	void readOutput();
 	void encodingFinished(int);
+  void ffmpegError(QProcess::ProcessError error);
     
     private slots:
+  void process_state_changed();
 
 };
 

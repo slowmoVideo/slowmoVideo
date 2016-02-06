@@ -8,6 +8,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QDir>
 #include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include "renderPreferences_sV.h"
 
@@ -76,8 +77,8 @@ private:
     qreal m_timeStart;
     qreal m_timeEnd;
 
-    QTime m_stopwatch;
-    int m_renderTimeElapsed;
+    QElapsedTimer m_stopwatch;
+    qint64 m_renderTimeElapsed;
 
     bool m_stopRendering; //  Process is aborted when true
     qreal m_nextFrameTime;
