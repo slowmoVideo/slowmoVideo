@@ -126,6 +126,7 @@ protected:
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
+    void keyPressEvent(QKeyEvent *event);
     void leaveEvent(QEvent *);
     void contextMenuEvent(QContextMenuEvent *);
 
@@ -209,7 +210,7 @@ private:
     QAction *m_aShutterFunction;
     std::vector<QAction *> m_aSpeeds;
 
-    Node_sV convertCanvasToTime(const QPoint &p) const;
+    Node_sV convertCanvasToTime(const QPoint &p, bool snap = false) const;
     QPoint convertTimeToCanvas(const Node_sV &p) const;
     QPoint convertTimeToCanvas(const QPointF &p) const;
     QPointF convertDistanceToTime(const QPoint &p) const;

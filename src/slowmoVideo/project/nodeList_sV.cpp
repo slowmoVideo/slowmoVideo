@@ -88,16 +88,19 @@ qreal NodeList_sV::sourceTime(qreal targetTime) const
                 srcTime = m_list[index].y() + ratio*( m_list[index+1].y()-m_list[index].y() );
             }
         } else {
+	    //TODO:
             if (index >= m_list.size()) {
                 qDebug() << "index " << index << " is > list size: " << m_list.size();
-                Q_ASSERT(false);
+                //Q_ASSERT(false);
             } else {
                 srcTime = m_list[index].y();
             }
         }
     } else {
+	// this seem because no project loaded ?
+	// TODO: how can we check ?
         qDebug() << "No node before " << targetTime;
-        Q_ASSERT(false);
+        //Q_ASSERT(false);
         if (m_list.size() > 0) {
             srcTime = m_list[0].y();
         }
@@ -257,7 +260,7 @@ bool NodeList_sV::validate() const
 
 ////////// Moving
 
-void NodeList_sV::moveSelected(const Node_sV &time)
+void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
 {
     qreal maxRMove = 100000;
     qreal maxLMove = -100000;
@@ -441,8 +444,14 @@ void NodeList_sV::fixHandles(int leftIndex)
         m_list[leftIndex+1].setLeftNodeHandle(rightHandle, m_list.at(leftIndex+1).leftNodeHandle().y());
     }
 }
-void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
+
+/**
+ * on error return int indicating error type
+ * hint : maybe add error method ?
+ */
+int NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
 {
+    int error = 0;
     int left, right;
     findBySegment(segmentTime, left, right);
     if (left >= 0 && right >= 0) {
@@ -452,9 +461,11 @@ void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
         if (y > m_maxY || y < 0) {
             if (y > m_maxY) {
                 qDebug() << speed << "x speed would shoot over maximum time. Correcting.";
+                error = -1;
                 y = m_maxY;
             } else {
                 qDebug() << speed << "x speed goes below 0. Correcting.";
+                error = -2;
                 y = 0;
             }
             qreal xNew = leftN->x() + (y - leftN->y())/speed;
@@ -463,14 +474,17 @@ void NodeList_sV::setSpeed(qreal segmentTime, qreal speed)
                 add(Node_sV(xNew, y));
             } else {
                 qDebug() << "New node would be too close, not adding it.";
+                error = -3;
             }
         } else {
             rightN->setY(y);
         }
     } else {
         qDebug() << "Outside segment.";
+        error = -4;
     }
     validate();
+    return error;
 }
 
 
@@ -608,3 +622,4 @@ QDebug operator<<(QDebug dbg, const NodeList_sV &list)
     }
     return dbg.maybeSpace();
 }
+

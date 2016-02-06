@@ -472,7 +472,14 @@ namespace V3D_GPU
    bool
    FrameBufferObject::allocate()
    {
-      glGenFramebuffersEXT(1, &_fboID);
+     //  if (glGenFramebuffers != 0) {
+	      glGenFramebuffers(1, &_fboID);
+       //    fprintf(stderr,"new alloc\n");
+       //}
+       //else {
+	    //  glGenFramebuffersEXT(1, &_fboID);
+         //  fprintf(stderr,"old alloc\n");
+       //}
       checkGLErrorsHere1(_fboName);
       return true;
    }

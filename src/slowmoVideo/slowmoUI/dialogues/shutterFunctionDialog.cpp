@@ -28,17 +28,15 @@ ShutterFunctionDialog::ShutterFunctionDialog(Project_sV *project, QWidget *paren
     ui->lblcHeader->setText(ShutterFunction_sV::templateHeader);
     ui->lblcFooter->setText(ShutterFunction_sV::templateFooter);
 
-    bool b = true;
-    b &= connect(ui->bClose, SIGNAL(clicked()), this, SLOT(accept()));
-    b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotUpdateNode()));
-    b &= connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotLoadSelectedFunction()));
-    b &= connect(ui->function, SIGNAL(textChanged()), this, SLOT(slotFunctionTextChanged()));
-    b &= connect(ui->bAdd, SIGNAL(clicked()), this, SLOT(slotAddFunction()));
-    b &= connect(ui->bRemove, SIGNAL(clicked()), this, SLOT(slotRemoveFunction()));
+    connect(ui->bClose, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotUpdateNode()));
+    connect(ui->cbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(slotLoadSelectedFunction()));
+    connect(ui->function, SIGNAL(textChanged()), this, SLOT(slotFunctionTextChanged()));
+    connect(ui->bAdd, SIGNAL(clicked()), this, SLOT(slotAddFunction()));
+    connect(ui->bRemove, SIGNAL(clicked()), this, SLOT(slotRemoveFunction()));
 
-    b &= connect(ui->bPrevSegment, SIGNAL(clicked()), this, SLOT(slotPrevSegment()));
-    b &= connect(ui->bNextSegment, SIGNAL(clicked()), this, SLOT(slotNextSegment()));
-    Q_ASSERT(b);
+    connect(ui->bPrevSegment, SIGNAL(clicked()), this, SLOT(slotPrevSegment()));
+    connect(ui->bNextSegment, SIGNAL(clicked()), this, SLOT(slotNextSegment()));
 
     loadProject(project);
     slotLoadSelectedFunction();

@@ -31,6 +31,8 @@ public:
     QImage frameAt(const uint, const FrameSize = FrameSize_Orig) { return QImage(); }
     const QString framePath(const uint, const FrameSize) const { return QString(); }
 
+    void loadOrigFrames() {};
+    
 public slots:
     void slotAbortInitialization() {}
     void slotUpdateProjectDir() {}

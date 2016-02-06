@@ -14,11 +14,13 @@
 // Against the «UINT64_C not declared» message.
 // See: http://code.google.com/p/ffmpegsource/issues/detail?id=11
 #ifdef __cplusplus
+ #ifndef __STDC_CONSTANT_MACROS
  #define __STDC_CONSTANT_MACROS
  #ifdef _STDINT_H
   #undef _STDINT_H
  #endif
  # include <stdint.h>
+ #endif //  __STDC_CONSTANT_MACROS
 #endif
 
 #include <libavcodec/avcodec.h>

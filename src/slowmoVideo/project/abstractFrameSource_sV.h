@@ -14,6 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/defs_sV.hpp"
 
 #include <QImage>
+#include <QCache>
 #include <QtCore/QDir>
 
 class Project_sV;
@@ -52,6 +53,11 @@ public:
     virtual const Fps_sV* fps() const = 0;
     double maxTime() const throw(Div0Exception);
 
+    /*
+     * add a qcache here for perf loading
+     */
+    QCache<QString,QImage> frameCache;
+    // use it in frameAt
     /**
       \fn frameAt()
       \return The frame at the given position, as image. Fails
@@ -64,6 +70,8 @@ public:
     virtual QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig) = 0;
     virtual const QString framePath(const uint frame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
+    virtual void loadOrigFrames() =0;
+    
 signals:
     /**
       \fn void signalNextTask(const QString taskDescription, int taskSize)

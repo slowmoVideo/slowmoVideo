@@ -13,11 +13,12 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <QWidget>
 #include <QSemaphore>
+#include <QCache>
+#include <QImage>
 
 namespace Ui {
     class FrameMonitor;
 }
-class QImage;
 
 /**
   \brief Used for displaying input frames at the mouse position.
@@ -30,9 +31,12 @@ public:
     explicit FrameMonitor(QWidget *parent = 0);
     ~FrameMonitor();
 
+	  void setCacheLimit(int n);
+	  int cacheLimit() { return cache_limit; };
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
-
+    virtual void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
     void slotLoadImage(const QString &filename);
@@ -42,6 +46,10 @@ private:
 
     QSemaphore m_semaphore;
     QString *m_queue[2];
+    
+    // for cache mgmt
+	  int cache_limit;
+    QCache<QString, QImage> imgCache;
 };
 
 #endif // INPUTMONITOR_H

@@ -108,7 +108,8 @@ QImage Shutter_sV::convolutionBlur(const QImage interpolatedAtOffset, const Flow
 {
     Q_ASSERT(interpolatedAtOffset.width() == flow->width());
     Q_ASSERT(interpolatedAtOffset.height() == flow->height());
-    Q_ASSERT(offset > 0);
+    // could be equal to 0, in case of integer !
+    //Q_ASSERT(offset > 0);
     Q_ASSERT(offset < 1);
 
     SourceField_sV source(flow, offset);

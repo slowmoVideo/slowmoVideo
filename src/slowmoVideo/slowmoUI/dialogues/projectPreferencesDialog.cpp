@@ -11,9 +11,7 @@ ProjectPreferencesDialog::ProjectPreferencesDialog(ProjectPreferences_sV *prefs,
     ui->setupUi(this);
     ui->canvas_xAxisFPS->setText(m_projectPrefs->canvas_xAxisFPS().toString());
 
-    bool b = true;
-    b &= connect(ui->canvas_xAxisFPS, SIGNAL(textChanged(QString)), this, SLOT(slotCheckFPS()));
-    Q_ASSERT(b);
+    connect(ui->canvas_xAxisFPS, SIGNAL(textChanged(QString)), this, SLOT(slotCheckFPS()));
 }
 ProjectPreferencesDialog::~ProjectPreferencesDialog()
 {

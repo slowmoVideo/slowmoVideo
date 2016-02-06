@@ -44,7 +44,6 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
         m_sizeSmall = m_sizeSmall/2;
     }
 
-
     createDirectories();
 }
 
@@ -69,7 +68,8 @@ const QStringList ImagesFrameSource_sV::inputFiles() const
 
 void ImagesFrameSource_sV::slotUpdateProjectDir()
 {
-    m_dirImagesSmall.rmdir(".");
+    //TODO: really needed ?
+    //m_dirImagesSmall.rmdir(".");
     createDirectories();
 }
 

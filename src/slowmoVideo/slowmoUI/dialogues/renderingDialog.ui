@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>495</height>
+    <width>719</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
@@ -746,6 +746,16 @@
                <string>Optional arguments</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QCheckBox" name="use_qt">
+                 <property name="text">
+                  <string>Use Quicktime</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <layout class="QGridLayout" name="gridLayout_3">
                  <item row="0" column="0">

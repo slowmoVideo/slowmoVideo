@@ -263,8 +263,9 @@ QString MotionBlur_sV::cachedFramePath(float framePos, const RenderPreferences_s
 
 void MotionBlur_sV::slotUpdateProjectDir()
 {
-    m_dirCacheSmall.rmdir(".");
-    m_dirCacheOrig.rmdir(".");
+    //TODO: check if really needed ?
+    //m_dirCacheSmall.rmdir(".");
+    //m_dirCacheOrig.rmdir(".");
     createDirectories();
 }
 

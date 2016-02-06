@@ -20,9 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QSettings>
 #include <QtCore/QSemaphore>
 
-extern "C" {
 #include "../lib/videoInfo_sV.h"
-}
 
 class QProcess;
 class Project_sV;
@@ -53,6 +51,8 @@ public:
     /** \return The absolute path of the input video file. */
     const QString videoFile() const;
 
+    void loadOrigFrames();
+    
 public slots:
     void slotAbortInitialization();
     void slotUpdateProjectDir();

@@ -23,7 +23,7 @@ set(SRCS_MOC
     testProject_sV.h
 )
 
-qt4_wrap_cpp(MOC_OUT ${SRCS_MOC})
+qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
 add_executable(UnitTests ${SRCS} ${MOC_OUT})
