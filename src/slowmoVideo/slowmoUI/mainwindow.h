@@ -93,6 +93,9 @@ private:
 
     QThread m_rendererThread;
 
+    void createDockWindows();
+    void createActions();
+    
 	void loadProject(QString path);
     void loadProject(Project_sV *project);
     void resetDialogs();

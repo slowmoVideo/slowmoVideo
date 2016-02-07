@@ -57,138 +57,35 @@ MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     m_cs(this)
 {
     ui->setupUi(this);
-
+    
     m_project = new Project_sV();
-
+    
     m_wCanvas = new Canvas(m_project, this);
     setCentralWidget(m_wCanvas);
-
-
-    m_wInputMonitor = new FrameMonitor(this);
-    m_wInputMonitorDock = new QDockWidget(tr("Input monitor"), this);
-    m_wInputMonitorDock->setWidget(m_wInputMonitor);
-    m_wInputMonitorDock->setObjectName("inputMonitor");
-    addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
-
-    m_wCurveMonitor = new FrameMonitor(this);
-    m_wCurveMonitorDock = new QDockWidget(tr("Curve monitor"), this);
-    m_wCurveMonitorDock->setWidget(m_wCurveMonitor);
-    m_wCurveMonitorDock->setObjectName("curveMonitor");
-    addDockWidget(Qt::TopDockWidgetArea, m_wCurveMonitorDock);
-
-    m_wRenderPreview = new RenderPreview(m_project, this);
-    m_wRenderPreviewDock = new QDockWidget(tr("Render preview"), this);
-    m_wRenderPreviewDock->setWidget(m_wRenderPreview);
-    m_wRenderPreviewDock->setObjectName("renderPreview");
-    addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
-
-   
     
-    // Fill the view menu that allows (de)activating widgets
-    QObjectList windowChildren = children();
-    QDockWidget *w;
-    for (int i = 0; i < windowChildren.size(); i++) {
-        if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
-            qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
-
-            QAction *a = new QAction("&" + w->objectName(), this);
-            a->setCheckable(true);
-            connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
-            // This does not work since it is also emitted e.g. when the window is minimized
-            // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
-            // Thanks ArGGu^^ for the tip!
-//            connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
-            a->setChecked(true);
-
-            // To uncheck the menu entry when the widget is closed via the (x)
-            w->installEventFilter(this);
-
-            ui->menuView->addAction(a);
-            m_widgetActions << a;
-
-        }
-    }
-
-    ui->actionNew->setShortcut(QKeySequence(QKeySequence::New));
-    ui->actionOpen->setShortcut(QKeySequence(QKeySequence::Open));
-    ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
-    ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
-    ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
-    ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
-    ui->actionRenderPreview->setShortcut(QKeySequence("Shift+Ctrl+R"));
-    ui->actionExamineFlow->setShortcut(QKeySequence("Shift+Ctrl+X"));
-    ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
-    ui->actionAbout->setShortcut(QKeySequence("F1"));
-    ui->actionQuit->setShortcut(QKeySequence(QKeySequence::Quit));
-    ui->actionZoomIn->setShortcut(QKeySequence(QKeySequence::ZoomIn));
-    ui->actionZoomOut->setShortcut(QKeySequence(QKeySequence::ZoomOut));
-
-    m_cs.addShortcut("h", Help, tr("Show help overlay"));
-    m_cs.addShortcut("q-q", Quit, tr("Quit"));
-    m_cs.addShortcut("n", New, tr("New project"));
-    m_cs.addShortcut("o", Open, tr("Open project"));
-    m_cs.addShortcut("s-s", Save_Same, tr("Save"));
-    m_cs.addShortcut("s-a", Save_As, tr("Save as ..."));
-    m_cs.addShortcut("a", Abort, tr("Abort move"));
-    m_cs.addShortcut("a-s", Abort_Selection, tr("Unselect all"));
-    m_cs.addShortcut("d-n", Delete_Node, tr("Delete selected nodes"));
-    m_cs.addShortcut("t-s", Tool_Select, tr("Selecting tool"));
-    m_cs.addShortcut("t-m", Tool_Move, tr("Move tool"));
-    m_cs.addShortcut("t-t", Tag, tr("Insert label (tag)"));
-
-    connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
-
-    connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
-    connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
-    connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
-    connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
-
-    connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
-    connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
-
-    connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
-                 this, SLOT(slotForwardInputPosition(qreal)));
-    connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
-                 this, SLOT(slotForwardCurveSrcPosition(qreal)));
-
-    
-    connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
-    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
-    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
-    connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
-    connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
-    connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
-    connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
-    connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
-    connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
-    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
-    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
-    connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
-
-
+    createActions();
+    createDockWindows();
     
     updateWindowTitle();
     setWindowIcon(QIcon(":icons/slowmoIcon.png"));
-
+    
     QSettings settings;
     bool show = settings.value("ui/displayHelp", false).toBool();
     m_wCanvas->showHelp(show);
     settings.sync();
-
+    
     restoreGeometry(settings.value("mainwindow/geometry").toByteArray());
     restoreState(settings.value("mainwindow/windowState").toByteArray());
-
-   
+    
     if (!projectPath.isEmpty()) {
         loadProject(projectPath);
     }
     
     if (!settings.contains("binaries/ffmpeg")) {
         qDebug() << "need to find ffmpeg";
-	QMessageBox::information( this, 
-		"valid FFMPEG not found", "Please choose a working ffmpeg\n" , 
-		QMessageBox::Ok, 0 );
+        QMessageBox::information( this,
+                                 "valid FFMPEG not found", "Please choose a working ffmpeg\n" ,
+                                 QMessageBox::Ok, 0 );
         PreferencesDialog dialog;
         dialog.exec();
     }
@@ -227,6 +124,117 @@ MainWindow::~MainWindow()
     }
 }
 
+void MainWindow::createActions()
+{
+    ui->actionNew->setShortcut(QKeySequence(QKeySequence::New));
+    ui->actionOpen->setShortcut(QKeySequence(QKeySequence::Open));
+    ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
+    ui->actionSave_as->setShortcut(QKeySequence("Shift+Ctrl+S"));
+    ui->actionShortcuts->setShortcut(QKeySequence("Ctrl+H"));
+    ui->actionRender->setShortcut(QKeySequence("Ctrl+R"));
+    ui->actionRenderPreview->setShortcut(QKeySequence("Shift+Ctrl+R"));
+    ui->actionExamineFlow->setShortcut(QKeySequence("Shift+Ctrl+X"));
+    ui->actionPreferences->setShortcut(QKeySequence("Ctrl+,"));
+    ui->actionAbout->setShortcut(QKeySequence("F1"));
+    ui->actionQuit->setShortcut(QKeySequence(QKeySequence::Quit));
+    ui->actionZoomIn->setShortcut(QKeySequence(QKeySequence::ZoomIn));
+    ui->actionZoomOut->setShortcut(QKeySequence(QKeySequence::ZoomOut));
+    
+    m_cs.addShortcut("h", Help, tr("Show help overlay"));
+    m_cs.addShortcut("q-q", Quit, tr("Quit"));
+    m_cs.addShortcut("n", New, tr("New project"));
+    m_cs.addShortcut("o", Open, tr("Open project"));
+    m_cs.addShortcut("s-s", Save_Same, tr("Save"));
+    m_cs.addShortcut("s-a", Save_As, tr("Save as ..."));
+    m_cs.addShortcut("a", Abort, tr("Abort move"));
+    m_cs.addShortcut("a-s", Abort_Selection, tr("Unselect all"));
+    m_cs.addShortcut("d-n", Delete_Node, tr("Delete selected nodes"));
+    m_cs.addShortcut("t-s", Tool_Select, tr("Selecting tool"));
+    m_cs.addShortcut("t-m", Tool_Move, tr("Move tool"));
+    m_cs.addShortcut("t-t", Tag, tr("Insert label (tag)"));
+    
+    connect(&m_cs, SIGNAL(signalShortcutUsed(int)), this, SLOT(slotShortcutUsed(int)));
+    
+    connect(this, SIGNAL(deleteNodes()), m_wCanvas, SLOT(slotDeleteNodes()));
+    connect(this, SIGNAL(setMode(Canvas::ToolMode)), m_wCanvas, SLOT(slotSetToolMode(Canvas::ToolMode)));
+    connect(this, SIGNAL(abort(Canvas::Abort)), m_wCanvas, SLOT(slotAbort(Canvas::Abort)));
+    connect(this, SIGNAL(addTag()), m_wCanvas, SLOT(slotAddTag()));
+    
+    connect(ui->actionZoomIn, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomIn()));
+    connect(ui->actionZoomOut, SIGNAL(triggered()), m_wCanvas, SLOT(slotZoomOut()));
+    
+    connect(m_wCanvas, SIGNAL(signalMouseInputTimeChanged(qreal)),
+            this, SLOT(slotForwardInputPosition(qreal)));
+    connect(m_wCanvas, SIGNAL(signalMouseCurveSrcTimeChanged(qreal)),
+            this, SLOT(slotForwardCurveSrcPosition(qreal)));
+    
+    
+    connect(ui->actionNew, SIGNAL(triggered()), this, SLOT(slotNewProject()));
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(slotLoadProjectDialog()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(slotSaveProject()));
+    connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(slotSaveProjectDialog()));
+    connect(ui->actionRender, SIGNAL(triggered()), this, SLOT(slotShowRenderDialog()));
+    connect(ui->actionRenderPreview, SIGNAL(triggered()), this, SLOT(slotUpdateRenderPreview()));
+    connect(ui->actionExamineFlow, SIGNAL(triggered()), this, SLOT(slotShowFlowExaminerDialog()));
+    connect(ui->actionPreferences, SIGNAL(triggered()), this, SLOT(slotShowPreferencesDialog()));
+    connect(ui->actionShortcuts, SIGNAL(triggered()), this, SLOT(slotToggleHelp()));
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(slotShowAboutDialog()));
+    connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
+    connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
+}
+
+void MainWindow::createDockWindows()
+{
+    m_wInputMonitor = new FrameMonitor(this);
+    m_wInputMonitorDock = new QDockWidget(tr("Input monitor"), this);
+    m_wInputMonitorDock->setWidget(m_wInputMonitor);
+    m_wInputMonitorDock->setObjectName("inputMonitor");
+    addDockWidget(Qt::TopDockWidgetArea, m_wInputMonitorDock);
+    
+    m_wCurveMonitor = new FrameMonitor(this);
+    m_wCurveMonitorDock = new QDockWidget(tr("Curve monitor"), this);
+    m_wCurveMonitorDock->setWidget(m_wCurveMonitor);
+    m_wCurveMonitorDock->setObjectName("curveMonitor");
+    addDockWidget(Qt::TopDockWidgetArea, m_wCurveMonitorDock);
+    
+    m_wRenderPreview = new RenderPreview(m_project, this);
+    m_wRenderPreviewDock = new QDockWidget(tr("Render preview"), this);
+    m_wRenderPreviewDock->setWidget(m_wRenderPreview);
+    m_wRenderPreviewDock->setObjectName("renderPreview");
+    addDockWidget(Qt::TopDockWidgetArea, m_wRenderPreviewDock);
+    //TODO: replace by :
+    // ui->menuView->addAction(dock->toggleViewAction());
+    // http://ariya.ofilabs.com/2007/04/custom-toggle-action-for-qdockwidget.html
+    
+    // Fill the view menu that allows (de)activating widgets
+    QObjectList windowChildren = children();
+    QDockWidget *w;
+    for (int i = 0; i < windowChildren.size(); i++) {
+        if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
+            qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
+            
+            QAction *a = new QAction("&" + w->objectName(), this);
+            a->setCheckable(true);
+            connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
+            // This does not work since it is also emitted e.g. when the window is minimized
+            // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
+            // Thanks ArGGu^^ for the tip!
+            connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
+            a->setChecked(true);
+            
+#if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
+            // To uncheck the menu entry when the widget is closed via the (x)
+            w->installEventFilter(this);
+#endif
+            
+            ui->menuView->addAction(a);
+            m_widgetActions << a;
+            
+        }
+    }
+}
+
 bool MainWindow::okToContinue()
 {
     if (isWindowModified()) {
@@ -255,14 +263,22 @@ void MainWindow::closeEvent(QCloseEvent *e)
 	}
 }
 
+
+#if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
+/**
+ * this is only for pre 4.2 code !
+ * http://ariya.ofilabs.com/2007/04/custom-toggle-action-for-qdockwidget.html
+ */
 bool MainWindow::eventFilter(QObject *obj, QEvent *e)
 {
+
+    
     QObjectList windowChildren = children();
     QDockWidget *w;
-
+    
     if (e->type() == QEvent::Close && windowChildren.contains(obj)) {
         if ((w = dynamic_cast<QDockWidget *>(obj)) != NULL) {
-
+            
             QList<QAction*> actions = findChildren<QAction *>();
             for (int i = 0; i < actions.size(); i++) {
                 if (actions.at(i)->text() == w->objectName()) {
@@ -270,13 +286,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
                     return true;
                 }
             }
-
+            
         }
     }
 
-    return false;
+    return QObject::eventFilter(object, event);
+    //return false;
 }
-
+#endif
 
 
 
