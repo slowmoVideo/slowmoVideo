@@ -221,7 +221,7 @@ void MainWindow::createDockWindows()
             // (with «Show Desktop» on KDE4), therefore an event filter is required. (below.)
             // Thanks ArGGu^^ for the tip!
             connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
-            a->setChecked(true);
+            //a->setChecked(true);
             
 #if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
             // To uncheck the menu entry when the widget is closed via the (x)
