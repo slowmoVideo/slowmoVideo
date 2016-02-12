@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(CMAKE_MODULE_PATH
-  ${slowmoVideo_SOURCE_DIR}/cmake
-)
 
 project(slowmoVideo)
 
@@ -12,15 +9,24 @@ set(CMAKE_BUILD_TYPE Debug)
 #
 # Make a version file containing the current version from git.
 #
-include(GetGitRevisionDescription)
-git_describe(VERSION --tags --dirty=-dirty)
+#include(GetGitRevisionDescription)
+#git_describe(VERSION --tags --dirty=-dirty)
+find_package(Git)
+if(GIT_FOUND)
+# ? ${CMAKE_SOURCE_DIR}/.git
+				execute_process(
+            COMMAND ${GIT_EXECUTABLE} --git-dir=${CMAKE_CURRENT_SOURCE_DIR}/../.git describe 
+            OUTPUT_VARIABLE VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+				#parse the version information into pieces.
+				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SHA1 "${VERSION}")
+				set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+				configure_file(version.h.in version.h)
+endif()
 
-#parse the version information into pieces.
-string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${VERSION}")
-string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SHA1 "${VERSION}")
-set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 set(PROJECT_VERSION_MAJOR "0")
 set(PROJECT_VERSION_MINOR "3")
@@ -55,6 +61,10 @@ endif(MSYS)
 
 
 ### Find packages ###
+
+set(CMAKE_MODULE_PATH
+  ${slowmoVideo_SOURCE_DIR}/cmake
+)
 
 # Check if environment variable QTDIR is set.
 # needed for Qt5
@@ -248,13 +258,13 @@ if(WIN32)
 set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
 endif(WIN32)
 
-find_package(OpenGL)
-find_package(GLEW)
-find_package(GLUT)
+#find_package(OpenGL)
+#find_package(GLEW)
+#find_package(GLUT)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
-find_package(X11)
+#find_package(X11)
 
 # Windows: Try to find libraries that could not be found manually in the libs/ directory.
 if(WIN32)

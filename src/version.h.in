@@ -1,0 +1,10 @@
+/*
+ * version information
+ */
+#define ver_major "@VERSION_MAJOR@"
+#define  ver_minor "@VERSION_MINOR@"
+#define ver_patch "@VERSION_PATCH@"
+#define ver_sha1 "@VERSION_SHA1@"
+#define ver_short "@VERSION_SHORT@"
+
+
