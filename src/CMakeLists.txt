@@ -14,7 +14,7 @@ set(CMAKE_MODULE_PATH
 # Make a version file containing the current version from git.
 #
 include(GetGitRevisionDescription)
-git_describe(VERSION --tags )
+git_describe(VERSION --dirty=-dev)
 if (VERSION)
 				#parse the version information into pieces.
 			  # v0.4.0-123-gdddf621
