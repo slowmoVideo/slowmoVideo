@@ -1,10 +1,13 @@
 /*
- * version information
+ * slowmovideo version information
  */
-#define ver_major "@VERSION_MAJOR@"
-#define  ver_minor "@VERSION_MINOR@"
-#define ver_patch "@VERSION_PATCH@"
-#define ver_sha1 "@VERSION_SHA1@"
-#define ver_short "@VERSION_SHORT@"
+#ifndef _VER_INFO_H
+#define _VER_INFO_H 1
 
+#define SLOWMOVIDEO_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define SLOWMOVIDEO_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define SLOWMOVIDEO_VERSION_MICRO @PROJECT_VERSION_PATCH@
 
+#define SLOWMOVIDEO_VERSION_SHA1 "@PROJECT_VERSION_SHA1@"
+
+#endif

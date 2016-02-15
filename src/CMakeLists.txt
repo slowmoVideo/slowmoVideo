@@ -7,31 +7,29 @@ project(slowmoVideo)
 set(CMAKE_BUILD_TYPE Debug)
 
 #
+set(CMAKE_MODULE_PATH
+  ${slowmoVideo_SOURCE_DIR}/cmake
+)
+
 # Make a version file containing the current version from git.
 #
-#include(GetGitRevisionDescription)
-#git_describe(VERSION --tags --dirty=-dirty)
-find_package(Git)
-if(GIT_FOUND)
-# ? ${CMAKE_SOURCE_DIR}/.git
-				execute_process(
-            COMMAND ${GIT_EXECUTABLE} --git-dir=${CMAKE_CURRENT_SOURCE_DIR}/../.git describe 
-            OUTPUT_VARIABLE VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE)
+include(GetGitRevisionDescription)
+git_describe(VERSION --tags )
+if (VERSION)
 				#parse the version information into pieces.
-				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" VERSION_PATCH "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_SHA1 "${VERSION}")
-				set(VERSION_SHORT "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-				configure_file(version.h.in version.h)
+			  # v0.4.0-123-gdddf621
+				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+-(.*)" "\\1" PROJECT_VERSION_SHA1 "${VERSION}")
+else()
+				set(PROJECT_VERSION_MAJOR "0")
+				set(PROJECT_VERSION_MINOR "5")
+				set(PROJECT_VERSION_PATCH "0")
 endif()
 
-
-set(PROJECT_VERSION_MAJOR "0")
-set(PROJECT_VERSION_MINOR "3")
-set(PROJECT_VERSION_PATCH "1")
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+configure_file(version.h.in version.h)
 
 ### Compiler options ###
 
@@ -62,9 +60,6 @@ endif(MSYS)
 
 ### Find packages ###
 
-set(CMAKE_MODULE_PATH
-  ${slowmoVideo_SOURCE_DIR}/cmake
-)
 
 # Check if environment variable QTDIR is set.
 # needed for Qt5
