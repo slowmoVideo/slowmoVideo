@@ -20,7 +20,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "imagesFrameSource_sV.h"
 #include "motionBlur_sV.h"
 #include "abstractFlowSource_sV.h"
-
+//TODO: #include "defs_sV.hpp"
 
 #include <QDebug>
 #include <QTextStream>
@@ -33,6 +33,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Error_sV)
 {
+    //TODO: use global define in defs !
     QDomDocument doc;
     QDomElement root = doc.createElement("sVproject");
     root.setAttribute("version", SLOWMOPROJECT_VERSION_MAJOR);

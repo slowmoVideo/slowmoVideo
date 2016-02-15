@@ -143,7 +143,7 @@ endif()
 #        BUNDLE DESTINATION . COMPONENT Runtime
 #        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
 # create desktop file for KDE/Gnome
 # desktop file section
 	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"

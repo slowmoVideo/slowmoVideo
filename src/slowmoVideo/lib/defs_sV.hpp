@@ -39,7 +39,7 @@ namespace Version_sV {
     static int micro = SLOWMOVIDEO_VERSION_MICRO;
     /// Version number as string
     static QString version_short(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
-	  static QString version(SLOWMOVIDEO_VERSION_FULL);
+    static QString version(SLOWMOVIDEO_VERSION_FULL);
     /// Architecture
     static QString bits(
 #ifdef BITS_64

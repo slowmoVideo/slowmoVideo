@@ -28,6 +28,11 @@ else()
 				set(PROJECT_VERSION_PATCH "0")
 endif()
 
+if (APPLE)
+				# git describe bug ?
+				set(PROJECT_VERSION_PATCH "0")
+endif()
+
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 configure_file(version.h.in version.h)
 
@@ -68,7 +73,11 @@ if (DEFINED ENV{QTDIR})
     set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 endif ()
 
-set(DEST "bin")
+if (APPLE)
+				set(DEST "slowmoUI.app/Content/Tools/bin")
+else()
+				set(DEST "bin")
+endif()
 
 include(cmake/macros.cmake)
 
