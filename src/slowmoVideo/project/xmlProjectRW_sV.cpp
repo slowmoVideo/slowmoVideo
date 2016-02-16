@@ -48,7 +48,7 @@ int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Er
     QDomElement version = doc.createElement("version");
     version.setAttribute("major", SLOWMOVIDEO_VERSION_MAJOR);
     version.setAttribute("minor", SLOWMOVIDEO_VERSION_MINOR);
-    version.setAttribute("micro", SLOWMOVIDEO_VERSION_MICRO);
+    version.setAttribute("micro", SLOWMOVIDEO_VERSION_PATCH);
     info.appendChild(appName);
     info.appendChild(version);
 

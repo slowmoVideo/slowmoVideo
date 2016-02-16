@@ -36,7 +36,7 @@ namespace Version_sV {
     /// Minor version number
     static int minor = SLOWMOVIDEO_VERSION_MINOR;
     /// Micro version number
-    static int micro = SLOWMOVIDEO_VERSION_MICRO;
+    static int micro = SLOWMOVIDEO_VERSION_PATCH;
     /// Version number as string
     static QString version_short(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
     static QString version(SLOWMOVIDEO_VERSION_FULL);
