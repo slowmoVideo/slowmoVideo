@@ -14,7 +14,11 @@ Building
 --------
 
 ### Building for Linux
-http://slowmovideo.granjow.net/download.php
+See [our wiki](https://github.com/slowmoVideo/slowmoVideo/wiki/Download) for build instructions
+
+Or see (outdated) http://slowmovideo.granjow.net/download.php
+
+
 
 ### Building for Windows
 Compiling slowmoVideo for Windows using MXE on Linux:
