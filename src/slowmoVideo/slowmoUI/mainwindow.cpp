@@ -627,12 +627,13 @@ void MainWindow::slotShowRenderDialog()
             connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
             //connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
             
-            //connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
+            connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
             connect(&m_rendererThread, SIGNAL(started()), task, SLOT(slotContinueRendering()));
-            //TODO: connect(task, SIGNAL(finished()), m_rendererThread, SLOT(quit()), Qt::DirectConnection);
-            connect(task, SIGNAL(finished()), &m_rendererThread, SLOT(quit()));
-            connect(task, SIGNAL(finished()), task, SLOT(deleteLater()));
-
+ 
+            connect(task, SIGNAL(signalRenderingFinished(QString)), &m_rendererThread, SLOT(quit()));
+            // done another way ?!
+            //connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLat    er()));
+             
             //connect(&m_rendererThread, &QThread::finished, task, &QObject::deleteLater);
             // let's start
             m_rendererThread.wait(); // If the thread is not running, this will immediately return.
