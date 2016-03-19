@@ -1,14 +1,41 @@
 cmake_minimum_required(VERSION 2.6)
 
+
 project(slowmoVideo)
 
 #set (CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
 
-set(PROJECT_VERSION_MAJOR "0")
-set(PROJECT_VERSION_MINOR "3")
-set(PROJECT_VERSION_PATCH "1")
+#
+set(CMAKE_MODULE_PATH
+  ${slowmoVideo_SOURCE_DIR}/cmake
+)
+
+# Make a version file containing the current version from git.
+#
+include(GetGitRevisionDescription)
+git_describe(VERSION --dirty=-dev)
+if (VERSION)
+				#parse the version information into pieces.
+			  # v0.4.0-123-gdddf621
+				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+-(.*)" "\\1" PROJECT_VERSION_SHA1 "${VERSION}")
+else()
+				set(PROJECT_VERSION_MAJOR "0")
+				set(PROJECT_VERSION_MINOR "5")
+				set(PROJECT_VERSION_PATCH "0")
+endif()
+
+if(NOT PROJECT_VERSION_PATCH)
+				# git describe bug ?
+				set(PROJECT_VERSION_PATCH "0")
+endif()
+
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+configure_file(version.h.in version.h)
 
 ### Compiler options ###
 
@@ -18,6 +45,12 @@ if (APPLE)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
+
+# Set additional project information
+set(COMPANY "granjow")
+set(COPYRIGHT "Copyright (c) 2011 Simon A. Eugster (Granjow). All rights reserved.")
+set(IDENTIFIER "net.granjow.slomoui")
+
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 endif()
@@ -39,9 +72,6 @@ endif(MSYS)
 
 ### Find packages ###
 
-set(CMAKE_MODULE_PATH
-  ${slowmoVideo_SOURCE_DIR}/cmake
-)
 
 # Check if environment variable QTDIR is set.
 # needed for Qt5
@@ -50,7 +80,11 @@ if (DEFINED ENV{QTDIR})
     set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 endif ()
 
-set(DEST "bin")
+if (APPLE)
+				set(DEST "slowmoUI.app/Contents/Tools/bin")
+else()
+				set(DEST "bin")
+endif()
 
 include(cmake/macros.cmake)
 
@@ -235,13 +269,13 @@ if(WIN32)
 set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
 endif(WIN32)
 
-find_package(OpenGL)
-find_package(GLEW)
-find_package(GLUT)
+#find_package(OpenGL)
+#find_package(GLEW)
+#find_package(GLUT)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
-find_package(X11)
+#find_package(X11)
 
 # Windows: Try to find libraries that could not be found manually in the libs/ directory.
 if(WIN32)

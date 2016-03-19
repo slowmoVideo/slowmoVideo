@@ -26,9 +26,7 @@ typedef __int64 int64_t;
 #include <QtGui/QColor>
 #include <cmath>
 
-#define SLOWMOVIDEO_VERSION_MAJOR 0
-#define SLOWMOVIDEO_VERSION_MINOR 5
-#define SLOWMOVIDEO_VERSION_MICRO 0
+#include "version.h"
 
 
 /// Contains information about this slowmoVideo version
@@ -38,9 +36,10 @@ namespace Version_sV {
     /// Minor version number
     static int minor = SLOWMOVIDEO_VERSION_MINOR;
     /// Micro version number
-    static int micro = SLOWMOVIDEO_VERSION_MICRO;
+    static int micro = SLOWMOVIDEO_VERSION_PATCH;
     /// Version number as string
-    static QString version(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
+    static QString version_short(QString("%1.%2.%3").arg(major).arg(minor).arg(micro));
+    static QString version(SLOWMOVIDEO_VERSION_FULL);
     /// Architecture
     static QString bits(
 #ifdef BITS_64
