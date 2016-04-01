@@ -54,6 +54,12 @@ else( WIN32 )
                              ${AVUTIL_INCLUDE_DIRS}
                              #${AVDEVICE_INCLUDE_DIRS}
                              )
+   # check to see if we can find swscale
+   FIND_LIBRARY(LIB_SWSCALE_ swscale ${FFMPEG_LIBRARY_DIR} )
+   IF ( LIB_SWSCALE_ )
+      SET( SWSCALE_FOUND TRUE )
+   ENDIF( LIB_SWSCALE_ )
+
 endif( WIN32 )
 
 # add in swscale if found
@@ -122,3 +128,10 @@ IF ( ${INC_SUCCESS} EQUAL ${LIST_SIZE_} )
 ENDIF ( ${INC_SUCCESS} EQUAL ${LIST_SIZE_} )
 
 string(REPLACE "/usr/include/" "" FFMPEG_INCLUDE_DIR "${FFMPEG_INCLUDE_DIR}")
+
+# On OS X we ffmpeg libraries depend on VideoDecodeAcceleration and CoreVideo frameworks
+IF (APPLE)
+    SET(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} "-framework CoreFoundation -framework QuartzCore -framework VideoDecodeAcceleration -liconv -lbz2 -lz")
+ENDIF()
+
+

@@ -12,6 +12,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project_sV.h"
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QDebug>
+#include <QtGui/QImageReader>
 
 ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList images) throw(FrameSourceError) :
     AbstractFrameSource_sV(project),
@@ -28,10 +30,20 @@ ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList imag
     m_imagesList.append(images);
     m_imagesList.sort();
 
-    m_sizeSmall = QImage(m_imagesList.at(0)).size();
+    QImage repImage(m_imagesList.at(0));
+    if (repImage.isNull()) {
+        qDebug() << "Image is null: " << m_imagesList.at(0);
+        qDebug() << "Supported image formats: " << QImageReader::supportedImageFormats();
+        throw FrameSourceError(QString("Cannot read image: %1").arg(m_imagesList.at(0)));
+    }
+    m_sizeSmall = repImage.size();
+    if (m_sizeSmall.isEmpty()) {
+        throw FrameSourceError(QString("Image read from %1 is empty.").arg(m_imagesList.at(0)));
+    }
     while (m_sizeSmall.width() > 600) {
         m_sizeSmall = m_sizeSmall/2;
     }
+
 
     createDirectories();
 }

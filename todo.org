@@ -7,8 +7,11 @@
 - [ ] Customize grid: Replay speed (e.g. 1x, 0.5x, etc.)
 - [ ] Help texts
 - [ ] Lock mode for replay speed
+- [ ] Windows: Note that flowBuilder is not available
+- [ ] Remove Bézier interpolation
 
 * Flow Editor [/]
+- [ ] Add pipet tool for inpainting
 - [ ] Alphabetic loading: Change file naming (%03d instead of %d e.g.)
 
 * File loading [0/2]

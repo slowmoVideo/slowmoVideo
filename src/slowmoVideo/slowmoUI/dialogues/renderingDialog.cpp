@@ -408,7 +408,7 @@ void RenderingDialog::slotBrowseImagesDir()
 void RenderingDialog::slotBrowseVideoFile()
 {
     QFileDialog dialog(this, tr("Output video file"));
-    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setDirectory(QFileInfo(ui->videoOutputFile->text()).absolutePath());
     if (dialog.exec() == QDialog::Accepted) {

@@ -8,4 +8,4 @@ set(SRCS
 add_executable(slowmoVisualizeFlow ${SRCS})
 target_link_libraries(slowmoVisualizeFlow sVvis ${EXTERNAL_LIBS})
 
-install(TARGETS slowmoVisualizeFlow DESTINATION bin)
+install(TARGETS slowmoVisualizeFlow DESTINATION ${DEST})
