@@ -21,7 +21,9 @@ QString myName;
 SlowmoRenderer_sV renderer;
 
 int terminateCounter = 0;
+int genproj = 0;
 
+//TODO: maybe in case of abort we should remove directories ?
 void terminate(int)
 {
     if (terminateCounter == 0) {
@@ -34,6 +36,7 @@ void terminate(int)
     terminateCounter++;
     renderer.abort();
 }
+
 void printProgress(int)
 {
     renderer.printProgress();
@@ -42,8 +45,9 @@ void printProgress(int)
 void printHelp()
 {
     std::cout << "slowmoRenderer for slowmoVideo " << Version_sV::version.toStdString() << std::endl
-              << myName.toStdString() << " <project>" << std::endl
+              << myName.toStdString() << " [<project>]" << std::endl
               << "\t-target [video <path> [<codec>|auto] | images <filenamePattern> <directory> ] " << std::endl
+              << "\t-input video <path> | images <filenamePattern> <directory> ] " << std::endl
               << "\t-size [small|orig] " << std::endl
               << "\t-fps <fps> " << std::endl
               << "\t-start <startTime> -end <endTime> " << std::endl
@@ -89,13 +93,17 @@ int main(int argc, char *argv[])
 
 
 
-    renderer.load(args.at(1));
+    int next = 1;
+    if ((args.at(1)).contains("svProj", Qt::CaseInsensitive) ) {
+	    renderer.load(args.at(1));
+	    next = 2;
+    } else 
+	    renderer.create();
 
     QString start = ":start";
     QString end = ":end";
 
     const int n = args.size();
-    int next = 2;
     while (next < n) {
         if ("-target" == args.at(next)) {
             require(3, next, n);
@@ -119,6 +127,26 @@ int main(int argc, char *argv[])
                 return -1;
             }
 
+        } else if ("-input" == args.at(next)) {
+            require(2, next, n);
+            next++;
+            if ("video" == args.at(next)) {
+                next++;
+                QString filename = args.at(next++);
+                
+                renderer.setInputTarget(filename);
+                
+            } else if ("images" == args.at(next)) {
+                next++;
+                QString filenamePattern = args.at(next++);
+                QString dir = args.at(next++);
+                //TODO: pattern ?
+                //renderer.setImagesRenderTarget(filenamePattern, dir);
+                
+            } else {
+                std::cerr << "Not a valid input: " << args.at(next).toStdString() << std::endl;
+                return -1;
+            }
         } else if ("-size" == args.at(next)) {
             require(1, next, n);
             next++;
@@ -196,7 +224,19 @@ int main(int argc, char *argv[])
             renderer.setV3dLambda(lambda);
             next++;
 
-        } else {
+        } else if ("-slowfactor" == args.at(next)) {
+            require(1, next, n);
+            next++;
+            bool b;
+            double slowfactor = args.at(next).toDouble(&b);
+            if (!b) {
+                std::cerr << "Not a number: " << args.at(next).toStdString() << std::endl;
+                return -1;
+            }
+            std::cerr << "will slow down to : " << slowfactor << std::endl;
+	    renderer.setSpeed(slowfactor);
+            next++;
+	} else {
             std::cout << "Argument not recognized: " << args.at(next).toStdString() << std::endl;
             printHelp();
             return -1;
@@ -212,6 +252,9 @@ int main(int argc, char *argv[])
         return 42;
     }
 
-    renderer.start();
+    if (genproj) 
+	renderer.save("test.svProj");
+    else
+	renderer.start();
 
 }

@@ -20,12 +20,10 @@ TagAddDialog::TagAddDialog(TagAxis defaultAxis, QWidget *parent) :
     ui->setupUi(this);
     ui->bOk->setEnabled(false);
 
-    bool b = true;
-    b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
-    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
-    b &= connect(ui->tag, SIGNAL(textChanged(QString)), this, SLOT(slotTextChanged(QString)));
-    b &= connect(ui->tag, SIGNAL(returnPressed()), ui->bOk, SLOT(click()));
-    Q_ASSERT(b);
+    connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui->tag, SIGNAL(textChanged(QString)), this, SLOT(slotTextChanged(QString)));
+    connect(ui->tag, SIGNAL(returnPressed()), ui->bOk, SLOT(click()));
 
     slotUpdateAxis();
 }

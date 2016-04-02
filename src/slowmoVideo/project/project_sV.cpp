@@ -25,12 +25,21 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
+#if 1
+#include "work_flow.h"
+#endif
+
 #include <cmath>
 
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QSettings>
+#include <QThread>
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QTemporaryDir>
+#endif
 
 //#define DEBUG_P
 #ifdef DEBUG_P
@@ -40,37 +49,55 @@ the Free Software Foundation, either version 3 of the License, or
 
 #define MIN_FRAME_DIST .001
 
-Project_sV::Project_sV() :
-    m_projDir(QDir::temp())
+Project_sV::Project_sV()
 {
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    //QTemporaryDir tempDir("slowmovideo");
+    QTemporaryDir tempDir;; // use default
+    if (tempDir.isValid())
+        m_projDir = QDir(tempDir.path());
+    else
+#endif
+        m_projDir = QDir::temp();
+    
     init();
+    
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	worker[tid]=0;
+    	thread[tid]=0;    
+    }
 }
 
-Project_sV::Project_sV(QString projectDir) :
-    m_projDir(projectDir)
+Project_sV::Project_sV(QString projectDir) : m_projDir(projectDir)
 {
+
     init();
 
-    // Create directory if necessary
-    qDebug() << "Project directory: " << m_projDir.absolutePath();
-    if (!m_projDir.exists()) {
-        m_projDir.mkpath(".");
-    }
 }
 
 void Project_sV::init()
 {
     m_preferences = new ProjectPreferences_sV();
     m_frameSource = new EmptyFrameSource_sV(this);
-    m_flowSource = new FlowSourceV3D_sV(this);
+    m_flowSource = 0; // leak ? new FlowSourceV3D_sV(this);
     m_motionBlur = new MotionBlur_sV(this);
 
+#if 0
     QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QString method = settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        if ("OCL" == method) {
+        	qDebug() << "setting OCL";
+        }
     }
+#else
+	reloadFlowSource();
+#endif
 
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
@@ -78,32 +105,80 @@ void Project_sV::init()
     m_renderTask = NULL;
 
     m_v3dFailCounter = 0;
+    
+    /* better here ? */
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	worker[tid]=0;
+    	thread[tid]=0;    
+    }
 }
 
 Project_sV::~Project_sV()
 {
+    int tid;
+    for(tid=0;tid<4;tid++) {
+    	if (worker[tid]!=0) {
+            worker[tid]->abort();
+            thread[tid]->wait();
+            
+            //qDebug()<<"Deleting thread and worker in Thread "<<this->QObject::thread()->currentThreadId();
+            
+            delete worker[tid];
+            delete thread[tid];
+    	}
+    }
+    
+    delete m_renderTask;
     delete m_preferences;
     delete m_frameSource;
     delete m_flowSource;
     delete m_motionBlur;
     delete m_tags;
     delete m_nodes;
-    delete m_renderTask;
     delete m_shutterFunctions;
 }
 
 void Project_sV::reloadFlowSource()
 {
-    Q_ASSERT(m_flowSource != NULL);
+    //Q_ASSERT(m_flowSource != NULL);
 
-    delete m_flowSource;
+    if (m_flowSource != 0)
+        delete m_flowSource;
 
-    QSettings settings;
-    if (settings.value("preferences/flowMethod", "V3D").toString() == "V3D") {
+    QSettings m_settings;
+    QString method = m_settings.value("preferences/flowMethod", "V3D").toString();
+    if ("V3D" == method) {
         m_flowSource = new FlowSourceV3D_sV(this);
     } else {
         m_flowSource = new FlowSourceOpenCV_sV(this);
+        FlowSourceOpenCV_sV *ocv;
+        ocv = dynamic_cast<FlowSourceOpenCV_sV*>(m_flowSource);
+        if ("OCL" == method) {
+        	qDebug() << "using OCL for OpenCV";
+        	
+        	if (ocv != NULL) {
+        		int dev = m_settings.value("preferences/oclDriver", 0).toInt();
+        		//qDebug() << "using OCL device : " << dev << "for rendering";
+        		ocv->initGPUDevice(dev);
+        	}
+        } else {
+            int algo = m_settings.value("preferences/oclAlgo", 0).toInt();
+            ocv->chooseAlgo(algo);
+        }
+        qDebug() << "initial OpenCV setup";
+        ocv->setupOpticalFlow(3,15,1.2,0.5,5);
     }
+    
+}
+
+void Project_sV::setupProjectDir()
+{
+    //qDebug() << "Project directory: " << m_projDir.absolutePath();
+
+    m_frameSource->slotUpdateProjectDir();
+    m_flowSource->slotUpdateProjectDir();
+    m_motionBlur->slotUpdateProjectDir();
 }
 
 void Project_sV::setProjectDir(QString projectDir)
@@ -114,15 +189,15 @@ void Project_sV::setProjectDir(QString projectDir)
     if (!m_projDir.exists()) {
         m_projDir.mkpath(".");
     }
-    m_frameSource->slotUpdateProjectDir();
-    m_flowSource->slotUpdateProjectDir();
-    m_motionBlur->slotUpdateProjectDir();
+  
+    setupProjectDir();
 }
 
 void Project_sV::setProjectFilename(QString filename)
 {
     m_projectFilename = filename;
 }
+
 QString Project_sV::projectFilename() const {
     return m_projectFilename;
 }
@@ -140,15 +215,20 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
     m_nodes->setMaxY(m_frameSource->maxTime());
 }
 
+
+//TODO: remove this
 void Project_sV::replaceRenderTask(RenderTask_sV *task)
 {
+    /*
     if (m_renderTask != NULL) {
         m_renderTask->slotStopRendering();
         m_renderTask->deleteLater();
         m_renderTask = NULL;
     }
+     */
     m_renderTask = task;
 }
+
 
 const QDir Project_sV::getDirectory(const QString &name, bool createIfNotExists) const
 {
@@ -391,5 +471,64 @@ QList<NodeList_sV::PointerWithDistance> Project_sV::objectsNear(QPointF pos, qre
     qSort(list);
 
     return list;
+}
+
+/**
+ *  start an optical flow on a thread
+ *
+ *  @param threadid  the thread on which to run our flow
+ *  @param frameSize size of frame for calcul (small/orig)
+ *  @param direction flow direction
+ */
+void Project_sV::startFlow(int threadid,const FrameSize frameSize,int direction)
+{
+    thread[threadid] = new QThread();
+    worker[threadid] = new WorkerFlow();
+    
+    // set on what to work ...
+    worker[threadid]->setFrameSize(frameSize);
+    worker[threadid]->setProject(this);
+    worker[threadid]->setDirection(direction);
+    worker[threadid]->setFlowSource(flowSource());
+    
+    worker[threadid]->moveToThread(thread[threadid]);
+    //connect(worker, SIGNAL(valueChanged(QString)), ui->label, SLOT(setText(QString)));
+    connect(worker[threadid], SIGNAL(workFlowRequested()), thread[threadid], SLOT(start()));
+    connect(thread[threadid], SIGNAL(started()), worker[threadid], SLOT(doWorkFlow()));
+    connect(worker[threadid], SIGNAL(finished()), thread[threadid], SLOT(quit()), Qt::DirectConnection);
+    
+    // let's start
+    thread[threadid]->wait(); // If the thread is not running, this will immediately return.
+    
+    worker[threadid]->requestWork();
+}
+
+/**
+ *  prebuild the optical flow using threading
+ */
+void Project_sV::buildCacheFlowSource()
+{
+
+    QSettings settings;
+    bool precalc = settings.value("preferences/precalcFlow", true).toBool();
+    if (precalc && (m_flowSource != NULL)) {
+#if 0
+        qDebug() << "Creating cached FlowSources ";
+        Q_ASSERT(m_flowSource != NULL);
+        // TODO: test/check better place ?
+        // we should do it for each size/each way
+        // use threading here
+        //flowSource()->buildFlowForwardCache(FrameSize_Orig);
+        
+        startFlow(0,FrameSize_Small,0);
+        startFlow(1,FrameSize_Small,1);
+        startFlow(2,FrameSize_Orig,0);
+        startFlow(3,FrameSize_Orig,1);
+#else
+        qDebug() << "cache flow source disable";
+#endif
+        
+    }
+
 }
 

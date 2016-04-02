@@ -42,6 +42,7 @@ public slots:
 
 signals:
     void signalMouseMoved(float x, float y);
+    void signalMousePressed(float x, float y);
     void signalRectDrawn(QRectF imageRect);
 
 protected slots:

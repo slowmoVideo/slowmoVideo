@@ -4,16 +4,18 @@
 #include <QMessageBox>
 #include <QtCore/QDebug>
 
+#include "notificator.h"
+
 ProgressDialog::ProgressDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ProgressDialog)
 {
     ui->setupUi(this);
+    // alas this make window transparent !
+    //setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowStaysOnTopHint);
 
-    bool b = true;
-    b &= connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));
-    b &= connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
-    Q_ASSERT(b);
+    connect(ui->bAbort, SIGNAL(clicked()), this, SLOT(slotAbortPressed()));
+    connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
 
     ui->bOk->setVisible(false);
     ui->bOk->setEnabled(false);
@@ -69,10 +71,17 @@ void ProgressDialog::slotAllTasksFinished(const QString& timePassed)
 {
     ui->progress->setValue(ui->progress->maximum());
     setWorking(false);
+    QString notifmsg = tr("Task finished in %1.").arg(timePassed);
     if (timePassed.length() > 0) {
-        slotTaskItemDescription(tr("Task finished in %1.").arg(timePassed));
+        slotTaskItemDescription(notifmsg);
     } else {
         slotTaskItemDescription(tr("Task finished."));
     }
     setWindowTitle(tr("(Finished) %1").arg(windowTitle()));
+// display OS notification
+    Notificator* notif;
+    notif = new Notificator("simple");
+
+	
+    notif->notify(Notificator::Information, windowTitle(), notifmsg);
 }

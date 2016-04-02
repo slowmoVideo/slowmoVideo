@@ -22,7 +22,7 @@ namespace Ui {
     class MainWindow;
 }
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QtCore/QMap>
 #include <QtCore/QList>
 #include <QtCore/QTime>
@@ -93,13 +93,13 @@ private:
 
     QThread m_rendererThread;
 
-
-    void loadProject(QString path);
+	void loadProject(QString path);
     void loadProject(Project_sV *project);
     void resetDialogs();
     void updateWindowTitle();
-
-private slots:
+	bool okToContinue();
+	
+	private slots:
     void slotShortcutUsed(int id);
     void slotShowRenderDialog();
     void slotShowPreferencesDialog();
@@ -123,7 +123,8 @@ private slots:
     void slotShowAboutDialog();
     void slotUpdateRenderPreview();
 
-
+	void slotShowFlowEditWindow();
+	
 signals:
     void deleteNodes();
     void setMode(const Canvas::ToolMode mode);

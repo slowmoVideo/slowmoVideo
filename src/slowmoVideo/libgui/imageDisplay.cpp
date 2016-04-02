@@ -11,10 +11,11 @@ the Free Software Foundation, either version 3 of the License, or
 #include "imageDisplay.h"
 #include <QtCore/QDebug>
 #include <QtGui/QPainter>
-#include <QtGui/QMenu>
-#include <QtGui/QFileDialog>
-#include <QtGui/QContextMenuEvent>
+#include <QMenu>
+#include <QFileDialog>
+#include <QContextMenuEvent>
 
+#include <QAction>
 #include <QApplication>
 #include <QtCore/QSettings>
 #include <QtCore/QFileInfo>
@@ -31,10 +32,8 @@ ImageDisplay::ImageDisplay(QWidget *parent, Qt::WindowFlags f) :
 
     m_aExportImage = new QAction(tr("Export image"), this);
 
-    bool b = true;
-    b &= connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
-    b &= connect(m_aExportImage, SIGNAL(triggered()), this, SLOT(slotExportImage()));
-    Q_ASSERT(b);
+    connect(m_aScaling, SIGNAL(triggered()), this, SLOT(repaint()));
+    connect(m_aExportImage, SIGNAL(triggered()), this, SLOT(slotExportImage()));
 
     setContentsMargins(5, 5, 5, 5);
 
@@ -125,10 +124,14 @@ void ImageDisplay::mousePressEvent(QMouseEvent *e)
     m_states.mouseInitialImagePos = convertCanvasToImage(e->pos());
     m_states.mousePrevPos = e->pos();
     m_states.manhattan = 0;
+
+    QPointF pos = convertCanvasToImage(e->pos());
+    emit signalMousePressed(pos.x(), pos.y());
 }
 
 void ImageDisplay::mouseMoveEvent(QMouseEvent *e)
 {
+
     if (e->buttons().testFlag(Qt::LeftButton)) {
         m_states.manhattan += (e->pos()-m_states.mousePrevPos).manhattanLength();
     }

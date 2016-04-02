@@ -27,6 +27,7 @@ public:
     MotionblurType& renderMotionblurType();
     Fps_sV& renderFPS();
     QString& renderTarget();
+    bool& renderFormat();
     QString& imagesOutputDir();
     QString& imagesFilenamePattern();
     QString& videoFilename();
@@ -52,7 +53,8 @@ private:
     MotionblurType m_motionblurType;
     Fps_sV m_renderFPS;
     QString m_renderTarget;
-
+	bool m_renderFormat;
+	
     QString m_imagesOutputDir;
     QString m_imagesFilenamePattern;
     QString m_videoFilename;

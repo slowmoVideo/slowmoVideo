@@ -8,7 +8,7 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtCore/QTranslator>
 #include <QtCore/QDebug>
 #include "mainwindow.h"
@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
 
     QString projectPath;
+    qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
 
     const int N = a.arguments().size();

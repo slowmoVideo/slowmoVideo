@@ -261,7 +261,8 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
 
             // Check if non-ASCII characters are present in the file path
             char nonAscii = 0;
-            for (int i = 0; i < strlen(video->filename); i++) {
+	    int i;
+            for (i = 0; i < strlen(video->filename); i++) {
                 if ((unsigned short)video->filename[i] > 0x7f) {
                     fprintf(stderr, "Contains non-ASCII character: %c (%d)\n", video->filename[i], (unsigned char)video->filename[i]);
                     nonAscii = 1;
@@ -298,6 +299,7 @@ int prepare(VideoOut_sV *video, const char *filename, const char *vcodec, const 
     video->outbufV = av_malloc(video->outbufSizeV);
 
     video->picture = avcodec_alloc_frame();
+            //TODO: replace by: av_frame_alloc(); ?
     avpicture_alloc((AVPicture*)video->picture, video->streamV->codec->pix_fmt,
                     video->streamV->codec->width, video->streamV->codec->height);
     if (!video->picture) {
@@ -351,6 +353,7 @@ int eatARGB(VideoOut_sV *video, const unsigned char *data)
     } else {
         /* encode the image */
         video->outSize = avcodec_encode_video(cc, video->outbufV, video->outbufSizeV, video->picture);
+        //TODO: check usage of avcodec_encode_video2 ?
         /* if zero size, it means the image was buffered */
         if (video->outSize > 0) {
             AVPacket pkt;
@@ -419,7 +422,7 @@ void eatSample(VideoOut_sV *video)
 
         if (cc->coded_frame->pts != AV_NOPTS_VALUE) {
             pkt.pts = av_rescale_q(cc->coded_frame->pts, cc->time_base, video->streamV->time_base);
-            printf("pkt.pts is %ld.\n", pkt.pts);
+            printf("pkt.pts is %lld.\n", pkt.pts);
         }
         if(cc->coded_frame->key_frame) {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,30,2)
@@ -457,7 +460,8 @@ void finish(VideoOut_sV *video)
     }
 
     /* free the streams */
-    for(int i = 0; i < video->fc->nb_streams; i++) {
+    int i;
+    for(i = 0; i < video->fc->nb_streams; i++) {
         av_freep(&video->fc->streams[i]->codec);
         av_freep(&video->fc->streams[i]);
     }

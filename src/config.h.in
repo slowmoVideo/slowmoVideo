@@ -1,0 +1,11 @@
+/*
+ * compile time/plateform define
+*/
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#cmakedefine USE_QTKIT
+#cmakedefine USE_DBUS
+#cmakedefine USE_FFMPEG
+
+#endif // CONFIG_H

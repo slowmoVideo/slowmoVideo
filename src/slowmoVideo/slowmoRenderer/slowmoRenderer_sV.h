@@ -35,6 +35,8 @@ public:
     ~SlowmoRenderer_sV();
 
     void load(QString filename) throw(Error);
+    void save(QString filename);
+    void create() throw(Error);
     void start();
     void abort();
 
@@ -42,10 +44,12 @@ public:
     void setFps(double fps);
     void setVideoRenderTarget(QString filename, QString codec);
     void setImagesRenderTarget(QString filenamePattern, QString directory);
+    void setInputTarget(QString inFilename);
     void setInterpolation(InterpolationType interpolation);
     void setMotionblur(MotionblurType motionblur);
     void setSize(bool original);
     void setV3dLambda(float lambda);
+    void setSpeed(double slowfactor);
 
 
     void printProgress();
@@ -71,6 +75,10 @@ private slots:
     void slotProgressInfo(int progress);
     void slotTaskSize(QString desc, int size);
     void slotFinished(QString time);
+    
+    void slotNewFrameSourceTask(const QString taskDescription, int taskSize);
+    void slotFrameSourceTasksFinished();
+
 };
 
 

@@ -41,7 +41,8 @@ public:
 
     const QStringList inputFiles() const;
 
-
+    void loadOrigFrames() { }; // TODO
+    
 public slots:
     void slotAbortInitialization();
     void slotUpdateProjectDir();

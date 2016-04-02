@@ -84,7 +84,7 @@ public:
       Only succeeds if the nodes are still within valid bounds.
       A move has to be either confirmed or aborted.
       */
-    void moveSelected(const Node_sV &time);
+    void moveSelected(const Node_sV &time,bool snap = false);
     /**
       Confirm the move on all nodes.
       */
@@ -101,7 +101,7 @@ public:
 
     void fixHandles(int leftIndex);
 
-    void setSpeed(qreal segmentTime, qreal speed);
+    int setSpeed(qreal segmentTime, qreal speed);
 
 
 

@@ -17,9 +17,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "project/project_sV.h"
 
-extern "C" {
-    #include "lib/videoInfo_sV.h"
-}
+#include "lib/videoInfo_sV.h"
 
 namespace Ui {
     class NewProjectDialog;

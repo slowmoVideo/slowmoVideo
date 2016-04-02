@@ -15,7 +15,12 @@ the Free Software Foundation, either version 3 of the License, or
 #include "lib/flowTools_sV.h"
 #include "lib/flowVisualization_sV.h"
 
+#include <QtCore>
+#include <QObject>
 #include <QtCore/QDebug>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QtWidgets>
+#endif
 
 FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
     QWidget(parent),
@@ -27,10 +32,15 @@ FlowEditCanvas::FlowEditCanvas(QWidget *parent) :
 
     ui->flow->trackMouse(true);
 
-    bool b = true;
-    b &= connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
-    b &= connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
-    Q_ASSERT(b);
+    connect(ui->flow, SIGNAL(signalRectDrawn(QRectF)), this, SLOT(slotRectDrawn(QRectF)));
+    connect(ui->flow, SIGNAL(signalMouseMoved(float,float)), this, SLOT(slotExamineValues(float,float)));
+    connect(ui->flow, SIGNAL(signalMousePressed(float,float)), this,SLOT(slotPickValues(float,float)));
+    connect(ui->amplification, SIGNAL(valueChanged(int)),this, SLOT(newAmplification(int)));
+
+    tool= 0;
+    vx = 0.0;
+    vy = 0.0;
+    ui->average->setChecked(true);
 }
 
 FlowEditCanvas::~FlowEditCanvas()
@@ -42,10 +52,20 @@ float FlowEditCanvas::amplification() const
 {
     return m_boost;
 }
+
 void FlowEditCanvas::setAmplification(float val)
 {
+	//qDebug() << "setAmplification: " << val;
     Q_ASSERT(val > 0);
     m_boost = val;
+    repaintFlow();
+}
+
+void FlowEditCanvas::newAmplification(int val)
+{
+	//qDebug() << "newAmplification: " << val;
+    Q_ASSERT(val > 0);
+    m_boost = (float)val;
     repaintFlow();
 }
 
@@ -61,11 +81,30 @@ void FlowEditCanvas::repaintFlow()
 void FlowEditCanvas::slotRectDrawn(QRectF imageRect)
 {
     qDebug() << "Rect drawn: " << imageRect;
-    Kernel_sV k(8, 8);
-    k.gauss();
-    FlowTools_sV::deleteRect(*m_flowField, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
-    FlowTools_sV::refill(*m_flowField, k, imageRect.top(), imageRect.left(), imageRect.bottom(), imageRect.right());
+    if (m_flowField != NULL) {
+            //TODO: ugly code
+            if (ui->average->isChecked() ) {
+                 // average
+                    qDebug() << "average";
+                    Kernel_sV k(8, 8);
+                    k.gauss();
+                    FlowTools_sV::deleteRect(*m_flowField, 
+                            imageRect.top(), imageRect.left(), 
+                            imageRect.bottom(), imageRect.right());
+                    FlowTools_sV::refill(*m_flowField, k, 
+                        imageRect.top(), imageRect.left(), 
+                        imageRect.bottom(), imageRect.right());
+                    }
+            if (ui->picker->isChecked() ) {
+                    qDebug() << "paint" << vx << " , " << vy;
+                    FlowTools_sV::fillRect(*m_flowField, 
+                            imageRect.top(), imageRect.left(), 
+                            imageRect.bottom(), imageRect.right(), vx, vy);
+                }
+                 
+    
     repaintFlow();
+    }
 }
 
 void FlowEditCanvas::slotLoadFlow(QString filename)
@@ -101,6 +140,21 @@ void FlowEditCanvas::slotExamineValues(float x, float y)
             float dy = m_flowField->y(x,y);
             ui->lblValues->setText(QString("dx/dy: (%1|%2)").arg(dx, 0, 'f', 2).arg(dy, 0, 'f', 2));
             ui->lblPos->setText(QString("(%1|%2)").arg(x).arg(y));
+        }
+    }
+}
+
+void FlowEditCanvas::slotPickValues(float x, float y)
+{
+    if (ui->eyedropper->isChecked()) {
+       qDebug() << "pick value";
+        if (m_flowField != NULL) {
+            if (x >= 0 && y >= 0
+                    && x <= m_flowField->width()-1 && y <= m_flowField->height()-1) {
+                vx = m_flowField->x(x,y);
+                vy = m_flowField->y(x,y);
+                qDebug() << "will fill with : " << vx << " , " << vy;
+            }
         }
     }
 }
