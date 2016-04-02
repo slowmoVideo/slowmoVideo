@@ -1,3 +1,12 @@
+slowmovideo (0.5-1) UNRELEASED; urgency=low
+
+  * New upstream relase 0.5
+  * update packaging to debian standard 3.9.6
+  * extend Qt5 dependencies to include Qt5Script
+  * configuration for git-buildpackage
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Sat, 02 Apr 2016 22:11:29 +0200
+
 slowmovideo (0.4-1) unstable; urgency=low
 
   * New upstream relase
