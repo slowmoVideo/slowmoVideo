@@ -1,24 +1,36 @@
 Source: slowmovideo
-Section: graphics
+Section: video
 Priority: extra
 Maintainer: Valery Brasseur <vbrasseur@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), cmake, libavformat-dev, libopencv-dev, libqt4-dev, qtbase5-dev, freeglut3-dev, libglew1.6-dev, libsdl1.2-dev
-Standards-Version: 3.9.4
+Uploaders: Benoit Rousselle <brousselle@gmail.com>, Hermann Vosseler <deb@ichthyostega.de>
+Changed-By: Hermann Vosseler <deb@ichthyostega.de>
+Build-Depends: debhelper (>= 8.0.0),
+               cmake,
+               libavformat-dev,
+               libopencv-dev,
+               libqt4-dev,
+               qtbase5-dev,
+               freeglut3-dev,
+               libglew1.6-dev,
+               libsdl1.2-dev
+Standards-Version: 3.9.6
 Homepage: http://slowmovideo.granjow.net
-#Vcs-Git: git://git.debian.org/collab-maint/slowmovideo.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/slowmovideo.git;a=summary
+Vcs-Git: https://github.com/slowmoVideo/slowmoVideo.git
+Vcs-Browser: https://github.com/slowmoVideo/slowmoVideo/tree/debian
 
 Package: slowmovideo
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: slow-motion videos from your footage
- slowmoVideo is an OpenSource program that creates slow-motion videos 
- from your footage.
+ slowmoVideo creates smooth slow-motion videos from your footage.
  But it does not simply make your videos play at 0.01× speed.
  You can smoothly slow down and speed up your footage,
- optionally with motion blur.
+ optionally with motion blur. SlowmoVideo tries to find out
+ where pixels move in the video (known as the Optical Flow),
+ and then uses this information to calculate additional frames
+ between the ones recorded by your camera.
+ .
+ slowmoVideo provides a Qt UI to define the parameters of the
+ slow-motion to be calculated, most notably it allows to edit
+ the change of speed as time proceeds through bézier curves.
 
-#Package: slowmovideo-doc
-#Architecture: all
-#Description: documentation for slowmovideo
-# <insert long description, indented with spaces>
