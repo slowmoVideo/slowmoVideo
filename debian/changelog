@@ -1,3 +1,10 @@
+slowmovideo (0.5-1~jessie1) Lumiera-jessie; urgency=low
+
+  * Rebuild for use on Debian/Jessie (stable).
+  * published at: deb http://lumiera.org/debian/ jessie tool
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Sat, 02 Apr 2016 22:15:50 +0200
+
 slowmovideo (0.5-1) UNRELEASED; urgency=low
 
   * New upstream relase 0.5
