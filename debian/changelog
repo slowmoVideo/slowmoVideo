@@ -1,3 +1,27 @@
+slowmovideo (0.5-2ppa1~xenial) xenial; urgency=medium
+
+  * Rebuild for Ubuntu/Xenial (16.04 LTS)
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Thu, 07 Apr 2016 05:04:19 +0200
+
+slowmovideo (0.5-2ppa1~wily) wily; urgency=medium
+
+  * Rebuild for Ubuntu/Wily (15.10)
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Thu, 07 Apr 2016 05:03:34 +0200
+
+slowmovideo (0.5-2ppa1~vivid) vivid; urgency=low
+
+  * Rebuild for Ubuntu/Vivid (15.04)
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Thu, 07 Apr 2016 05:02:16 +0200
+
+slowmovideo (0.5-2ppa1~trusty2) trusty; urgency=low
+
+  * Rebuild for Ubuntu/Trusty (14.04 LTS)
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Thu, 07 Apr 2016 04:51:54 +0200
+
 slowmovideo (0.5-2~jessie1) Lumiera-jessie; urgency=low
 
   * Rebuild for use on Debian/Jessie (stable).
