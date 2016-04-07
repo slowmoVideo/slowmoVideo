@@ -8,12 +8,10 @@ Build-Depends: debhelper (>= 9),
                cmake,
                libavformat-dev,
                libopencv-dev,
-               libqt4-dev,
                qtbase5-dev,
                qtscript5-dev,
                freeglut3-dev,
-               libglew1.6-dev,
-               libsdl1.2-dev
+               libglew1.6-dev
 Standards-Version: 3.9.6
 Homepage: http://slowmovideo.granjow.net
 Vcs-Git: https://github.com/slowmoVideo/slowmoVideo.git
