@@ -1,3 +1,10 @@
+slowmovideo (0.5-2~jessie1) Lumiera-jessie; urgency=low
+
+  * Rebuild for use on Debian/Jessie (stable).
+  * published at: deb http://lumiera.org/debian/ jessie tool
+
+ -- Hermann Vosseler <deb@ichthyostega.de>  Thu, 07 Apr 2016 04:01:46 +0200
+
 slowmovideo (0.5-2) UNRELEASED; urgency=low
 
   * remove unnecessary dependencies (Qt4 and libsdl)
