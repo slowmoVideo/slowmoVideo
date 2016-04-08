@@ -1,0 +1,7 @@
+?package(slowmovideo):\
+  needs="X11"\
+  section="Applications/Video"\
+  title="slowmovideo"\
+  longtitle="create smooth slow-motion videos"\
+  command="/usr/bin/slowmoUI"
+
