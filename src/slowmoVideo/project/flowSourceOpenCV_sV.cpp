@@ -15,12 +15,17 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
+#ifndef OCV_VERSION_3 
+// this is for OpenCV 2.x 
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 // not use #include "opencv2/gpu/gpumat.hpp"
-
 #include "opencv2/ocl/ocl.hpp" 
+
+#else
+#error "need to port to OpenCV 3.x"
+#endif
 
 #include <QtCore/QTime>
 #include <iostream>
