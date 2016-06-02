@@ -64,12 +64,16 @@ private:
 	
     void createDirectories();
     
-#if CV_MAJOR_VERSION == 2
-// do opencv 2 code
-    // optical flow
-    cv::ocl::FarnebackOpticalFlow farn;
-#endif
-    
+    // optical flow Farn
+   	int numLevels;
+	  int numIters;
+	  int winSize;
+	  double polySigma;
+	  double pyrScale;
+	  int polyN;
+	  int flags;
+
+	  // optical TVL1
 };
 
 #endif // FLOWSOURCEOPENCV_SV_H

@@ -20,15 +20,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-#if CV_MAJOR_VERSION == 2
-// do opencv 2 code
-// now in core (issue #32)
-#include "opencv2/core/gpumat.hpp"
-
-#include "opencv2/ocl/ocl.hpp"
-//#elif CV_MAJOR_VERSION == 3
-// do opencv 3 code
-#endif
 
 #include <QtCore/QTime>
 #include <iostream>
@@ -37,91 +28,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QList>
  
 using namespace cv;
-//using namespace cv::ocl; 
-//using namespace cv::gpu;
 
 
-#if CV_MAJOR_VERSION == 2
-/**
- *  list GPU support for OpenCV
- */
-void check_gpu()
-{
-        qDebug() << "check GPU" ;
-        int num_devices = gpu::getCudaEnabledDeviceCount();
-        qDebug() << "CUDA support : " << num_devices << "found";
-        if (num_devices >= 1) {
-                for (int i = 0; i < num_devices; ++i) {
-                gpu::printShortCudaDeviceInfo(i);
-
-                gpu::DeviceInfo dev_info(i);
-                if (!dev_info.isCompatible()) {
-            std::cerr << "GPU module isn't built for GPU #" << i << " ("
-                 << dev_info.name() << ", CC " << dev_info.majorVersion()
-                 << dev_info.minorVersion() << "\n";
-        } /* if */
-        } /* for */
-    } /* CUDA devices */
-
-        qDebug() << "OpenCL support";
-        ocl::PlatformsInfo platforms;
-        ocl::getOpenCLPlatforms(platforms);
-
-        for(size_t i=0;i<platforms.size();i++) {
-                std::cerr << "plateform : " << platforms[i]->platformName <<  " vendor: " << platforms[i]->platformVendor << "\n";
-        }
-
-        ocl::DevicesInfo devInfo;
-#if 0
-        int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
-#else
-        int res = cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_GPU);
-#endif
-        if (res != 0) {
-        for(size_t i = 0 ; i < devInfo.size() ;i++) {
-            std::cerr << "Device : " << i << " " << devInfo[i]->deviceName << " is present" << std::endl;
-        }
-            
-
-		}
-        qDebug() << "end OpenCL support";
-}
-
-/**
- *  check if OpenCV as OpenCL support
- *
- *  @return 1 if support
- */
-int isOCLsupported()
-{
-	ocl::PlatformsInfo platforms;
-    int res = ocl::getOpenCLPlatforms(platforms);	
-    return res;
-}
-
-/**
- *  return a list of supported OpenCL devices
- *
- *  @return list of devices
- */
-QList<QString> oclFillDevices(void)
-{
-	  ocl::PlatformsInfo platforms;
-      ocl::getOpenCLPlatforms(platforms);
-
-      ocl::DevicesInfo devInfo;
-      cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
-      
-      QList<QString> device_list;
-      
-      for(size_t i = 0 ; i < devInfo.size() ;i++) {
-            std::cerr << "Device : " << i << " " << devInfo[i]->deviceName << " is present" << std::endl;
-            device_list.insert(i,QString::fromStdString(devInfo[i]->deviceName));
-      }
-      return device_list;
-}
-
-#else
 void check_gpu() {
 	qDebug() << "no OpenCL support";
 }
@@ -136,13 +44,10 @@ QList<QString> oclFillDevices(void)
       QList<QString> device_list;
       return device_list;
 }
-#endif // OpenCL
 
 FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
     AbstractFlowSource_sV(project)
 {
-	// for debugging OpenCL support
-    check_gpu();
     use_gpu = 0; // default do not use GPU
     method = 0; // default to Farnback
     createDirectories();
@@ -150,36 +55,7 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 
 void FlowSourceOpenCV_sV::initGPUDevice(int dev)
 {
-#if CV_MAJOR_VERSION == 2
-    if (dev == -1) {
-        qDebug() << "bad OCL device : " << dev << "for rendering not using it !";
-        use_gpu = 0;
-    } else {
-        qDebug() << "using OCL device : " << dev << "for rendering";
-        int ocl_support = isOCLsupported();
-        if (ocl_support)  {
-            use_gpu = 1;
-            ocl::PlatformsInfo platforms;
-            ocl::getOpenCLPlatforms(platforms);
-            
-            ocl::DevicesInfo devInfo;
-            cv::ocl::getOpenCLDevices(devInfo,ocl::CVCL_DEVICE_TYPE_ALL);
-            
-            ocl::setDevice(devInfo[dev]);
-            std::cerr << "Device : " << dev << " is " << devInfo[dev]->deviceName << std::endl;
-        } else {
-            qDebug() << "no OCL device : " << dev << "for rendering";
-            //TODO: display warning ?
-            /*QMessageBox::information( this,
-                    "OpenCL not found", "OpenCL not found but configured, please check your preferences\n",                    QMessageBox::Ok, 0 );
-            */
-            use_gpu = 0;
-        }
-    }
-#else
-//TODO: OCL API
         qDebug() << "Transparent API OCL device TODO";
-#endif
 }
      
 void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
@@ -267,19 +143,18 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
                                            const int polyN)
 {
 	qDebug() << "setup Optical Flow ";
-#if CV_MAJOR_VERSION == 2
-    farn.pyrScale = pyrScale;
-    farn.polyN = polyN;
-    farn.polySigma = polySigma;
-    farn.flags = 0;
+
+    this->pyrScale = pyrScale;
+    this->polyN = polyN;
+    this->polySigma = polySigma;
+    this->flags = 0;
     
-    farn.numLevels = levels;
-    farn.winSize = winsize;
+    this->numLevels = levels;
+    this->winSize = winsize;
     
     //const int iterations = 8; // 10
-    farn.numIters = 8;
-#endif
-//TODO  v3 ?
+    this->numIters = 8;
+
 }
 
 void FlowSourceOpenCV_sV::setupTVL(double thau,double lambda, double pyrScale, double warp)
@@ -333,19 +208,6 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
             
             if( prevgray.data ) {
                 
-#if CV_MAJOR_VERSION == 2
-                if (use_gpu) {
-        			qDebug() << "using GPU OCL version";
-        			
-        			cv::ocl::oclMat d_flowx, d_flowy;
-    				farn(ocl::oclMat(prevgray), ocl::oclMat(gray), d_flowx, d_flowy);
-                    
-    				cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
-    				cv::merge(flowxy, 2, flow);
-    				
-        		} else 
-#endif
-						{
                     if (method) { // DualTVL1
                         qDebug() << "calcOpticalFlowDual_TVL1";
                         // TODO: put this as instance variable
@@ -354,6 +216,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                         // default are 0.25 0.15 5 5
                         //tlv1_->set("tau", tau_);
                         //tvl1->set("lambda",0.05);
+												//qDebug() <<  "lambda : " <<  tvl1->getLambda();
                         //alg_->set("lambda", lambda_);
                         //alg_->set("nscales", nscales_);
                         //alg_->set("warps", warps_);
@@ -361,24 +224,21 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
                     } else { // _FARN_
                         qDebug() << "calcOpticalFlowFarneback";
-#if CV_MAJOR_VERSION == 2
                         // TODO: check to use prev flow as initial flow ? (flags)
                         calcOpticalFlowFarneback(
                                                  prevgray, gray,
                                                  //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
                                                  flow,
-                                                 farn.pyrScale, //0.5,
-                                                 farn.numLevels, //3,
-                                                 farn.winSize, //15,
-                                                 farn.numIters, //3,
-                                                 farn.polyN, //5,
-                                                 farn.polySigma, //1.2,
-                                                 farn.flags //0
+                                                 pyrScale, //0.5,
+                                                 numLevels, //3,
+                                                 winSize, //15,
+                                                 numIters, //3,
+                                                 polyN, //5,
+                                                 polySigma, //1.2,
+                                                 flags //0
                                                  );
-#endif
                     }
                     
-                }
                 drawOptFlowMap(flow, flowFileName.toStdString());
             } else {
                 qDebug() << "imread: Could not read image " << prevpath;
