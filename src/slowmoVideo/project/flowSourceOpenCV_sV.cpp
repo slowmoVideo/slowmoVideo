@@ -15,16 +15,19 @@ the Free Software Foundation, either version 3 of the License, or
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
-#ifndef OCV_VERSION_3 
-// this is for OpenCV 2.x 
+#include "opencv2/core/version.hpp"
+
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
-// not use #include "opencv2/gpu/gpumat.hpp"
-#include "opencv2/ocl/ocl.hpp" 
+#if CV_MAJOR_VERSION == 2
+// do opencv 2 code
+// now in core (issue #32)
+#include "opencv2/core/gpumat.hpp"
 
-#else
-#error "need to port to OpenCV 3.x"
+#include "opencv2/ocl/ocl.hpp"
+//#elif CV_MAJOR_VERSION == 3
+// do opencv 3 code
 #endif
 
 #include <QtCore/QTime>
@@ -38,7 +41,7 @@ using namespace cv;
 //using namespace cv::gpu;
 
 
-#if 1
+#if CV_MAJOR_VERSION == 2
 /**
  *  list GPU support for OpenCV
  */
@@ -127,6 +130,12 @@ int isOCLsupported()
 {
 	return 0;
 }
+
+QList<QString> oclFillDevices(void)
+{
+      QList<QString> device_list;
+      return device_list;
+}
 #endif // OpenCL
 
 FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
@@ -141,6 +150,7 @@ FlowSourceOpenCV_sV::FlowSourceOpenCV_sV(Project_sV *project) :
 
 void FlowSourceOpenCV_sV::initGPUDevice(int dev)
 {
+#if CV_MAJOR_VERSION == 2
     if (dev == -1) {
         qDebug() << "bad OCL device : " << dev << "for rendering not using it !";
         use_gpu = 0;
@@ -166,6 +176,10 @@ void FlowSourceOpenCV_sV::initGPUDevice(int dev)
             use_gpu = 0;
         }
     }
+#else
+//TODO: OCL API
+        qDebug() << "Transparent API OCL device TODO";
+#endif
 }
      
 void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
@@ -252,6 +266,8 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
                                            const double pyrScale,
                                            const int polyN)
 {
+	qDebug() << "setup Optical Flow ";
+#if CV_MAJOR_VERSION == 2
     farn.pyrScale = pyrScale;
     farn.polyN = polyN;
     farn.polySigma = polySigma;
@@ -262,11 +278,13 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
     
     //const int iterations = 8; // 10
     farn.numIters = 8;
+#endif
+//TODO  v3 ?
 }
 
 void FlowSourceOpenCV_sV::setupTVL(double thau,double lambda, double pyrScale, double warp)
 {
-
+	qDebug() << "setup Optical Flow TLV";
 }
 
 FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
@@ -315,6 +333,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
             
             if( prevgray.data ) {
                 
+#if CV_MAJOR_VERSION == 2
                 if (use_gpu) {
         			qDebug() << "using GPU OCL version";
         			
@@ -324,7 +343,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     				cv::Mat flowxy[] = {cv::Mat(d_flowx), cv::Mat(d_flowy)};
     				cv::merge(flowxy, 2, flow);
     				
-        		} else {
+        		} else 
+#endif
+						{
                     if (method) { // DualTVL1
                         qDebug() << "calcOpticalFlowDual_TVL1";
                         // TODO: put this as instance variable
@@ -340,6 +361,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
                     } else { // _FARN_
                         qDebug() << "calcOpticalFlowFarneback";
+#if CV_MAJOR_VERSION == 2
                         // TODO: check to use prev flow as initial flow ? (flags)
                         calcOpticalFlowFarneback(
                                                  prevgray, gray,
@@ -353,6 +375,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                                                  farn.polySigma, //1.2,
                                                  farn.flags //0
                                                  );
+#endif
                     }
                     
                 }

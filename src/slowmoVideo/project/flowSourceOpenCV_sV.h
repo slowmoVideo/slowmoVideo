@@ -12,17 +12,26 @@ the Free Software Foundation, either version 3 of the License, or
 #ifndef FLOWSOURCEOPENCV_SV_H
 #define FLOWSOURCEOPENCV_SV_H
 
+
 #include "abstractFlowSource_sV.h"
 
 #include <QtCore/QDir>
 
+#include "opencv2/core/version.hpp"
+
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#if CV_MAJOR_VERSION == 2
+// do opencv 2 code
 // now in core (issue #32) 
 #include "opencv2/core/gpumat.hpp"
 
 #include "opencv2/ocl/ocl.hpp"
+//#elif CV_MAJOR_VERSION == 3
+// do opencv 3 code
+#endif
+
 
 class FlowSourceOpenCV_sV : public AbstractFlowSource_sV
 {
@@ -55,8 +64,11 @@ private:
 	
     void createDirectories();
     
+#if CV_MAJOR_VERSION == 2
+// do opencv 2 code
     // optical flow
     cv::ocl::FarnebackOpticalFlow farn;
+#endif
     
 };
 
