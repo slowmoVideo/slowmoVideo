@@ -172,8 +172,8 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         QTime time;
         time.start();
         
-        Mat prevgray, gray;
-        Mat_<Point2f> flow;
+        cv::Mat prevgray, gray;
+        cv::Mat_<cv::Point2f> flow;
         QString prevpath = project()->frameSource()->framePath(leftFrame, frameSize);
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
         //        namedWindow("flow", 1);
@@ -195,8 +195,8 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         if (!QFile(path).exists())
             throw FlowBuildingError(QString("Could not read image " + path));
         
-        prevgray = imread(prevpath.toStdString(), 0);
-        gray = imread(path.toStdString(), 0);
+        prevgray = cv::imread(prevpath.toStdString(), CV_LOAD_IMAGE_ANYDEPTH);
+        gray = cv::imread(path.toStdString(), CV_LOAD_IMAGE_ANYDEPTH);
         
         //cvtColor(l1, prevgray, CV_BGR2GRAY);
         //cvtColor(l2, gray, CV_BGR2GRAY);
@@ -211,9 +211,10 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                 if (method) { // DualTVL1
                     qDebug() << "calcOpticalFlowDual_TVL1";
                     // TODO: put this as instance variable
-                    Ptr<DenseOpticalFlow> tvl1 = createOptFlow_DualTVL1();
+                    cv::Ptr<cv::DualTVL1OpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
                     //setupTVL(0.25,0.15, 5, 10);
                     // default are 0.25 0.15 5 5
+									  tvl1->setLambda(0.05);
                     //tlv1_->set("tau", tau_);
                     //tvl1->set("lambda",0.05);
                     //qDebug() <<  "lambda : " <<  tvl1->getLambda();
