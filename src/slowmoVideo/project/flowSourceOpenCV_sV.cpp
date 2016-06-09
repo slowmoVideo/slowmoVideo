@@ -211,6 +211,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                 
                 if (method) { // DualTVL1
                     qDebug() << "calcOpticalFlowDual_TVL1";
+#if CV_MAJOR_VERSION == 3
                     // TODO: put this as instance variable
                     cv::Ptr<cv::DualTVL1OpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
                     //setupTVL(0.25,0.15, 5, 10);
@@ -223,7 +224,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                     //alg_->set("nscales", nscales_);
                     //alg_->set("warps", warps_);
                     tvl1->calc(prevgray, gray, flow);
-                    
+#else
+                    qDebug() << "calcOpticalFlowDual_TVL1 not supported";
+#endif 
                 } else { // _FARN_
                     qDebug() << "calcOpticalFlowFarneback";
                     // TODO: check to use prev flow as initial flow ? (flags)
