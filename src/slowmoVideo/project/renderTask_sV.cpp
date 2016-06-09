@@ -204,6 +204,7 @@ void RenderTask_sV::slotContinueRendering()
         if (abort) {
         	// user stop the process
             qDebug()<<"Aborting Rendering process in Thread "<<thread()->currentThreadId();
+						m_renderTimeElapsed = m_stopwatch.elapsed();
             emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
         	qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
             break;
@@ -239,16 +240,27 @@ void RenderTask_sV::slotContinueRendering()
     } /* while */
     
     
-    //TODO: closing rendering project
-    qDebug() << "Rendering : exporting";
-    updateMessage(tr("Rendering : exporting"));
-    m_renderTarget->closeRenderTarget();
-    m_renderTimeElapsed = m_stopwatch.elapsed();
-	  qDebug() << "time : " << m_renderTimeElapsed;
-    emit signalRenderingFinished(QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
-    qDebug() << "Rendering stopped after " << QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
+    // Checks if the process should be aborted
+    mutex.lock();
+    bool abort = m_stopRendering;
+    mutex.unlock();
+        
+    if (abort) {
+						qDebug() << "Rendering : aborting";
+						updateMessage(tr("Rendering : aborting"));
+	  } else {
+						//TODO: closing rendering project
+						qDebug() << "Rendering : exporting";
+						updateMessage(tr("Rendering : exporting"));
+						m_renderTarget->closeRenderTarget();
+	  }
+
+		m_renderTimeElapsed = m_stopwatch.elapsed();
+		qDebug() << "time : " << m_renderTimeElapsed;
+		emit signalRenderingFinished(QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+		qDebug() << "Rendering stopped after " << QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
    
-    qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
+		qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
 
     // Set _working to false, meaning the process can't be aborted anymore.
     mutex.lock();
