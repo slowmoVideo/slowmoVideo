@@ -24,7 +24,8 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
 #endif
 #else
 // deprecated in qt5 ?
-// QString path = s.value("db.path", QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString();
+ //QString path = s.value("db.path", QStandardPaths::standardLocations(QStandardPaths::DataLocation)).toString();
+m_videoFilename(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)),
 #endif
     m_flowV3DLambda(20.0)
 {
