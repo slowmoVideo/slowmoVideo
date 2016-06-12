@@ -109,22 +109,18 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QCheckBox" name="clearflow">
+        <property name="text">
+         <string>clear flow cache</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="precalcFlow">
-       <property name="text">
-        <string>Use background thread for Optical Flow</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <layout class="QHBoxLayout" name="horizontalLayout_2"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
