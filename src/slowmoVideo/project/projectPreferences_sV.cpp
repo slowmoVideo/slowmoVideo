@@ -33,7 +33,10 @@ m_videoFilename(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)
 #endif
     m_flowV3DLambda(20.0)
 {
+    qDebug() << "cnostructor";
 }
+
+
 
 TagAxis& ProjectPreferences_sV::lastSelectedTagAxis()
 {
