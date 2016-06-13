@@ -34,12 +34,6 @@ public slots:
     void slotUpdateProjectDir();
 
 private:
-    QDir m_dirFlowSmall;
-    QDir m_dirFlowOrig;
-
-   
-
-    void createDirectories();
 
 };
 

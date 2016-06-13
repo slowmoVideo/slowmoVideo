@@ -72,13 +72,6 @@ void FlowSourceOpenCV_sV::slotUpdateProjectDir()
     createDirectories();
 }
 
-void FlowSourceOpenCV_sV::createDirectories()
-{
-    //qDebug() << "FlowSourceOpenCV_sV::createDirectories()"; 
-    m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
-    m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
-}
-
 /**
  *  create a optical flow file
  *

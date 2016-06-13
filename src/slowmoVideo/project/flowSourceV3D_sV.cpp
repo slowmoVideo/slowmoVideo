@@ -33,12 +33,6 @@ void FlowSourceV3D_sV::slotUpdateProjectDir()
     createDirectories();
 }
 
-void FlowSourceV3D_sV::createDirectories()
-{
-    m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
-    m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
-}
-
 
 FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {

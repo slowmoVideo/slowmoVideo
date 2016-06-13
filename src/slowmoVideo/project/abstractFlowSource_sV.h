@@ -13,6 +13,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../lib/defs_sV.hpp"
 
+#include <QtCore>
+#include <QDir>
+
 class Project_sV;
 class FlowField_sV;
 
@@ -30,6 +33,9 @@ public:
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)  = 0;
 
     virtual void setLambda(double lambda) { m_lambda = lambda;} ;
+  
+    void clearFlowCache();
+    void createDirectories();
 
 public slots:
     /**
@@ -42,6 +48,9 @@ public slots:
 protected:
     Project_sV* project();
     double m_lambda;
+
+    QDir m_dirFlowSmall;
+    QDir m_dirFlowOrig;
     
 private:
     Project_sV *m_project;
