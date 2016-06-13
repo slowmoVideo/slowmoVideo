@@ -16,23 +16,28 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_renderFPS(24),
     m_imagesOutputDir(QDir::homePath()),
     m_imagesFilenamePattern("rendered-%1.jpg"),
+    m_flowV3DLambda(20.0)
+{
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #ifdef USE_QTKIT
-    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mov"),
+    m_videoFilename = (QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mov");
 #else
-    m_videoFilename(QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mp4"),
+    m_videoFilename = (QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mp4");
 #endif
 #else
 // deprecated in qt5 ?
 #ifdef USE_QTKIT
-m_videoFilename(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mov"),
+m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mov");
 #else
-m_videoFilename(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mp4"),
+m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mp4");
 #endif
 
 #endif
-    m_flowV3DLambda(20.0)
-{
+	qDebug() << "filename is : " << m_videoFilename;
+}
+
+ProjectPreferences_sV::~ProjectPreferences_sV() {
+	qDebug() << "destroy filename is : " << m_videoFilename;
 }
 
 TagAxis& ProjectPreferences_sV::lastSelectedTagAxis()
@@ -78,7 +83,9 @@ QString& ProjectPreferences_sV::renderTarget() { return m_renderTarget; }
 QString& ProjectPreferences_sV::imagesOutputDir() { return m_imagesOutputDir; }
 QString& ProjectPreferences_sV::imagesFilenamePattern() { return m_imagesFilenamePattern; }
 
-QString& ProjectPreferences_sV::videoFilename() { return m_videoFilename; }
+QString& ProjectPreferences_sV::videoFilename() { 
+qDebug() << "filename is : " << m_videoFilename;
+return m_videoFilename; }
 QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }
 
 float& ProjectPreferences_sV::flowV3DLambda() { return m_flowV3DLambda; }
