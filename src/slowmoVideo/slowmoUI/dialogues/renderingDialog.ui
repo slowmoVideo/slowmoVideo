@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>719</width>
-    <height>544</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
@@ -450,6 +450,13 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="clearcahce">
+            <property name="text">
+             <string>clear flow cache</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer_3">

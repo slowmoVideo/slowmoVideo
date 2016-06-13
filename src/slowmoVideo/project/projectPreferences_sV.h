@@ -6,7 +6,6 @@ class ProjectPreferences_sV
 {
 public:
     ProjectPreferences_sV();
-    ~ProjectPreferences_sV();
 
     /**
       \return Reference to the previously selected tag axis

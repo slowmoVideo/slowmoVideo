@@ -33,12 +33,8 @@ m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocati
 #endif
 
 #endif
-	qDebug() << "filename is : " << m_videoFilename;
 }
 
-ProjectPreferences_sV::~ProjectPreferences_sV() {
-	qDebug() << "destroy filename is : " << m_videoFilename;
-}
 
 TagAxis& ProjectPreferences_sV::lastSelectedTagAxis()
 {
