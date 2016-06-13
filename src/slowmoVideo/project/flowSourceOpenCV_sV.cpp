@@ -63,15 +63,6 @@ void FlowSourceOpenCV_sV::chooseAlgo(int algo) {
     method = algo;
 }
         		
-void FlowSourceOpenCV_sV::slotUpdateProjectDir()
-{
-    //TODO: check if needed ?
-    //qDebug() << "FlowSourceOpenCV_sV::slotUpdateProjectDir()"; 
-    //m_dirFlowSmall.rmdir(".");
-    //m_dirFlowOrig.rmdir(".");
-    createDirectories();
-}
-
 /**
  *  create a optical flow file
  *

@@ -30,8 +30,6 @@ public:
     static QString correctFlowBinaryLocation();
 
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError) {};
-public slots:
-    void slotUpdateProjectDir();
 
 private:
 

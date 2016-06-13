@@ -30,9 +30,8 @@ Project_sV* AbstractFlowSource_sV::project()
  */
 void AbstractFlowSource_sV::clearFlowCache()
 {
-    //TODO:
-	  const QString path;
-    QDir dir( path );
+	  //TODO: loop for small files also !
+	  QDir dir = m_dirFlowOrig;
 
     dir.setFilter( QDir::NoDotAndDotDot | QDir::Files );
     foreach( QString dirItem, dir.entryList() )
@@ -45,6 +44,15 @@ void AbstractFlowSource_sV::clearFlowCache()
         subDir.removeRecursively();
     }
 }
+
+void AbstractFlowSource_sV::slotUpdateProjectDir()
+{
+     //TODO: check
+     //m_dirFlowSmall.rmdir(".");
+     //m_dirFlowOrig.rmdir(".");
+     createDirectories();
+}
+
 
 void AbstractFlowSource_sV::createDirectories()
 {

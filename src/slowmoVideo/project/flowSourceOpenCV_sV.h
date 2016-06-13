@@ -52,9 +52,6 @@ public:
     void initGPUDevice(int dev);
     void chooseAlgo(int algo);
     
-public slots:
-    virtual void slotUpdateProjectDir();
-
   
 private:
 	int use_gpu;

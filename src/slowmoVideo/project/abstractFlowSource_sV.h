@@ -43,7 +43,7 @@ public slots:
       Informs the flow source that the project directory has changed. If the flow source created sub-directories
       in the old project directories, it can e.g. delete them and create them at the new place.
       */
-    virtual void slotUpdateProjectDir() = 0;
+    virtual void slotUpdateProjectDir() ;
 
 protected:
     Project_sV* project();
