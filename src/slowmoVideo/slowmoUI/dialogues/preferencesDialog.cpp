@@ -79,6 +79,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
     connect(&m_flowMethodGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFlowMethod()));
     connect(ui->bFFmpeg, SIGNAL(clicked()), this, SLOT(slotBrowseFfmpeg()));
+    connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlow()));
 
     if (!FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         FlowSourceV3D_sV::correctFlowBinaryLocation();
@@ -188,4 +189,7 @@ void PreferencesDialog::slotBrowseFfmpeg()
         ui->ffmpeg->setText(dialog.selectedFiles().at(0));
         //slotValidateFffmpegBinary();
     }
+}
+
+void PreferencesDialog::slotClearFlow() {
 }

@@ -80,6 +80,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 	//  connect( this->ui.comboBox, SIGNAL( activated(int) ), this, SLOT(comboBox_Activated()) );
 	
 #endif
+	connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlowCache()));
     
     // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
@@ -522,7 +523,8 @@ void MainWindow::comboBox_Activated()
 }
 #endif
 
-
+void RenderingDialog::slotClearFlowCache() {
+}
 
 
 
