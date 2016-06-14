@@ -79,7 +79,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     connect(ui->buildFlow, SIGNAL(textChanged(QString)), this, SLOT(slotValidateFlowBinary()));
     connect(&m_flowMethodGroup, SIGNAL(buttonClicked(int)), this, SLOT(slotUpdateFlowMethod()));
     connect(ui->bFFmpeg, SIGNAL(clicked()), this, SLOT(slotBrowseFfmpeg()));
-    connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlow()));
 
     if (!FlowSourceV3D_sV::validateFlowBinary(ui->buildFlow->text())) {
         FlowSourceV3D_sV::correctFlowBinaryLocation();
@@ -117,12 +116,13 @@ void PreferencesDialog::accept()
     
     qDebug() << "saving method  : " << method;
     m_settings.setValue("preferences/flowMethod", method);
-    
+   
+#if 0
+
     // thread calc
     bool precalc = true;
     
-    
-#if 0
+
     //TODO: remove
     if (ui->precalcFlow->isChecked()) {
         precalc = true;
@@ -191,5 +191,3 @@ void PreferencesDialog::slotBrowseFfmpeg()
     }
 }
 
-void PreferencesDialog::slotClearFlow() {
-}
