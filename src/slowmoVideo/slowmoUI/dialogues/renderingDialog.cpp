@@ -524,6 +524,7 @@ void MainWindow::comboBox_Activated()
 #endif
 
 void RenderingDialog::slotClearFlowCache() {
+    m_project->flowSource()->clearFlowCache();
 }
 
 

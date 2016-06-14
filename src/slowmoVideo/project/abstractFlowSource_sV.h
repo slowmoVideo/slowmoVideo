@@ -36,7 +36,8 @@ public:
   
     void clearFlowCache();
     void createDirectories();
-
+    void cleardirectory(QDir dir);
+    
 public slots:
     /**
       \fn slotUpdateProjectDir()
