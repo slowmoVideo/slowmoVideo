@@ -400,12 +400,12 @@
            </layout>
           </item>
           <item>
-           <widget class="QStackedWidget" name="stackedWidget">
+           <widget class="QStackedWidget" name="flowStackedWidget">
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
-            <widget class="QWidget" name="page">
-             <widget class="QWidget" name="layoutWidget">
+            <widget class="QWidget" name="page3D">
+             <widget class="QWidget" name="FarnlayoutWidget">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -475,7 +475,7 @@
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="">
+             <widget class="QWidget" name="flowlayoutWidget">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -501,7 +501,7 @@
               </layout>
              </widget>
             </widget>
-            <widget class="QWidget" name="page_2">
+            <widget class="QWidget" name="pageFarn">
              <widget class="QWidget" name="layoutWidget_2">
               <property name="geometry">
                <rect>
@@ -567,6 +567,85 @@
                  </property>
                  <property name="wordWrap">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="pageTVL1">
+             <widget class="QWidget" name="layoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>261</width>
+                <height>154</height>
+               </rect>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_18">
+                 <property name="text">
+                  <string>Thau :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QDoubleSpinBox" name="TVLthau">
+                 <property name="value">
+                  <double>0.250000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_19">
+                 <property name="text">
+                  <string>Lambda :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QDoubleSpinBox" name="TVLlambda">
+                 <property name="value">
+                  <double>0.150000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>Warp :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="TVLwarp">
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>10.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_21">
+                 <property name="text">
+                  <string>Pyr Scale :</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
                  </property>
                 </widget>
                </item>

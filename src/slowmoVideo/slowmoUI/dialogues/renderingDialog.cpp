@@ -34,6 +34,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFileDialog>
 #include <QSettings> // TODO: better
 #include <QMessageBox>
+#include <QComboBox>
 
 RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QDialog(parent),
@@ -61,25 +62,29 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
 
     // Optical flow
     ui->lambda->setValue(m_project->preferences()->flowV3DLambda());
-#if 0
-    ui->flowMethod->clear();
-    ui->flowMethod->addItem(tr("GPU GL V3D"),QVariant(1));
-    ui->flowMethod->addItem(tr("OpenCV-Farnback (cpu)"),QVariant(2));
-    ui->flowMethod->addItem(tr("OpenCV (OpenCL)"),QVariant(3));
-    ui->flowMethod->addItem(tr("OpenCV (CUDA)"),QVariant(4));
+
+    ui->opticalFlowMethod->clear();
+    ui->opticalFlowMethod->addItem(tr("GPU GL V3D"),QVariant(1));
+    ui->opticalFlowMethod->addItem(tr("OpenCV - Farnback"),QVariant(2));
+    ui->opticalFlowMethod->addItem(tr("OpenCV - Dual TVL1"),QVariant(3));
+    //ui->flowMethod->addItem(tr("OpenCV (CUDA)"),QVariant(4));
+
+    connect(ui->opticalFlowMethod, SIGNAL(activated(int)),
+            ui->flowStackedWidget, SLOT(setCurrentIndex(int)));
 
 	QSettings settings; //TODO: better define in project ?
-	int index = ui->flowMethod->findText(settings.value("preferences/flowMethod", "V3D").toString());
+	int index = ui->opticalFlowMethod->findText(settings.value("preferences/flowMethod", "V3D").toString());
 	if ( index != -1 ) { // -1 for not found	
-  			ui->flowMethod->setCurrentIndex(index);
+  			ui->opticalFlowMethod->setCurrentIndex(index);
+            ui->flowStackedWidget->setCurrentIndex(index);
 	} else {
 		// default to opencv
-		ui->flowMethod->setCurrentIndex(1);
+		ui->opticalFlowMethod->setCurrentIndex(2);
+        ui->flowStackedWidget->setCurrentIndex(2);
 	}
 	qDebug() << "found index : "<< index << "for : " <<settings.value("preferences/flowMethod", "V3D").toString() ;
-	//  connect( this->ui.comboBox, SIGNAL( activated(int) ), this, SLOT(comboBox_Activated()) );
 	
-#endif
+	
 	connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlowCache()));
     
     // Motion blur
@@ -160,7 +165,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
 
     // Restore rendering start/end
-    int index;
+    //int index;
     index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
     if (index >= 0) {
         ui->cbStartTag->setCurrentIndex(index);
@@ -322,6 +327,7 @@ void RenderingDialog::fillTagLists()
 
 void RenderingDialog::slotSaveSettings()
 {
+    qDebug() << "RenderingDialog::slotSaveSettings()";
 
     const InterpolationType interpolation = (InterpolationType)ui->cbInterpolation->itemData(ui->cbInterpolation->currentIndex()).toInt();
     const FrameSize size = (FrameSize)ui->cbSize->itemData(ui->cbSize->currentIndex()).toInt();
@@ -369,11 +375,19 @@ void RenderingDialog::slotSaveSettings()
     m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
 	m_project->preferences()->renderFormat() = use_qt;
 	
+    int algo = ui->opticalFlowMethod->currentIndex();
+    //m_settings.setValue("preferences/oclAlgo",algo);
+    qDebug() << "algo is " << algo;
+    qDebug() << "saving method  : " << ui->opticalFlowMethod->currentText();
+    //m_settings.setValue("preferences/flowMethod", method);
+
     accept();
 }
 
 bool RenderingDialog::slotValidate()
 {
+    qDebug() << "RenderingDialog::slotValidate()";
+
     bool ok = true;
 
     float fps = ui->cbFps->currentText().toFloat(&ok);
