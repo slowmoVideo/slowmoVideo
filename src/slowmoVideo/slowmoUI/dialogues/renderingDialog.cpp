@@ -19,6 +19,9 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/renderTask_sV.h"
 #include "project/imagesRenderTarget_sV.h"
 #include "project/abstractFlowSource_sV.h"
+#include "project/flowSourceOpenCV_sV.h"
+#include "project/flowSourceV3D_sV.h"
+
 #ifdef USE_FFMPEG
 #if 0
 #include "project/new_videoRenderTarget.h"
@@ -298,8 +301,31 @@ RenderTask_sV* RenderingDialog::buildTask()
         }
 
         // set optical flow parameters
-        AbstractFlowSource_sV *flow_algo = m_project->flowSource();
-        flow_algo->setLambda(prefs->flowV3DLambda());
+        int algo = ui->opticalFlowMethod->currentIndex();
+        //m_settings.setValue("preferences/oclAlgo",algo);
+        qDebug() << "algo is " << algo;
+        qDebug() << "saving method  : " << ui->opticalFlowMethod->currentText();
+        //m_settings.setValue("preferences/flowMethod", method);
+        switch (algo) {
+            case 0 : {
+                AbstractFlowSource_sV *flow_algo = m_project->flowSource();
+                flow_algo->setLambda(prefs->flowV3DLambda());
+            }
+                break;
+            case 1 : {
+                FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
+                flow_algo->setupOpticalFlow(<#const int levels#>, <#const int winsize#>, <#const double polySigma#>, <#const double pyrScale#>, <#const int polyN#>);
+            }
+                break;
+            case 2 : {
+                FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
+                flow_algo->setupTVL(<#double thau#>, <#double lambda#>, <#double pyrScale#>, <#double warp#>);
+            }
+                break;
+                qDebug() << "no algo defined";
+            default:
+        }
+        
         return task;
     } else {
         return NULL;
