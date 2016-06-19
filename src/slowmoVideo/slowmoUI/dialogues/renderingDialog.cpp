@@ -313,17 +313,18 @@ RenderTask_sV* RenderingDialog::buildTask()
             }
                 break;
             case 1 : {
+                //TODO: parameters
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupOpticalFlow(<#const int levels#>, <#const int winsize#>, <#const double polySigma#>, <#const double pyrScale#>, <#const int polyN#>);
+                flow_algo->setupOpticalFlow(3, 15, 1.2, 0.5, 5);
             }
                 break;
             case 2 : {
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupTVL(<#double thau#>, <#double lambda#>, <#double pyrScale#>, <#double warp#>);
+                flow_algo->setupTVL(0.25, 0.15, 5, 10);
             }
                 break;
-                qDebug() << "no algo defined";
             default:
+                qDebug() << "no algo defined";
         }
         
         return task;
