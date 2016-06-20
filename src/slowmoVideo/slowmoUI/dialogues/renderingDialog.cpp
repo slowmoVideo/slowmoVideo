@@ -315,12 +315,19 @@ RenderTask_sV* RenderingDialog::buildTask()
             case 1 : {
                 //TODO: parameters
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupOpticalFlow(3, 15, 1.2, 0.5, 5);
+                flow_algo->setupOpticalFlow(ui->FarnLevel->value(),
+                    ui->FarnWin->value(),
+                    ui->FarnPoly->value(), 
+                    ui->FarnPyr->value(),
+                    ui->FarnPolyN->value());
             }
                 break;
             case 2 : {
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupTVL(0.25, 0.15, 5, 10);
+                flow_algo->setupTVL(ui->TVLthau->value(), 
+                    ui->TVLlambda->value(), 
+                    ui->TVLpyr->value(), 
+                    ui->TVLwarp->value());
             }
                 break;
             default:
