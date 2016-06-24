@@ -9,10 +9,16 @@
 #include "../lib/flowRW_sV.h"
 #include "../lib/flowField_sV.h"
 
+#ifndef OCV_VERSION_3
+// OpenCV 2.x
 #include "opencv2/video/tracking.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
+#else
+#error "need to portto OpenCV 3.x"
+
+#endif
 
 #include "work_flow.h"
 #include <QTimer>
