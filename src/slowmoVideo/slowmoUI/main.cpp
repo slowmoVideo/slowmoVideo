@@ -13,6 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDebug>
 #include "mainwindow.h"
 
+#include "opencv2/core/version.hpp"
+
 int main(int argc, char *argv[])
 {
 
@@ -38,6 +40,10 @@ int main(int argc, char *argv[])
     QString projectPath;
     qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
+
+		//TODO: place this in About ...
+	  qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "." 
+					<< CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
 
     const int N = a.arguments().size();
     for (int n = 1; n < N; n++) {
