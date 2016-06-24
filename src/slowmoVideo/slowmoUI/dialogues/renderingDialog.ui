@@ -570,6 +570,9 @@
                </item>
                <item row="4" column="1">
                 <widget class="QDoubleSpinBox" name="FarnPoly">
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
                  <property name="value">
                   <double>1.200000000000000</double>
                  </property>
@@ -601,6 +604,9 @@
                </item>
                <item row="6" column="1">
                 <widget class="QDoubleSpinBox" name="FarnPyr">
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
                  <property name="value">
                   <double>0.500000000000000</double>
                  </property>
@@ -638,6 +644,9 @@
                </item>
                <item row="0" column="1">
                 <widget class="QDoubleSpinBox" name="TVLthau">
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
                  <property name="value">
                   <double>0.250000000000000</double>
                  </property>
@@ -652,6 +661,9 @@
                </item>
                <item row="1" column="1">
                 <widget class="QDoubleSpinBox" name="TVLlambda">
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
                  <property name="value">
                   <double>0.150000000000000</double>
                  </property>
