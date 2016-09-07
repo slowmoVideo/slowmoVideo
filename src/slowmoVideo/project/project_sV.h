@@ -147,6 +147,7 @@ private:
 
     qreal sourceTimeToFrame(qreal time) const;
 
+    QDir getDirectoryName();
     void init();
 
     /**

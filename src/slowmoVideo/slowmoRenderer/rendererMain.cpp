@@ -53,6 +53,7 @@ void printHelp()
               << "\t-start <startTime> -end <endTime> " << std::endl
               << "\t-interpolation [forward[2]|twoway[2]] " << std::endl
               << "\t -motionblur [stack|convolve] " << std::endl
+              << "\t -slowfactor <factor>" << std::endl
               << "\t-v3dLambda <lambda> " << std::endl;
 }
 
