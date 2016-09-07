@@ -52,15 +52,9 @@ the Free Software Foundation, either version 3 of the License, or
 Project_sV::Project_sV()
 {
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    //QTemporaryDir tempDir("slowmovideo");
-    QTemporaryDir tempDir;; // use default
-    if (tempDir.isValid())
-        m_projDir = QDir(tempDir.path());
-    else
-#endif
-        m_projDir = QDir::temp();
-    
+//TODO: scoping problem
+    m_projDir = getDirectoryName();
+
     init();
     
     int tid;
@@ -75,6 +69,22 @@ Project_sV::Project_sV(QString projectDir) : m_projDir(projectDir)
 
     init();
 
+}
+
+QDir Project_sV::getDirectoryName()
+{
+    QDir dirName;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    //QTemporaryDir tempDir("slowmovideo");
+    QTemporaryDir tempDir;; // use default
+    if (tempDir.isValid())
+        dirName = QDir(tempDir.path());
+    else
+#endif
+        dirName = QDir::temp();
+   
+    return dirName;
 }
 
 void Project_sV::init()

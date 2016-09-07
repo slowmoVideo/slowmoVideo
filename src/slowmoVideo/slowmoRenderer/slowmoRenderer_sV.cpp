@@ -108,7 +108,8 @@ void SlowmoRenderer_sV::create() throw(Error)
     }
     
     try {
-        //TODO: ? file path
+ 
+
         m_project = new Project_sV();
         
         
