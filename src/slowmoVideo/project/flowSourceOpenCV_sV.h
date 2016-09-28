@@ -27,7 +27,10 @@ the Free Software Foundation, either version 3 of the License, or
 // now in core (issue #32) 
 #include "opencv2/core/gpumat.hpp"
 
+#ifdef HAVE_OPENCL
 #include "opencv2/ocl/ocl.hpp"
+#endif
+
 //#elif CV_MAJOR_VERSION == 3
 // do opencv 3 code
 #endif
