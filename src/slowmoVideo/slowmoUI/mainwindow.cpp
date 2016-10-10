@@ -632,7 +632,7 @@ void MainWindow::slotShowRenderDialog()
  
             connect(task, SIGNAL(signalRenderingFinished(QString)), &m_rendererThread, SLOT(quit()));
             // done another way ?!
-            //connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLat    er()));
+            connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLater()));
              
             //connect(&m_rendererThread, &QThread::finished, task, &QObject::deleteLater);
             // let's start
