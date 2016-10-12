@@ -1,0 +1,29 @@
+#
+# Copyright (c) 2016 
+# travis CI config for slowmovideo check/test
+
+# Enable C++ support
+language: cpp
+
+# Compiler selection
+compiler:
+  - gcc
+
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+#install necessary Qt files
+install:
+  - sudo apt-get install -y qt5-default qttools5-dev-tools
+
+before_script:
+  - mkdir build
+  - cd build
+	- cmake ../slowmoVideo/src 
+
+
+# Build steps
+script:
+				make
+
