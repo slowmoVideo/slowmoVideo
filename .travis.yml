@@ -19,7 +19,7 @@ before_install:
 
 #install necessary Qt files
 install:
-  - sudo apt-get install -y qt5-default qttools5-dev-tools
+  - sudo apt-get install -y qttools5-dev-tools libopencv-dev qtbase5-dev qtscript5-dev  qt5widgets5-dev  qt5test5-dev qt5qml5-dev qt5gui5-dev qtdeclarative5-dev
 
 before_script:
   - mkdir build
