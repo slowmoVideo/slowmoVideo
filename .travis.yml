@@ -24,7 +24,7 @@ install:
 before_script:
   - mkdir build
   - cd build
-  - cmake ../slowmoVideo/src 
+  - cmake ../src 
 
 # Build steps
 script:
