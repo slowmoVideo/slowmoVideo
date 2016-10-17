@@ -3,8 +3,8 @@
 # travis CI config for slowmovideo check/test
 
 # for  Ubuntu 14.04 Trusty 
-#sudo: required
-#dist: trusty
+sudo: required
+dist: trusty
 
 # Enable C++ support
 language: cpp
