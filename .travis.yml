@@ -25,10 +25,8 @@ before_script:
   - mkdir build
   - cd build
   - cmake ../slowmoVideo/src 
-fi
 
 # Build steps
 script:
   make
-  fi
 
