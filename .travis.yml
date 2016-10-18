@@ -5,6 +5,7 @@
 # for  Ubuntu 14.04 Trusty 
 sudo: required
 dist: trusty
+cache: apt
 
 # Enable C++ support
 language: cpp
@@ -24,9 +25,9 @@ install:
 before_script:
   - mkdir build
   - cd build
-  - cmake ../src 
+  - cmake ../src  -DENABLE_TESTS=TRUE
 
 # Build steps
 script:
-  make
+  make 
 
