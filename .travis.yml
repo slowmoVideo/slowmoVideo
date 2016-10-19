@@ -29,5 +29,5 @@ before_script:
 
 # Build steps
 script:
-  make 
-
+  - make 
+  - ./slowmoVideo/unittests/UnitTests
