@@ -54,7 +54,9 @@ int main(int argc, char *argv[])
 
             // Changes the file loaded from the resource container
             // to force a different language
-            if (arg == "--de") {
+            if (arg == "--fr") {
+                QLocale::setDefault(QLocale::French);
+						} else if (arg == "--de") {
                 QLocale::setDefault(QLocale::German);
             } else if (arg == "--en") {
                 QLocale::setDefault(QLocale::English);
