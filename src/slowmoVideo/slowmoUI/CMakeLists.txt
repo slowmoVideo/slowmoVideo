@@ -30,6 +30,15 @@ set(SRCS
 
 # notification
 if (APPLE)
+find_library(CORE_FOUNDATION NAMES CoreFoundation)
+find_library(FOUNDATION NAMES Foundation)
+find_library(APPLICATION_SERVICES NAMES ApplicationServices)
+find_library(CORE_SERVICES NAMES CoreServices)
+find_library(COCOA NAMES Cocoa)
+
+SET(OSX_EXTRA_LIBS ${FOUNDATION} ${CORE_FOUNDATION} ${APPLICATION_SERVICES})
+message(STATUS "OSX Additional libraries: ${OSX_EXTRA_LIBS}")
+
 set(SRCS
         ${SRCS}
         macnotificationhandler.mm
@@ -88,9 +97,9 @@ if(APPLE)
         set(MACOSX_BUNDLE_BUNDLE_VERSION "${BUNDLE} ${PROJECT_VERSION}")
         set(MACOSX_BUNDLE_LONG_VERSION_STRING "${BUNDLE} ${PROJECT_VERSION}")
         set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
-        set(MACOSX_BUNDLE_COPYRIGHT "${PROJECT_COPYRIGHT_YEAR} ${PROJECT_VENDOR}")
+        set(MACOSX_BUNDLE_COPYRIGHT ${COPYRIGHT} )
         set(MACOSX_BUNDLE_ICON_FILE "slowmoUI.icns")
-        set(MACOSX_BUNDLE_GUI_IDENTIFIER "${PROJECT_DOMAIN_SECOND}.${PROJECT_DOMAIN_FIRST}")
+        set(MACOSX_BUNDLE_GUI_IDENTIFIER ${IDENTIFIER} )
         set(MACOSX_BUNDLE_BUNDLE_NAME "${BUNDLE}")
 
         set(MACOSX_BUNDLE_RESOURCES "${CMAKE_CURRENT_BINARY_DIR}/${BUNDLE}.app/Contents/Resources")
@@ -101,6 +110,16 @@ if(APPLE)
         message(STATUS "slowmoUI Bundle will be : ${MACOSX_BUNDLE} ")
 
 	set( SRCS ${SRCS} ${MACOSX_BUNDLE_ICON} )
+
+  set(INFO_PLIST_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+  configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.in ${INFO_PLIST_FILENAME})
+  set_target_properties(${PROGNAME} PROPERTIES
+                        MACOSX_BUNDLE_INFO_PLIST ${INFO_PLIST_FILENAME} )
+  #ADD_CUSTOM_COMMAND(TARGET slowmoUI
+  #  POST_BUILD
+  #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
+  #  COMMENT "Updating Info.plist"
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
 
 endif()
 
@@ -125,25 +144,13 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
-target_link_libraries(slowmoUI sVproj sVvis sVgui )
-
-if(APPLE)
-  configure_file(${CMAKE_SOURCE_DIR}/slowmoVideo/slowmoUI/res/Info.plist.cmake ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-  set_target_properties(${PROGNAME} PROPERTIES
-                        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
-  #ADD_CUSTOM_COMMAND(TARGET slowmoUI
-  #  POST_BUILD
-  #  COMMAND cp Info.plist slowmoUI.app/Contents/Info.plist
-  #  COMMENT "Updating Info.plist"
-  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
-
-endif()
+target_link_libraries(slowmoUI sVproj sVvis sVgui ${OSX_EXTRA_LIBS})
 
 #install(TARGETS ${slowmoUI}
 #        BUNDLE DESTINATION . COMPONENT Runtime
 #        RUNTIME DESTINATION ${BIN_INSTALL_DIR} COMPONENT Runtime)
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
 # create desktop file for KDE/Gnome
 # desktop file section
 	file( WRITE "${PROJECT_BINARY_DIR}/slowmoUI.desktop"

@@ -60,6 +60,8 @@ public:
     ProjectPreferences_sV* preferences() { return m_preferences; }
 
     void setProjectDir(QString projectDir);
+    void setupProjectDir(); // TODO:
+    QDir getProjectDir() { return m_projDir; };
     /** The project filename should be set when saving or loading the project. */
     void setProjectFilename(QString filename);
     /** \return The filename this project was last saved as. */
@@ -139,11 +141,13 @@ private:
 
     NodeList_sV *m_nodes;
     QList<Tag_sV> *m_tags;
+    //TODO: remove this
     RenderTask_sV *m_renderTask;
     ShutterFunctionList_sV *m_shutterFunctions;
 
     qreal sourceTimeToFrame(qreal time) const;
 
+    QDir getDirectoryName();
     void init();
 
     /**

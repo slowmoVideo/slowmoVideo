@@ -101,7 +101,7 @@ public:
 
     void fixHandles(int leftIndex);
 
-    void setSpeed(qreal segmentTime, qreal speed);
+    int setSpeed(qreal segmentTime, qreal speed);
 
 
 

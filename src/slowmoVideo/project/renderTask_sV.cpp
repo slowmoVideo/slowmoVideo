@@ -19,12 +19,16 @@
 #include "../lib/defs_sV.hpp"
 
 RenderTask_sV::RenderTask_sV(Project_sV *project) :
-m_project(project),
+//m_project(project),
 m_renderTarget(NULL),
 m_renderTimeElapsed(0),
 m_stopRendering(false),
 m_prevTime(-1)
 {
+    //m_project->setupProjectDir();
+    m_project = project;
+    
+
     m_timeStart = m_project->nodes()->startTime();
     m_timeEnd = m_project->nodes()->endTime();
     
@@ -51,7 +55,9 @@ void RenderTask_sV::requestWork()
     qDebug()<<"rendering worker start in Thread "<<thread()->currentThreadId();
     mutex.unlock();
     
-    emit workFlowRequested();
+    //emit workFlowRequested();
+
+	  qDebug() << "workflow request";
 }
 
 /**
@@ -138,10 +144,21 @@ QSize RenderTask_sV::resolution()
     return const_cast<Project_sV*>(m_project)->frameSource()->frameAt(0, m_prefs.size).size();
 }
 
+/*
+ * return a suitable dir for rendered frame
+ */
+QDir RenderTask_sV::getRenderDirectory() {
+	//bug using : return m_project->getDirectory("cache/rendered");
+	QDir dir(m_project->getProjectDir().absolutePath() + "/" + "rendered");
+	if (!dir.exists()) {
+		dir.mkpath(".");
+	}
+	return dir;
+
+}
 
 #pragma mark - 
 #pragma mark rendering
-
 
 /**
  *  this is the real workhorse.
@@ -150,6 +167,7 @@ QSize RenderTask_sV::resolution()
 void RenderTask_sV::slotContinueRendering()
 {
     qDebug()<<"Starting rendering process in Thread "<<thread()->currentThreadId();   
+
     /* real workhorse, need to account for exporting */
     setupProgress(trUtf8("Rendering Slow-Mo …"), 2* int(m_prefs.fps().fps() * (m_timeEnd-m_timeStart)));
         
@@ -186,6 +204,7 @@ void RenderTask_sV::slotContinueRendering()
         if (abort) {
         	// user stop the process
             qDebug()<<"Aborting Rendering process in Thread "<<thread()->currentThreadId();
+						m_renderTimeElapsed = m_stopwatch.elapsed();
             emit signalRenderingStopped(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
         	qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
             break;
@@ -221,18 +240,30 @@ void RenderTask_sV::slotContinueRendering()
     } /* while */
     
     
+    // Checks if the process should be aborted
+    mutex.lock();
+    bool abort = m_stopRendering;
+    mutex.unlock();
+        
+    if (abort) {
+						qDebug() << "Rendering : aborting";
+						updateMessage(tr("Rendering : aborting"));
+	  } else {
+						//TODO: closing rendering project
+						qDebug() << "Rendering : exporting";
+						updateMessage(tr("Rendering : exporting"));
+						m_renderTarget->closeRenderTarget();
+	  }
+
+		m_renderTimeElapsed = m_stopwatch.elapsed();
+		qDebug() << "time : " << m_renderTimeElapsed;
+		emit signalRenderingFinished(QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
+		qDebug() << "Rendering stopped after " << QTime(0,0).addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
+   
+		qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
+
     // Set _working to false, meaning the process can't be aborted anymore.
     mutex.lock();
     _working = false;
     mutex.unlock();
-    
-    //TODO: closing rendering project
-    qDebug() << "Rendering : exporting";
-    updateMessage(tr("Rendering : exporting"));
-    m_renderTarget->closeRenderTarget();
-    m_renderTimeElapsed += m_stopwatch.elapsed();
-    emit signalRenderingFinished(QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss"));
-    qDebug() << "Rendering stopped after " << QTime().addMSecs(m_renderTimeElapsed).toString("hh:mm:ss");
-    
-    qDebug()<<"Rendering process finished in Thread "<<thread()->currentThreadId();
 }

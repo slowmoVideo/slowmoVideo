@@ -13,6 +13,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDebug>
 #include "mainwindow.h"
 
+#include "opencv2/core/version.hpp"
+
 //TODO: 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -71,6 +73,10 @@ int main(int argc, char *argv[])
     qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
 
+		//TODO: place this in About ...
+	  qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "." 
+					<< CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
+
     const int N = a.arguments().size();
     for (int n = 1; n < N; n++) {
         QString arg = a.arguments().at(n);
@@ -80,7 +86,9 @@ int main(int argc, char *argv[])
 
             // Changes the file loaded from the resource container
             // to force a different language
-            if (arg == "--de") {
+            if (arg == "--fr") {
+                QLocale::setDefault(QLocale::French);
+						} else if (arg == "--de") {
                 QLocale::setDefault(QLocale::German);
             } else if (arg == "--en") {
                 QLocale::setDefault(QLocale::English);

@@ -31,6 +31,7 @@ private slots:
     void slotUpdateFfmpeg();
     void slotBrowseFlow();
     void slotBrowseFfmpeg();
+   
 };
 
 #endif // PREFERENCESDIALOG_H

@@ -6,7 +6,9 @@
 #define RENDERTASK_SV_H
 
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 #include <QtCore/QTime>
+#include <QtCore/QElapsedTimer>
 
 #include "renderPreferences_sV.h"
 
@@ -43,6 +45,8 @@ public:
     void setTimeRange(qreal start, qreal end);
     void setTimeRange(QString start, QString end);
 
+    QDir getRenderDirectory();
+
     /// Rendered frames per second
     Fps_sV fps() { return m_prefs.fps(); }
     /// Output frame resolution
@@ -73,8 +77,8 @@ private:
     qreal m_timeStart;
     qreal m_timeEnd;
 
-    QTime m_stopwatch;
-    int m_renderTimeElapsed;
+    QElapsedTimer m_stopwatch;
+    qint64 m_renderTimeElapsed;
 
     bool m_stopRendering; //  Process is aborted when true
     qreal m_nextFrameTime;

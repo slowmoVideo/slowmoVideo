@@ -51,7 +51,9 @@ public:
 
 protected slots:
     virtual void closeEvent(QCloseEvent *e);
+#if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
     virtual bool eventFilter(QObject *obj, QEvent *e);
+#endif
 
 private:
     enum ShortcutCommands {
@@ -93,6 +95,9 @@ private:
 
     QThread m_rendererThread;
 
+    void createDockWindows();
+    void createActions();
+    
 	void loadProject(QString path);
     void loadProject(Project_sV *project);
     void resetDialogs();

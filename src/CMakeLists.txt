@@ -1,14 +1,42 @@
 cmake_minimum_required(VERSION 2.6)
-
 project(slowmoVideo)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-source builds are not allowed.")
+endif()
 
-#set (CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
-set(PROJECT_VERSION_MAJOR "0")
-set(PROJECT_VERSION_MINOR "3")
-set(PROJECT_VERSION_PATCH "1")
+#
+set(CMAKE_MODULE_PATH
+  ${slowmoVideo_SOURCE_DIR}/cmake
+)
+
+# Make a version file containing the current version from git.
+#
+include(GetGitRevisionDescription)
+git_describe(VERSION --dirty=-dev)
+if (VERSION)
+				#parse the version information into pieces.
+			  # v0.4.0-123-gdddf621
+				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
+				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+-(.*)" "\\1" PROJECT_VERSION_SHA1 "${VERSION}")
+else()
+				set(PROJECT_VERSION_MAJOR "0")
+				set(PROJECT_VERSION_MINOR "5")
+				set(PROJECT_VERSION_PATCH "0")
+endif()
+
+if(NOT PROJECT_VERSION_PATCH)
+				# git describe bug ?
+				set(PROJECT_VERSION_PATCH "0")
+endif()
+
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+configure_file(version.h.in version.h)
 
 ### Compiler options ###
 
@@ -18,6 +46,12 @@ if (APPLE)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall --verbose")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall ")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -mtune=corei7")
+
+# Set additional project information
+set(COMPANY "granjow")
+set(COPYRIGHT "Copyright (c) 2011 Simon A. Eugster (Granjow). All rights reserved.")
+set(IDENTIFIER "net.granjow.slomoui")
+
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g")
 endif()
@@ -39,9 +73,6 @@ endif(MSYS)
 
 ### Find packages ###
 
-set(CMAKE_MODULE_PATH
-  ${slowmoVideo_SOURCE_DIR}/cmake
-)
 
 # Check if environment variable QTDIR is set.
 # needed for Qt5
@@ -50,7 +81,11 @@ if (DEFINED ENV{QTDIR})
     set(CMAKE_PREFIX_PATH $ENV{QTDIR} ${CMAKE_PREFIX_PATH})
 endif ()
 
-set(DEST "bin")
+if (APPLE)
+				set(DEST "slowmoUI.app/Contents/Tools/bin")
+else()
+				set(DEST "bin")
+endif()
 
 include(cmake/macros.cmake)
 
@@ -170,7 +205,25 @@ if (APPLE AND USE_QTKIT)
 	set(ADDITIONAL_LIBS "-framework Cocoa -framework QTKit -framework QuartzCore -framework AppKit -framework OpenCL")
 endif()
 	
-find_package(OpenCV)
+# Find OpenCV, you may need to set OpenCV_DIR variable
+# to the absolute path to the directory containing OpenCVConfig.cmake file
+# via the command line or GUI
+find_package(OpenCV REQUIRED)
+# If the package has been found, several variables will
+# be set, you can find the full list with descriptions
+# in the OpenCVConfig.cmake file. 
+# Print some message showing some of them
+message(STATUS "OpenCV library status:")
+message(STATUS " version: ${OpenCV_VERSION}")
+message(STATUS " libraries: ${OpenCV_LIBS}")
+message(STATUS " include path: ${OpenCV_INCLUDE_DIRS}")
+
+if (${OpenCV_VERSION_MAJOR} EQUAL 3)
+				set(HAS_OCV_VERSION_3 ON)
+else()
+				set(HAS_OCV_VERSION_3 OFF)
+endif()
+
 include_directories(${OPENCV_INCLUDE_DIRS})
 
 # for config.h
@@ -218,9 +271,9 @@ add_subdirectory(slowmoVideo/slowmoInfo)
 add_subdirectory(slowmoVideo/slowmoRenderer)
 add_subdirectory(slowmoVideo/visualizeFlow)
 if(ENABLE_TESTS)
-SET(QT_USE_QTTEST TRUE)
-add_subdirectory(slowmoVideo/test)
-add_subdirectory(slowmoVideo/unittests)
+  SET(QT_USE_QTTEST TRUE)
+  ## add_subdirectory(slowmoVideo/test)
+  add_subdirectory(slowmoVideo/unittests)
 endif(ENABLE_TESTS)
 
 ##### SV END #####
@@ -241,7 +294,7 @@ find_package(GLUT)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
-find_package(X11)
+#find_package(X11)
 
 # Windows: Try to find libraries that could not be found manually in the libs/ directory.
 if(WIN32)
@@ -426,7 +479,7 @@ endif(NOT FFMPEG_SWSCALE_FOUND)
 if(NOT OpenCV_VERSION)
     message("x OpenCV could not be found.")
 else(NOT OpenCV_VERSION)
-    message("* (ok) OpenCV ${OpenCV_VERSION} found at ${OPENCV_LIB_DIR}.")
+    message("* (ok) OpenCV ${OpenCV_VERSION} found at ${OpenCV_INCLUDE_DIRS}.")
 endif(NOT OpenCV_VERSION)
 message("* slowmoVideo will be built:                ---${BUILD_SLOWMO}---")
 message("=======================END===========================")
