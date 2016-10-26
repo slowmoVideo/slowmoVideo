@@ -26,6 +26,8 @@ set(SRCS
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
         notificator.cpp
+	logbrowser.cpp
+	logbrowserdialog.cpp
 )
 
 # notification

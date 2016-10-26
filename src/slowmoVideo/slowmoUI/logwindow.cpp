@@ -1,6 +1,8 @@
 // ?
+#include "logwindow.h"
+
 QTextEdit *logwindow::m_LogEdit = 0;
-logwindow *logWindow::m_Me = 0;
+logwindow *logwindow::m_Me = 0;
  
  
 void myMessageOutput( QtMsgType type, const char *msg )
@@ -16,8 +18,8 @@ void myMessageOutput( QtMsgType type, const char *msg )
                 mw->logMessageToFile(msg);
 }
 
-logwindow::logwindow( QWidget* parent, const char* name, WFlags fl )
-: QMainWindow( parent, name, fl )
+logwindow::logwindow( QWidget* parent, const char* name  , Qt::WindowFlags flags  )
+: QMainWindow( parent, name ,flags)
 {
         if(!m_Me) m_Me = this;
 
