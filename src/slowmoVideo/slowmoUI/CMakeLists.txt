@@ -81,6 +81,8 @@ set(SRCS_MOC
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
         notificator.h
+	logbrowser.h
+	logbrowserdialog.h
 )
 
 # notification

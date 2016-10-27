@@ -9,35 +9,23 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include <QApplication>
+#include <QPointer>
 #include <QtCore/QTranslator>
 #include <QtCore/QDebug>
-#include "mainwindow.h"
 
 #include "opencv2/core/version.hpp"
 
-//TODO: 
+#include "mainwindow.h"
+#include "logbrowser.h"
+ 
+QPointer<LogBrowser> logBrowser;
+ 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-//	QDir::temp()
-    QFile file(QDate::currentDate().toString("slowmovideo_dd_MM_yyyy.log"));
- 
-    file.open(QIODevice::Append | QIODevice::Text);
- 
-    QTextStream out(&file);
-    out << QTime::currentTime().toString("hh:mm:ss.zzz ");
- 
-    switch (type)
-    {
-    case QtDebugMsg:    out << "DBG"; break;
-    case QtWarningMsg:  out << "WRN"; break;
-    case QtCriticalMsg: out << "CRT"; break;
-    case QtFatalMsg:    out << "FTL"; break;
-    }
- 
-    out << " slowmovideo " << msg << '\n';
-    out.flush();
+				if(logBrowser)
+								logBrowser->outputMessage( type, msg );
 }
-
+ 
 int main(int argc, char *argv[])
 {
 
@@ -51,7 +39,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
- // Setup debug output system.
+  // Setup debug output system.
+  logBrowser = new LogBrowser;
 #if QT_VERSION >= 0x050000
   qInstallMessageHandler(myMessageOutput);
 #else
@@ -124,5 +113,8 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    return a.exec();
+    int result = a.exec();
+    qDebug() << "application exec return result =" << result;
+    delete logBrowser;
+    return result;
 }
