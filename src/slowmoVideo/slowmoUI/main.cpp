@@ -41,13 +41,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-  // Setup debug output system.
-  logBrowser = new LogBrowser;
-#if QT_VERSION >= 0x050000
-  qInstallMessageHandler(myMessageOutput);
-#else
-  qInstallMsgHandler(myMessageOutput);
-#endif
+
 
     //QDebug()<<"starting app"
 
@@ -110,6 +104,14 @@ int main(int argc, char *argv[])
     MainWindow w(projectPath);
 
     w.show();
+
+  // Setup debug output system.
+  logBrowser = new LogBrowser;
+#if QT_VERSION >= 0x050000
+  qInstallMessageHandler(myMessageOutput);
+#else
+  qInstallMsgHandler(myMessageOutput);
+#endif
 
     int result = a.exec();
     qDebug() << "application exec return result =" << result;
