@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
     }
 #endif
 
+    QApplication a(argc, argv);
+
   // Setup debug output system.
   logBrowser = new LogBrowser;
 #if QT_VERSION >= 0x050000
@@ -49,14 +51,10 @@ int main(int argc, char *argv[])
 
     //QDebug()<<"starting app"
 
-    QApplication a(argc, argv);
-
     // Set up preferences for the QSettings file
     QCoreApplication::setOrganizationName("Granjow");
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
-
-
 
     QString projectPath;
     qDebug() << "threading info : " << QThread::idealThreadCount();
