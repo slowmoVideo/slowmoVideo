@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    logBrowser->show();
+    //use menu here : logBrowser->show();
 
     int result = a.exec();
     qDebug() << "application exec return result =" << result;
