@@ -25,8 +25,7 @@ set(SRCS
   dialogues/flowExaminer.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
-        notificator.cpp
-	logbrowser.cpp
+  notificator.cpp
 	logbrowserdialog.cpp
 )
 
@@ -80,8 +79,7 @@ set(SRCS_MOC
   dialogues/flowExaminer.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
-        notificator.h
-	logbrowser.h
+  notificator.h
 	logbrowserdialog.h
 )
 

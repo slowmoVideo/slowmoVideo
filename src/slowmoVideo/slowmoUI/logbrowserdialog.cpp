@@ -20,6 +20,7 @@
 LogBrowserDialog::LogBrowserDialog(QWidget *parent)
 : QDialog(parent)
 {
+//    setAttribute(Qt::WA_DeleteOnClose);
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
     
@@ -42,7 +43,7 @@ LogBrowserDialog::LogBrowserDialog(QWidget *parent)
     buttonLayout->addWidget(saveButton);
     connect(saveButton, SIGNAL (clicked()), this, SLOT (save()));
     
-    resize(200, 400);
+    resize(600, 400);
 }
 
 

@@ -25,6 +25,7 @@ protected:
     virtual void closeEvent( QCloseEvent *e );
     
     QTextBrowser *browser;
+	  // static QTextEdit *m_LogEdit;
     QPushButton *clearButton;
     QPushButton *saveButton;
 };
