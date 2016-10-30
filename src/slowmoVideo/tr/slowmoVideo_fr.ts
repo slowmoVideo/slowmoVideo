@@ -6,12 +6,12 @@
     <message>
         <location filename="../slowmoUI/dialogues/aboutDialog.ui" line="14"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/aboutDialog.ui" line="28"/>
         <source>About slowmoVideo</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos de slowmoVideo</translation>
     </message>
     <message utf8="true">
         <location filename="../slowmoUI/dialogues/aboutDialog.ui" line="41"/>
@@ -36,12 +36,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/dialogues/aboutDialog.ui" line="133"/>
         <source>(c) 2012 Simon A. Eugster</source>
-        <translation type="unfinished"></translation>
+        <translation>(c) 2012 Simon A. Eugster</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/aboutDialog.cpp" line="23"/>
         <source>Version %1, %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Version %1, %2</translation>
     </message>
 </context>
 <context>
@@ -59,7 +59,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="106"/>
         <source>&amp;Snap in node</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aimanter aux noeuds</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvas.cpp" line="107"/>
@@ -503,19 +503,21 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="383"/>
         <source>Save project</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le projet</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="405"/>
         <source>
 Navigation: [Shift] Scroll, Drag</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Navigation: [Shift] Défiler, Déplacer</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="406"/>
         <source>
 Move nodes: [Ctrl]  Drag</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Déplacement des noeuds: [Ctrl] Déplacer</translation>
     </message>
     <message>
         <location filename="../slowmoUI/mainwindow.cpp" line="444"/>
@@ -660,7 +662,7 @@ Taille : %3x%4</translation>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.cpp" line="168"/>
         <source>Frame rate: %1/%2</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence d&apos;image: %1/%2</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/newProjectDialog.cpp" line="172"/>
@@ -794,7 +796,7 @@ Taille : %3x%4</translation>
     <message>
         <location filename="../project/project_sV.cpp" line="249"/>
         <source>Empty frame source; Cannot build flow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Image source vide: Impossible de construire le flux.</translation>
     </message>
 </context>
 <context>
@@ -802,32 +804,32 @@ Taille : %3x%4</translation>
     <message>
         <location filename="../lib/defs_sV.cpp" line="38"/>
         <source>Orig</source>
-        <translation type="unfinished"></translation>
+        <translation>Original</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="40"/>
         <source>Small</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniature</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="43"/>
         <source>Unknown size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille inconnue</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="51"/>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrière</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="53"/>
         <source>Backward</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="56"/>
         <source>Unknown direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direction inconnue</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="64"/>
@@ -862,22 +864,22 @@ Taille : %3x%4</translation>
     <message>
         <location filename="../lib/defs_sV.cpp" line="95"/>
         <source>Forward interpolation (fast)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation avant (rapide)</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="97"/>
         <source>Forward interpolation (accurate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation avant (précis)</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="99"/>
         <source>Two-way interpolation (fast)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation avant et arrière (rapide)</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="101"/>
         <source>Two-way interpolation (accurate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation avant et arrière (précis)</translation>
     </message>
     <message utf8="true">
         <location filename="../lib/defs_sV.cpp" line="103"/>
@@ -892,53 +894,53 @@ Taille : %3x%4</translation>
     <message>
         <location filename="../lib/defs_sV.cpp" line="114"/>
         <source>Stacking</source>
-        <translation type="unfinished"></translation>
+        <translation>Empillement</translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="116"/>
         <source>Convolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../lib/defs_sV.cpp" line="118"/>
         <source>Nearest (no blurring)</source>
-        <translation type="unfinished"></translation>
+        <translation>Le plus proche (pas de flou)</translation>
     </message>
     <message>
         <location filename="../project/interpolator_sV.cpp" line="13"/>
         <source>Requested frame %1: Not within valid range. (%2 frames)</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;image demandé %1: Est hors borne. (%2 images)</translation>
     </message>
     <message>
         <location filename="../project/motionBlur_sV.cpp" line="90"/>
         <source>Range too small: Start frame is %1, end frame is %2. Using normal interpolation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Borne trop petite: L&apos;image de départ est %1, celle de fin est %2. En utilisant une interpolation normale.</translation>
     </message>
     <message>
         <location filename="../project/videoRenderTarget_sV.cpp" line="61"/>
         <source>Video could not be prepared (error code %1).
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>La vidéo n&apos;as pas pu être préparé (code d&apos;erreur %1). %2</translation>
     </message>
     <message>
         <location filename="../project/xmlProjectRW_sV.cpp" line="159"/>
         <source>Cannot write to %1; please check if you have write permissions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Écriture impossible sur %1: merci de vérifier vos permissions d&apos;écriture.</translation>
     </message>
     <message utf8="true">
         <location filename="../project/xmlProjectRW_sV.cpp" line="305"/>
         <source>Unknown frame source “%1”. Cannot load the project.</source>
-        <translation type="unfinished"></translation>
+        <translation>Image source inconnue &quot;%1&quot;. Le projet ne sera pas chargé.</translation>
     </message>
     <message>
         <location filename="../project/xmlProjectRW_sV.cpp" line="314"/>
         <source>Cannot read from file %1. (Opening in read-only mode failed.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire le fichier %1. (l&apos;ouverture en lecture seule a échoué)</translation>
     </message>
     <message>
         <location filename="../project/xmlProjectRW_sV.cpp" line="321"/>
         <source>Invalid project file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de projet invalide: %1</translation>
     </message>
     <message>
         <location filename="../slowmoUI/canvasTools.cpp" line="39"/>
@@ -967,42 +969,42 @@ Frame %1</source>
     <message>
         <location filename="../slowmoUI/renderPreview.ui" line="14"/>
         <source>Render preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Prévisualisation de rendu</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.ui" line="51"/>
         <source>This is an information message.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci est un message d&apos;information.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="61"/>
         <source>Cannot render preview, no frames loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de faire une prévisualisation, aucune images chargées.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="65"/>
         <source>Cannot render preview at the curve position since no curve is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de faire un rendu a la position de courbe tant que la courbe n&apos;est pas disponible.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="69"/>
         <source>Rendering preview at output time %1 s (might take some time) ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu de la prévisualisation au temps %1 (cela peu encore prendre du temps) ...</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="72"/>
         <source>Preview is still being rendered.</source>
-        <translation type="unfinished"></translation>
+        <translation>La prévisualisation est toujours en cours.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="88"/>
         <source>Cannot render at output time %1 s; Not within the curve.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de faire le rendu au temps %1 ; Il n&apos;est pas contenu dans la courbe.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/renderPreview.cpp" line="98"/>
         <source>Preview rendering finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu de la prévisualisation terminé.</translation>
     </message>
 </context>
 <context>
@@ -1010,27 +1012,27 @@ Frame %1</source>
     <message>
         <location filename="../project/renderTask_sV.cpp" line="102"/>
         <source>Rendering aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu annulé.</translation>
     </message>
     <message utf8="true">
         <location filename="../project/renderTask_sV.cpp" line="110"/>
         <source>Rendering Slow-Mo …</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu Slow-Mo ...</translation>
     </message>
     <message>
         <location filename="../project/renderTask_sV.cpp" line="121"/>
         <source>No rendering target given! Aborting rendering.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune cible de rendu donné! Annulation du rendu.</translation>
     </message>
     <message>
         <location filename="../project/renderTask_sV.cpp" line="126"/>
         <source>Empty frame source, cannot be rendered.</source>
-        <translation type="unfinished"></translation>
+        <translation>Image source vide, rendu impossible.</translation>
     </message>
     <message>
         <location filename="../project/renderTask_sV.cpp" line="143"/>
         <source>Rendering frame %1 @ %2 s  from input position: %3 s (frame %4)</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu de l&apos;image %1 @ %2 s depuis la position d&apos;entrée : %3 s (image %4)</translation>
     </message>
 </context>
 <context>
@@ -1039,7 +1041,7 @@ Frame %1</source>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="14"/>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="46"/>
         <source>Rendering settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de rendu</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="40"/>
@@ -1050,52 +1052,52 @@ Frame %1</source>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="54"/>
         <source>Full Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Projet entier</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="64"/>
         <source>Tag section</source>
-        <translation type="unfinished"></translation>
+        <translation>Section par tags</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="71"/>
         <source>Custom section</source>
-        <translation type="unfinished"></translation>
+        <translation>Section personnalisée</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="116"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>à</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="192"/>
         <source>Frames per second:</source>
-        <translation type="unfinished"></translation>
+        <translation>Images par seconde :</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="284"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille :</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="310"/>
         <source>Interpolation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpolation :</translation>
     </message>
     <message utf8="true">
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="340"/>
         <source>For two frames A and B, the two-way interpolations calculate both the flows A→B and B→A, which leads to smoother transitions between them. Forward interpolations only calculate A→B; Twice as fast, but usually less smooth.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour deux images A et B, l&apos;interpolation &quot;avant-arrière&quot; calcule les deux flux A→B et B→A, ce qui genère des transitions plus fluide entre elles. L&apos;interpolation &quot;avant&quot; ne calcule que A→B; deux fois plus rapide, mais générallement moins fluide.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="366"/>
         <source>Optical Flow</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux Optique</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="372"/>
         <source>Optical flow</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux optique</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="380"/>
@@ -1105,175 +1107,175 @@ Frame %1</source>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="428"/>
         <source>Use a higher value for high-quality footage and larger images.</source>
-        <translation type="unfinished"></translation>
+        <translation>Une valeur haute produit des vidéos haute-qualité et des images plus grosses.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="445"/>
         <source>The lambda is only used with the GPU based Optical Flow algorithm. There is no general rule which value is best, so it is usually a good idea to render a short part with a low (5) and a high (50) lambda to see the differences, and then try to find the best value between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le lambda est uniquement utilisé pour l&apos;algorithme de de Flux Optique basé sur le GPU. Il n&apos;y a pas de régle général pour le choix de la meilleur valeur. C&apos;est générallement une bonne idée d&apos;effectuer des tests sur un extrait avec un faible (5) et un haut (50) lambda pour finallement trouver la meilleure valeur entre les deux.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="474"/>
         <source>Motion Blur</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="480"/>
         <source>Motion blur</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="486"/>
         <source>Motion blur will only be applied for segments on which it is enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motion blur ne seras appliqué uniquement pour les segments sur lequel il est activé.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="496"/>
         <source>Stacking blur (Uses more disk space, but is faster for repeated rendering.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stacking blur. (Utilise plus d&apos;espace disque mais plus rapide pour des rendus répétés)</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="505"/>
         <source>Maximum samples</source>
-        <translation type="unfinished"></translation>
+        <translation>Samples maximum</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="538"/>
         <source>Samples for slow motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Samples pour le slow motion</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="570"/>
         <source>Convolution blur (Smoother than stacking, usually the better choice.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Convolution blur (Plus fluide que stacking, générallement un meilleur choix)</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="577"/>
         <source>Nearest (no blurring)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="601"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortie</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="609"/>
         <source>Target:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cible :</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="619"/>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="711"/>
         <source>Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Vidéo</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="626"/>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="651"/>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Images</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="657"/>
         <source>The %1 in the filename pattern is mandatory and will be replaced by the frame number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le %1 dans le modèle du nom de fichier est obligatoire, il sera remplacé par le numéro de l&apos;image.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="666"/>
         <source>Output directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Dossier de sortie</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="676"/>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="739"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="683"/>
         <source>Filename pattern</source>
-        <translation type="unfinished"></translation>
+        <translation>Modèle du nom de fichier</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="693"/>
         <source>rendered-%1.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>rendu-%1.jpg</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="717"/>
         <source>Videos will be encoded with ffmpeg. If additional arguments are left empty, defaults will be used. The video format is determined by ffmpeg according to the file suffix.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les vidéos seront encodées avec ffmpeg. Si aucun paramètres additionels ne sont donnés, ceux par défaut seront utilisés. Le format de la vidéo est déterminé par ffmpeg suivant le suffixe du fichier.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="729"/>
         <source>Output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de sortie</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="746"/>
         <source>Optional arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètre optionnels</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="806"/>
         <source>Will *not* save the project!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci n&apos;enregistrera *pas* le projet!</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="809"/>
         <source>&amp;Save settings</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Enregistrer les paramètres</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="816"/>
         <source>&amp;Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.ui" line="823"/>
         <source>&amp;Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="94"/>
         <source>Original size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille original</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="95"/>
         <source>Small</source>
-        <translation type="unfinished"></translation>
+        <translation>Miniature</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="244"/>
         <source>&lt;Start&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Début&gt;</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="249"/>
         <source>&lt;End&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Fin&gt;</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="360"/>
         <source>Start time must be &lt; end time!</source>
-        <translation type="unfinished"></translation>
+        <translation>Le temps de début doit être &lt; au temps de fin!</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="363"/>
         <source>Rendering from %1 s to %2 s.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendu en cours de %1 s à %2 s.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="398"/>
         <source>Output directory for rendered images</source>
-        <translation type="unfinished"></translation>
+        <translation>Dossier de sortie pour le rendu des images</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/renderingDialog.cpp" line="410"/>
         <source>Output video file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier vidéo de sortie</translation>
     </message>
 </context>
 <context>
@@ -1281,7 +1283,7 @@ Frame %1</source>
     <message>
         <location filename="../slowmoFlowEdit/shortcutListDialog.ui" line="20"/>
         <source>Flow Editor shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Raccourcis de l&apos;Éditeur de flux</translation>
     </message>
 </context>
 <context>
@@ -1289,60 +1291,60 @@ Frame %1</source>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="14"/>
         <source>Shutter Functions</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonctions de l&apos;obturateur</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="22"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="29"/>
         <source>Segment %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Segment %1</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="36"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="70"/>
         <source>+</source>
-        <translation type="unfinished"></translation>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="77"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="100"/>
         <source>shutterFunc1</source>
-        <translation type="unfinished"></translation>
+        <translation>obturateurFunc1</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="123"/>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.cpp" line="184"/>
         <source>Used: %1 times</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisé : %1 fois</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="164"/>
         <source>// header
 (function foo(args...) {</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="202"/>
         <source>return 0;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="215"/>
         <source>// footer
 })</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="230"/>
@@ -1353,17 +1355,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Math functions are available in the Math namespace:&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Monospace&apos;;&quot;&gt;Math.PI, Math.cos(...), Math.pow(base. exponent) etc.&lt;/span&gt;&lt;/p&gt;
 &lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.ui" line="293"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/shutterFunctionDialog.cpp" line="95"/>
         <source>Segment %1 (total number: %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Segment %1 (sur un total de %2)</translation>
     </message>
 </context>
 <context>
@@ -1371,32 +1373,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="14"/>
         <source>Add tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter un tag</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="20"/>
         <source>Change the tag type with Arrows up/down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Changez le type du tag avec les flèches haut/bas.</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="45"/>
         <source>Source Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag Source</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="65"/>
         <source>Output Tag</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag Sortie</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="154"/>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="../slowmoUI/dialogues/tagAddDialog.ui" line="161"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -1404,34 +1406,36 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="30"/>
         <source>Video file %1 does not exist!</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier vidéo %1 n&apos;existe pas !</translation>
     </message>
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="38"/>
         <source>Video is invalid, no streams found in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>La vidéo n&apos;est pas valide, aucun flux trouvé dans %1</translation>
     </message>
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="175"/>
         <source>ffmpeg/avconv executable not found! Cannot load video.
 (It is also possible that it took a little long to respond due to high workload, so you might want to try again.)
 Please download the 32-bit static ffmpeg build from ffmpeg.zeranoe.com and extract ffmpeg.exe in the same directory as slowmoUI.exe.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le programme ffmpeg/avconv n&apos;as pas été trouvé ! Impossible de charger la vidéo.
+(Il est également possible qu&apos;il ai mis du temps à répondre du à une importante charge processus, vous pouvez avoir envie de retenter)
+Merci d&apos;installer ffmpeg.exe, 32-bit static build depuis ffmpeg.zeranoe.com, dans le même dossier que slowmoUI.exe.</translation>
     </message>
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="188"/>
         <source>Extracting thumbnail-sized frames from the video file</source>
-        <translation type="unfinished"></translation>
+        <translation>Extraction d&apos;images miniatures depuis le fichier vidéo</translation>
     </message>
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="213"/>
         <source>Extracting original-sized frames from the video file</source>
-        <translation type="unfinished"></translation>
+        <translation>Extraction d&apos;images à la taille originale depuis le fichier vidéo</translation>
     </message>
     <message>
         <location filename="../project/videoFrameSource_sV.cpp" line="269"/>
         <source>Frame %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Image %1 sur %2</translation>
     </message>
 </context>
 </TS>
