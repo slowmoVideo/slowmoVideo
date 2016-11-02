@@ -2,6 +2,7 @@
 #define LOGDIALOG_H
 
 #include <QDialog>
+#include <QTextEdit>
 
 class QTextBrowser;
 class QPushButton;
@@ -24,8 +25,8 @@ protected:
     virtual void keyPressEvent( QKeyEvent *e );
     virtual void closeEvent( QCloseEvent *e );
     
-    QTextBrowser *browser;
-	  // static QTextEdit *m_LogEdit;
+    //QTextBrowser *browser;
+	  /*static*/ QTextEdit *browser; // m_LogEdit;
     QPushButton *clearButton;
     QPushButton *saveButton;
 };

@@ -126,6 +126,7 @@ MainWindow::~MainWindow()
     for (int i = 0; i < m_widgetActions.size(); i++) {
         delete m_widgetActions[i];
     }
+
 }
 
 void MainWindow::createActions()
@@ -264,6 +265,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
         qDebug() << "closing";
         m_settings.setValue("mainwindow/geometry", saveGeometry());
         m_settings.setValue("mainwindow/windowState", saveState());
+				logBrowser->close();
 	    QMainWindow::closeEvent(e);
 	}
 }

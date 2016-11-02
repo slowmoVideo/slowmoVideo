@@ -24,7 +24,8 @@ LogBrowserDialog::LogBrowserDialog(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
     
-    browser = new QTextBrowser(this);
+//    browser = new QTextBrowser(this);
+	  browser = new QTextEdit(this);
     layout->addWidget(browser);
     
     QHBoxLayout *buttonLayout = new QHBoxLayout;
