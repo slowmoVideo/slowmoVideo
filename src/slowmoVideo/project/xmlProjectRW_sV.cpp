@@ -524,7 +524,10 @@ Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) thr
                                 pr->imagesFilenamePattern() = xml.attributes().value("pattern").toString();
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoFilename") {
-                                pr->videoFilename() = xml.attributes().value("file").toString();
+                                QString filename = xml.attributes().value("file").toString();
+                                if (!filename.isEmpty()) {
+                                    pr->videoFilename() = filename;
+                                }
                                 xml.skipCurrentElement();
                             } else if (xml.name() == "videoCodec") {
                                 pr->videoCodec() = xml.attributes().value("codec").toString();

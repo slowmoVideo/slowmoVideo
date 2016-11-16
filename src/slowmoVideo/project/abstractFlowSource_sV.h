@@ -13,6 +13,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "../lib/defs_sV.hpp"
 
+#include <QtCore>
+#include <QDir>
+
 class Project_sV;
 class FlowField_sV;
 
@@ -30,18 +33,25 @@ public:
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)  = 0;
 
     virtual void setLambda(double lambda) { m_lambda = lambda;} ;
-
+  
+    void clearFlowCache();
+    void createDirectories();
+    void cleardirectory(QDir dir);
+    
 public slots:
     /**
       \fn slotUpdateProjectDir()
       Informs the flow source that the project directory has changed. If the flow source created sub-directories
       in the old project directories, it can e.g. delete them and create them at the new place.
       */
-    virtual void slotUpdateProjectDir() = 0;
+    virtual void slotUpdateProjectDir() ;
 
 protected:
     Project_sV* project();
     double m_lambda;
+
+    QDir m_dirFlowSmall;
+    QDir m_dirFlowOrig;
     
 private:
     Project_sV *m_project;

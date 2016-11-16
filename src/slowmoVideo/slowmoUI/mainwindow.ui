@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSlowmoVideo_UI">
@@ -56,6 +56,7 @@
     <addaction name="actionZoomOut"/>
     <addaction name="separator"/>
     <addaction name="actionEdit_Flow"/>
+    <addaction name="actionDebug_Window"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -163,11 +164,22 @@
    </property>
   </action>
   <action name="actionEdit_Flow">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Edit Optical Flow</string>
    </property>
    <property name="toolTip">
     <string>Edit Optical Flow</string>
+   </property>
+  </action>
+  <action name="actionDebug_Window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug Window</string>
    </property>
   </action>
  </widget>

@@ -55,18 +55,11 @@ public:
     void initGPUDevice(int dev);
     void chooseAlgo(int algo);
     
-public slots:
-    virtual void slotUpdateProjectDir();
-
   
 private:
-    QDir m_dirFlowSmall;
-    QDir m_dirFlowOrig;
 	int use_gpu;
 	int method;
 	
-    void createDirectories();
-    
     // optical flow Farn
    	int numLevels;
 	  int numIters;

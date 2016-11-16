@@ -63,12 +63,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
         ui->oclAlgo->setCurrentIndex(algo);
     }
 	
+#if 0
+    // TODO: remove
     // state of threading
     bool precalc = m_settings.value("preferences/precalcFlow", true).toBool();
     if (precalc)
         ui->precalcFlow->setChecked(true);
     else
         ui->precalcFlow->setChecked(false);
+#endif
     
     connect(ui->bOk, SIGNAL(clicked()), this, SLOT(accept()));
     connect(ui->bCancel, SIGNAL(clicked()), this, SLOT(reject()));
@@ -113,17 +116,22 @@ void PreferencesDialog::accept()
     
     qDebug() << "saving method  : " << method;
     m_settings.setValue("preferences/flowMethod", method);
-    
+   
+#if 0
+
     // thread calc
     bool precalc = true;
     
-    
+
+    //TODO: remove
     if (ui->precalcFlow->isChecked()) {
         precalc = true;
     } else
         precalc = false;
     m_settings.setValue("preferences/precalcFlow", precalc
                         );
+#endif
+    
     
     // ffmpeg location
     if (AvconvInfo::testAvconvExecutable(ui->ffmpeg->text())) {
@@ -182,3 +190,4 @@ void PreferencesDialog::slotBrowseFfmpeg()
         //slotValidateFffmpegBinary();
     }
 }
+

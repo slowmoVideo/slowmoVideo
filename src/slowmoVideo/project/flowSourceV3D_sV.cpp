@@ -25,20 +25,6 @@ FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, double lambda) :
     m_lambda = lambda;
 }
 
-void FlowSourceV3D_sV::slotUpdateProjectDir()
-{
-    //TODO: check
-    //m_dirFlowSmall.rmdir(".");
-    //m_dirFlowOrig.rmdir(".");
-    createDirectories();
-}
-
-void FlowSourceV3D_sV::createDirectories()
-{
-    m_dirFlowSmall = project()->getDirectory("cache/oFlowSmall");
-    m_dirFlowOrig = project()->getDirectory("cache/oFlowOrig");
-}
-
 
 FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {

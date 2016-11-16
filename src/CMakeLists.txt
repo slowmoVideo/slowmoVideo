@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
-
-
 project(slowmoVideo)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-source builds are not allowed.")
+endif()
 
-#set (CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
 #
 set(CMAKE_MODULE_PATH
@@ -270,9 +271,9 @@ add_subdirectory(slowmoVideo/slowmoInfo)
 add_subdirectory(slowmoVideo/slowmoRenderer)
 add_subdirectory(slowmoVideo/visualizeFlow)
 if(ENABLE_TESTS)
-SET(QT_USE_QTTEST TRUE)
-add_subdirectory(slowmoVideo/test)
-add_subdirectory(slowmoVideo/unittests)
+  SET(QT_USE_QTTEST TRUE)
+  ## add_subdirectory(slowmoVideo/test)
+  add_subdirectory(slowmoVideo/unittests)
 endif(ENABLE_TESTS)
 
 ##### SV END #####

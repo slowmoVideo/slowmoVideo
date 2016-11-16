@@ -9,12 +9,24 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include <QApplication>
+#include <QPointer>
 #include <QtCore/QTranslator>
 #include <QtCore/QDebug>
-#include "mainwindow.h"
 
 #include "opencv2/core/version.hpp"
 
+#include "mainwindow.h"
+#include "logbrowserdialog.h"
+ 
+//QPointer<LogBrowser> logBrowser;
+QPointer<LogBrowserDialog> logBrowser;
+ 
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+				if(logBrowser)
+								logBrowser->outputMessage( type, msg );
+}
+ 
 int main(int argc, char *argv[])
 {
 
@@ -30,13 +42,22 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    //QDebug()<<"starting app"
+
     // Set up preferences for the QSettings file
     QCoreApplication::setOrganizationName("Granjow");
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
 
+  // Setup debug output system.
+  logBrowser = new LogBrowserDialog;
+#if QT_VERSION >= 0x050000
+  qInstallMessageHandler(myMessageOutput);
+#else
+  qInstallMsgHandler(myMessageOutput);
+#endif
 
-
+    // startup...
     QString projectPath;
     qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
@@ -54,7 +75,9 @@ int main(int argc, char *argv[])
 
             // Changes the file loaded from the resource container
             // to force a different language
-            if (arg == "--de") {
+            if (arg == "--fr") {
+                QLocale::setDefault(QLocale::French);
+						} else if (arg == "--de") {
                 QLocale::setDefault(QLocale::German);
             } else if (arg == "--en") {
                 QLocale::setDefault(QLocale::English);
@@ -90,5 +113,10 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    return a.exec();
+    //use menu here : logBrowser->show();
+
+    int result = a.exec();
+    qDebug() << "application exec return result =" << result;
+    delete logBrowser;
+    return result;
 }
