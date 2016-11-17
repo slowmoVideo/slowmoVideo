@@ -46,8 +46,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     	ui->methodOCL->setEnabled(false);
     if ("V3D" == method) {
         ui->methodV3D->setChecked(true);
-    } 
-    if ("OCL" == method) {
+    } else if ("OCL" == method) {
         ui->methodOCL->setChecked(true);
         //qDebug() << "setting OCL";
         // restore selected device for OpenCL
