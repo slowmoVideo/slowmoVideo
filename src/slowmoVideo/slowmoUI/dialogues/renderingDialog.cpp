@@ -313,27 +313,32 @@ RenderTask_sV* RenderingDialog::buildTask()
             }
                 break;
             case 1 : {
-                //TODO: parameters
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupOpticalFlow(ui->FarnLevel->value(),
+                flow_algo->setupOpticalFlow(
+                    ui->FarnLevel->value(),
                     ui->FarnWin->value(),
-                    ui->FarnPoly->value(), 
+                    ui->FarnPoly->value(),
                     ui->FarnPyr->value(),
-                    ui->FarnPolyN->value());
+                    ui->FarnPolyN->value()
+                );
             }
                 break;
             case 2 : {
                 FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupTVL(ui->TVLthau->value(), 
-                    ui->TVLlambda->value(), 
-                    ui->TVLpyr->value(), 
-                    ui->TVLwarp->value());
+                flow_algo->setupTVL(
+                    ui->TVLthau->value(),
+                    ui->TVLlambda->value(),
+                    ui->TVLnscales->value(),
+                    ui->TVLwarps->value(),
+                    ui->TVLiterations->value(),
+                    ui->TVLepsilon->value()
+                );
             }
                 break;
             default:
                 qDebug() << "no algo defined";
         }
-        
+
         return task;
     } else {
         return NULL;
