@@ -42,8 +42,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     	QList<QString> ocldevices = oclFillDevices();
         ui->ocl_device->addItems(ocldevices);    
     }
-    else
-    	ui->methodOCL->setEnabled(false);
+    else {
+        ui->methodOCL->setEnabled(false);
+    }
+    ui->oclAlgo->clear();
+    ui->oclAlgo->addItem(tr("Farnback"),QVariant(1));
+    ui->oclAlgo->addItem(tr("Dual TVL1"),QVariant(2));
     if ("V3D" == method) {
         ui->methodV3D->setChecked(true);
     } else if ("OCL" == method) {
@@ -54,10 +58,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
         ui->ocl_device->setCurrentIndex(dev);
     } else {
         	ui->methodOCV->setChecked(true);
-        // TODO: for testing
-        ui->oclAlgo->clear();
-        ui->oclAlgo->addItem(tr("Farnback"),QVariant(1));
-        ui->oclAlgo->addItem(tr("Dual TVL1"),QVariant(2));
         int algo = m_settings.value("preferences/oclAlgo", 0).toInt();
         ui->oclAlgo->setCurrentIndex(algo);
     }
