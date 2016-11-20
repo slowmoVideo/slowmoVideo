@@ -30,14 +30,12 @@ public:
     /** \return The path to the flow file for the given frames */
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 
-    virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError)  = 0;
-
     virtual void setLambda(double lambda) { m_lambda = lambda;} ;
-  
+
     void clearFlowCache();
     void createDirectories();
     void cleardirectory(QDir dir);
-    
+
 public slots:
     /**
       \fn slotUpdateProjectDir()
@@ -52,10 +50,10 @@ protected:
 
     QDir m_dirFlowSmall;
     QDir m_dirFlowOrig;
-    
+
 private:
     Project_sV *m_project;
-    
+
 };
 
 #endif // ABSTRACTFLOWSOURCE_SV_H

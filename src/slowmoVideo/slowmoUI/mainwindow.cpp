@@ -572,7 +572,6 @@ void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
     dialog.exec();
-
     // Use the new flow method (if it has changed)
     m_project->reloadFlowSource();
 }
