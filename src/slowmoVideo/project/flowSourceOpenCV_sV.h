@@ -38,8 +38,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 class FlowSourceOpenCV_sV : public AbstractFlowSource_sV
 {
- 
-    
+
 public:
     FlowSourceOpenCV_sV(Project_sV *project);
     ~FlowSourceOpenCV_sV() {}
@@ -48,28 +47,33 @@ public:
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const;
 
     virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError);
-	
+
     void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);
-    void setupTVL(double thau,double lambda, double pyrScale, double warp);
+    void setupTVL(double tau, double lambda, int nscales, int warps, int iterations, double epsilon);
 
     void initGPUDevice(int dev);
     void chooseAlgo(int algo);
-    
-  
-private:
-	int use_gpu;
-	int method;
-	
-    // optical flow Farn
-   	int numLevels;
-	  int numIters;
-	  int winSize;
-	  double polySigma;
-	  double pyrScale;
-	  int polyN;
-	  int flags;
 
-	  // optical TVL1
+private:
+    int use_gpu;
+    int method;
+
+    // optical flow Farn
+    int numLevels;
+    int numIters;
+    int winSize;
+    double polySigma;
+    double pyrScale;
+    int polyN;
+    int flags;
+
+    // optical TVL1
+    double tau;
+    double lambda;
+    int warps;
+    int nscales;
+    int iterations;
+    double epsilon;
 };
 
 #endif // FLOWSOURCEOPENCV_SV_H

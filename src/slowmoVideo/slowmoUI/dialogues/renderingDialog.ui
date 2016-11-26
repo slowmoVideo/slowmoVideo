@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>762</width>
-    <height>567</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,7 @@
          <item>
           <widget class="QRadioButton" name="radioFullProject">
            <property name="text">
-            <string>Full Project</string>
+            <string>Fu&amp;ll Project</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -61,14 +61,14 @@
          <item>
           <widget class="QRadioButton" name="radioTagSection">
            <property name="text">
-            <string>Tag section</string>
+            <string>&amp;Tag section</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="radioSection">
            <property name="text">
-            <string>Custom section</string>
+            <string>Custom sect&amp;ion</string>
            </property>
           </widget>
          </item>
@@ -417,7 +417,7 @@
                 <x>0</x>
                 <y>20</y>
                 <width>472</width>
-                <height>34</height>
+                <height>36</height>
                </rect>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -487,7 +487,7 @@
                 <x>0</x>
                 <y>70</y>
                 <width>662</width>
-                <height>57</height>
+                <height>101</height>
                </rect>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -508,13 +508,19 @@
              </widget>
             </widget>
             <widget class="QWidget" name="pageFarn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>223</height>
+              </size>
+             </property>
              <widget class="QWidget" name="layoutWidget">
               <property name="geometry">
                <rect>
                 <x>10</x>
                 <y>10</y>
                 <width>231</width>
-                <height>203</height>
+                <height>212</height>
                </rect>
               </property>
               <layout class="QFormLayout" name="formLayout_2">
@@ -616,13 +622,19 @@
              </widget>
             </widget>
             <widget class="QWidget" name="pageTVL1">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>229</height>
+              </size>
+             </property>
              <widget class="QWidget" name="layoutWidget">
               <property name="geometry">
                <rect>
                 <x>10</x>
                 <y>10</y>
                 <width>261</width>
-                <height>154</height>
+                <height>218</height>
                </rect>
               </property>
               <layout class="QFormLayout" name="formLayout">
@@ -638,7 +650,7 @@
                <item row="0" column="0">
                 <widget class="QLabel" name="label_18">
                  <property name="text">
-                  <string>Thau :</string>
+                  <string>Tau:</string>
                  </property>
                 </widget>
                </item>
@@ -655,7 +667,7 @@
                <item row="1" column="0">
                 <widget class="QLabel" name="label_19">
                  <property name="text">
-                  <string>Lambda :</string>
+                  <string>Lambda:</string>
                  </property>
                 </widget>
                </item>
@@ -672,12 +684,12 @@
                <item row="2" column="0">
                 <widget class="QLabel" name="label_20">
                  <property name="text">
-                  <string>Warp :</string>
+                  <string>Warps :</string>
                  </property>
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QDoubleSpinBox" name="TVLwarp">
+                <widget class="QDoubleSpinBox" name="TVLwarps">
                  <property name="decimals">
                   <number>0</number>
                  </property>
@@ -689,17 +701,54 @@
                <item row="3" column="0">
                 <widget class="QLabel" name="label_21">
                  <property name="text">
-                  <string>Pyr Scale :</string>
+                  <string>Nscales:</string>
                  </property>
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QDoubleSpinBox" name="TVLpyr">
+                <widget class="QDoubleSpinBox" name="TVLnscales">
                  <property name="decimals">
                   <number>0</number>
                  </property>
                  <property name="value">
                   <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QDoubleSpinBox" name="TVLiterations">
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <double>400.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="iteration_label">
+                 <property name="text">
+                  <string>Iterations:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLabel" name="epsilonLabel">
+                 <property name="text">
+                  <string>Epsilon:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QDoubleSpinBox" name="TVLepsilon">
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.010000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -774,7 +823,7 @@
           <item>
            <widget class="QRadioButton" name="radioBlurStacking">
             <property name="text">
-             <string>Stacking blur (Uses more disk space, but is faster for repeated rendering.)</string>
+             <string>Stacking &amp;blur (Uses more disk space, but is faster for repeated rendering.)</string>
             </property>
            </widget>
           </item>
@@ -848,14 +897,14 @@
           <item>
            <widget class="QRadioButton" name="radioBlurConvolution">
             <property name="text">
-             <string>Convolution blur (Smoother than stacking, usually the better choice.)</string>
+             <string>Convolution blur (Smoother &amp;than stacking, usually the better choice.)</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="radioBlurNearest">
             <property name="text">
-             <string>Nearest (no blurring)</string>
+             <string>Nearest (no b&amp;lurring)</string>
             </property>
            </widget>
           </item>
@@ -897,14 +946,14 @@
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>Video</string>
+            <string>&amp;Video</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="radioImages">
            <property name="text">
-            <string>Images</string>
+            <string>&amp;Images</string>
            </property>
            <property name="checked">
             <bool>true</bool>

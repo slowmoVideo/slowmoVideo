@@ -127,42 +127,43 @@ void FlowSourceOpenCV_sV::setupOpticalFlow(const int levels,const int winsize,co
                                            const double pyrScale,
                                            const int polyN)
 {
-	qDebug() << "setup Optical Flow ";
-
+    qDebug() << "setup Optical Flow ";
     this->pyrScale = pyrScale;
     this->polyN = polyN;
     this->polySigma = polySigma;
     this->flags = 0;
-    
     this->numLevels = levels;
     this->winSize = winsize;
-    
     //const int iterations = 8; // 10
     this->numIters = 8;
 
 }
 
-void FlowSourceOpenCV_sV::setupTVL(double thau,double lambda, double pyrScale, double warp)
+void FlowSourceOpenCV_sV::setupTVL(double tau, double lambda, int nscales, int warps, int iterations, double epsilon)
 {
-	qDebug() << "setup Optical Flow TLV";
+    qDebug() << "setup Optical Flow TLV";
+    this->tau        = tau;
+    this->lambda     = lambda;
+    this->nscales    = nscales;
+    this->warps      = warps;
+    this->iterations = iterations;
+    this->epsilon    = epsilon;
 }
 
 FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
 {
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
-    
+
     /// \todo Check if size is equal
     if (!QFile(flowFileName).exists()) {
-        
         QTime time;
         time.start();
-        
         cv::Mat prevgray, gray;
         cv::Mat_<cv::Point2f> flow;
         QString prevpath = project()->frameSource()->framePath(leftFrame, frameSize);
         QString path = project()->frameSource()->framePath(rightFrame, frameSize);
         //        namedWindow("flow", 1);
-        
+
         qDebug() << "Building flow for left frame " << leftFrame << " to right frame " << rightFrame << "; Size: " << frameSize;
         
         // any previous flow file ?
@@ -190,53 +191,43 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
         {
             //const int iterations = 8; // 10
             //done outside setupOpticalFlow(3,15,1.2,0.5,5);
-            
             if( prevgray.data ) {
-                
                 if (method) { // DualTVL1
-                    qDebug() << "calcOpticalFlowDual_TVL1";
-#if CV_MAJOR_VERSION == 3
-                    // TODO: put this as instance variable
-                    cv::Ptr<cv::DualTVL1OpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
-                    //setupTVL(0.25,0.15, 5, 10);
-                    // default are 0.25 0.15 5 5
-									  tvl1->setLambda(0.05);
-                    //tlv1_->set("tau", tau_);
-                    //tvl1->set("lambda",0.05);
-                    //qDebug() <<  "lambda : " <<  tvl1->getLambda();
-                    //alg_->set("lambda", lambda_);
-                    //alg_->set("nscales", nscales_);
-                    //alg_->set("warps", warps_);
+                    qDebug() << "calcOpticalFlowDual_TVL1" << " lambda:" <<
+                      lambda << " tau:" <<tau << " nscales:" << nscales <<
+                      "warps:" << warps << " iterations:" << iterations <<
+                      "epsilon:" << epsilon;
+                    cv::Ptr<cv::DenseOpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
+                    tvl1->set("lambda", lambda);
+                    tvl1->set("tau", tau);
+                    tvl1->set("nscales", nscales);
+                    tvl1->set("warps", warps);
+                    tvl1->set("iterations", iterations);
+                    tvl1->set("epsilon", epsilon);
                     tvl1->calc(prevgray, gray, flow);
-#else
-                    qDebug() << "calcOpticalFlowDual_TVL1 not supported";
-#endif 
                 } else { // _FARN_
                     qDebug() << "calcOpticalFlowFarneback";
                     // TODO: check to use prev flow as initial flow ? (flags)
                     calcOpticalFlowFarneback(
-                                             prevgray, gray,
-                                             //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
-                                             flow,
-                                             pyrScale, //0.5,
-                                             numLevels, //3,
-                                             winSize, //15,
-                                             numIters, //3,
-                                             polyN, //5,
-                                             polySigma, //1.2,
-                                             flags //0
-                                             );
+                        prevgray, gray,
+                        //gray, prevgray,  // TBD this seems to match V3D output better but a sign flip could also do that
+                        flow,
+                        pyrScale, //0.5,
+                        numLevels, //3,
+                        winSize, //15,
+                        numIters, //3,
+                        polyN, //5,
+                        polySigma, //1.2,
+                        flags //0
+                    );
                 }
-                
                 drawOptFlowMap(flow, flowFileName.toStdString());
             } else {
                 qDebug() << "imread: Could not read image " << prevpath;
                 throw FlowBuildingError(QString("imread: Could not read image " + prevpath));
             }
         }
-        
         qDebug() << "Optical flow built for " << flowFileName << " in " << time.elapsed() << " ms.";
-        
     } else {
         qDebug().nospace() << "Re-using existing flow image for left frame " << leftFrame << " to right frame " << rightFrame << ": " << flowFileName;
     }
