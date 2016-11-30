@@ -197,18 +197,19 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                       lambda << " tau:" <<tau << " nscales:" << nscales <<
                       "warps:" << warps << " iterations:" << iterations <<
                       "epsilon:" << epsilon;
-                    cv::Ptr<cv::DenseOpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
 #if CV_MAJOR_VERSION == 3
-/*
+                    cv::Ptr<cv::DualTVL1OpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
+
 												tvl1->setLambda(lambda);
 												tvl1->setTau(tau);
 												tvl1->setScalesNumber(nscales);
 												tvl1->setWarpingsNumber(warps);
 												tvl1->setInnerIterations(iterations);
 												tvl1->setOuterIterations(iterations);
-												tvl1->set("epsilon", epsilon);
-*/
+												tvl1->setEpsilon(epsilon);
+
 #else
+                    cv::Ptr<cv::DenseOpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
                     tvl1->set("lambda", lambda);
                     tvl1->set("tau", tau);
                     tvl1->set("nscales", nscales);
