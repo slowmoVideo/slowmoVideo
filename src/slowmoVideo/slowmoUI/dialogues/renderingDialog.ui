@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
@@ -408,7 +408,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page3D">
              <widget class="QWidget" name="FarnlayoutWidget">
@@ -514,7 +514,7 @@
                <height>223</height>
               </size>
              </property>
-             <widget class="QWidget" name="layoutWidget">
+             <widget class="QWidget" name="layoutWidget_1">
               <property name="geometry">
                <rect>
                 <x>10</x>
@@ -534,7 +534,7 @@
                 <number>5</number>
                </property>
                <item row="0" column="0">
-                <widget class="QLabel" name="label_15">
+                <widget class="QLabel" name="labelLevel">
                  <property name="text">
                   <string>level : </string>
                  </property>
@@ -551,7 +551,7 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_16">
+                <widget class="QLabel" name="labelWinsize">
                  <property name="text">
                   <string>winSize :</string>
                  </property>
@@ -568,7 +568,7 @@
                 </widget>
                </item>
                <item row="4" column="0">
-                <widget class="QLabel" name="label_22">
+                <widget class="QLabel" name="labelSigma">
                  <property name="text">
                   <string>polySigma :</string>
                  </property>
@@ -585,14 +585,14 @@
                 </widget>
                </item>
                <item row="6" column="0">
-                <widget class="QLabel" name="label_23">
+                <widget class="QLabel" name="labelPyr">
                  <property name="text">
                   <string>pyrScale : </string>
                  </property>
                 </widget>
                </item>
                <item row="8" column="0">
-                <widget class="QLabel" name="label_24">
+                <widget class="QLabel" name="labelPoly">
                  <property name="text">
                   <string>polyN : </string>
                  </property>
@@ -628,7 +628,7 @@
                <height>229</height>
               </size>
              </property>
-             <widget class="QWidget" name="layoutWidget">
+             <widget class="QWidget" name="layoutWidget_2">
               <property name="geometry">
                <rect>
                 <x>10</x>
@@ -648,7 +648,7 @@
                 <number>4</number>
                </property>
                <item row="0" column="0">
-                <widget class="QLabel" name="label_18">
+                <widget class="QLabel" name="labelTau">
                  <property name="text">
                   <string>Tau:</string>
                  </property>
@@ -665,7 +665,7 @@
                 </widget>
                </item>
                <item row="1" column="0">
-                <widget class="QLabel" name="label_19">
+                <widget class="QLabel" name="labelLambda">
                  <property name="text">
                   <string>Lambda:</string>
                  </property>
@@ -682,7 +682,7 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_20">
+                <widget class="QLabel" name="labelWarp">
                  <property name="text">
                   <string>Warps :</string>
                  </property>
@@ -699,7 +699,7 @@
                 </widget>
                </item>
                <item row="3" column="0">
-                <widget class="QLabel" name="label_21">
+                <widget class="QLabel" name="labelNscales">
                  <property name="text">
                   <string>Nscales:</string>
                  </property>
@@ -729,14 +729,14 @@
                 </widget>
                </item>
                <item row="5" column="0">
-                <widget class="QLabel" name="iteration_label">
+                <widget class="QLabel" name="labelIter">
                  <property name="text">
                   <string>Iterations:</string>
                  </property>
                 </widget>
                </item>
                <item row="6" column="0">
-                <widget class="QLabel" name="epsilonLabel">
+                <widget class="QLabel" name="LabelEspilon">
                  <property name="text">
                   <string>Epsilon:</string>
                  </property>
