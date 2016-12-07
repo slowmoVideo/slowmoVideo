@@ -20,6 +20,13 @@ public:
     
     protected slots:
     void save();
+
+// TODO: 
+/*
+static void registerQDebugMessageHandler(){
+        qInstallMessageHandler(myQDebugMessageHandler);
+Q_DebugStream::registerQDebugMessageHandler();
+*/
     
 protected:
     virtual void keyPressEvent( QKeyEvent *e );

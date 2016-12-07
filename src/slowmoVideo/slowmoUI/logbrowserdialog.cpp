@@ -58,20 +58,25 @@ void LogBrowserDialog::outputMessage(QtMsgType type, const QString &msg)
 {
     // out << QTime::currentTime().toString("hh:mm:ss.zzz ");
     // fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+			  QString temp;
+
 				switch (type) {
                     case QtDebugMsg:
-                        browser->append(tr("DEBUG: %1").arg(msg));
+                        temp= (tr("DEBUG: %1").arg(msg));
                         break;
                     case QtWarningMsg:
-                        browser->append(tr("WARNING: %1").arg(msg));
+                        temp = (tr("WARNING: %1").arg(msg));
                         break;
                     case QtCriticalMsg:
-                        browser->append(tr("CRITICAL: %1").arg(msg));
+                        temp = (tr("CRITICAL: %1").arg(msg));
                         break;
                     case QtFatalMsg:
-                        browser->append(tr("FATAL: %1").arg(msg));
+                        temp = (tr("FATAL: %1").arg(msg));
                         break;
                 }
+			  //  indirect invoke for threading safety
+				QMetaObject::invokeMethod(browser, "append", 
+                            Qt::QueuedConnection, Q_ARG(QString, temp));
 }
 
 
