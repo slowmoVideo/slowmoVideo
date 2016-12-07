@@ -197,6 +197,18 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                       lambda << " tau:" <<tau << " nscales:" << nscales <<
                       "warps:" << warps << " iterations:" << iterations <<
                       "epsilon:" << epsilon;
+#if CV_MAJOR_VERSION == 3
+                    cv::Ptr<cv::DualTVL1OpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
+
+												tvl1->setLambda(lambda);
+												tvl1->setTau(tau);
+												tvl1->setScalesNumber(nscales);
+												tvl1->setWarpingsNumber(warps);
+												tvl1->setInnerIterations(iterations);
+												tvl1->setOuterIterations(iterations);
+												tvl1->setEpsilon(epsilon);
+
+#else
                     cv::Ptr<cv::DenseOpticalFlow> tvl1 = cv::createOptFlow_DualTVL1();
                     tvl1->set("lambda", lambda);
                     tvl1->set("tau", tau);
@@ -204,6 +216,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
                     tvl1->set("warps", warps);
                     tvl1->set("iterations", iterations);
                     tvl1->set("epsilon", epsilon);
+#endif
                     tvl1->calc(prevgray, gray, flow);
                 } else { // _FARN_
                     qDebug() << "calcOpticalFlowFarneback";
