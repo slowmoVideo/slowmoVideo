@@ -29,11 +29,6 @@
 
 using namespace cv;
 
-extern void drawOptFlowMap(const Mat& flow, int step,
-                         double, const Scalar& color, std::string flowname );
-
-
-
 WorkerFlow::WorkerFlow(QObject *parent) :
 QObject(parent)
 {

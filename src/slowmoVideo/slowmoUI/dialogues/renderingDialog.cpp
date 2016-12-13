@@ -66,30 +66,34 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     // Optical flow
     ui->lambda->setValue(m_project->preferences()->flowV3DLambda());
 
-    ui->opticalFlowMethod->clear();
-    ui->opticalFlowMethod->addItem(tr("GPU GL V3D"),QVariant(1));
-    ui->opticalFlowMethod->addItem(tr("OpenCV - Farnback"),QVariant(2));
-    ui->opticalFlowMethod->addItem(tr("OpenCV - Dual TVL1"),QVariant(3));
-    //ui->flowMethod->addItem(tr("OpenCV (CUDA)"),QVariant(4));
+    QSettings settings; //TODO: better define in project ?
+    ui->opticalFlowAlgo->clear();
+    QString flow_method = settings.value("preferences/flowMethod", "OpenCV-CPU").toString();
+    if (flow_method == "V3D") {
+        ui->opticalFlowAlgo->addItem(tr("flowBuilder"), QVariant(1));
+    } else {
+        ui->opticalFlowAlgo->addItem(tr("OpenCV - Farneback"), QVariant(2));
+        ui->opticalFlowAlgo->addItem(tr("OpenCV - Dual TVL1"), QVariant(3));
+    }
 
-    connect(ui->opticalFlowMethod, SIGNAL(activated(int)),
+    connect(ui->opticalFlowAlgo, SIGNAL(activated(int)),
             ui->flowStackedWidget, SLOT(setCurrentIndex(int)));
 
-	QSettings settings; //TODO: better define in project ?
-	int index = ui->opticalFlowMethod->findText(settings.value("preferences/flowMethod", "V3D").toString());
-	if ( index != -1 ) { // -1 for not found	
-  			ui->opticalFlowMethod->setCurrentIndex(index);
-            ui->flowStackedWidget->setCurrentIndex(index);
-	} else {
-		// default to opencv
-		ui->opticalFlowMethod->setCurrentIndex(2);
-        ui->flowStackedWidget->setCurrentIndex(2);
-	}
-	qDebug() << "found index : "<< index << "for : " <<settings.value("preferences/flowMethod", "V3D").toString() ;
-	
-	
-	connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlowCache()));
-    
+    QWidget *flowbuilder_pane = ui->flowStackedWidget->widget(0);
+    QWidget *farneback_pane = ui->flowStackedWidget->widget(1);
+    QWidget *tvl1_pane = ui->flowStackedWidget->widget(2);
+    if (flow_method == "V3D") {
+        ui->opticalFlowAlgo->setCurrentIndex(0);
+        ui->flowStackedWidget->setCurrentIndex(0);
+        ui->flowStackedWidget->removeWidget(farneback_pane);
+        ui->flowStackedWidget->removeWidget(tvl1_pane);
+    } else {
+        int algo = settings.value("preferences/preferredOpenCVAlgo", 0).toInt();
+        ui->opticalFlowAlgo->setCurrentIndex(algo);
+        ui->flowStackedWidget->setCurrentIndex(algo+1);
+        ui->flowStackedWidget->removeWidget(flowbuilder_pane);
+    }
+    connect(ui->clearflow, SIGNAL(clicked()), this, SLOT(slotClearFlowCache()));
     // Motion blur
     ui->maxSamples->setValue(m_project->motionBlur()->maxSamples());
     ui->slowmoSamples->setValue(m_project->motionBlur()->slowmoSamples());
@@ -168,8 +172,7 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     connect(ui->bBrowseVideoOutputFile, SIGNAL(clicked()), this, SLOT(slotBrowseVideoFile()));
 
     // Restore rendering start/end
-    //int index;
-    index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
+    int index = ui->cbStartTag->findText(m_project->preferences()->renderStartTag());
     if (index >= 0) {
         ui->cbStartTag->setCurrentIndex(index);
     }
@@ -206,143 +209,142 @@ RenderingDialog::~RenderingDialog()
 
 RenderTask_sV* RenderingDialog::buildTask()
 {
-    if (slotValidate()) {
-        slotSaveSettings();
+    if (!slotValidate()) {
+        return NULL;
+    }
+    slotSaveSettings();
 
-        ProjectPreferences_sV *prefs = m_project->preferences();
+    ProjectPreferences_sV *prefs = m_project->preferences();
 
-        const QString imagesOutputDir = ui->imagesOutputDir->text();
-        const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
+    const QString imagesOutputDir = ui->imagesOutputDir->text();
+    const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
 
-        RenderTask_sV *task = new RenderTask_sV(m_project);
-        task->renderPreferences().setFps(prefs->renderFPS());
-        task->renderPreferences().size = prefs->renderFrameSize();
-        task->renderPreferences().interpolation = prefs->renderInterpolationType();
-        task->renderPreferences().motionblur = prefs->renderMotionblurType();
+    RenderTask_sV *task = new RenderTask_sV(m_project);
+    task->renderPreferences().setFps(prefs->renderFPS());
+    task->renderPreferences().size = prefs->renderFrameSize();
+    task->renderPreferences().interpolation = prefs->renderInterpolationType();
+    task->renderPreferences().motionblur = prefs->renderMotionblurType();
 
 
-        if (ui->radioImages->isChecked()) {
-            ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);
-            renderTarget->setFilenamePattern(imagesFilenamePattern);
-            renderTarget->setTargetDir(imagesOutputDir);
-            task->setRenderTarget(renderTarget);
-        } else if (ui->radioVideo->isChecked()) {
-	#ifdef USE_FFMPEG
-	#warning "using QTKit version"
+    if (ui->radioImages->isChecked()) {
+        ImagesRenderTarget_sV *renderTarget = new ImagesRenderTarget_sV(task);
+        renderTarget->setFilenamePattern(imagesFilenamePattern);
+        renderTarget->setTargetDir(imagesOutputDir);
+        task->setRenderTarget(renderTarget);
+    } else if (ui->radioVideo->isChecked()) {
+#ifdef USE_FFMPEG
 #if 0
-            newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
+        newVideoRenderTarget *renderTarget = new newVideoRenderTarget(task);
 #else
-	#warning "using fork version"
-            exportVideoRenderTarget *renderTarget = new exportVideoRenderTarget(task);
+        exportVideoRenderTarget *renderTarget = new exportVideoRenderTarget(task);
 #endif
-			const bool use_qt = ui->use_qt->isChecked();
-			if (!use_qt) {
-				qDebug() << "using classical FFMPEG";
-				renderTarget->setQT(0);
-			}
-    #else
-	#warning "should not use this"
-            VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
-	#endif
-			// check if file exist
-			QFile filetest(ui->videoOutputFile->text());
-			if (filetest.exists()) {
-				int r = QMessageBox::warning(this, tr("slowmoUI"),
-                        tr("The file already exist.\n"
-                           "Do you want to overwrite it ?"),
-                        QMessageBox::Yes | QMessageBox::No);
-                if (r == QMessageBox::Yes) {
-            		filetest.remove();
-        		} else {
-        			//TODO:  maybe should delete task ?
-            		return 0;
-        		}				
-			}
-			renderTarget->setTargetFile(ui->videoOutputFile->text());
-            renderTarget->setVcodec(ui->vcodec->text());
-			task->setRenderTarget(renderTarget);
-        } else {
-            qDebug() << "Render target is neither images nor video. Not implemented?";
-            Q_ASSERT(false);
+        const bool use_qt = ui->use_qt->isChecked();
+        if (!use_qt) {
+            qDebug() << "using classical FFMPEG";
+            renderTarget->setQT(0);
         }
-
-        if (ui->radioTagSection->isChecked()) {
-            bool b;
-            qreal start = ui->cbStartTag->itemData(ui->cbStartTag->currentIndex()).toFloat(&b);
-            Q_ASSERT(b);
-            qreal end = ui->cbEndTag->itemData(ui->cbEndTag->currentIndex()).toFloat(&b);
-            Q_ASSERT(b);
-            qDebug() << QString("Rendering tag section from %1 (%2) to %3 (%4)")
-                        .arg(ui->cbStartTag->currentText())
-                        .arg(start).arg(ui->cbEndTag->currentText()).arg(end);
-            Q_ASSERT(start <= end);
-            task->setTimeRange(start, end);
-        } else if (ui->radioSection->isChecked()) {
-            qDebug() << QString("Rendering time section from %1 to %3")
-                        .arg(ui->cbStartTag->currentText())
-                        .arg(ui->cbEndTag->currentText());
-            task->setTimeRange(ui->timeStart->text(), ui->timeEnd->text());
-        }
-
-        QString mode;
-        if (ui->radioFullProject->isChecked()) {
-            mode = "full";
-        } else if (ui->radioSection->isChecked()) {
-            mode = "time";
-            m_project->preferences()->renderStartTime() = ui->timeStart->text();
-            m_project->preferences()->renderEndTime() = ui->timeEnd->text();
-        } else if (ui->radioTagSection->isChecked()) {
-            mode = "tags";
-            m_project->preferences()->renderStartTag() = ui->cbStartTag->currentText();
-            m_project->preferences()->renderEndTag() = ui->cbEndTag->currentText();
-        } else {
-            qDebug() << "No section mode selected?";
-            Q_ASSERT(false);
-        }
-
-        // set optical flow parameters
-        int algo = ui->opticalFlowMethod->currentIndex();
-        //m_settings.setValue("preferences/oclAlgo",algo);
-        qDebug() << "algo is " << algo;
-        qDebug() << "saving method  : " << ui->opticalFlowMethod->currentText();
-        //m_settings.setValue("preferences/flowMethod", method);
-        switch (algo) {
-            case 0 : {
-                AbstractFlowSource_sV *flow_algo = m_project->flowSource();
-                flow_algo->setLambda(prefs->flowV3DLambda());
+#else
+#warning "should not use this"
+        VideoRenderTarget_sV *renderTarget = new VideoRenderTarget_sV(task);
+#endif
+        // check if file exist
+        QFile filetest(ui->videoOutputFile->text());
+        if (filetest.exists()) {
+            int r = QMessageBox::warning(this, tr("slowmoUI"),
+                tr("The file already exist.\n"
+                "Do you want to overwrite it ?"),
+                QMessageBox::Yes | QMessageBox::No);
+            if (r == QMessageBox::Yes) {
+            filetest.remove();
+            } else {
+            //TODO:  maybe should delete task ?
+            return 0;
             }
-                break;
-            case 1 : {
-                FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
+        }
+        renderTarget->setTargetFile(ui->videoOutputFile->text());
+        renderTarget->setVcodec(ui->vcodec->text());
+        task->setRenderTarget(renderTarget);
+    } else {
+        qDebug() << "Render target is neither images nor video. Not implemented?";
+        Q_ASSERT(false);
+    }
+
+    if (ui->radioTagSection->isChecked()) {
+        bool b;
+        qreal start = ui->cbStartTag->itemData(ui->cbStartTag->currentIndex()).toFloat(&b);
+        Q_ASSERT(b);
+        qreal end = ui->cbEndTag->itemData(ui->cbEndTag->currentIndex()).toFloat(&b);
+        Q_ASSERT(b);
+        qDebug() << QString("Rendering tag section from %1 (%2) to %3 (%4)")
+                    .arg(ui->cbStartTag->currentText())
+                    .arg(start).arg(ui->cbEndTag->currentText()).arg(end);
+        Q_ASSERT(start <= end);
+        task->setTimeRange(start, end);
+    } else if (ui->radioSection->isChecked()) {
+        qDebug() << QString("Rendering time section from %1 to %3")
+                    .arg(ui->cbStartTag->currentText())
+                    .arg(ui->cbEndTag->currentText());
+        task->setTimeRange(ui->timeStart->text(), ui->timeEnd->text());
+    }
+
+    QString mode;
+    if (ui->radioFullProject->isChecked()) {
+        mode = "full";
+    } else if (ui->radioSection->isChecked()) {
+        mode = "time";
+        m_project->preferences()->renderStartTime() = ui->timeStart->text();
+        m_project->preferences()->renderEndTime() = ui->timeEnd->text();
+    } else if (ui->radioTagSection->isChecked()) {
+        mode = "tags";
+        m_project->preferences()->renderStartTag() = ui->cbStartTag->currentText();
+        m_project->preferences()->renderEndTag() = ui->cbEndTag->currentText();
+    } else {
+        qDebug() << "No section mode selected?";
+        Q_ASSERT(false);
+    }
+
+    // set optical flow parameters
+    QSettings settings;
+    QString flow_method = settings.value("preferences/flowMethod", "OpenCV-CPU").toString();
+    if (flow_method == "V3D") {
+        AbstractFlowSource_sV *flow_algo = m_project->flowSource();
+        flow_algo->setLambda(prefs->flowV3DLambda());
+    }
+    else if (flow_method == "OpenCV-CPU" || flow_method == "OpenCV-OCL") {
+        int algo_index = ui->opticalFlowAlgo->currentIndex();
+        qDebug() << "algo index is " << algo_index;
+        FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
+
+        switch (algo_index) {
+            case 0:
                 flow_algo->setupOpticalFlow(
-                    ui->FarnLevel->value(),
+                    ui->FarnLevels->value(),
                     ui->FarnWin->value(),
                     ui->FarnPoly->value(),
                     ui->FarnPyr->value(),
                     ui->FarnPolyN->value()
                 );
-            }
                 break;
-            case 2 : {
-                FlowSourceOpenCV_sV *flow_algo = (FlowSourceOpenCV_sV *)m_project->flowSource();
-                flow_algo->setupTVL(
-                    ui->TVLthau->value(),
+
+            case 1:
+                flow_algo->setupTVL1(
+                    ui->TVLtau->value(),
                     ui->TVLlambda->value(),
                     ui->TVLnscales->value(),
                     ui->TVLwarps->value(),
                     ui->TVLiterations->value(),
                     ui->TVLepsilon->value()
                 );
-            }
                 break;
+
             default:
                 qDebug() << "no algo defined";
         }
-
-        return task;
-    } else {
-        return NULL;
     }
+    else {
+        throw Error_sV("Unsupported Flow method");
+    }
+    return task;
 }
 
 void RenderingDialog::fillTagLists()
@@ -374,8 +376,8 @@ void RenderingDialog::slotSaveSettings()
     const QString imagesFilenamePattern = ui->imagesFilenamePattern->text();
     const float fps = ui->cbFps->currentText().toFloat();
 
-	const bool use_qt = ui->use_qt->isChecked();
-	
+    const bool use_qt = ui->use_qt->isChecked();
+
     m_project->motionBlur()->setMaxSamples(ui->maxSamples->value());
     m_project->motionBlur()->setSlowmoSamples(ui->slowmoSamples->value());
     m_project->preferences()->flowV3DLambda() = ui->lambda->value();
@@ -412,13 +414,7 @@ void RenderingDialog::slotSaveSettings()
     m_project->preferences()->renderFrameSize() = size;
     m_project->preferences()->renderFPS() = fps;
     m_project->preferences()->renderTarget() = ui->radioImages->isChecked() ? "images" : "video";
-	m_project->preferences()->renderFormat() = use_qt;
-	
-    int algo = ui->opticalFlowMethod->currentIndex();
-    //m_settings.setValue("preferences/oclAlgo",algo);
-    qDebug() << "algo is " << algo;
-    qDebug() << "saving method  : " << ui->opticalFlowMethod->currentText();
-    //m_settings.setValue("preferences/flowMethod", method);
+    m_project->preferences()->renderFormat() = use_qt;
 
     accept();
 }
