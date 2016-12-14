@@ -15,6 +15,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QSettings>
 #include <QObject>
 
+
+//TODO:  another rewrite 
+/* prefer use of :
+   avconv -i ~/Videos/MOV_0010.MP4 -f null /dev/nul
+   frame=  336 fps=  0 q=0.0 Lsize=       0kB time=10.92 bitrate=   0.0kbits/s    
+video:0kB audio:696kB global headers:0kB muxing overhead -100.000000%
+  use frame= for fnum
+  use  time= divide by frame for fps
+  */
+ 
 VideoInfoSV getInfo(const char filename[])
 {
     VideoInfoSV info;
@@ -23,8 +33,8 @@ VideoInfoSV getInfo(const char filename[])
     info.streamsCount = -1;
     info.framesCount = 0;
 
-    printf("Reading info for file %s.\n", filename);
-    fflush(stdout);
+    qDebug() << "Reading info for file " << filename;
+    //flush(stdout);
 
     double videorate;
     double duration;
@@ -54,7 +64,7 @@ VideoInfoSV getInfo(const char filename[])
     //QRegExp rx("Stream.*Video:.*(\\d{2,})x(\\d{2,}).*");
     //rx.setMinimal(true);
     if (-1 == rx.indexIn(videoInfo)) {
-        fprintf(stderr,"Could not find size.\n");
+        qDebug() << "Could not find size.";
         return info;
     }
 
@@ -65,7 +75,7 @@ VideoInfoSV getInfo(const char filename[])
     //rx.setPattern("Duration: (([0-9]+):([0-9]{2}):([0-9]{2}).([0-9]+))");
     rx.setPattern("Duration: ([0-9]*):([0-9]*):([0-9]*\\.[0-9]*)");
     if (-1 == rx.indexIn(videoInfo)) {
-        fprintf(stderr,"Could not find duration of stream.\n");
+        qDebug() << "Could not find duration of stream.";
         return info;
     }
 
@@ -91,6 +101,7 @@ VideoInfoSV getInfo(const char filename[])
     }
     
     info.framesCount = duration * videorate;
+    qDebug() << "calculated framesCount : " << info.framesCount << "with :" << duration << " and " << videorate;
     Fps_sV fps(videorate);
 
     info.frameRateNum = fps.num;
