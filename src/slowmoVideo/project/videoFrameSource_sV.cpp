@@ -96,7 +96,7 @@ int64_t VideoFrameSource_sV::framesCount() const
 }
 
 void VideoFrameSource_sV::setFramesCount(int64_t framesCount) {
-    qDebug() << "setting frameCount "<< framesCount;
+    //qDebug() << "setting frameCount "<< framesCount;
     m_videoInfo->framesCount = framesCount;
 }
 
@@ -271,7 +271,7 @@ void VideoFrameSource_sV::slotInitializationFinished()
     qDebug() << "slotExtractOrigFrames : " << s << "end";
     if (regex.lastIndexIn(s) >= 0) {
         //fprintf(stderr,"last frame is : %d\n",regex.cap(1).toInt());
-        setFramesCount(regex.cap(1).toInt());
+        setFramesCount(regex.cap(1).toLong());
     }  else {
         //fprintf(stderr, "last frame not found !\n" );
         qDebug() << "last frame not found";

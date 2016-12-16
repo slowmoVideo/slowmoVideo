@@ -781,11 +781,15 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MiddleButton)) {
 #endif
         QList<NodeList_sV::PointerWithDistance> nearObjects = m_project->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
+        
+#if _NEARBY_DBG
         qDebug() << "Nearby objects:";
         for (int i = 0; i < nearObjects.size(); i++) {
             qDebug() << typeid(*(nearObjects.at(i).ptr)).name() << " at distance " << nearObjects.at(i).dist;
         }
+#endif
     }
+    
 }
 
 void Canvas::contextMenuEvent(QContextMenuEvent *e)

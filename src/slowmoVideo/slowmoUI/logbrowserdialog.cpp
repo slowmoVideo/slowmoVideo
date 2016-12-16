@@ -73,6 +73,9 @@ void LogBrowserDialog::outputMessage(QtMsgType type, const QString &msg)
                     case QtFatalMsg:
                         temp = (tr("FATAL: %1").arg(msg));
                         break;
+                    default:
+                        temp = (tr("UNK: %1").arg(msg));
+                        break;
                 }
 			  //  indirect invoke for threading safety
 				QMetaObject::invokeMethod(browser, "append", 
