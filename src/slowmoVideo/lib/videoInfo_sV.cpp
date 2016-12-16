@@ -24,7 +24,8 @@ video:0kB audio:696kB global headers:0kB muxing overhead -100.000000%
   use frame= for fnum
   use  time= divide by frame for fps
   */
- 
+
+
 VideoInfoSV getInfo(const char filename[])
 {
     VideoInfoSV info;
@@ -41,11 +42,13 @@ VideoInfoSV getInfo(const char filename[])
     QString output;
     
 	QProcess ffmpeg;
-        QSettings settings;
+    QSettings settings;
 	QString prog = settings.value("binaries/ffmpeg", "ffmpeg").toString();
 	QStringList args;
 	args << "-i" << filename;
-	
+	args << "-f" << "null";
+    args << "/dev/null";
+
     ffmpeg.start(prog, args);
     ffmpeg.waitForFinished();
     QString videoInfo = ffmpeg.readAllStandardError();
@@ -102,6 +105,15 @@ VideoInfoSV getInfo(const char filename[])
     
     info.framesCount = duration * videorate;
     qDebug() << "calculated framesCount : " << info.framesCount << "with :" << duration << " and " << videorate;
+    
+
+    rx = QRegExp("frame=\\s*(\\d+).*time=(\\d+)");
+    rx.setMinimal(true);
+    
+    // beeter use of pos/offset ?
+    rx.lastIndexIn (videoInfo);
+    qDebug() << "frame" << rx.cap(1) << "time " << rx.cap(2);
+
     Fps_sV fps(videorate);
 
     info.frameRateNum = fps.num;
