@@ -28,7 +28,8 @@ throw(FrameSourceError) :
     m_inFile(filename),
     m_fps(1,1),
     m_ffmpegSemaphore(1),
-    m_initialized(false)
+    m_initialized(false),
+    cur_frame(0)
 {
     if (!QFileInfo(filename).exists()) {
         throw FrameSourceError(tr("Video file %1 does not exist!").arg(filename));
@@ -93,6 +94,12 @@ int64_t VideoFrameSource_sV::framesCount() const
 {
     return m_videoInfo->framesCount;
 }
+
+void VideoFrameSource_sV::setFramesCount(int64_t framesCount) {
+    //qDebug() << "setting frameCount "<< framesCount;
+    m_videoInfo->framesCount = framesCount;
+}
+
 const Fps_sV* VideoFrameSource_sV::fps() const
 {
     return &m_fps;
@@ -257,6 +264,19 @@ void VideoFrameSource_sV::slotInitializationFinished()
 
     m_ffmpegSemaphore.acquire();
     m_ffmpeg->waitForFinished(tmout);
+
+    QRegExp regex(regexFrameNumber);
+    QString s;
+    s = QString(m_ffmpeg->readAllStandardError());
+    qDebug() << "slotExtractOrigFrames : " << s << "end";
+    if (regex.lastIndexIn(s) >= 0) {
+        //fprintf(stderr,"last frame is : %d\n",regex.cap(1).toInt());
+        setFramesCount(regex.cap(1).toLong());
+    }  else {
+        //fprintf(stderr, "last frame not found !\n" );
+        qDebug() << "last frame not found";
+    }
+
     m_ffmpeg->terminate();
     m_ffmpegSemaphore.release();
 
