@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
-    <height>376</height>
+    <width>489</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,7 +62,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="flowMethodGroupBox">
      <property name="title">
       <string>Flow method</string>
      </property>
@@ -72,7 +72,7 @@
         <item>
          <widget class="QRadioButton" name="methodV3D">
           <property name="text">
-           <string>external (GPU, V3D (requires flowBuilder and a video card))</string>
+           <string>&amp;flowBuilder (external binary, GPU based, requires GLSL)</string>
           </property>
          </widget>
         </item>
@@ -83,15 +83,12 @@
         <item>
          <widget class="QRadioButton" name="methodOCV">
           <property name="text">
-           <string>CPU, OpenCV</string>
+           <string>CP&amp;U, OpenCV</string>
           </property>
           <property name="checked">
            <bool>true</bool>
           </property>
          </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="oclAlgo"/>
         </item>
        </layout>
       </item>
@@ -100,7 +97,7 @@
         <item>
          <widget class="QRadioButton" name="methodOCL">
           <property name="text">
-           <string>OpenCV with OpenCL</string>
+           <string>OpenC&amp;V with OpenCL</string>
           </property>
          </widget>
         </item>
@@ -109,22 +106,52 @@
         </item>
        </layout>
       </item>
+      <item>
+       <widget class="QGroupBox" name="preferredOpenCVAlgoBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="labelPreferredOpenCVAlgo">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Preferred OpenCV Algorithm:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="preferredOpenCVAlgo">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QCheckBox" name="precalcFlow">
-       <property name="text">
-        <string>Use background thread for Optical Flow</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -179,5 +206,38 @@
   <tabstop>bOk</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>methodOCV</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>preferredOpenCVAlgoBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>34</x>
+     <y>197</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>170</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>methodOCL</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>preferredOpenCVAlgoBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>73</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>86</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

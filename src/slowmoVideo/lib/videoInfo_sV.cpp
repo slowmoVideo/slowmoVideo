@@ -15,6 +15,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QSettings>
 #include <QObject>
 
+
+/**
+ * get information from video file
+ */
 VideoInfoSV getInfo(const char filename[])
 {
     VideoInfoSV info;
@@ -23,19 +27,21 @@ VideoInfoSV getInfo(const char filename[])
     info.streamsCount = -1;
     info.framesCount = 0;
 
-    printf("Reading info for file %s.\n", filename);
-    fflush(stdout);
+    qDebug() << "Reading info for file " << filename;
+    //flush(stdout);
 
     double videorate;
     double duration;
     QString output;
     
 	QProcess ffmpeg;
-        QSettings settings;
+    QSettings settings;
 	QString prog = settings.value("binaries/ffmpeg", "ffmpeg").toString();
 	QStringList args;
 	args << "-i" << filename;
-	
+	args << "-f" << "null";
+    args << "/dev/null";
+
     ffmpeg.start(prog, args);
     ffmpeg.waitForFinished();
     QString videoInfo = ffmpeg.readAllStandardError();
@@ -45,7 +51,14 @@ VideoInfoSV getInfo(const char filename[])
     // Stream #0:0: Video: mpeg4 (Simple Profile) (DX50 / 0x30355844), yuv420p, 400x240 [SAR 1:1 DAR 5:3], 23 tbr, 23 tbn, 23 tbc    
     //  Duration: 00:00:11.13, start: 0.000000, bitrate: 6338 kb/s
     // Stream #0.0(eng): Video: mpeg4 (Main Profile), yuv420p, 1280x720 [PAR 1:1 DAR 16:9], 6309 kb/s, 30.69 fps, 90k tbn, 300 tbc
-
+    /* prefer use of :
+     avconv -i ~/Videos/MOV_0010.MP4 -f null /dev/nul
+     frame=  336 fps=  0 q=0.0 Lsize=       0kB time=10.92 bitrate=   0.0kbits/s
+     video:0kB audio:696kB global headers:0kB muxing overhead -100.000000%
+     use frame= for fnum
+     use  time= divide by frame for fps
+     */
+    
     qDebug() << "output : " << videoInfo;
     
     // find the source resolution
@@ -54,7 +67,7 @@ VideoInfoSV getInfo(const char filename[])
     //QRegExp rx("Stream.*Video:.*(\\d{2,})x(\\d{2,}).*");
     //rx.setMinimal(true);
     if (-1 == rx.indexIn(videoInfo)) {
-        fprintf(stderr,"Could not find size.\n");
+        qDebug() << "Could not find size.";
         return info;
     }
 
@@ -65,7 +78,7 @@ VideoInfoSV getInfo(const char filename[])
     //rx.setPattern("Duration: (([0-9]+):([0-9]{2}):([0-9]{2}).([0-9]+))");
     rx.setPattern("Duration: ([0-9]*):([0-9]*):([0-9]*\\.[0-9]*)");
     if (-1 == rx.indexIn(videoInfo)) {
-        fprintf(stderr,"Could not find duration of stream.\n");
+        qDebug() << "Could not find duration of stream.";
         return info;
     }
 
@@ -91,6 +104,17 @@ VideoInfoSV getInfo(const char filename[])
     }
     
     info.framesCount = duration * videorate;
+    qDebug() << "calculated framesCount : " << info.framesCount << "with :" << duration << " and " << videorate;
+    
+    // TODO: correct time
+    rx = QRegExp("frame=\\s*(\\d+).*time=(\\d+)");
+    rx.setMinimal(true);
+    
+    // beeter use of pos/offset ?
+    rx.lastIndexIn (videoInfo);
+    qDebug() << "frame" << rx.cap(1) << "time " << rx.cap(2);
+    info.framesCount = rx.cap(1).toLong();
+    
     Fps_sV fps(videorate);
 
     info.frameRateNum = fps.num;

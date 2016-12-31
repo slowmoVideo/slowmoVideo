@@ -9,6 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include <QtCore>
+#include <QPointer>
 #include <QObject>
 #include <QDockWidget>
 #include <QDebug>
@@ -46,7 +47,10 @@ the Free Software Foundation, either version 3 of the License, or
 // for editing optical flow
 #include "flowEditCanvas.h"
 
+#include "logbrowserdialog.h"
+ 
 
+extern QPointer<LogBrowserDialog> logBrowser;
 
 MainWindow::MainWindow(QString projectPath, QWidget *parent) :
     QMainWindow(parent),
@@ -122,6 +126,7 @@ MainWindow::~MainWindow()
     for (int i = 0; i < m_widgetActions.size(); i++) {
         delete m_widgetActions[i];
     }
+
 }
 
 void MainWindow::createActions()
@@ -182,6 +187,7 @@ void MainWindow::createActions()
     connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionProjectPreferences, SIGNAL(triggered()), this, SLOT(slotShowProjectPreferencesDialog()));
     connect(ui->actionEdit_Flow, SIGNAL(triggered()), this, SLOT(slotShowFlowEditWindow()));
+    connect(ui->actionDebug_Window, SIGNAL(toggled(bool)), this, SLOT(slotShowDebugWindow(bool)));
 }
 
 void MainWindow::createDockWindows()
@@ -259,6 +265,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
         qDebug() << "closing";
         m_settings.setValue("mainwindow/geometry", saveGeometry());
         m_settings.setValue("mainwindow/windowState", saveState());
+				logBrowser->close();
 	    QMainWindow::closeEvent(e);
 	}
 }
@@ -565,7 +572,6 @@ void MainWindow::slotShowPreferencesDialog()
 {
     PreferencesDialog dialog;
     dialog.exec();
-
     // Use the new flow method (if it has changed)
     m_project->reloadFlowSource();
 }
@@ -621,18 +627,19 @@ void MainWindow::slotShowRenderDialog()
             connect(task, SIGNAL(signalItemDesc(QString)), m_renderProgressDialog, SLOT(slotTaskItemDescription(QString)));
             connect(task, SIGNAL(signalTaskProgress(int)), m_renderProgressDialog, SLOT(slotTaskProgress(int)));
             connect(task, SIGNAL(signalRenderingFinished(QString)), m_renderProgressDialog, SLOT(slotAllTasksFinished(QString)));
-            connect(task, SIGNAL(signalRenderfdcingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
+            connect(task, SIGNAL(signalRenderingAborted(QString)), this, SLOT(slotRenderingAborted(QString)));
             connect(task, SIGNAL(signalRenderingAborted(QString)), m_renderProgressDialog, SLOT(close()));
             connect(task, SIGNAL(signalRenderingStopped(QString)), m_renderProgressDialog, SLOT(slotAborted(QString)));
             connect(m_renderProgressDialog, SIGNAL(signalAbortTask()), task, SLOT(slotStopRendering()));
             //connect(this, SIGNAL(signalRendererContinue()), task, SLOT(slotContinueRendering()), Qt::UniqueConnection);
             
-            //connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
+            connect(task, SIGNAL(workFlowRequested()), &m_rendererThread, SLOT(start()));
             connect(&m_rendererThread, SIGNAL(started()), task, SLOT(slotContinueRendering()));
-            //TODO: connect(task, SIGNAL(finished()), m_rendererThread, SLOT(quit()), Qt::DirectConnection);
-            connect(task, SIGNAL(finished()), &m_rendererThread, SLOT(quit()));
-            connect(task, SIGNAL(finished()), task, SLOT(deleteLater()));
-
+ 
+            connect(task, SIGNAL(signalRenderingFinished(QString)), &m_rendererThread, SLOT(quit()));
+            // done another way ?!
+            connect(task, SIGNAL(signalRenderingFinished(QString)), task, SLOT(deleteLater()));
+             
             //connect(&m_rendererThread, &QThread::finished, task, &QObject::deleteLater);
             // let's start
             m_rendererThread.wait(); // If the thread is not running, this will immediately return.
@@ -718,3 +725,23 @@ void MainWindow::slotShowFlowEditWindow()
 #endif 
 }
 
+/**
+ *  display/hide the debug window
+ */
+void MainWindow::slotShowDebugWindow(bool set)
+{
+    qDebug() << "slotShowDebugWindow " << set;
+    
+    if (set)
+    	logBrowser->show();
+    else
+    	logBrowser->hide();
+#if 0
+    // dock it
+    QDockWidget *m_wflowMonitorDock = new QDockWidget(tr("Flow monitor"), this);
+    m_wflowMonitorDock->setWidget(m_canvas);
+    m_wflowMonitorDock->setObjectName("flowMonitor");
+    addDockWidget(Qt::TopDockWidgetArea, m_wflowMonitorDock);
+#endif 
+
+}

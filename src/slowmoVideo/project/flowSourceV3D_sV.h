@@ -29,17 +29,7 @@ public:
     static bool validateFlowBinary(const QString path);
     static QString correctFlowBinaryLocation();
 
-    virtual void buildFlowForwardCache(FrameSize frameSize) throw(FlowBuildingError) {};
-public slots:
-    void slotUpdateProjectDir();
-
 private:
-    QDir m_dirFlowSmall;
-    QDir m_dirFlowOrig;
-
-   
-
-    void createDirectories();
 
 };
 

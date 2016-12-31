@@ -8,4 +8,7 @@
 #cmakedefine USE_DBUS
 #cmakedefine USE_FFMPEG
 
+// OpenCV version in use
+#cmakedefine HAS_OCV_VERSION_3 
+
 #endif // CONFIG_H

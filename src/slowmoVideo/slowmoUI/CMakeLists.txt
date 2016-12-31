@@ -25,11 +25,21 @@ set(SRCS
   dialogues/flowExaminer.cpp
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
-        notificator.cpp
+  notificator.cpp
+	logbrowserdialog.cpp
 )
 
 # notification
 if (APPLE)
+find_library(CORE_FOUNDATION NAMES CoreFoundation)
+find_library(FOUNDATION NAMES Foundation)
+find_library(APPLICATION_SERVICES NAMES ApplicationServices)
+find_library(CORE_SERVICES NAMES CoreServices)
+find_library(COCOA NAMES Cocoa)
+
+SET(OSX_EXTRA_LIBS ${FOUNDATION} ${CORE_FOUNDATION} ${APPLICATION_SERVICES})
+message(STATUS "OSX Additional libraries: ${OSX_EXTRA_LIBS}")
+
 set(SRCS
         ${SRCS}
         macnotificationhandler.mm
@@ -69,7 +79,8 @@ set(SRCS_MOC
   dialogues/flowExaminer.h
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
-        notificator.h
+  notificator.h
+	logbrowserdialog.h
 )
 
 # notification
@@ -135,7 +146,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
-target_link_libraries(slowmoUI sVproj sVvis sVgui )
+target_link_libraries(slowmoUI sVproj sVvis sVgui ${OSX_EXTRA_LIBS})
 
 #install(TARGETS ${slowmoUI}
 #        BUNDLE DESTINATION . COMPONENT Runtime

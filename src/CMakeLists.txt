@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
-
-
 project(slowmoVideo)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-source builds are not allowed.")
+endif()
 
-#set (CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
 #
 set(CMAKE_MODULE_PATH
@@ -204,7 +205,25 @@ if (APPLE AND USE_QTKIT)
 	set(ADDITIONAL_LIBS "-framework Cocoa -framework QTKit -framework QuartzCore -framework AppKit -framework OpenCL")
 endif()
 	
-find_package(OpenCV)
+# Find OpenCV, you may need to set OpenCV_DIR variable
+# to the absolute path to the directory containing OpenCVConfig.cmake file
+# via the command line or GUI
+find_package(OpenCV REQUIRED)
+# If the package has been found, several variables will
+# be set, you can find the full list with descriptions
+# in the OpenCVConfig.cmake file. 
+# Print some message showing some of them
+message(STATUS "OpenCV library status:")
+message(STATUS " version: ${OpenCV_VERSION}")
+message(STATUS " libraries: ${OpenCV_LIBS}")
+message(STATUS " include path: ${OpenCV_INCLUDE_DIRS}")
+
+if (${OpenCV_VERSION_MAJOR} EQUAL 3)
+				set(HAS_OCV_VERSION_3 ON)
+else()
+				set(HAS_OCV_VERSION_3 OFF)
+endif()
+
 include_directories(${OPENCV_INCLUDE_DIRS})
 
 # for config.h
@@ -252,9 +271,9 @@ add_subdirectory(slowmoVideo/slowmoInfo)
 add_subdirectory(slowmoVideo/slowmoRenderer)
 add_subdirectory(slowmoVideo/visualizeFlow)
 if(ENABLE_TESTS)
-SET(QT_USE_QTTEST TRUE)
-add_subdirectory(slowmoVideo/test)
-add_subdirectory(slowmoVideo/unittests)
+  SET(QT_USE_QTTEST TRUE)
+  ## add_subdirectory(slowmoVideo/test)
+  add_subdirectory(slowmoVideo/unittests)
 endif(ENABLE_TESTS)
 
 ##### SV END #####
@@ -269,9 +288,9 @@ if(WIN32)
 set(GLUT_ROOT_PATH ${PROJECT_SOURCE_DIR}/libs/)
 endif(WIN32)
 
-#find_package(OpenGL)
-#find_package(GLEW)
-#find_package(GLUT)
+find_package(OpenGL)
+find_package(GLEW)
+find_package(GLUT)
 find_package(JPEG)
 find_package(PNG)
 find_package(ZLIB)
@@ -460,7 +479,7 @@ endif(NOT FFMPEG_SWSCALE_FOUND)
 if(NOT OpenCV_VERSION)
     message("x OpenCV could not be found.")
 else(NOT OpenCV_VERSION)
-    message("* (ok) OpenCV ${OpenCV_VERSION} found at ${OPENCV_LIB_DIR}.")
+    message("* (ok) OpenCV ${OpenCV_VERSION} found at ${OpenCV_INCLUDE_DIRS}.")
 endif(NOT OpenCV_VERSION)
 message("* slowmoVideo will be built:                ---${BUILD_SLOWMO}---")
 message("=======================END===========================")

@@ -44,6 +44,8 @@ public:
     bool initialized() const;
 
     int64_t framesCount() const;
+    void setFramesCount(int64_t framesCount);
+
     const Fps_sV* fps() const;
     QImage frameAt(const uint frame, const FrameSize frameSize = FrameSize_Orig);
     const QString framePath(const uint frame, const FrameSize frameSize) const;
@@ -74,7 +76,7 @@ private:
     QProcess *m_ffmpeg;
     QSemaphore m_ffmpegSemaphore;
     bool m_initialized;
-
+    int64_t cur_frame;
 
     void createDirectories();
     /**

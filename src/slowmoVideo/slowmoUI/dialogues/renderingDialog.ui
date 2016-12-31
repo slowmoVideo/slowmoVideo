@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>719</width>
-    <height>544</height>
+    <width>762</width>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
@@ -51,7 +51,7 @@
          <item>
           <widget class="QRadioButton" name="radioFullProject">
            <property name="text">
-            <string>Full Project</string>
+            <string>Fu&amp;ll Project</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -61,14 +61,14 @@
          <item>
           <widget class="QRadioButton" name="radioTagSection">
            <property name="text">
-            <string>Tag section</string>
+            <string>&amp;Tag section</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="radioSection">
            <property name="text">
-            <string>Custom section</string>
+            <string>Custom sect&amp;ion</string>
            </property>
           </widget>
          </item>
@@ -373,81 +373,477 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <layout class="QHBoxLayout" name="horizontalLayout_13">
             <item>
-             <widget class="QLabel" name="label_12">
+             <widget class="QLabel" name="label_17">
               <property name="text">
-               <string>buildFlow lambda</string>
+               <string>Optical Flow Algorithm : </string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QDoubleSpinBox" name="lambda">
-              <property name="locale">
-               <locale language="English" country="UnitedStates"/>
-              </property>
-              <property name="minimum">
-               <double>5.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>50.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="value">
-               <double>20.000000000000000</double>
-              </property>
-             </widget>
+             <widget class="QComboBox" name="opticalFlowAlgo"/>
             </item>
             <item>
-             <spacer name="horizontalSpacer_10">
+             <spacer name="horizontalSpacer_14">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>10</width>
+                <width>40</width>
                 <height>20</height>
                </size>
               </property>
              </spacer>
             </item>
-            <item>
-             <widget class="QLabel" name="label_11">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Use a higher value for high-quality footage and larger images.</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
-            <property name="topMargin">
-             <number>8</number>
+           <widget class="QStackedWidget" name="flowStackedWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>The lambda is only used with the GPU based Optical Flow algorithm. There is no general rule which value is best, so it is usually a good idea to render a short part with a low (5) and a high (50) lambda to see the differences, and then try to find the best value between.</string>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="page3D">
+             <widget class="QWidget" name="FarnlayoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>20</y>
+                <width>472</width>
+                <height>36</height>
+               </rect>
               </property>
-              <property name="wordWrap">
-               <bool>true</bool>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>buildFlow lambda</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="lambda">
+                 <property name="locale">
+                  <locale language="English" country="UnitedStates"/>
+                 </property>
+                 <property name="minimum">
+                  <double>5.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>50.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>20.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_10">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>10</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Use a higher value for high-quality footage and larger images.</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="flowlayoutWidget">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>70</y>
+                <width>662</width>
+                <height>101</height>
+               </rect>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <property name="topMargin">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>The lambda is only used with the GPU based Optical Flow algorithm. There is no general rule which value is best, so it is usually a good idea to render a short part with a low (5) and a high (50) lambda to see the differences, and then try to find the best value between.</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="pageFarn">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>223</height>
+              </size>
+             </property>
+             <widget class="QWidget" name="layoutWidget_1">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>231</width>
+                <height>212</height>
+               </rect>
+              </property>
+              <layout class="QFormLayout" name="formLayout_2">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetMinAndMaxSize</enum>
+               </property>
+               <property name="horizontalSpacing">
+                <number>2</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>5</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="labelLevel">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;number of pyramid layers including the initial image; `levels=1` means that no extra layers are created and only the original images are used&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Levels:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QDoubleSpinBox" name="FarnLevels">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;number of pyramid layers including the initial image; `levels=1` means that no extra layers are created and only the original images are used&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>3.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="labelWinsize">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Averaging window size; larger values increase the algorithm robustness to image noise and give more chances for fast motion detection, but yield more blurred motion field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>WinSize:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="FarnWin">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Averaging window size; larger values increase the algorithm robustness to image noise and give more chances for fast motion detection, but yield more blurred motion field.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>15.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="labelSigma">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard deviation of the Gaussian that is used to smooth derivatives used as a basis for the polynomial expansion; for  `poly_n=5`, you can set `poly_sigma=1.1`, for `poly_n=7`, a good value would be `poly_sigma=1.5`.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>PolySigma:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QDoubleSpinBox" name="FarnPoly">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard deviation of the Gaussian that is used to smooth derivatives used as a basis for the polynomial expansion; for  `poly_n=5`, you can set `poly_sigma=1.1`, for `poly_n=7`, a good value would be `poly_sigma=1.5`.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.200000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLabel" name="labelPyr">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Parameter, specifying the image scale (&amp;lt;1) to build pyramids for each image; `pyr_scale=0.5` means a classical pyramid, where each next layer is twice smaller than the previous one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Pyr_Scale:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="labelPoly">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Size of the pixel neighborhood used to find polynomial expansion in each pixel; larger values mean that the image will be approximated with smoother surfaces, yielding more robust algorithm and more blurred  motion field, typically `poly_n` = 5 or 7.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>PolyN:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="1">
+                <widget class="QDoubleSpinBox" name="FarnPolyN">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Size of the pixel neighborhood used to find polynomial expansion in each pixel; larger values mean that the image will be approximated with smoother surfaces, yielding more robust algorithm and more blurred  motion field, typically `poly_n` = 5 or 7.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QDoubleSpinBox" name="FarnPyr">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Parameter, specifying the image scale (&amp;lt;1) to build pyramids for each image; `pyr_scale=0.5` means a classical pyramid, where each next layer is twice smaller than the previous one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.500000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="pageTVL1">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>229</height>
+              </size>
+             </property>
+             <widget class="QWidget" name="layoutWidget_2">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>261</width>
+                <height>218</height>
+               </rect>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
+               <property name="horizontalSpacing">
+                <number>2</number>
+               </property>
+               <property name="verticalSpacing">
+                <number>4</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="labelTau">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Time step of the numerical scheme&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Tau:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QDoubleSpinBox" name="TVLtau">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Time step of the numerical scheme&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.250000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="labelLambda">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Weight parameter for the data term, attachment parameter. This is the most relevant parameter, which determines the smoothness of the output. The smaller this parameter is, the smoother the solutions we obtain. It depends on the range of motions of the images, so its value should be adapted to each image sequence&lt;/span&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Lambda:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QDoubleSpinBox" name="TVLlambda">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Weight parameter for the data term, attachment parameter. This is the most relevant parameter, which determines the smoothness of the output. The smaller this parameter is, the smoother the solutions we obtain. It depends on the range of motions of the images, so its value should be adapted to each image sequence&lt;/span&gt;</string>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.150000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="labelWarp">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Number of warpings per scale. Represents the number of times that I1(x+u0) and grad( I1(x+u0) ) are computed per scale. This is a parameter that assures the stability of the method. It also affects the running time, so it is a compromise between speed and accuracy&lt;/span&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Warps:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="TVLwarps">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Number of warpings per scale. Represents the number of times that I1(x+u0) and grad( I1(x+u0) ) are computed per scale. This is a parameter that assures the stability of the method. It also affects the running time, so it is a compromise between speed and accuracy&lt;/span&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>10.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="labelNscales">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Number of scales used to create the pyramid of images&lt;/span&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Nscales:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QDoubleSpinBox" name="TVLnscales">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Number of scales used to create the pyramid of images&lt;/span&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QDoubleSpinBox" name="TVLiterations">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Stopping criterion iterations number used in the numerical scheme&lt;/span&gt;</string>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <double>400.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>100.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0">
+                <widget class="QLabel" name="labelIter">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Stopping criterion iterations number used in the numerical scheme&lt;/span&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Iterations:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLabel" name="LabelEspilon">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Stopping criterion threshold used in the numerical scheme, which is a trade-off between precision and running time. A small value will yield more accurate solutions at the expense of a slower convergence&lt;/span&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>Epsilon:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QDoubleSpinBox" name="TVLepsilon">
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'sans-serif'; font-size:16px; color:#000000; background-color:#ffffff;&quot;&gt;Stopping criterion threshold used in the numerical scheme, which is a trade-off between precision and running time. A small value will yield more accurate solutions at the expense of a slower convergence&lt;/span&gt;</string>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.010000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <widget class="QPushButton" name="clearflow">
+              <property name="text">
+               <string>Clear Flow Cache</string>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>
@@ -493,7 +889,7 @@
           <item>
            <widget class="QRadioButton" name="radioBlurStacking">
             <property name="text">
-             <string>Stacking blur (Uses more disk space, but is faster for repeated rendering.)</string>
+             <string>Stacking &amp;blur (Uses more disk space, but is faster for repeated rendering.)</string>
             </property>
            </widget>
           </item>
@@ -567,14 +963,14 @@
           <item>
            <widget class="QRadioButton" name="radioBlurConvolution">
             <property name="text">
-             <string>Convolution blur (Smoother than stacking, usually the better choice.)</string>
+             <string>Convolution blur (Smoother &amp;than stacking, usually the better choice.)</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QRadioButton" name="radioBlurNearest">
             <property name="text">
-             <string>Nearest (no blurring)</string>
+             <string>Nearest (no b&amp;lurring)</string>
             </property>
            </widget>
           </item>
@@ -616,14 +1012,14 @@
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>Video</string>
+            <string>&amp;Video</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QRadioButton" name="radioImages">
            <property name="text">
-            <string>Images</string>
+            <string>&amp;Images</string>
            </property>
            <property name="checked">
             <bool>true</bool>

@@ -110,6 +110,7 @@ private:
     void slotShowPreferencesDialog();
     void slotShowProjectPreferencesDialog();
     void slotShowFlowExaminerDialog();
+    void slotShowDebugWindow(bool set);
     void slotForwardInputPosition(qreal frame);
     void slotForwardCurveSrcPosition(qreal frame);
 

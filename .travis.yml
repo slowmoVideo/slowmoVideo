@@ -1,0 +1,37 @@
+#
+# Copyright (c) 2016 
+# travis CI config for slowmovideo check/test
+
+# for  Ubuntu 14.04 Trusty 
+sudo: required
+dist: trusty
+cache: apt
+
+# Enable C++ support
+language: cpp
+
+# Compiler selection
+compiler:
+  - gcc
+
+env:
+ - OpenCV=2
+ - OpenCV=3
+
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  
+#install necessary Qt files
+install:
+  - sudo apt-get install -y qttools5-dev-tools libopencv-dev qtbase5-dev qtscript5-dev  qtdeclarative5-dev
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ../src  -DENABLE_TESTS=TRUE
+
+# Build steps
+script:
+  - make 
+  - ./slowmoVideo/unittests/UnitTests
