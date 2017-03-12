@@ -17,16 +17,22 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "mainwindow.h"
 #include "logbrowserdialog.h"
- 
+
 //QPointer<LogBrowser> logBrowser;
 QPointer<LogBrowserDialog> logBrowser;
- 
+
+#if QT_VERSION >= 0x050000
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-				if(logBrowser)
-								logBrowser->outputMessage( type, msg );
+#else
+void myMessageOutput(QtMsgType type, const char *str)
+{
+    QString msg = QString::fromUtf8(str);
+#endif
+    if(logBrowser)
+        logBrowser->outputMessage( type, msg );
 }
- 
+
 int main(int argc, char *argv[])
 {
 
@@ -63,7 +69,7 @@ int main(int argc, char *argv[])
     qDebug() << a.arguments();
 
 		//TODO: place this in About ...
-	  qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "." 
+	  qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
 					<< CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
 
     const int N = a.arguments().size();
