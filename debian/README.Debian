@@ -1,6 +1,10 @@
 slowmovideo for Debian
 ----------------------
 
-<possible notes regarding this package - if none, delete this file>
+This package is built with the "flowBuilder" feature enabled,
+which requires sufficient OpenGL support. This feature uses
+GPU support for calculating the Optical Flow, based on the
+GPU-KLT+FLOW library, and usually produces evidently better results.
 
  -- vbr <vbrasseur@gmail.com>  Mon, 07 Jul 2014 05:32:32 -0700
+
