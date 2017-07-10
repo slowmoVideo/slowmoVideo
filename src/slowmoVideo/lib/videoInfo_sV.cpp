@@ -43,7 +43,7 @@ VideoInfoSV getInfo(const char filename[])
     args << "/dev/null";
 
     ffmpeg.start(prog, args);
-    ffmpeg.waitForFinished();
+    ffmpeg.waitForFinished(-1);
     QString videoInfo = ffmpeg.readAllStandardError();
     ffmpeg.close();
   
