@@ -87,11 +87,11 @@ int VideoFFMPEG::exportFrames(QString filepattern,int first,RenderTask_sV *progr
 
 	QStringList args;
 
+	args << "-r" << QString::number(movieFPS);
 	args << "-f" << "image2";
 	if (first != 0)
 		args << "-start_number" << QString::number(first);
 	args << "-i" << filepattern;
-	args << "-r" << QString::number(movieFPS);
 	args << "-vcodec" << m_vcodec;
 	args << "-s" << QString("%1x%2").arg(QString::number(mWidth), QString::number(mHeight));
 	args << m_filename;
