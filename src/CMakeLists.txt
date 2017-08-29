@@ -405,7 +405,7 @@ if (BUILD_FLOW_BUILDER)
         V3D/Math/v3d_linearbase.h
     )
 
-    add_library(V3D ${ALL_SRC})
+    add_library(V3D STATIC ${ALL_SRC})
     target_link_libraries(V3D ${GLEW_LIBRARIES} X11)
     #install(TARGETS V3D DESTINATION lib)
     add_subdirectory(V3D/Apps)
