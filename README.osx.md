@@ -8,7 +8,7 @@ will need some dependencies :
 * ffmpeg (ffmpeg-2.2)
 * jpeg (jpeg-9a)
 * libpng (libpng-1.6.10)
-*zlib (zlib-1.2.8)
+* zlib (zlib-1.2.8)
 * yasm (for ffmpeg) (yasm-1.2.0)
 * opencv (opencv-2.4.8)
 * qt4 (qt 4.8.5)
