@@ -1,7 +1,7 @@
 /*
  This file is part of slowmoVideo.
  Copyright (C) 2011  Simon A. Eugster (Granjow)  <simon.eu@gmail.com>
- 
+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -33,11 +33,15 @@ void AbstractFlowSource_sV::cleardirectory(QDir dir)
     dir.setFilter( QDir::NoDotAndDotDot | QDir::Files );
     foreach( QString dirItem, dir.entryList() )
     dir.remove( dirItem );
-    
+
     dir.setFilter( QDir::NoDotAndDotDot | QDir::Dirs );
     foreach( QString dirItem, dir.entryList() ) {
         QDir subDir( dir.absoluteFilePath( dirItem ) );
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
         subDir.removeRecursively();
+#else
+#warning  removeRecursively not define in QT4
+#endif
     }
 }
 
