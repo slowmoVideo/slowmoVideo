@@ -39,28 +39,31 @@ enum ColorComponent { CC_Red, CC_Green, CC_Blue };
 inline
 float interpR(const QColor cols[2][2], float x, float y)
 {
-    return (1-x)*(1-y) * cols[0][0].redF()
-        + x*(1-y) * cols[1][0].redF()
-        + y*(1-x) * cols[0][1].redF()
-        + x*y * cols[1][1].redF();
+    return cols[0][0].redF()
+        + x*(cols[1][0].redF() - cols[0][0].redF())
+        + y*(cols[0][1].redF() - cols[0][0].redF())
+        + x*y*(cols[0][0].redF() - cols[1][0].redF()
+               - cols[0][1].redF() + cols[1][1].redF());
 }
 
 inline
 float interpG(const QColor cols[2][2], float x, float y)
 {
-    return (1-x)*(1-y) * cols[0][0].greenF()
-        + x*(1-y) * cols[1][0].greenF()
-        + y*(1-x) * cols[0][1].greenF()
-        + x*y * cols[1][1].greenF();
+    return cols[0][0].greenF()
+        + x*(cols[1][0].greenF() - cols[0][0].greenF())
+        + y*(cols[0][1].greenF() - cols[0][0].greenF())
+        + x*y*(cols[0][0].greenF() - cols[1][0].greenF()
+               - cols[0][1].greenF() + cols[1][1].greenF());
 }
 
 inline
 float interpB(const QColor cols[2][2], float x, float y)
 {
-    return (1-x)*(1-y) * cols[0][0].blueF()
-        + x*(1-y) * cols[1][0].blueF()
-        + y*(1-x) * cols[0][1].blueF()
-        + x*y * cols[1][1].blueF();
+    return cols[0][0].blueF()
+        + x*(cols[1][0].blueF() - cols[0][0].blueF())
+        + y*(cols[0][1].blueF() - cols[0][0].blueF())
+        + x*y*(cols[0][0].blueF() - cols[1][0].blueF()
+               - cols[0][1].blueF() + cols[1][1].blueF());
 }
 
 QColor Interpolate_sV::interpolate(const QImage& in, float x, float y)
@@ -93,10 +96,10 @@ QColor Interpolate_sV::blend(const QColor &left, const QColor &right, float pos)
 {
     Q_ASSERT(pos >= 0 && pos <= 1);
 
-    float r = (1-pos)*left.redF()   + pos*right.redF();
-    float g = (1-pos)*left.greenF() + pos*right.greenF();
-    float b = (1-pos)*left.blueF()  + pos*right.blueF();
-    float a = (1-pos)*left.alphaF() + pos*right.alphaF();
+    float r = left.redF() + pos*(right.redF() - left.redF());
+    float g = left.greenF() + pos*(right.greenF() - left.greenF());
+    float b = left.blueF() + pos*(right.blueF() - left.blueF());
+    float a = left.alphaF() + pos*(right.alphaF() - left.alphaF());
     r = CLAMP(r,0.0,1.0);
     g = CLAMP(g,0.0,1.0);
     b = CLAMP(b,0.0,1.0);
@@ -159,9 +162,9 @@ void Interpolate_sV::twowayFlow(const QImage &left, const QImage &right, const F
             colLeft = QColor(left.pixel(x - pos*forward.moveX, y - pos*forward.moveY));
             colRight = QColor(right.pixel(x - (1-pos)*backward.moveX , y - (1-pos)*backward.moveY));
 #endif
-            r = (1-pos)*colLeft.redF() + pos*colRight.redF();
-            g = (1-pos)*colLeft.greenF() + pos*colRight.greenF();
-            b = (1-pos)*colLeft.blueF() + pos*colRight.blueF();
+            r = colLeft.redF() + pos*(colRight.redF() - colLeft.redF());
+            g = colLeft.greenF() + pos*(colRight.greenF() - colLeft.greenF());
+            b = colLeft.blueF() + pos*(colRight.blueF() - colLeft.blueF());
             colOut = QColor::fromRgbF(
                                       CLAMP1(r),
                                       CLAMP1(g),
@@ -471,9 +474,11 @@ void Interpolate_sV::simpleinterpolate(const QImage &prev, const QImage &right, 
                 QRgb lt = prev.pixel(x,y);
                 QRgb rt = right.pixel(x,y);
 
-                int red = CLAMP((1-pos)*qRed(lt)+(pos)*qRed(rt),0,255);
-                int green = CLAMP((1-pos)*qGreen(lt)+(pos)*qGreen(rt),0,255);
-                int blue = CLAMP((1-pos)*qBlue(lt)+(pos)*qBlue(rt),0,255);
+                int red = CLAMP(qRed(lt)+(pos)*(qRed(rt)-qRed(lt)),0,255);
+                int green = CLAMP(qGreen(lt)+(pos)*(qGreen(rt)-qGreen(lt)),
+                                  0,255);
+                int blue = CLAMP(qBlue(lt)+(pos)*(qBlue(rt)-qBlue(lt)),
+                                 0,255);
 
                 QColor out = QColor::fromRgb(red,green,blue);
                                   
