@@ -9,8 +9,8 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 #include "../lib/interpolate_sV.h"
-#include "../lib/flowField_sV.h"
-#include "../lib/flowRW_sV.h"
+#include "flowField_sV.h"
+#include "flowRW_sV.h"
 
 #include <iostream>
 #include <cmath>

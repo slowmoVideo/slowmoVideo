@@ -12,7 +12,10 @@ set(SRCS_MOC
 qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 
-include_directories(${CMAKE_BINARY_DIR}/libgui)
+include_directories(
+        ${CMAKE_BINARY_DIR}/libgui
+        ../lib/libsvflow
+)
 
 add_library(sVgui STATIC ${SRCS} ${MOC_OUT})
 qt_use_modules(sVgui Core)

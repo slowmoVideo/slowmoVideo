@@ -85,11 +85,12 @@ qt_use_modules(sVinfo Gui)
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
 add_library(sVencode  STATIC ${LIB_SRC_ENCODE} ${MOC_OUT})
-target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
+target_link_libraries(sVencode  ${FFMPEG_LIBRARIES} sVflow)
 qt_use_modules(sVencode Core)
 qt_use_modules(sVencode Gui)
 
 add_library(sVflowtools  STATIC ${LIB_SRC_FLOWTOOLS})
+target_link_libraries(sVflowtools sVflow)
 
 add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
 qt_use_modules(sVvis Core)

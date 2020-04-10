@@ -21,9 +21,6 @@ set(SRCS_MOC
     shortcutListDialog.h
 )
 
-qt_wrap_ui(UI_H_OUT ${SRCS_UI})
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
-
 if(APPLE)
         set(BUNDLE "slowmoFlowEdit")
         set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/slowmoVideo/slowmoUI/res")
@@ -52,9 +49,9 @@ include_directories(..)
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoFlowEdit)
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/libgui)
 
-add_executable(slowmoFlowEdit WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT})
+add_executable(slowmoFlowEdit WIN32 MACOSX_BUNDLE ${SRCS})
 qt_use_modules(slowmoFlowEdit Widgets Gui  Core )
-target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis)
+target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis sVflowtools)
 
 #install(TARGETS slowmoFlowEdit
 #        BUNDLE DESTINATION . COMPONENT Runtime

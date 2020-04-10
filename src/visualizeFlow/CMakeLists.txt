@@ -6,6 +6,6 @@ set(SRCS
 )
 
 add_executable(slowmoVisualizeFlow ${SRCS})
-target_link_libraries(slowmoVisualizeFlow sVvis )
+target_link_libraries(slowmoVisualizeFlow sVvis sVflowtools)
 
 install(TARGETS slowmoVisualizeFlow DESTINATION ${DEST})

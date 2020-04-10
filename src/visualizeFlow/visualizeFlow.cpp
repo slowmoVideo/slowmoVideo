@@ -9,7 +9,7 @@ the Free Software Foundation, either version 3 of the License, or
 */
 
 
-#include "lib/flowRW_sV.h"
+#include "flowRW_sV.h"
 #include "lib/flowVisualization_sV.h"
 #include "lib/flowTools_sV.h"
 

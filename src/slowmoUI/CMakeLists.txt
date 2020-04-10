@@ -26,7 +26,7 @@ set(SRCS
   dialogues/tagAddDialog.cpp
   dialogues/aboutDialog.cpp
   notificator.cpp
-	logbrowserdialog.cpp
+  logbrowserdialog.cpp
 )
 
 # notification
@@ -136,17 +136,15 @@ set(SRC_RES resources.qrc)
 qt_add_resources(RES_OUT ${SRC_RES})
 
 # Generate header files from the .ui files
-qt_wrap_ui(UI_H_OUT ${SRCS_UI})
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 # Include the generated header files
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
 
 link_directories(${FFMPEG_LIBRARY_DIR})
-add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
+add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${RES_OUT})
 qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
-target_link_libraries(slowmoUI sVproj sVvis sVgui sVflow ${OSX_EXTRA_LIBS})
+target_link_libraries(slowmoUI sVproj sVvis sVgui sVflow sVflowtools ${OSX_EXTRA_LIBS})
 
 #install(TARGETS ${slowmoUI}
 #        BUNDLE DESTINATION . COMPONENT Runtime

@@ -1,9 +1,18 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1)
 
 project(slowmoVideo)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "In-source builds are not allowed.")
 endif()
+
+# Partly from https://doc.qt.io/qt-5/cmake-get-started.html#build-a-gui-executable
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
+
 
 set(CMAKE_MODULE_PATH
   ${slowmoVideo_SOURCE_DIR}/cmake
@@ -90,10 +99,10 @@ include(cmake/macros.cmake)
 if (NOT FORCE_QT4)
          find_package(Qt5Core QUIET)
          if (Qt5Core_FOUND) 
-                 message(STATUS "Using qt5")
+                 message(STATUS "Using Qt5")
 		 set(USE_QT TRUE)
 		 # go on with other packages
-		 find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script)
+		 find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script REQUIRED)
 		if (Qt5_POSITION_INDEPENDENT_CODE)
 			set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 		endif(Qt5_POSITION_INDEPENDENT_CODE)
@@ -104,7 +113,11 @@ if (NOT FORCE_QT4)
 		 include_directories(${Qt5Widgets_INCLUDES}) 
 		 include_directories(${Qt5Gui_INCLUDES}) 
 		 include_directories(${Qt5Xml_INCLUDES}) 
-		 include_directories(${Qt5Script_INCLUDES}) 
+		 include_directories(${Qt5Script_INCLUDES})
+
+         # set up a mapping so that the Release configuration for the Qt imported target is
+         # used in the COVERAGE CMake configuration.
+         set_target_properties(Qt5::Core PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE "DEBUG")
 
 		 macro(qt_use_modules)
 		    qt5_use_modules(${ARGN})
