@@ -11,6 +11,7 @@ set(LIB_SRC_BASE
   interpolate_sV.cpp
   bezierTools_sV.cpp
   sourceField_sV.cpp
+  libsvflow/src/flowField_sV.cpp
 )
 
 set(LIB_SRC_VIDEO
@@ -30,12 +31,6 @@ set(LIB_SRC_FLOWTOOLS
 
 set(LIB_SRC_FLOWVIS
   flowVisualization_sV.cpp
-)
-
-set(HEADERS
-  flowRW_sV.h
-  flowField_sV.h
-  flowTools_sV.h
 )
 
 
@@ -77,8 +72,10 @@ qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
+include_directories(libsvflow)
+
 add_library(sV  STATIC ${LIB_SRC_BASE})
-target_link_libraries(sV  ${QT_LIBRARIES})
+target_link_libraries(sV  ${QT_LIBRARIES} sVflow)
 qt_use_modules(sV Core)
 qt_use_modules(sV Gui)
 

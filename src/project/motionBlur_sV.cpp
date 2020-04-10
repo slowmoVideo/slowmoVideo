@@ -14,7 +14,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "abstractFlowSource_sV.h"
 #include "interpolator_sV.h"
 #include "renderTask_sV.h"
-#include "../lib/flowField_sV.h"
+#include "flowField_sV.h"
 #include "../lib/shutter_sV.h"
 
 #define MAX_CONV_FRAMES 5

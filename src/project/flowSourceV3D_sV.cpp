@@ -11,7 +11,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "flowSourceV3D_sV.h"
 #include "project_sV.h"
 #include "abstractFrameSource_sV.h"
-#include "../lib/flowRW_sV.h"
+#include "flowRW_sV.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QProcess>

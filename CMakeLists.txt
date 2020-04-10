@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 
 project(slowmoVideo)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -33,7 +33,7 @@ if(NOT PROJECT_VERSION_PATCH)
 endif()
 
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
-configure_file(src/version.h.in src/version.h)
+configure_file(src/version.h.in version.h)
 
 ### Compiler options ###
 
@@ -256,6 +256,7 @@ endif(NOT FFMPEG_SWSCALE_FOUND)
 
 include_directories(src/tr)
 add_subdirectory(src/lib)
+add_subdirectory(src/lib/libsvflow)
 add_subdirectory(src/libgui)
 add_subdirectory(src/project)
 add_subdirectory(src/slowmoCLI)
@@ -307,5 +308,4 @@ if(NOT BUILD_SLOWMO)
     error(WARNING "Cannot build slowmoVideo, please install the missing packages first.")
 endif(NOT BUILD_SLOWMO)
 
-configure_file(src/config.h.in src/config.h)
-
+configure_file(src/config.h.in config.h)

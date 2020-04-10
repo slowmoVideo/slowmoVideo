@@ -22,8 +22,8 @@ the Free Software Foundation, either version 3 of the License, or
 #include "shutterFunctionList_sV.h"
 #include "../lib/shutter_sV.h"
 #include "../lib/interpolate_sV.h"
-#include "../lib/flowRW_sV.h"
-#include "../lib/flowField_sV.h"
+#include "flowRW_sV.h"
+#include "flowField_sV.h"
 
 #if 1
 #include "work_flow.h"

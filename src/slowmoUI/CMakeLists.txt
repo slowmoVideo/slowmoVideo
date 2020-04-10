@@ -80,7 +80,7 @@ set(SRCS_MOC
   dialogues/tagAddDialog.h
   dialogues/aboutDialog.h
   notificator.h
-	logbrowserdialog.h
+  logbrowserdialog.h
 )
 
 # notification
@@ -146,7 +146,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${MOC_OUT} ${UI_H_OUT} ${RES_OUT})
 qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
-target_link_libraries(slowmoUI sVproj sVvis sVgui ${OSX_EXTRA_LIBS})
+target_link_libraries(slowmoUI sVproj sVvis sVgui sVflow ${OSX_EXTRA_LIBS})
 
 #install(TARGETS ${slowmoUI}
 #        BUNDLE DESTINATION . COMPONENT Runtime

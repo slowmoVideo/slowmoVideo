@@ -1,6 +1,6 @@
 #include "interpolator_sV.h"
 #include "abstractFrameSource_sV.h"
-#include "../lib/flowField_sV.h"
+#include "flowField_sV.h"
 #include "../lib/interpolate_sV.h"
 #include <QtCore/QObject>
 
