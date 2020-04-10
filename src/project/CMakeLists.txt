@@ -36,22 +36,10 @@ set(SRCS_PROJ
 )
 endif()
 
-set(SRCS_MOC
-  project_sV.h
-  renderTask_sV.h
-  abstractFrameSource_sV.h
-  imagesFrameSource_sV.h
-  videoFrameSource_sV.h
-  emptyFrameSource_sV.h
-  work_flow.h
-)
-
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
-
 include_directories(${FFMPEG_INCLUDE_PATHS})
-add_library(sVproj STATIC ${SRCS_PROJ} ${MOC_OUT})
-qt_use_modules(sVproj Core)
-qt_use_modules(sVproj Gui)
-qt_use_modules(sVproj Xml)
-qt_use_modules(sVproj Script)
+add_library(sVproj STATIC ${SRCS_PROJ})
+qt5_use_modules(sVproj Core)
+qt5_use_modules(sVproj Gui)
+qt5_use_modules(sVproj Xml)
+qt5_use_modules(sVproj Script)
 target_link_libraries(sVproj sV sVinfo sVflow sVencode ${EXTERNAL_LIBS})

@@ -95,102 +95,30 @@ endif()
 
 include(cmake/macros.cmake)
 
-# search for Qt4
-if (NOT FORCE_QT4)
-         find_package(Qt5Core QUIET)
-         if (Qt5Core_FOUND) 
-                 message(STATUS "Using Qt5")
-		 set(USE_QT TRUE)
-		 # go on with other packages
-		 find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script REQUIRED)
-		if (Qt5_POSITION_INDEPENDENT_CODE)
-			set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-		endif(Qt5_POSITION_INDEPENDENT_CODE)
-#		 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
-#		    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+find_package(Qt5Core QUIET)
+if (Qt5Core_FOUND)
+	message(STATUS "Using Qt5")
+	set(USE_QT TRUE)
+	# go on with other packages
+	find_package(Qt5 COMPONENTS Core Widgets Gui Xml Script REQUIRED)
+	if (Qt5_POSITION_INDEPENDENT_CODE)
+		set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+	endif (Qt5_POSITION_INDEPENDENT_CODE)
+	#		 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}
+	#		    ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 
-		 include_directories(${Qt5Core_INCLUDES}) 
-		 include_directories(${Qt5Widgets_INCLUDES}) 
-		 include_directories(${Qt5Gui_INCLUDES}) 
-		 include_directories(${Qt5Xml_INCLUDES}) 
-		 include_directories(${Qt5Script_INCLUDES})
+	include_directories(${Qt5Core_INCLUDES})
+	include_directories(${Qt5Widgets_INCLUDES})
+	include_directories(${Qt5Gui_INCLUDES})
+	include_directories(${Qt5Xml_INCLUDES})
+	include_directories(${Qt5Script_INCLUDES})
 
-         # set up a mapping so that the Release configuration for the Qt imported target is
-         # used in the COVERAGE CMake configuration.
-         set_target_properties(Qt5::Core PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE "DEBUG")
+	# set up a mapping so that the Release configuration for the Qt imported target is
+	# used in the COVERAGE CMake configuration.
+	#set_target_properties(Qt5::Core PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE "DEBUG")
 
-		 macro(qt_use_modules)
-		    qt5_use_modules(${ARGN})
-		 endmacro()
- 
-		 macro(qt_wrap_ui)
-		     qt5_wrap_ui(${ARGN})
-		 endmacro()
- 
-		 macro(qt_wrap_cpp)
-		     qt5_wrap_cpp(${ARGN})
-		 endmacro()
- 
-		 macro(qt_add_resources)
-		     qt5_add_resources(${ARGN})
-		 endmacro()
- 
-		 #find_package(Qt5LinguistTools REQUIRED)
-		 macro(qt_add_translation)
-		     qt5_add_translation(${ARGN})
-		 endmacro()
+endif (Qt5Core_FOUND)
 
-		 macro(install_qt_executable)
-			install_qt5_executable(${ARGN})
-		 endmacro()
-	 endif(Qt5Core_FOUND)
-endif(NOT FORCE_QT4)
-
-#old qt4 ...
-if(NOT Qt5Core_FOUND) 
-
-# should replace :
-#SET(QT_USE_QTXML TRUE)
-#SET(QT_USE_QTSCRIPT TRUE)
-#find_package(Qt4)
-#include(${QT_USE_FILE})
-#include_directories(${QT_INCLUDES})
-
-     message(STATUS "Could not find Qt5, searching for Qt4 instead...")
- 
-     set(NEEDED_QT4_COMPONENTS "QtCore" "QtXml" "QtGui" "QtScript") 
- 
-     find_package(Qt4 REQUIRED COMPONENTS ${NEEDED_QT4_COMPONENTS})
-
-     macro(qt_use_modules)
- 
-     endmacro()
- 
-     macro(qt_wrap_ui)
-         qt4_wrap_ui(${ARGN})
-     endmacro()
- 
-     macro(qt_wrap_cpp)
-         qt4_wrap_cpp(${ARGN})
-     endmacro()
- 
-     macro(qt_add_resources)
-         qt4_add_resources(${ARGN})
-     endmacro()
- 
-     macro(qt_add_translation)
-         qt4_add_translation(${ARGN})
-     endmacro()
- 
-     macro(install_qt_executable)
-         install_qt4_executable(${ARGN})
-     endmacro()
-
-     include(${QT_USE_FILE})
-     add_definitions(${QT_DEFINITIONS})
- 
-     set(USE_QT TRUE)
-endif()
 
 message("Qt libraries found at : ${Qt5Gui_LIBRARIES} /  ${QT_LIBRARIES}" )
 
@@ -296,7 +224,7 @@ message("* (info) slowmoVideo installation goes to ${CMAKE_INSTALL_PREFIX}.")
 message("         (Can be adjusted with -DCMAKE_INSTALL_PREFIX=your_path. Default is ${SV_INST_DIR}.)")
 #if(NOT QT_LIBRARIES)
 if (NOT USE_QT)
-    message("QT5 nor Qt4 libraries could not be found.")
+    message("Qt5 libraries could not be found.")
 #endif(NOT QT_LIBRARIES)
 endif(NOT USE_QT)
 if(NOT FFMPEG_FOUND)

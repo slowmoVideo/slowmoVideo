@@ -11,24 +11,10 @@ set(SRCS
     testNodeList_sV.cpp
     testAll.cpp
 )
-set(SRCS_MOC
-    testFlowRW_sV.h
-    testFlowField_sV.h
-    testVector_sV.h
-    testIntMatrix_sV.h
-    testDefs_sV.h
-    testShutterFunction_sV.h
-    testXmlProjectRW_sV.h
-    testNodeList_sV.h
-    testProject_sV.h
-)
-
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
-add_executable(UnitTests ${SRCS} ${MOC_OUT})
-qt_use_modules(UnitTests Concurrent  Core Test)
+add_executable(UnitTests ${SRCS})
+qt5_use_modules(UnitTests Concurrent  Core Test)
 target_link_libraries(UnitTests sVproj ${EXTERNAL_LIBS})
 
 add_test(UnitTests UnitTests)
-

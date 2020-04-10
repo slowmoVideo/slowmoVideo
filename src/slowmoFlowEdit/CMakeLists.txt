@@ -8,19 +8,6 @@ set(SRCS
     shortcutListDialog.cpp
 )
 
-set(SRCS_UI
-    mainwindow.ui
-    flowEditCanvas.ui
-    shortcutListDialog.ui
-)
-
-
-set(SRCS_MOC
-    mainwindow.h
-    flowEditCanvas.h
-    shortcutListDialog.h
-)
-
 if(APPLE)
         set(BUNDLE "slowmoFlowEdit")
         set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/slowmoVideo/slowmoUI/res")
@@ -50,7 +37,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoFlowEdit)
 include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/libgui)
 
 add_executable(slowmoFlowEdit WIN32 MACOSX_BUNDLE ${SRCS})
-qt_use_modules(slowmoFlowEdit Widgets Gui  Core )
+qt5_use_modules(slowmoFlowEdit Widgets Gui  Core )
 target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis sVflowtools)
 
 #install(TARGETS slowmoFlowEdit
@@ -60,20 +47,17 @@ target_link_libraries(slowmoFlowEdit sVgui sVflow sVvis sVflowtools)
         #install(TARGETS slowmoUI DESTINATION ".")
         #install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
 
-if (Qt5Core_FOUND)
-        include(DeployQt5) # 2.8.7 or later
-else()
-        include(DeployQt4) # 2.8.7 or later
-endif()
+include(DeployQt5) # 2.8.7 or later
+
 
 if (APPLE)
        install(TARGETS slowmoFlowEdit DESTINATION ".")
-       install_qt_executable(slowmoFlowEdit.app "" ""  )
+       install_qt5_executable(slowmoFlowEdit.app "" ""  )
 elseif(WIN32)
        install(TARGETS slowmoFlowEdit DESTINATION ".")
-       install_qt_executable(slowmoFlowEdit.exe "" ""  )
+       install_qt5_executable(slowmoFlowEdit.exe "" ""  )
 else()
        install(TARGETS slowmoFlowEdit DESTINATION ${DEST})
-#       install_qt_executable(slowmoFlowEdit "" ""  )
+#       install_qt5_executable(slowmoFlowEdit "" ""  )
 endif()
 

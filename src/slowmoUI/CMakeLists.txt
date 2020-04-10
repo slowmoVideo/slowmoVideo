@@ -63,34 +63,6 @@ set(SRCS_UI
   dialogues/aboutDialog.ui
 )
 
-set(SRCS_MOC
-  mainwindow.h
-  canvas.h
-  frameMonitor.h
-  flowEditCanvas.h
-  renderPreview.h
-  dialogues/newProjectDialog.h
-  dialogues/preferencesDialog.h
-  dialogues/projectPreferencesDialog.h
-  dialogues/progressDialog.h
-  dialogues/renderingDialog.h
-  dialogues/shutterFunctionDialog.h
-  dialogues/shutterFunctionFrame.h
-  dialogues/flowExaminer.h
-  dialogues/tagAddDialog.h
-  dialogues/aboutDialog.h
-  notificator.h
-  logbrowserdialog.h
-)
-
-# notification
-if (APPLE)
-set(SRCS_MOC
-        ${SRCS_MOC}
-        macnotificationhandler.h
-)
-endif()
-
 if(APPLE)
 	set(BUNDLE "slowmoUI")
 	set(ICONS_DIR "${${PROJECT_NAME}_SOURCE_DIR}/slowmoVideo/slowmoUI/res")
@@ -133,7 +105,7 @@ include_directories(..)
 
 # Embed images in the binary
 set(SRC_RES resources.qrc)
-qt_add_resources(RES_OUT ${SRC_RES})
+qt5_add_resources(RES_OUT ${SRC_RES})
 
 # Generate header files from the .ui files
 
@@ -143,7 +115,7 @@ include_directories(${CMAKE_BINARY_DIR}/slowmoVideo/slowmoUI)
 
 link_directories(${FFMPEG_LIBRARY_DIR})
 add_executable(slowmoUI WIN32 MACOSX_BUNDLE ${SRCS} ${RES_OUT})
-qt_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
+qt5_use_modules(slowmoUI Script Widgets Concurrent Gui  Core )
 target_link_libraries(slowmoUI sVproj sVvis sVgui sVflow sVflowtools ${OSX_EXTRA_LIBS})
 
 #install(TARGETS ${slowmoUI}
@@ -173,22 +145,19 @@ Categories=Qt;AudioVideo;Video;\n")
 )
 endif()
 
-if (Qt5Core_FOUND)
-	include(DeployQt5) # 2.8.7 or later
-else()
-	include(DeployQt4) # 2.8.7 or later
-endif()
+include(DeployQt5)
+
 
 #set( PLUGINS "qjpeg;qtiff" )
 set( PLUGINS qjpeg )
 if (APPLE)
        install(TARGETS slowmoUI DESTINATION ".")
-       install_qt_executable(slowmoUI.app "${PLUGINS}"  )
+       install_qt5_executable(slowmoUI.app "${PLUGINS}"  )
 elseif(WIN32)
        install(TARGETS slowmoUI DESTINATION ".")
-       install_qt_executable(slowmoUI.exe "${PLUGINS}"  )
+       install_qt5_executable(slowmoUI.exe "${PLUGINS}"  )
 else()
        install(TARGETS slowmoUI DESTINATION ${DEST})
-#       install_qt_executable(slowmoUI "${PLUGINS}"  )
+#       install_qt5_executable(slowmoUI "${PLUGINS}"  )
 endif()
 

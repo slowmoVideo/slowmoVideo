@@ -42,12 +42,6 @@ set(LIB_SRC_ENCODE
   video_enc.cpp
 )
 
-set(SRCS_MOC
-  ffmpeg_writer.h
-)
-
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
-
 if (OLD_FFMPEG)
 set(LIB_SRC_ENCODE
 	${LIB_SRC_ENCODE}
@@ -63,12 +57,6 @@ set(LIB_SRC_ENCODE
 )
 endif()
 
-set(SRCS_MOC
-	ffmpeg_writer.h	
-)
-
-qt_wrap_cpp(MOC_OUT ${SRCS_MOC})
-
 message(STATUS "FFMPEG libraries are at ${FFMPEG_LIBRARIES}")
 
 include_directories(${FFMPEG_INCLUDE_PATHS})
@@ -76,24 +64,24 @@ include_directories(libsvflow)
 
 add_library(sV  STATIC ${LIB_SRC_BASE})
 target_link_libraries(sV  ${QT_LIBRARIES} sVflow)
-qt_use_modules(sV Core)
-qt_use_modules(sV Gui)
+qt5_use_modules(sV Core)
+qt5_use_modules(sV Gui)
 
 add_library(sVinfo  STATIC ${LIB_SRC_VIDEO})
-qt_use_modules(sVinfo Core)
-qt_use_modules(sVinfo Gui)
+qt5_use_modules(sVinfo Core)
+qt5_use_modules(sVinfo Gui)
 target_link_libraries(sVinfo  ${FFMPEG_LIBRARIES})
 
-add_library(sVencode  STATIC ${LIB_SRC_ENCODE} ${MOC_OUT})
+add_library(sVencode  STATIC ${LIB_SRC_ENCODE})
 target_link_libraries(sVencode  ${FFMPEG_LIBRARIES} sVflow)
-qt_use_modules(sVencode Core)
-qt_use_modules(sVencode Gui)
+qt5_use_modules(sVencode Core)
+qt5_use_modules(sVencode Gui)
 
 add_library(sVflowtools  STATIC ${LIB_SRC_FLOWTOOLS})
 target_link_libraries(sVflowtools sVflow)
 
 add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
-qt_use_modules(sVvis Core)
-qt_use_modules(sVvis Gui)
+qt5_use_modules(sVvis Core)
+qt5_use_modules(sVvis Gui)
 target_link_libraries(sVvis  sVflow ${QT_LIBRARIES})
 
