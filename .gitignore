@@ -22,3 +22,5 @@ material/*.blend2
 
 .DS_Store
 
+*build*
+.idea

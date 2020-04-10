@@ -1,26 +1,30 @@
-slowmoVideo
-===========
+# slowmoVideo
 
-Hello! This is a short introduction for you if you want to:
-- compile
-- develop
-- translate
+slowmoVideo is a tool that uses optical flow for generating slow-motion videos.
+See [here][demos] for some demo videos.
 
-slowmoVideo. For everything else please go to the 
-[web page](http://slowmoVideo.granjow.net) or the 
-[Google+ group](https://plus.google.com/communities/116570263544012246711).
 
-Building
---------
+## Building
+
+slowmoVideo uses CMake for building. You may also want to build [V3D Flow Builder][v3d]
+for fast GPU based rendering.
 
 ### Building for Linux
-See [our wiki](https://github.com/slowmoVideo/slowmoVideo/wiki/Download) for build instructions
 
-Or see (outdated) http://slowmovideo.granjow.net/download.php
+```bash
+git submodule update --init
+
+mkdir build
+cd build
+
+cmake ..
+make
+```
 
 
 
 ### Building for Windows
+
 Compiling slowmoVideo for Windows using MXE on Linux:
 
 1.  Get mxe _not_ from http://mxe.cc/ BUT, as long as OpenCV is not in the official branch, from
@@ -40,8 +44,7 @@ Additionally to slowmoVideo, ffmpeg.exe (32-bit build, static) is required.
 Download it from http://ffmpeg.zeranoe.com/builds/ and put it into the same directory as slowmoUI.exe.
 
 
-Translating
------------
+## Translating
 
 For this you should be in the slowmoVideo subdirectory which contains the tr/ directory. 
 The tools (`linguist`, `lupdate`, `lrelease`) are available in the `qt4-dev-tools` package for Debian based systems.
@@ -73,3 +76,6 @@ Finally, to see your translation “in action”, release the .ts file (this cre
 
 Now you can push your `.ts` file to git.
 
+
+[demos]: http://slowmovideo.granjow.net/videos.html
+[v3d]: https://github.com/slowmoVideo/v3d-flow-builder

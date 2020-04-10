@@ -23,9 +23,7 @@ set(LIB_SRC_ARGS
   trivialArgsReader_sV.cpp
 )
 
-set(LIB_SRC_FLOW
-  flowRW_sV.cpp
-  flowField_sV.cpp
+set(LIB_SRC_FLOWTOOLS
   flowTools_sV.cpp
   kernel_sV.cpp
 )
@@ -94,7 +92,7 @@ target_link_libraries(sVencode  ${FFMPEG_LIBRARIES})
 qt_use_modules(sVencode Core)
 qt_use_modules(sVencode Gui)
 
-add_library(sVflow  STATIC ${LIB_SRC_FLOW})
+add_library(sVflowtools  STATIC ${LIB_SRC_FLOWTOOLS})
 
 add_library(sVvis  STATIC ${LIB_SRC_FLOWVIS})
 qt_use_modules(sVvis Core)

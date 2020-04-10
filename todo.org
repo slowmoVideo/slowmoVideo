@@ -1,6 +1,9 @@
 #+STARTUP: showall
 #+STARTUP: nohideblocks
 
+git filter-branch --index-filter 'git rm --cached -qr --ignore-unmatch -- . && git reset -q $GIT_COMMIT -- V3D src/V3D src/cmake Config V3D/Config' --prune-empty -- --all
+
+
 
 * UI [1/3]
 - [X] Always display some units (user feedback when scrolling)

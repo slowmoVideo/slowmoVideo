@@ -1,0 +1,3 @@
+[submodule "src/lib/libsvflow"]
+	path = src/lib/libsvflow
+	url = git@github.com:slowmoVideo/libsvflow.git
