@@ -125,14 +125,14 @@ QString toString(const MotionblurType &type)
     }
 }
 
-Fps_sV::Fps_sV(int num, int den) throw(Error_sV) :
+Fps_sV::Fps_sV(int num, int den) noexcept(false) :
     num(num), den(den)
 {
     if (den <= 0) {
         throw Error_sV("FPS denominator must be >= 0.");
     }
 }
-Fps_sV::Fps_sV(QString fpsString) throw(Error_sV)
+Fps_sV::Fps_sV(QString fpsString) noexcept(false)
 {
     QRegExp e("(\\d+)\\/(\\d+)");
     if (e.exactMatch(fpsString)) {
@@ -145,7 +145,7 @@ Fps_sV::Fps_sV(QString fpsString) throw(Error_sV)
         throw Error_sV("Cannot create fps value from " + fpsString);
     }
 }
-Fps_sV::Fps_sV(float fps) throw(Error_sV)
+Fps_sV::Fps_sV(float fps) noexcept(false)
 {
     if (fps <= 0) {
         throw Error_sV(QString("FPS value must be larger than zero (is: %1)").arg(fps));

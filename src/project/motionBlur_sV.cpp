@@ -30,8 +30,7 @@ MotionBlur_sV::MotionBlur_sV(Project_sV *project) :
     createDirectories();
 }
 
-QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs)
-throw(RangeTooSmallError_sV)
+QImage MotionBlur_sV::blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs) noexcept(false)
 {
     if (prefs.motionblur == MotionblurType_Nearest) {
         return nearest(startFrame, prefs);
@@ -51,7 +50,7 @@ QImage MotionBlur_sV::nearest(float startFrame, const RenderPreferences_sV &pref
     return m_project->frameSource()->frameAt(startFrame, prefs.size);
 }
 
-QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) throw(RangeTooSmallError_sV)
+QImage MotionBlur_sV::fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) noexcept(false)
 {
     float low, high;
     if (startFrame < endFrame) {

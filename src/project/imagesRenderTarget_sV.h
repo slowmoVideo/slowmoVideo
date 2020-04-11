@@ -22,8 +22,8 @@ class ImagesRenderTarget_sV : public AbstractRenderTarget_sV
 public:
     ImagesRenderTarget_sV(RenderTask_sV *parentRenderTask);
 
-    virtual void openRenderTarget() throw(Error_sV) {} ;
-    virtual void closeRenderTarget() throw(Error_sV) {} ;
+    virtual void openRenderTarget() noexcept(false) {} ;
+    virtual void closeRenderTarget() noexcept(false) {} ;
 
 
     void setTargetDir(const QDir dir);

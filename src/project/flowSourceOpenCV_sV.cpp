@@ -129,7 +129,7 @@ void FlowSourceOpenCV_sV::setupTVL1(const double tau, const double lambda, const
     this->epsilon    = epsilon;
 }
 
-FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
+FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) noexcept(false)
 {
 #if CV_MAJOR_VERSION == 2
 #ifdef HAVE_OPENCV_OCL
@@ -194,7 +194,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
     try {
         return FlowRW_sV::load(flowFileName.toStdString());
     } catch (FlowRW_sV::FlowRWError &err) {
-        throw FlowBuildingError(err.message.c_str());
+        throw FlowBuildingError(err.what());
     }
 }
 

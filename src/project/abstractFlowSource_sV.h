@@ -26,7 +26,7 @@ public:
     virtual ~AbstractFlowSource_sV() {}
 
     /** \return The flow field from \c leftFrame to \c rightFrame */
-    virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError) = 0;
+    virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) noexcept(false) = 0;
     /** \return The path to the flow file for the given frames */
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const = 0;
 

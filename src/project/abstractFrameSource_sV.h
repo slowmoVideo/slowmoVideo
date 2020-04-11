@@ -51,7 +51,7 @@ public:
       */
     virtual int64_t framesCount() const = 0;
     virtual const Fps_sV* fps() const = 0;
-    double maxTime() const throw(Div0Exception);
+    double maxTime() const noexcept(false);
 
     /*
      * add a qcache here for perf loading

@@ -90,7 +90,7 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
 	first = frameNumber + 1;
 }
 
-void exportVideoRenderTarget::closeRenderTarget() throw(Error_sV)
+void exportVideoRenderTarget::closeRenderTarget() noexcept(false)
 {	
 	VideoWriter* writer;;
 

@@ -284,7 +284,7 @@ QImage Project_sV::render(qreal outTime, RenderPreferences_sV prefs)
     return Interpolator_sV::interpolate(this, sourceFrame, prefs);
 }
 
-FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) throw(FlowBuildingError)
+FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) noexcept(false)
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
@@ -360,7 +360,7 @@ qreal Project_sV::snapToOutFrame(qreal time, bool roundUp, const Fps_sV &fps, in
     float snapped = snapToFrame(time, roundUp, fps, out_framesBeforeHere) + m_nodes->startTime();
     return snapped;
 }
-qreal Project_sV::toOutTime(QString timeExpression, const Fps_sV &fps) const throw(Error_sV)
+qreal Project_sV::toOutTime(QString timeExpression, const Fps_sV &fps) const noexcept(false)
 {
     if (m_nodes->size() < 2) {
         throw Error_sV(tr("Not enough nodes available in the project."));

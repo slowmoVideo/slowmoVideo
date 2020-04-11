@@ -5,6 +5,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(FATAL_ERROR "In-source builds are not allowed.")
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+
 # Partly from https://doc.qt.io/qt-5/cmake-get-started.html#build-a-gui-executable
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

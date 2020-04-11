@@ -48,15 +48,15 @@ public:
       Saves a project to an XML project file.
       */
 
-    static Project_sV* loadProject(QString filename, QString *warning = NULL) throw(FrameSourceError, Error_sV);
-    static int saveProject(Project_sV *project, QString filename) throw(Error_sV);
+    static Project_sV* loadProject(QString filename, QString *warning = NULL) noexcept(false);
+    static int saveProject(Project_sV *project, QString filename) noexcept(false);
 
 private:
     static const QDomElement nodeToDom(QDomDocument *doc, const Node_sV *node);
     static const QDomElement tagToDom(QDomDocument *doc, const Tag_sV &tag);
 
     static const QDomElement frameSource(QDomDocument *doc, const AbstractFrameSource_sV *frameSource);
-    static void loadFrameSource(QXmlStreamReader *reader, Project_sV *project) throw(FrameSourceError);
+    static void loadFrameSource(QXmlStreamReader *reader, Project_sV *project) noexcept(false);
 };
 
 #endif // XMLPROJECTRW_SV_H

@@ -43,7 +43,7 @@ void newVideoRenderTarget::setVcodec(const QString &codec)
     m_vcodec = codec;
 }
 
-void newVideoRenderTarget::openRenderTarget() throw(Error_sV)
+void newVideoRenderTarget::openRenderTarget() noexcept(false)
 {
     writer = CreateVideoWriter(m_filename.toStdString().c_str(),
     	renderTask()->resolution().width(),
@@ -61,7 +61,7 @@ void newVideoRenderTarget::slotConsumeFrame(const QImage &image, const int frame
     WriteFrame(writer, image);
 }
 
-void newVideoRenderTarget::closeRenderTarget() throw(Error_sV)
+void newVideoRenderTarget::closeRenderTarget() noexcept(false)
 {
     ReleaseVideoWriter( &writer );
 }

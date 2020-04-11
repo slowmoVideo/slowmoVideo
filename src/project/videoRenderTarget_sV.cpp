@@ -45,7 +45,7 @@ void VideoRenderTarget_sV::setVcodec(const QString &codec)
     m_vcodec = codec;
 }
 
-void VideoRenderTarget_sV::openRenderTarget() throw(Error_sV)
+void VideoRenderTarget_sV::openRenderTarget() noexcept(false)
 {
     char *vcodec = NULL;
     if (m_vcodec.length() > 0) {
@@ -67,7 +67,7 @@ void VideoRenderTarget_sV::slotConsumeFrame(const QImage &image, const int frame
     eatARGB(m_videoOut, image.bits());
 }
 
-void VideoRenderTarget_sV::closeRenderTarget() throw(Error_sV)
+void VideoRenderTarget_sV::closeRenderTarget() noexcept(false)
 {
     finish(m_videoOut);
 }

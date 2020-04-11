@@ -34,9 +34,9 @@ public:
     SlowmoRenderer_sV();
     ~SlowmoRenderer_sV();
 
-    void load(QString filename) throw(Error);
+    void load(QString filename) noexcept(false);
     void save(QString filename);
-    void create() throw(Error);
+    void create() noexcept(false);
     void start();
     void abort();
 

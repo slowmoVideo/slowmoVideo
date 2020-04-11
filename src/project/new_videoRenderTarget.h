@@ -32,8 +32,8 @@ public:
     /// Set a custom video codec
     void setVcodec(const QString& codec);
 
-    void openRenderTarget() throw(Error_sV);
-    void closeRenderTarget() throw(Error_sV);
+    void openRenderTarget() noexcept(false);
+    void closeRenderTarget() noexcept(false);
 
 public slots:
     void slotConsumeFrame(const QImage &image, const int frameNumber);

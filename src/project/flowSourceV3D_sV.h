@@ -23,7 +23,7 @@ public:
     ~FlowSourceV3D_sV() {}
 
 
-    FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
+    FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) noexcept(false);
     const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize) const;
 
     static bool validateFlowBinary(const QString path);

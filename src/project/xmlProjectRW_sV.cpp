@@ -31,7 +31,7 @@ the Free Software Foundation, either version 3 of the License, or
 #endif
 
 
-int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) throw(Error_sV)
+int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) noexcept(false)
 {
     //TODO: use global define in defs !
     QDomDocument doc;
@@ -272,7 +272,7 @@ const QDomElement XmlProjectRW_sV::frameSource(QDomDocument *doc, const Abstract
     return source;
 }
 
-void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *project) throw(FrameSourceError)
+void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *project) noexcept(false)
 {
 	//qDebug() << "loadFrameSource";
     QStringRef frameSourceType = reader->attributes().value("type");
@@ -315,7 +315,7 @@ void XmlProjectRW_sV::loadFrameSource(QXmlStreamReader *reader, Project_sV *proj
     //qDebug() << "loadFrameSource ended";
 }
 
-Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) throw(FrameSourceError, Error_sV)
+Project_sV* XmlProjectRW_sV::loadProject(QString filename, QString *warning) noexcept(false)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {

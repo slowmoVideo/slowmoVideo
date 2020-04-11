@@ -27,7 +27,7 @@ class ImagesFrameSource_sV : public AbstractFrameSource_sV
 {
     Q_OBJECT
 public:
-    ImagesFrameSource_sV(Project_sV *project, QStringList images) throw(FrameSourceError);
+    ImagesFrameSource_sV(Project_sV *project, QStringList images) noexcept(false);
 
     static QString validateImages(const QStringList images);
 

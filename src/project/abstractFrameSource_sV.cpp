@@ -20,7 +20,7 @@ AbstractFrameSource_sV::~AbstractFrameSource_sV()
 
 }
 
-double AbstractFrameSource_sV::maxTime() const throw(Div0Exception)
+double AbstractFrameSource_sV::maxTime() const noexcept(false)
 {
     return (framesCount()-1)/fps()->fps();
 }

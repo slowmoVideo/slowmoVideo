@@ -66,7 +66,7 @@ void SlowmoRenderer_sV::save(QString filename)
 	writer.saveProject(m_project, filename);
 }
 
-void SlowmoRenderer_sV::load(QString filename) throw(Error)
+void SlowmoRenderer_sV::load(QString filename) noexcept(false)
 {
     if (m_project != NULL) {
         delete m_project;
@@ -98,7 +98,7 @@ void SlowmoRenderer_sV::load(QString filename) throw(Error)
     }
 }
 
-void SlowmoRenderer_sV::create() throw(Error)
+void SlowmoRenderer_sV::create() noexcept(false)
 {
     std::cout << "Standalone Rendering." << std::endl;
     

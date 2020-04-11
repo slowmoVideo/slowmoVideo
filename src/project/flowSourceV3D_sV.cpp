@@ -26,7 +26,7 @@ FlowSourceV3D_sV::FlowSourceV3D_sV(Project_sV *project, double lambda) :
 }
 
 
-FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError)
+FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) noexcept(false)
 {
     QString flowFileName(flowPath(leftFrame, rightFrame, frameSize));
 
@@ -76,7 +76,7 @@ FlowField_sV* FlowSourceV3D_sV::buildFlow(uint leftFrame, uint rightFrame, Frame
     try {
         return FlowRW_sV::load(flowFileName.toStdString());
     } catch (FlowRW_sV::FlowRWError &err) {
-        throw FlowBuildingError(err.message.c_str());
+        throw FlowBuildingError(err.what());
     }
 }
 

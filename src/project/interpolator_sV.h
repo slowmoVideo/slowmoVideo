@@ -7,8 +7,7 @@
 class Interpolator_sV
 {
 public:
-    static QImage interpolate(Project_sV *project, float frame, const RenderPreferences_sV& prefs)
-                             throw(FlowBuildingError, InterpolationError);
+    static QImage interpolate(Project_sV *project, float frame, const RenderPreferences_sV& prefs) noexcept(false);
 };
 
 #endif // INTERPOLATOR_SV_H

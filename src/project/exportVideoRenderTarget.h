@@ -30,14 +30,14 @@ public:
     exportVideoRenderTarget(RenderTask_sV *parentRenderTask);
     virtual ~exportVideoRenderTarget();
 
-    void openRenderTarget() throw(Error_sV) {} ;
+    void openRenderTarget() noexcept(false) {} ;
 
     /// openRenderTarget() will throw an error if the target file cannot be opened.
     void setTargetFile(const QString& filename);
     /// Set a custom video codec
     void setVcodec(const QString& codec);
 
-    void closeRenderTarget() throw(Error_sV);
+    void closeRenderTarget() noexcept(false);
 
 	void setQT(int use) { use_qt = use;};
 		

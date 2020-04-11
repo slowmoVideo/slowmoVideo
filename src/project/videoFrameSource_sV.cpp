@@ -22,8 +22,7 @@ QRegExp VideoFrameSource_sV::regexFrameNumber("frame=\\s*(\\d+)");
 const int tmout = (-1);
 
 /// \todo Check QProcess::exitCode() to find out if ffmpeg worked or not
-VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename)
-throw(FrameSourceError) :
+VideoFrameSource_sV::VideoFrameSource_sV(const Project_sV *project, const QString &filename) noexcept(false) :
     AbstractFrameSource_sV(project),
     m_inFile(filename),
     m_fps(1,1),

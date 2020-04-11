@@ -104,14 +104,14 @@ public:
       */
     static qreal snapToFrame(const qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere);
     qreal snapToOutFrame(qreal time, bool roundUp, const Fps_sV& fps, int* out_framesBeforeHere) const;
-    qreal toOutTime(QString timeExpression, const Fps_sV& fps) const throw(Error_sV);
+    qreal toOutTime(QString timeExpression, const Fps_sV& fps) const noexcept(false);
 
 
     const QDir getDirectory(const QString &name, bool createIfNotExists = true) const;
 
     QImage render(qreal outTime, RenderPreferences_sV prefs);
 
-    FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) throw(FlowBuildingError);
+    FlowField_sV* requestFlow(int leftFrame, int rightFrame, const FrameSize frameSize) noexcept(false);
 
     /**
       \brief Searches for objects near the given \c pos.

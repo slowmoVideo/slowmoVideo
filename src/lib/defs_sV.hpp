@@ -79,7 +79,7 @@ namespace Colours_sV {
 
 
 /// For general errors.
-class Error_sV {
+class Error_sV : virtual public std::exception {
 public:
     /// Creates a new error object with the given information message.
     Error_sV(QString msg);
@@ -96,11 +96,11 @@ struct Fps_sV {
     /// denominator
     int den;
 
-    Fps_sV(int num, int den) throw(Error_sV); ///< den must be > 0.
+    Fps_sV(int num, int den) noexcept(false); ///< den must be > 0.
 
-    Fps_sV(float fps) throw(Error_sV); ///< Converts a float fps number to a fractional. 23.97 and 29.97 are detected.
+    Fps_sV(float fps) noexcept(false); ///< Converts a float fps number to a fractional. 23.97 and 29.97 are detected.
 
-    Fps_sV(QString fpsString) throw(Error_sV); ///< Accepts fps strings like 24000/1001 for 23.97 fps.
+    Fps_sV(QString fpsString) noexcept(false); ///< Accepts fps strings like 24000/1001 for 23.97 fps.
 
     QString toString() const;
 
@@ -119,7 +119,7 @@ public:
 class FrameSourceError : public Error_sV {
 public:
     /// Default constructor.
-    FrameSourceError(QString msg);
+    explicit FrameSourceError(QString msg);
 };
 class InterpolationError : public Error_sV {
 public:

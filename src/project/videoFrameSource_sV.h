@@ -35,8 +35,7 @@ class VideoFrameSource_sV : public AbstractFrameSource_sV
     Q_OBJECT
 public:
     /** Builds a new video frame source from the given file. */
-    VideoFrameSource_sV(const Project_sV *project, const QString &filename)
-    throw(FrameSourceError);
+    VideoFrameSource_sV(const Project_sV *project, const QString &filename) noexcept(false);
 
     ~VideoFrameSource_sV();
 

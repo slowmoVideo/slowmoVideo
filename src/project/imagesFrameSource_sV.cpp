@@ -15,7 +15,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QtCore/QDebug>
 #include <QtGui/QImageReader>
 
-ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList images) throw(FrameSourceError) :
+ImagesFrameSource_sV::ImagesFrameSource_sV(Project_sV *project, QStringList images) noexcept(false) :
     AbstractFrameSource_sV(project),
     m_fps(24, 1),
     m_initialized(false),

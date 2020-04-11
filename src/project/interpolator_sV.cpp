@@ -6,8 +6,7 @@
 
 #define MIN_FRAME_DIST .001
 
-QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPreferences_sV &prefs)
-throw(FlowBuildingError, InterpolationError)
+QImage Interpolator_sV::interpolate(Project_sV *pr, float frame, const RenderPreferences_sV &prefs) noexcept(false)
 {
     if (frame > pr->frameSource()->framesCount()) {
         throw InterpolationError(QObject::tr("Requested frame %1: Not within valid range. (%2 frames)")

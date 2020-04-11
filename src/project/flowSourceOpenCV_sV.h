@@ -42,7 +42,7 @@ public:
     FlowSourceOpenCV_sV(Project_sV *project, int algo, int ocl_dev_index);
     ~FlowSourceOpenCV_sV() {}
 
-    virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) throw(FlowBuildingError);
+    virtual FlowField_sV* buildFlow(uint leftFrame, uint rightFrame, FrameSize frameSize) noexcept(false);
     virtual const QString flowPath(const uint leftFrame, const uint rightFrame, const FrameSize frameSize = FrameSize_Orig) const;
 
     void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);

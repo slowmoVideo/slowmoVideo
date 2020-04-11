@@ -39,14 +39,14 @@ public:
       Selects either fastBlur() or slowmoBlur(), depending on the replay speed.
       \param replaySpeed Must be >= 0
       */
-    QImage blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs) throw(RangeTooSmallError_sV);
+    QImage blur(float startFrame, float endFrame, float replaySpeed, RenderPreferences_sV prefs) noexcept(false);
 
     /**
       Blurs frames using cached frames on fixed, coarse-grained intervals.
       If the replay speed is high enough, it does not matter if frame 1.424242 or frame 1.5 is used
       together with other frames for rendering motion blur. That way calculation can be sped up a little bit.
       */
-    QImage fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) throw(RangeTooSmallError_sV);
+    QImage fastBlur(float startFrame, float endFrame, const RenderPreferences_sV &prefs) noexcept(false);
 
     /**
       Blurs frames that are re-played at very low speed, such that fastBlur() cannot be used.
