@@ -21,6 +21,26 @@ cmake ..
 make
 ```
 
+### Building AppImage on Ubuntu 16.04
+
+Get a [linuxdeployqt release][ldq-r]
+like [v6][ldq-6]
+
+```bash
+apt install build-essential libqwt-qt5-dev cmake libopencv-dev qt5-default qtscript5-dev qttools5-dev-tools
+
+mkdir build
+cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+
+make install DESTDIR=AppDir
+squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
+
+```
+
+[ldq-r]: https://github.com/probonopd/linuxdeployqt/releases
+[ldq-6]: https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+
 
 
 ### Building for Windows
