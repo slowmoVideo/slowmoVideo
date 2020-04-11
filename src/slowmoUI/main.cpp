@@ -37,37 +37,32 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
 
-    // Setup debug output system.
-    logBrowser = new LogBrowserDialog;
-    qInstallMessageHandler(myMessageOutput);
-
-
-    // startup...
     QString projectPath;
-    qDebug() << "threading info : " << QThread::idealThreadCount();
-    qDebug() << QApplication::arguments();
-
-    //TODO: place this in About ...
-    qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
-             << CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
+    bool logToStdout = false;
 
     const int N = app.arguments().size();
     for (int n = 1; n < N; n++) {
         QString arg = app.arguments().at(n);
         if (arg.startsWith("--")) {
 
-            bool langUpdated = true;
+            bool langUpdated = false;
 
             // Changes the file loaded from the resource container
             // to force a different language
             if (arg == "--fr") {
                 QLocale::setDefault(QLocale::French);
+                langUpdated = true;
             } else if (arg == "--de") {
                 QLocale::setDefault(QLocale::German);
+                langUpdated = true;
             } else if (arg == "--en") {
                 QLocale::setDefault(QLocale::English);
+                langUpdated = true;
             } else if (arg == "--it") {
                 QLocale::setDefault(QLocale::Italian);
+                langUpdated = true;
+            } else if (arg == "--log-stdout") {
+                logToStdout = true;
             } else {
                 langUpdated = false;
             }
@@ -89,10 +84,24 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // Setup debug output system.
+    logBrowser = new LogBrowserDialog;
+    if (logToStdout) {
+        myMessageOutput(QtInfoMsg, QMessageLogContext(), "Log is going to stdout.");
+    } else {
+        qInstallMessageHandler(myMessageOutput);
+    }
+
+    qDebug() << QApplication::arguments();
+    qDebug() << "threading info : " << QThread::idealThreadCount();
+    // TODO: place this in About ...
+    qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
+             << CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
+
     // Load the translation file from the resource container and use it
     QTranslator translator;
     translator.load(":translations");
-    app.installTranslator(&translator);
+    QApplication::installTranslator(&translator);
 
     MainWindow w(projectPath);
 
@@ -100,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     //use menu here : logBrowser->show();
 
-    int result = app.exec();
+    int result = QApplication::exec();
     qDebug() << "application exec return result =" << result;
     delete logBrowser;
     return result;
