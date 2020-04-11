@@ -9,6 +9,10 @@ See [here][demos] for some demo videos.
 slowmoVideo uses CMake for building. You may also want to build [V3D Flow Builder][v3d]
 for fast GPU based rendering.
 
+Dependencies on Ubuntu 19.10…16.04:
+
+    build-essential cmake libopencv-dev qt5-default qttools5-dev-tools qtscript5-dev
+
 ### Building for Linux
 
 ```bash
@@ -23,19 +27,37 @@ make
 
 ### Building AppImage on Ubuntu 16.04
 
-Get a [linuxdeployqt release][ldq-r]
-like [v6][ldq-6]
+This guide shows how to build a slowmoVideo AppImage in a Docker container with [linuxdeployqt release][ldq-r],
+in this example [version 6][ldq-6].
 
 ```bash
-apt install build-essential libqwt-qt5-dev cmake libopencv-dev qt5-default qtscript5-dev qttools5-dev-tools
+# Run a docker container and mount the current directory to /build in the container
+docker run -it --rm -v $(pwd):/build ubuntu:16.04
 
-mkdir build
-cd build
+# Install all packages that are required for building slowmoVideo
+apt update
+apt install wget build-essential cmake libopencv-dev qt5-default qttools5-dev-tools qtscript5-dev
+
+# Get linuxdeployqt and make it executable
+cd
+wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+chmod +x linuxdeployqt-6-x86_64.AppImage
+
+
+# Build slowmoVideo
+mkdir appimage-build
+cd appimage-build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+make
 
+# Install slowmoVideo to the AppDir directory for AppImage
 make install DESTDIR=AppDir
-squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
 
+# Extract the linuxdeployqt AppImage when FUSE is not available in a docker container
+~/linuxdeployqt-6-x86_64.AppImage --appimage-extract
+
+# Create the AppImage
+squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
 ```
 
 [ldq-r]: https://github.com/probonopd/linuxdeployqt/releases
@@ -44,6 +66,8 @@ squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
 
 
 ### Building for Windows
+
+*This guide is outdated.*
 
 Compiling slowmoVideo for Windows using MXE on Linux:
 
@@ -56,18 +80,20 @@ Compiling slowmoVideo for Windows using MXE on Linux:
     `cmake .. -DCMAKE_TOOLCHAIN_FILE=/PATH_TO_MXE/usr/i686-pc-mingw32/share/cmake/mxe-conf.cmake`
 5.  Compile!
 
-### Building for MacOS
-take a look at README.osx for more detailed instruction
-
 #### Notes
+
 Additionally to slowmoVideo, ffmpeg.exe (32-bit build, static) is required.
 Download it from http://ffmpeg.zeranoe.com/builds/ and put it into the same directory as slowmoUI.exe.
+
+### Building for MacOS
+
+take a look at README.osx for more detailed instruction
 
 
 ## Translating
 
-For this you should be in the slowmoVideo subdirectory which contains the tr/ directory. 
-The tools (`linguist`, `lupdate`, `lrelease`) are available in the `qt4-dev-tools` package for Debian based systems.
+For this you should be in the `src` subdirectory which contains the `tr/` directory. 
+The tools (`linguist`, `lupdate`, `lrelease`) are available in the `qttools5-dev-tools` package for Debian based systems.
 
 ### Adding your language
 To add your language xx (like fr, it), run the following command to generate the respective .ts file:
