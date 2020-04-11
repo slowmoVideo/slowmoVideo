@@ -20,6 +20,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 QPointer<LogBrowserDialog> logBrowser;
 
+/**
+ * Message handler; see https://doc.qt.io/qt-5/qtglobal.html#qInstallMessageHandler
+ */
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
     if (logBrowser) {
         logBrowser->outputMessage(type, msg);
@@ -27,7 +30,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 }
 
 int main(int argc, char *argv[]) {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
 
     // Set up preferences for the QSettings file
     QCoreApplication::setOrganizationName("Granjow");
@@ -42,15 +45,15 @@ int main(int argc, char *argv[]) {
     // startup...
     QString projectPath;
     qDebug() << "threading info : " << QThread::idealThreadCount();
-    qDebug() << a.arguments();
+    qDebug() << QApplication::arguments();
 
     //TODO: place this in About ...
     qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
              << CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
 
-    const int N = a.arguments().size();
+    const int N = app.arguments().size();
     for (int n = 1; n < N; n++) {
-        QString arg = a.arguments().at(n);
+        QString arg = app.arguments().at(n);
         if (arg.startsWith("--")) {
 
             bool langUpdated = true;
@@ -89,7 +92,7 @@ int main(int argc, char *argv[]) {
     // Load the translation file from the resource container and use it
     QTranslator translator;
     translator.load(":translations");
-    a.installTranslator(&translator);
+    app.installTranslator(&translator);
 
     MainWindow w(projectPath);
 
@@ -97,7 +100,7 @@ int main(int argc, char *argv[]) {
 
     //use menu here : logBrowser->show();
 
-    int result = a.exec();
+    int result = app.exec();
     qDebug() << "application exec return result =" << result;
     delete logBrowser;
     return result;

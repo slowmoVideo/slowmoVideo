@@ -44,7 +44,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QString projectPath = QString(), QWidget *parent = 0);
+    explicit MainWindow(const QString& projectPath = QString(), QWidget *parent = 0);
     ~MainWindow();
 
     void displayHelp(QPainter &davinci) const;

@@ -48,16 +48,16 @@ the Free Software Foundation, either version 3 of the License, or
 #include "flowEditCanvas.h"
 
 #include "logbrowserdialog.h"
- 
+
 
 extern QPointer<LogBrowserDialog> logBrowser;
 
-MainWindow::MainWindow(QString projectPath, QWidget *parent) :
+MainWindow::MainWindow(const QString& projectPath, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_progressDialog(NULL),
-    m_renderProgressDialog(NULL),
-    m_flowExaminer(NULL),
+    m_progressDialog(nullptr),
+    m_renderProgressDialog(nullptr),
+    m_flowExaminer(nullptr),
     m_cs(this)
 {
     ui->setupUi(this);
@@ -105,23 +105,15 @@ MainWindow::~MainWindow()
     delete m_wRenderPreview;
     delete m_wRenderPreviewDock;
 
-    if (m_project != NULL) {
-        delete m_project;
-    }
+    delete m_project;
 
-	// shoudl check task ?
-	m_rendererThread.quit();
-	m_rendererThread.wait();
-	
-    if (m_progressDialog != NULL) {
-        delete m_progressDialog;
-    }
-    if (m_renderProgressDialog != NULL) {
-        delete m_renderProgressDialog;
-    }
-    if (m_flowExaminer != NULL) {
-        delete m_flowExaminer;
-    }
+    // shoudl check task ?
+    m_rendererThread.quit();
+    m_rendererThread.wait();
+
+    delete m_progressDialog;
+    delete m_renderProgressDialog;
+    delete m_flowExaminer;
 
     for (int i = 0; i < m_widgetActions.size(); i++) {
         delete m_widgetActions[i];
@@ -261,7 +253,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
         qDebug() << "closing";
         m_settings.setValue("mainwindow/geometry", saveGeometry());
         m_settings.setValue("mainwindow/windowState", saveState());
-				logBrowser->close();
+        logBrowser->close();
 	    QMainWindow::closeEvent(e);
 	}
 }
