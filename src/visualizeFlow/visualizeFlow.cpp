@@ -57,7 +57,7 @@ void colourizeFlow(int argc, char *argv[])
     try {
         flowField = FlowRW_sV::load(inputFile);
     } catch (FlowRW_sV::FlowRWError &err) {
-        std::cout << err.message << std::endl;
+        std::cout << err.what() << std::endl;
         exit(-2);
     }
 
