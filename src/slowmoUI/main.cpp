@@ -18,59 +18,35 @@ the Free Software Foundation, either version 3 of the License, or
 #include "mainwindow.h"
 #include "logbrowserdialog.h"
 
-//QPointer<LogBrowser> logBrowser;
 QPointer<LogBrowserDialog> logBrowser;
 
-#if QT_VERSION >= 0x050000
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-#else
-void myMessageOutput(QtMsgType type, const char *str)
-{
-    QString msg = QString::fromUtf8(str);
-#endif
-    if(logBrowser)
-        logBrowser->outputMessage( type, msg );
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+    if (logBrowser) {
+        logBrowser->outputMessage(type, msg);
+    }
 }
 
-int main(int argc, char *argv[])
-{
-
-#ifdef Q_OS_MACX
-	// fix for osx UI and Qt4
-    if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
-    {
-        // fix Mac OS X 10.9 (mavericks) font issue
-        // https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
-    }
-#endif
-
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-
-    //QDebug()<<"starting app"
 
     // Set up preferences for the QSettings file
     QCoreApplication::setOrganizationName("Granjow");
     QCoreApplication::setOrganizationDomain("granjow.net");
     QCoreApplication::setApplicationName("slowmoUI");
 
-  // Setup debug output system.
-  logBrowser = new LogBrowserDialog;
-#if QT_VERSION >= 0x050000
-  qInstallMessageHandler(myMessageOutput);
-#else
-  qInstallMsgHandler(myMessageOutput);
-#endif
+    // Setup debug output system.
+    logBrowser = new LogBrowserDialog;
+    qInstallMessageHandler(myMessageOutput);
+
 
     // startup...
     QString projectPath;
     qDebug() << "threading info : " << QThread::idealThreadCount();
     qDebug() << a.arguments();
 
-		//TODO: place this in About ...
-	  qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
-					<< CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
+    //TODO: place this in About ...
+    qDebug() << "OpenCV version: " << CV_MAJOR_VERSION << "."
+             << CV_MINOR_VERSION << "." << CV_SUBMINOR_VERSION;
 
     const int N = a.arguments().size();
     for (int n = 1; n < N; n++) {
@@ -83,7 +59,7 @@ int main(int argc, char *argv[])
             // to force a different language
             if (arg == "--fr") {
                 QLocale::setDefault(QLocale::French);
-						} else if (arg == "--de") {
+            } else if (arg == "--de") {
                 QLocale::setDefault(QLocale::German);
             } else if (arg == "--en") {
                 QLocale::setDefault(QLocale::English);

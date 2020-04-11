@@ -30,6 +30,8 @@ make
 This guide shows how to build a slowmoVideo AppImage in a Docker container with [linuxdeployqt release][ldq-r],
 in this example [version 6][ldq-6].
 
+See [Packaging native binaries][ai] for more information on AppImage packaging.
+
 ```bash
 # Run a docker container and mount the current directory to /build in the container
 docker run -it --rm -v $(pwd):/build ubuntu:16.04
@@ -62,6 +64,7 @@ squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
 
 [ldq-r]: https://github.com/probonopd/linuxdeployqt/releases
 [ldq-6]: https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+[ai]: https://docs.appimage.org/packaging-guide/from-source/native-binaries.html
 
 
 
