@@ -216,11 +216,11 @@ void MainWindow::createDockWindows()
     // Fill the view menu that allows (de)activating widgets
     QObjectList windowChildren = children();
     QDockWidget *w;
-    for (int i = 0; i < windowChildren.size(); i++) {
-        if ((w = dynamic_cast<QDockWidget*>(windowChildren.at(i))) != NULL) {
+    for (auto i : windowChildren) {
+        if ((w = dynamic_cast<QDockWidget*>(i)) != nullptr) {
             qDebug() << "Adding " << w->windowTitle() << " to the menu's widget list";
             
-            QAction *a = new QAction("&" + w->objectName(), this);
+            auto *a = new QAction("&" + w->objectName(), this);
             a->setCheckable(true);
             connect(a, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
             // This does not work since it is also emitted e.g. when the window is minimized
@@ -228,11 +228,7 @@ void MainWindow::createDockWindows()
             // Thanks ArGGu^^ for the tip!
             connect(w, SIGNAL(visibilityChanged(bool)), a, SLOT(setChecked(bool)));
             //a->setChecked(true);
-            
-#if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
-            // To uncheck the menu entry when the widget is closed via the (x)
-            w->installEventFilter(this);
-#endif
+
             
             ui->menuView->addAction(a);
             m_widgetActions << a;
