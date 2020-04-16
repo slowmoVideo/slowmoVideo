@@ -24,26 +24,28 @@ set(CMAKE_MODULE_PATH
 #
 include(GetGitRevisionDescription)
 git_describe(VERSION --dirty=-dev)
-if (VERSION)
-				#parse the version information into pieces.
-			  # v0.4.0-123-gdddf621
-				string(REGEX REPLACE "^v([0-9]+)\\..*" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" PROJECT_VERSION_MINOR "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+-([0-9]+)-.*" "\\1" PROJECT_VERSION_PATCH "${VERSION}")
-				string(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+-(.*)" "\\1" PROJECT_VERSION_SHA1 "${VERSION}")
-else()
-				set(PROJECT_VERSION_MAJOR "0")
-				set(PROJECT_VERSION_MINOR "5")
-				set(PROJECT_VERSION_PATCH "0")
-endif()
 
-if(NOT PROJECT_VERSION_PATCH)
-				# git describe bug ?
-				set(PROJECT_VERSION_PATCH "0")
-endif()
+if (VERSION MATCHES "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-[a-zA-Z0-9]+)?$")
+	string(REGEX REPLACE "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-[a-zA-Z0-9]+)?$" "\\1" PROJECT_VERSION_MAJOR "${VERSION}")
+	string(REGEX REPLACE "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-[a-zA-Z0-9]+)?$" "\\2" PROJECT_VERSION_MINOR "${VERSION}")
+	if (VERSION MATCHES "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))(-[a-zA-Z0-9]+)?$")
+		string(REGEX REPLACE "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))(-[a-zA-Z0-9]+)?$" "\\3" PROJECT_VERSION_PATCH "${VERSION}")
+	else ()
+		set(PROJECT_VERSION_PATCH "0")
+	endif ()
+	if (VERSION MATCHES "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))(-[a-zA-Z0-9]+)$")
+		string(REGEX REPLACE "^v([0-9]+)\\.([0-9]+)(\\.([0-9]+))(-[a-zA-Z0-9]+)$" "\\4" PROJECT_VERSION_SHA1 "${VERSION}")
+	else ()
+		set(PROJECT_VERSION_SHA1 "")
+	endif ()
+else ()
+	set(PROJECT_VERSION_MAJOR "0")
+	set(PROJECT_VERSION_MINOR "6")
+	set(PROJECT_VERSION_PATCH "0")
+endif ()
 
 set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+message(STATUS "Building slowmoVideo ${PROJECT_VERSION}")
 configure_file(src/version.h.in version.h)
 
 ### Compiler options ###
@@ -248,7 +250,7 @@ message("")
 
 
 if(NOT BUILD_SLOWMO)
-    error(WARNING "Cannot build slowmoVideo, please install the missing packages first.")
+    message(FATAL_ERROR "Cannot build slowmoVideo, please install the missing packages first.")
 endif(NOT BUILD_SLOWMO)
 
 configure_file(src/config.h.in config.h)
