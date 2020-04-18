@@ -113,7 +113,6 @@ signals:
 public slots:
     void slotContinueRendering();
     void slotStopRendering();
-    // was void doWorkFlow();
 
 };
 

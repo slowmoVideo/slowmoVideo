@@ -82,7 +82,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc README.md todo.org
 %{_bindir}/slowmoFlowEdit
-%{_bindir}/slowmoInfo
 %{_bindir}/slowmoInterpolate
 %{_bindir}/slowmoRenderer
 %{_bindir}/slowmoUI
