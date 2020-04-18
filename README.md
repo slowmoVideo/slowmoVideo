@@ -3,6 +3,8 @@
 slowmoVideo is a tool that uses optical flow for generating slow-motion videos.
 See [here][demos] for some demo videos.
 
+For the last changes, see the [Changelog](docs/changelog.md).
+
 
 ## Building
 
