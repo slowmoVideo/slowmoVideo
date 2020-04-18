@@ -8,38 +8,18 @@ the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 */
 
-#include "exportVideoRenderTarget.h"
-
-#include <QtCore/QDebug>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#include <QTemporaryDir> 
-#endif
-
-#include "renderTask_sV.h"
 #include <QtCore/QObject>
 
+#include "exportVideoRenderTarget.h"
+#include "renderTask_sV.h"
 #include "../lib/video_enc.h"
 
 
 exportVideoRenderTarget::exportVideoRenderTarget(RenderTask_sV *parentRenderTask) :
     AbstractRenderTarget_sV(parentRenderTask)
 {
-#if _NO_INSIDE_TMPDIR_
-    //TODO: should use projectdir to create render dir
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    //QTemporaryDir tempDir("slowmovideo");
-    QTemporaryDir tempDir;; // use default
-    if (tempDir.isValid()) 
-    	m_targetDir = QDir(tempDir.path());
-    else 
-#endif
-     m_targetDir = QDir::temp();
-#else
+
 	m_targetDir = parentRenderTask->getRenderDirectory();
-#endif
-
-qDebug() << "  target dir " << m_targetDir;
-
     m_filenamePattern = "rendered-%1.png";
     
     use_qt = 1;
@@ -48,15 +28,7 @@ qDebug() << "  target dir " << m_targetDir;
 
 exportVideoRenderTarget::~exportVideoRenderTarget()
 {
-#ifdef _DO_NOT_KEEP_TEMP
-	// QT bug ?
-	qDebug() << "should remove dir : " << m_targetDir;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
- 	m_targetDir.removeRecursively();
-#else
-#warning  removeRecursively not define in QT4
-#endif
-#endif
+    qDebug() << "Closing exporter. Not deleting temporary files under " << m_targetDir.absolutePath() << ".";
 }
 
 void exportVideoRenderTarget::setTargetFile(const QString &filename)
@@ -92,7 +64,7 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
 
 void exportVideoRenderTarget::closeRenderTarget() noexcept(false)
 {	
-	VideoWriter* writer;;
+	VideoWriter* writer;
 
 	qDebug() << "exporting temporary frame to Video" << m_filename << " using codec " << m_vcodec << "starting at " << first;
 	if (m_vcodec.isEmpty()) 

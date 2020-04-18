@@ -123,7 +123,6 @@ Project_sV::~Project_sV()
     }
 
     delete m_renderTask;
-    qDebug() << "delete pref";
     delete m_preferences;
     delete m_frameSource;
     delete m_flowSource;
