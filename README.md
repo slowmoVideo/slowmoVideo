@@ -25,6 +25,9 @@ cd build
 
 cmake ..
 make
+
+# Run it
+src/slowmoUI/slowmoUI
 ```
 
 ### Building AppImage on Ubuntu 16.04
