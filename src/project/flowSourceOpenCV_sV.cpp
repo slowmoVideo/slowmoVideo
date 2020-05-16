@@ -18,6 +18,10 @@ the Free Software Foundation, either version 3 of the License, or
 #include <iostream>
 #include <fstream>
 
+#if CV_VERSION_MAJOR == 4
+#include <opencv2/optflow.hpp>
+#endif
+
 #include <QList>
 
 using namespace cv;
@@ -158,9 +162,16 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
             throw FlowBuildingError(QString("Could not read image " + path));
 
         cv::Mat prevgray, gray;
+
+#if CV_VERSION_MAJOR >= 4
+        prevgray = cv::imread(prevpath.toStdString(), IMREAD_GRAYSCALE);
+        gray = cv::imread(path.toStdString(), IMREAD_GRAYSCALE);
+        cv::UMat uprevgray, ugray;
+        prevgray.copyTo(uprevgray);
+        gray.copyTo(ugray);
+#elif CV_MAJOR_VERSION == 3
         prevgray = cv::imread(prevpath.toStdString(), CV_LOAD_IMAGE_ANYDEPTH);
         gray = cv::imread(path.toStdString(), CV_LOAD_IMAGE_ANYDEPTH);
-#if CV_MAJOR_VERSION == 3
         cv::UMat uprevgray, ugray;
         prevgray.copyTo(uprevgray);
         gray.copyTo(ugray);
@@ -168,7 +179,9 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
         {
             if (!prevgray.empty()) {
-#if CV_MAJOR_VERSION == 3
+#if CV_VERSION_MAJOR >= 4
+                buildFlowOpenCV_4(uprevgray, ugray, flowFileName.toStdString());
+#elif CV_MAJOR_VERSION == 3
                 buildFlowOpenCV_3(uprevgray, ugray, flowFileName.toStdString());
 #else
 #ifdef HAVE_OPENCV_OCL
@@ -214,7 +227,52 @@ void FlowSourceOpenCV_sV::dumpAlgosParams()
     }
 }
 
-#if CV_MAJOR_VERSION == 3
+#if CV_VERSION_MAJOR >= 4
+void FlowSourceOpenCV_sV::buildFlowOpenCV_4(cv::UMat& uprevgray, cv::UMat& ugray, std::string flowfilename)
+{
+    dumpAlgosParams();
+    qDebug() << "Have OpenCL: " << cv::ocl::haveOpenCL() << " useOpenCL:" << cv::ocl::useOpenCL();
+    qDebug() << (uprevgray.size() == ugray.size()) << uprevgray.channels() << ugray.channels();
+    UMat uflow;
+    if (algo == 1) { // DualTVL1
+        cv::Ptr<cv::optflow::DualTVL1OpticalFlow> tvl1;
+        tvl1 = cv::optflow::createOptFlow_DualTVL1();
+        tvl1->setLambda(lambda);
+        tvl1->setTau(tau);
+        tvl1->setScalesNumber(nscales);
+        tvl1->setWarpingsNumber(warps);
+        // In OpenCV 4, iterations have been split into inner and outer iterations
+        // See https://github.com/opencv/opencv/pull/724/files#diff-beae2b00b19536f45d2a4a513b5f2c76L147
+        // Use default ratio as in the OpenCV code
+        tvl1->setInnerIterations(std::max(1, iterations / 10));
+        tvl1->setOuterIterations(std::max(1, iterations / 30));
+        tvl1->setEpsilon(epsilon);
+        tvl1->calc(
+                uprevgray,
+                ugray,
+                uflow
+        );
+    } else { // _FARN_
+        calcOpticalFlowFarneback(
+                uprevgray,
+                ugray,
+                uflow,
+                pyrScale, //0.5,
+                numLevels, //3,
+                winSize, //15,
+                numIters, //8,
+                polyN, //5,
+                polySigma, //1.2,
+                flags //0
+        );
+    }
+    Mat flow;
+    uflow.copyTo(flow);
+    qDebug() << "finished";
+    drawOptFlowMap(flow, flowfilename);
+}
+
+#elif CV_MAJOR_VERSION == 3
 void FlowSourceOpenCV_sV::buildFlowOpenCV_3(cv::UMat& uprevgray, cv::UMat& ugray, std::string flowfilename)
 {
     dumpAlgosParams();

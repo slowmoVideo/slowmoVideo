@@ -123,7 +123,7 @@ void WorkerFlow::doWorkFlow()
 
         QString flowFileName(flowSource->flowPath(frame, nextFrame, frameSize));
 
-        qDebug() << "Building flow for left frame " << frame << " to right frame " << nextFrame << "; Size: " << frameSize;
+        qDebug() << "Building flow for left frame " << frame << " to right frame " << nextFrame << "using" << frameSize;
         /// \todo Check if size is equal
         if (!QFile(flowFileName).exists()) {
             //QTime time;

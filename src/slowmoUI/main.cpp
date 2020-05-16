@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationName("slowmoUI");
 
     QString projectPath;
-    bool logToStdout = false;
+    bool logToStdout = true;
 
     const int N = app.arguments().size();
     for (int n = 1; n < N; n++) {
@@ -61,8 +61,8 @@ int main(int argc, char *argv[]) {
             } else if (arg == "--it") {
                 QLocale::setDefault(QLocale::Italian);
                 langUpdated = true;
-            } else if (arg == "--log-stdout") {
-                logToStdout = true;
+            } else if (arg == "--no-stdout") {
+                logToStdout = false;
             } else {
                 langUpdated = false;
             }

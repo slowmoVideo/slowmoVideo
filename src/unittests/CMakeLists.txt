@@ -15,6 +15,6 @@ set(SRCS
 include_directories(${FFMPEG_INCLUDE_PATHS})
 add_executable(UnitTests ${SRCS})
 qt5_use_modules(UnitTests Concurrent  Core Test)
-target_link_libraries(UnitTests sVproj ${EXTERNAL_LIBS})
+target_link_libraries(UnitTests sVproj sVflowtools ${EXTERNAL_LIBS})
 
 add_test(UnitTests UnitTests)

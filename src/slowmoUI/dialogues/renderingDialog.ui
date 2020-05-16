@@ -33,7 +33,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabWidgetPage1">
       <property name="accessibleName">
@@ -408,7 +408,7 @@
              </sizepolicy>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="page3D">
              <widget class="QWidget" name="FarnlayoutWidget">
@@ -781,7 +781,7 @@
                   <double>400.000000000000000</double>
                  </property>
                  <property name="value">
-                  <double>100.000000000000000</double>
+                  <double>300.000000000000000</double>
                  </property>
                 </widget>
                </item>

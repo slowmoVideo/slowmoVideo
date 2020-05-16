@@ -211,8 +211,8 @@ add_subdirectory(src/slowmoRenderer)
 add_subdirectory(src/visualizeFlow)
 if(ENABLE_TESTS)
   SET(QT_USE_QTTEST TRUE)
-  ## add_subdirectory(slowmoVideo/test)
-  add_subdirectory(slowmoVideo/unittests)
+  ## add_subdirectory(srd/test)
+  add_subdirectory(src/unittests)
 endif(ENABLE_TESTS)
 
 ##### SV END #####

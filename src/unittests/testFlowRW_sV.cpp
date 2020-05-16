@@ -1,9 +1,9 @@
 #include "testFlowRW_sV.h"
 
-#include "../lib/flowRW_sV.h"
-#include "../lib/flowField_sV.h"
 #include <QDebug>
 #include <string>
+#include <flowField_sV.h>
+#include <flowRW_sV.h>
 
 void TestFlowRW_sV::testWriteAndRead()
 {

@@ -48,6 +48,8 @@ public:
     void setupOpticalFlow(const int levels,const int winsize,const double polySigma, const double pyrScale, const int polyN);
     void setupTVL1(const double tau, const double lambda, const int nscales, const int warps, const int iterations, const double epsilon);
 
+    void printOpencvDetails();
+
 private:
     int ocl_device_index;
     int algo;
@@ -69,9 +71,11 @@ private:
     int iterations;
     double epsilon;
 
-#if CV_MAJOR_VERSION == 3
+#if CV_MAJOR_VERSION >= 4
+    void buildFlowOpenCV_4(cv::UMat& prevgray, cv::UMat& gray, std::string flowfilename);
+#elif CV_MAJOR_VERSION == 3
     void buildFlowOpenCV_3(cv::UMat& prevgray, cv::UMat& gray, std::string flowfilename);
-#else
+#else // OpenCV 2
     void buildFlowOpenCV_CPU(cv::Mat& prevgray, cv::Mat& gray, std::string flowfilename);
 #ifdef HAVE_OPENCV_OCL
     void buildFlowOpenCV_OCL(cv::Mat& prevgray, cv::Mat& gray, std::string flowfilename);

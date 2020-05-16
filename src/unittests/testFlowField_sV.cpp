@@ -1,8 +1,9 @@
 #include "testFlowField_sV.h"
-#include "../lib/flowField_sV.h"
+#include "../lib/kernel_sV.h"
 #include "../lib/flowTools_sV.h"
 
 #include <iostream>
+#include <flowField_sV.h>
 
 void TestFlowField_sV::slotTestConstructorOpenGL()
 {
@@ -80,7 +81,7 @@ void TestFlowField_sV::slotTestMedian()
     QVERIFY(outField->y(0,1) == values[2]);
     QVERIFY(outField->y(1,1) == values[3]);
 
-    delete values;
+    delete[] values;
     delete outField;
 }
 
