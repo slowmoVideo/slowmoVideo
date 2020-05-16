@@ -4,7 +4,6 @@
 #include "project/flowSourceV3D_sV.h"
 #include "lib/defs_sV.hpp"
 #include "lib/avconvInfo_sV.h"
-#include "../../project/videoFrameSource_sV.h"
 #include <QtCore/QProcess>
 #include <QFileDialog>
 #include <sstream>
@@ -16,13 +15,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui->setupUi(this);
     ui->buildFlow->setText(m_settings.value("binaries/v3dFlowBuilder", "").toString());
     ui->ffmpeg->setText(m_settings.value("binaries/ffmpeg", "ffmpeg").toString());
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#if QT_VERSION >= 0x040700
-    ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0, QApplication::UnicodeUTF8));
-#endif
-#else
     ui->buildFlow->setPlaceholderText(QApplication::translate("PreferencesDialog", "flowBuilder binary location", 0));
-#endif
 
 // TODO: qcombox box instead ?
     m_flowMethodGroup.addButton(ui->methodOCV,-1);

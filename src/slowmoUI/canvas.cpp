@@ -88,7 +88,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     m_mode(ToolMode_Select)
 {
     ui->setupUi(this);
-    m_shutterFunctionDialog = NULL;
+    m_shutterFunctionDialog = nullptr;
 
     // Enable mouse tracking (not only when a mouse button is pressed)
     this->setMouseTracking(true);
@@ -98,7 +98,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 
     m_states.prevMousePos = QPoint(0,0);
     m_states.contextmenuMouseTime = QPointF(0,0);
-    m_states.initialContextObject = NULL;
+    m_states.initialContextObject = nullptr;
 
     Q_ASSERT(m_secResX > 0);
     Q_ASSERT(m_secResY > 0);
@@ -154,7 +154,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
     connect(m_aCustomSpeed, SIGNAL(triggered()), this, SLOT(slotSetSpeed()));
     connect(m_speedsMapper, SIGNAL(mapped(QString)), this, SLOT(slotSetSpeed(QString)));
     connect(m_aShutterFunction, SIGNAL(triggered()), this, SLOT(slotSetShutterFunction()));
-    for (std::vector<QAction*>::iterator it = m_aSpeeds.begin(); it != m_aSpeeds.end(); ++it) {
+    for (auto it = m_aSpeeds.begin(); it != m_aSpeeds.end(); ++it) {
         connect(*it, SIGNAL(triggered()), m_speedsMapper, SLOT(map()));
     }
 }
@@ -162,7 +162,7 @@ Canvas::Canvas(Project_sV *project, QWidget *parent) :
 Canvas::~Canvas()
 {
     delete ui;
-    if (m_shutterFunctionDialog != NULL) {
+    if (m_shutterFunctionDialog != nullptr) {
         delete m_shutterFunctionDialog;
     }
 
@@ -181,10 +181,10 @@ Canvas::~Canvas()
 
 void Canvas::load(Project_sV *project)
 {
-    if (m_shutterFunctionDialog != NULL) {
+    if (m_shutterFunctionDialog != nullptr) {
         m_shutterFunctionDialog->close();
         delete m_shutterFunctionDialog;
-        m_shutterFunctionDialog = NULL;
+        m_shutterFunctionDialog = nullptr;
     }
 
     m_project = project;
@@ -609,7 +609,7 @@ void Canvas::mousePressEvent(QMouseEvent *e)
     m_states.initialContextObject = objectAt(e->pos(), e->modifiers());
     m_states.initial_t0 = m_t0;
 
-    if (m_states.initialContextObject != NULL) {
+    if (m_states.initialContextObject != nullptr) {
         qDebug() << "Mouse pressed. Context: " << typeid(*m_states.initialContextObject).name();
     }
 }
@@ -630,8 +630,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
 #endif
 
         if (m_mode == ToolMode_Select) {
-            if (dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject) != NULL) {
-                const NodeHandle_sV *handle = dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject);
+            if (dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject) != nullptr) {
+                auto *handle = dynamic_cast<const NodeHandle_sV*>(m_states.initialContextObject);
                 int index = m_nodes->indexOf(handle->parentNode());
                 if (index < 0) {
                     qDebug () << "FAIL!";
@@ -653,8 +653,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *e)
                         qDebug() << "Node " << i << " is at " << &m_nodes->at(i);
                     }
                 }
-            } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
-                const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
+            } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != nullptr) {
+                auto *node = (const Node_sV*) m_states.initialContextObject;
 
                 if (!m_states.nodesMoved) {
                     qDebug() << "Moving node " << node;
@@ -743,7 +743,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                             && !m_states.selectAttempted) {
 
                         // Try to select a node below the mouse. If there is none, add a point.
-                        if (m_states.initialContextObject == NULL || dynamic_cast<const Node_sV*>(m_states.initialContextObject) == NULL) {
+                        if (m_states.initialContextObject == nullptr || dynamic_cast<const Node_sV*>(m_states.initialContextObject) == nullptr) {
                             if (m_mode == ToolMode_Select) {
                                 // check snap to grid
                                 //qDebug()<< event->modifiers();
@@ -758,7 +758,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                                 qDebug() << "Not adding node. Mode is " << m_mode;
                             }
 
-                        } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+                        } else if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != nullptr) {
                             m_nodes->select((const Node_sV*) m_states.initialContextObject, !m_states.initialModifiers.testFlag(Qt::ControlModifier));
                         }
                         repaint();
@@ -775,11 +775,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                 break;
             }
         }
-#if QT_VERSION < 0x040700
-    } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MidButton)) {
-#else
     } else if (m_states.initialButtons.testFlag(Qt::RightButton) || m_states.initialButtons.testFlag(Qt::MiddleButton)) {
-#endif
         QList<NodeList_sV::PointerWithDistance> nearObjects = m_project->objectsNear(convertCanvasToTime(m_states.initialMousePos).toQPointF(),  delta(10));
         
 #if _NEARBY_DBG
@@ -803,7 +799,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
     const CanvasObject_sV *obj = objectAt(e->pos(), m_states.prevModifiers);
 
     if (dynamic_cast<const Node_sV*>(obj)) {
-        Node_sV *node = (Node_sV *) obj;
+        auto *node = (Node_sV *) obj;
         m_toDeleteNode.objectPointer = node;
         m_toSnapInNode.objectPointer = node;
 
@@ -816,7 +812,7 @@ void Canvas::contextMenuEvent(QContextMenuEvent *e)
         menu.addAction(m_aResetLeftHandle);
         menu.addAction(m_aResetRightHandle);
 
-    } else if (dynamic_cast<const Segment_sV*>(obj) != NULL) {
+    } else if (dynamic_cast<const Segment_sV*>(obj) != nullptr) {
         const Segment_sV* segment = (const Segment_sV*) obj;
         int leftNode = segment->leftNodeIndex();
 
@@ -861,7 +857,7 @@ void Canvas::leaveEvent(QEvent *)
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
-	if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
+	if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != nullptr) {
         const Node_sV *node = (const Node_sV*) m_states.initialContextObject;
         
         //qDebug() << "node : " << node->x() << "," << node->y();
@@ -1017,7 +1013,7 @@ const CanvasObject_sV* Canvas::objectAt(QPoint pos, Qt::KeyboardModifiers modifi
     if (nearObjects.size() > 0) {
         return nearObjects.at(0).ptr;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -1147,7 +1143,7 @@ void Canvas::slotRunAction(QObject *o)
 
     qDebug() << "Desired action: " << toString(to->reason);
 
-    if (dynamic_cast<Tag_sV*>(to->objectPointer) != NULL) {
+    if (dynamic_cast<Tag_sV*>(to->objectPointer) != nullptr) {
 
         /// Tag actions ///
 
@@ -1214,8 +1210,8 @@ void Canvas::slotChangeCurveType(int curveType)
 }
 void Canvas::slotResetHandle(const QString &position)
 {
-    if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != NULL) {
-        Node_sV *node = const_cast<Node_sV*>(dynamic_cast<const Node_sV*>(m_states.initialContextObject));
+    if (dynamic_cast<const Node_sV*>(m_states.initialContextObject) != nullptr) {
+        auto *node = const_cast<Node_sV*>(dynamic_cast<const Node_sV*>(m_states.initialContextObject));
         if (position == "left") {
             node->setLeftNodeHandle(0, 0);
         } else {
@@ -1290,7 +1286,7 @@ void Canvas::slotSetShutterFunction()
         left = m_nodes->size()-2;
     }
 
-    if (m_shutterFunctionDialog == NULL) {
+    if (m_shutterFunctionDialog == nullptr) {
         m_shutterFunctionDialog = new ShutterFunctionDialog(m_project, this);
         connect(this, SIGNAL(nodesChanged()), m_shutterFunctionDialog, SLOT(slotNodesUpdated()));
     }

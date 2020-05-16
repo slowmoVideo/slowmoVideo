@@ -2,8 +2,6 @@
 #include <QtCore/QDir>
 #include <QDesktopServices>
 
-#include "config.h"
-
 ProjectPreferences_sV::ProjectPreferences_sV() :
     m_tagAxis(TagAxis_Source),
     m_viewport_t0(0, 0),
@@ -18,21 +16,12 @@ ProjectPreferences_sV::ProjectPreferences_sV() :
     m_imagesFilenamePattern("rendered-%1.jpg"),
     m_flowV3DLambda(20.0)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #ifdef USE_QTKIT
-    m_videoFilename = (QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mov");
+    m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mov");
 #else
-    m_videoFilename = (QDesktopServices::storageLocation(QDesktopServices::MoviesLocation)+"/rendered.mp4");
-#endif
-#else
-// deprecated in qt5 ?
-#ifdef USE_QTKIT
-m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mov");
-#else
-m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mp4");
+    m_videoFilename = (QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)+"/rendered.mp4");
 #endif
 
-#endif
 }
 
 
@@ -86,4 +75,4 @@ QString& ProjectPreferences_sV::videoCodec() { return m_vcodec; }
 
 float& ProjectPreferences_sV::flowV3DLambda() { return m_flowV3DLambda; }
 
-bool& ProjectPreferences_sV::renderFormat() { return m_renderFormat;};
+bool& ProjectPreferences_sV::renderFormat() { return m_renderFormat;}

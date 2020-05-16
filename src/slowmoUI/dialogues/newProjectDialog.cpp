@@ -15,8 +15,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/imagesFrameSource_sV.h"
 
 
-#include <QDebug>
-
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 
@@ -104,11 +102,7 @@ void NewProjectDialog::slotSelectVideoFile()
             // No video stream found. Check if the path contains a non-ASCII character and warn if this is the case.
             unsigned char ascii;
             for (int i = 0; i < ui->inputVideo->text().length(); i++) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-                ascii = ui->inputVideo->text().at(i).toAscii();
-#else
                 ascii = ui->inputVideo->text().at(i).toLatin1();
-#endif
                 if (ascii == 0 || ascii > 0x7f) {
                     ui->txtVideoInfo->appendPlainText(
                                 tr("Character %1 is not an ASCII character. This file path will likely not work with ffmpeg.")

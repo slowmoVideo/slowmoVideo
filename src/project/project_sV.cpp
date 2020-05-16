@@ -10,7 +10,6 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include "project_sV.h"
 #include "projectPreferences_sV.h"
-#include "videoFrameSource_sV.h"
 #include "emptyFrameSource_sV.h"
 #include "flowSourceV3D_sV.h"
 #include "flowSourceOpenCV_sV.h"
@@ -31,15 +30,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 #include <cmath>
 
-#include <QDebug>
 #include <QFile>
-#include <QFileInfo>
 #include <QSettings>
 #include <QThread>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QTemporaryDir>
-#endif
 
 //#define DEBUG_P
 #ifdef DEBUG_P
@@ -73,13 +68,10 @@ QDir Project_sV::getDirectoryName()
 {
     QDir dirName;
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    //QTemporaryDir tempDir("slowmovideo");
-    QTemporaryDir tempDir;; // use default
+    QTemporaryDir tempDir; // use default
     if (tempDir.isValid())
         dirName = QDir(tempDir.path());
     else
-#endif
         dirName = QDir::temp();
 
     return dirName;
@@ -95,7 +87,7 @@ void Project_sV::init()
     m_tags = new QList<Tag_sV>();
     m_nodes = new NodeList_sV();
     m_shutterFunctions = new ShutterFunctionList_sV(m_nodes);
-    m_renderTask = NULL;
+    m_renderTask = nullptr;
 
     m_v3dFailCounter = 0;
 
@@ -183,10 +175,10 @@ QString Project_sV::projectFilename() const {
 
 void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
 {
-    if (m_frameSource != NULL) {
+    if (m_frameSource != nullptr) {
         delete m_frameSource;
     }
-    if (frameSource == NULL) {
+    if (frameSource == nullptr) {
         m_frameSource = new EmptyFrameSource_sV(this);
     } else {
         m_frameSource = frameSource;
@@ -199,10 +191,10 @@ void Project_sV::loadFrameSource(AbstractFrameSource_sV *frameSource)
 void Project_sV::replaceRenderTask(RenderTask_sV *task)
 {
     /*
-    if (m_renderTask != NULL) {
+    if (m_renderTask != nullptr) {
         m_renderTask->slotStopRendering();
         m_renderTask->deleteLater();
-        m_renderTask = NULL;
+        m_renderTask = nullptr;
     }
      */
     m_renderTask = task;
@@ -256,8 +248,8 @@ QImage Project_sV::render(qreal outTime, RenderPreferences_sV prefs)
 
     ShutterFunction_sV *shutterFunction = m_shutterFunctions->function(leftNode->shutterFunctionID());
 
-    if (shutterFunction != NULL) {
-        float dy = 0;
+    if (shutterFunction != nullptr) {
+        float dy;
         if (outTime+1/prefs.fps().fps() <= m_nodes->endTime()) {
             dy = m_nodes->sourceTime(outTime+1/prefs.fps().fps()) - sourceTime;
         } else {
@@ -287,14 +279,14 @@ FlowField_sV* Project_sV::requestFlow(int leftFrame, int rightFrame, const Frame
 {
     Q_ASSERT(leftFrame < m_frameSource->framesCount());
     Q_ASSERT(rightFrame < m_frameSource->framesCount());
-    if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == NULL) {
+    if (dynamic_cast<EmptyFrameSource_sV*>(m_frameSource) == nullptr) {
 
         FlowSourceV3D_sV *v3d;
-        if ((v3d = dynamic_cast<FlowSourceV3D_sV*>(m_flowSource)) != NULL) {
+        if ((v3d = dynamic_cast<FlowSourceV3D_sV*>(m_flowSource)) != nullptr) {
             v3d->setLambda(m_preferences->flowV3DLambda());
             try {
                 return m_flowSource->buildFlow(leftFrame, rightFrame, frameSize);
-            } catch (FlowBuildingError err) {
+            } catch (FlowBuildingError) {
                 m_v3dFailCounter++;
                 qDebug() << "Failed creating optical flow, falling back to OpenCV ...";
                 qDebug() << "Failed attempts so far: " << m_v3dFailCounter;
@@ -343,7 +335,7 @@ qreal Project_sV::snapToFrame(const qreal time, bool roundUp, const Fps_sV &fps,
         frameCount--;
     }
 
-    if (out_framesBeforeHere != NULL) {
+    if (out_framesBeforeHere != nullptr) {
         *out_framesBeforeHere = frameCount;
     }
 
@@ -497,10 +489,10 @@ void Project_sV::buildCacheFlowSource()
 
     QSettings settings;
     bool precalc = settings.value("preferences/precalcFlow", true).toBool();
-    if (precalc && (m_flowSource != NULL)) {
+    if (precalc && (m_flowSource != nullptr)) {
 #if 0
         qDebug() << "Creating cached FlowSources ";
-        Q_ASSERT(m_flowSource != NULL);
+        Q_ASSERT(m_flowSource != nullptr);
         // TODO: test/check better place ?
         // we should do it for each size/each way
         // use threading here

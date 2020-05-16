@@ -51,11 +51,8 @@ SlowmoRenderer_sV::SlowmoRenderer_sV() :
 
 SlowmoRenderer_sV::~SlowmoRenderer_sV()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-        m_project->getProjectDir().removeRecursively();
-#else
-#warning  removeRecursively not define in QT4
-#endif
+    // TODO Only do this after checking if the directory is really a project directory
+    //m_project->getProjectDir().removeRecursively();
 
     delete m_project;
 }

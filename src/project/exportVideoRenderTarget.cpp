@@ -45,11 +45,7 @@ void exportVideoRenderTarget::slotConsumeFrame(const QImage &image, const int fr
     if (!m_targetDir.exists()) {
         m_targetDir.mkpath(".");
     }
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QString path = m_targetDir.absoluteFilePath(m_filenamePattern.arg(frameNumber+1, 5, 10, QChar::fromAscii('0')));
-#else
     QString path = m_targetDir.absoluteFilePath(m_filenamePattern.arg(frameNumber+1, 5, 10, QChar::fromLatin1('0')));
-#endif
 
     bool ok;
     ok = image.save(path);

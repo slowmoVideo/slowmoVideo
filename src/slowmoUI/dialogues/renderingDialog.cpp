@@ -20,7 +20,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include "project/imagesRenderTarget_sV.h"
 #include "project/abstractFlowSource_sV.h"
 #include "project/flowSourceOpenCV_sV.h"
-#include "project/flowSourceV3D_sV.h"
 
 #ifdef USE_FFMPEG
 #if 0
@@ -37,7 +36,6 @@ the Free Software Foundation, either version 3 of the License, or
 #include <QFileDialog>
 #include <QSettings> // TODO: better
 #include <QMessageBox>
-#include <QComboBox>
 
 RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
     QDialog(parent),
@@ -187,10 +185,8 @@ RenderingDialog::RenderingDialog(Project_sV *project, QWidget *parent) :
         ui->timeEnd->setText(m_project->preferences()->renderEndTime());
     }
 
-#if QT_VERSION >= 0x040700
     ui->timeStart->setPlaceholderText(QVariant(m_project->nodes()->startTime()).toString());
     ui->timeEnd->setPlaceholderText(QVariant(m_project->nodes()->endTime()).toString());
-#endif
 
 #ifndef USE_QTKIT
      ui->use_qt->setChecked(false);

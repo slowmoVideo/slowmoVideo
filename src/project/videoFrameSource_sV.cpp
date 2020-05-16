@@ -137,11 +137,7 @@ const QString VideoFrameSource_sV::framePath(const uint frame, const FrameSize f
     }
 
     // ffmpeg numbering starts with 1, therefore add 1 to the frame number
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    return QString("%1/frame%2.png").arg(dir).arg(frame+1, 5, 10, QChar::fromAscii('0'));
-#else
     return QString("%1/frame%2.png").arg(dir).arg(frame+1, 5, 10, QChar::fromLatin1('0'));
-#endif
 }
 
 void VideoFrameSource_sV::extractFramesFor(const FrameSize frameSize, QProcess *process)
@@ -221,7 +217,7 @@ void VideoFrameSource_sV::slotExtractSmallFrames()
         m_ffmpeg->waitForFinished(tmout);
         m_ffmpeg->terminate();
 
-        disconnect(m_ffmpeg, SIGNAL(finished(int)), this, 0);
+        disconnect(m_ffmpeg, SIGNAL(finished(int)), this, nullptr);
         connect(m_ffmpeg, SIGNAL(finished(int)), this, SLOT(slotExtractOrigFrames()));
 
         extractFramesFor(FrameSize_Small, m_ffmpeg);

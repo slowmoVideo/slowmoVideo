@@ -259,38 +259,6 @@ void MainWindow::closeEvent(QCloseEvent *e)
 }
 
 
-#if QT_VERSION <= QT_VERSION_CHECK(4, 2, 0)
-/**
- * this is only for pre 4.2 code !
- * http://ariya.ofilabs.com/2007/04/custom-toggle-action-for-qdockwidget.html
- */
-bool MainWindow::eventFilter(QObject *obj, QEvent *e)
-{
-
-    
-    QObjectList windowChildren = children();
-    QDockWidget *w;
-    
-    if (e->type() == QEvent::Close && windowChildren.contains(obj)) {
-        if ((w = dynamic_cast<QDockWidget *>(obj)) != NULL) {
-            
-            QList<QAction*> actions = findChildren<QAction *>();
-            for (int i = 0; i < actions.size(); i++) {
-                if (actions.at(i)->text() == w->objectName()) {
-                    actions.at(i)->setChecked(false);
-                    return true;
-                }
-            }
-            
-        }
-    }
-
-    return QObject::eventFilter(object, event);
-    //return false;
-}
-#endif
-
-
 
 
 
@@ -378,11 +346,11 @@ void MainWindow::slotNewProject()
 
 void MainWindow::loadProject(Project_sV *project)
 {
-    Q_ASSERT(project != NULL);
+    Q_ASSERT(project != nullptr);
     resetDialogs();
 
-    Project_sV *projTemp = NULL;
-    if (m_project != NULL) {
+    Project_sV *projTemp = nullptr;
+    if (m_project != nullptr) {
         projTemp = m_project;
     }
     m_project = project;
@@ -390,11 +358,9 @@ void MainWindow::loadProject(Project_sV *project)
     m_wRenderPreview->load(m_project);
     updateWindowTitle();
 
-    if (projTemp != NULL) {
-        // Do not delete the old project object earlier to avoid segfaults
-        // (may still be used in the ShutterFunction dialog e.g.)
-        delete projTemp;
-    }
+    // Do not delete the old project object earlier to avoid segfaults
+    // (may still be used in the ShutterFunction dialog e.g.)
+    delete projTemp;
 
     connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), this, SLOT(slotNewFrameSourceTask(QString,int)));
     connect(m_project->frameSource(), SIGNAL(signalAllTasksFinished()), this, SLOT(slotFrameSourceTasksFinished()));
@@ -513,7 +479,7 @@ void MainWindow::slotUpdateRenderPreview()
 {
     m_wRenderPreview->slotRenderAt(m_project->snapToOutFrame(
                                        m_wCanvas->prevMouseTime().x(), false,
-                                       m_project->preferences()->renderFPS(), NULL)
+                                       m_project->preferences()->renderFPS(), nullptr)
                                    );
 }
 
@@ -533,20 +499,20 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::resetDialogs()
 {
-    if (m_progressDialog != NULL) {
+    if (m_progressDialog != nullptr) {
         m_progressDialog->close();
         delete m_progressDialog;
-        m_progressDialog = NULL;
+        m_progressDialog = nullptr;
     }
-    if (m_renderProgressDialog != NULL) {
+    if (m_renderProgressDialog != nullptr) {
         m_renderProgressDialog->close();
         delete m_renderProgressDialog;
-        m_renderProgressDialog = NULL;
+        m_renderProgressDialog = nullptr;
     }
-    if (m_flowExaminer != NULL) {
+    if (m_flowExaminer != nullptr) {
         m_flowExaminer->close();
         delete m_flowExaminer;
-        m_flowExaminer = NULL;
+        m_flowExaminer = nullptr;
     }
 }
 
@@ -572,7 +538,7 @@ void MainWindow::slotShowProjectPreferencesDialog()
 
 void MainWindow::slotShowFlowExaminerDialog()
 {
-    if (m_flowExaminer == NULL) {
+    if (m_flowExaminer == nullptr) {
         m_flowExaminer = new FlowExaminer(m_project, this);
     }
 
@@ -588,7 +554,7 @@ void MainWindow::slotShowFlowExaminerDialog()
 
 void MainWindow::slotShowRenderDialog()
 {
-    if (m_project->renderTask() != NULL) {
+    if (m_project->renderTask() != nullptr) {
         disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
     }
     
@@ -596,15 +562,15 @@ void MainWindow::slotShowRenderDialog()
     if (renderingDialog.exec() == QDialog::Accepted) {
         
         RenderTask_sV *task = renderingDialog.buildTask();
-        if (task != 0) {
+        if (task != nullptr) {
             task->moveToThread(&m_rendererThread);
             
-            if (m_project->renderTask() != NULL) {
+            if (m_project->renderTask() != nullptr) {
                 disconnect(SIGNAL(signalRendererContinue()), m_project->renderTask());
             }
             //m_project->replaceRenderTask(task);
             
-            if (m_renderProgressDialog == NULL) {
+            if (m_renderProgressDialog == nullptr) {
                 m_renderProgressDialog = new ProgressDialog(this);
                 m_renderProgressDialog->setWindowTitle(tr("Rendering progress"));
             } else {
@@ -651,7 +617,7 @@ void MainWindow::slotRenderingAborted(QString message)
 
 void MainWindow::slotNewFrameSourceTask(const QString taskDescription, int taskSize)
 {
-    if (m_progressDialog == NULL) {
+    if (m_progressDialog == nullptr) {
         m_progressDialog = new ProgressDialog(this);
         m_progressDialog->setWindowTitle(tr("Frame extraction progress"));
         connect(m_project->frameSource(), SIGNAL(signalNextTask(QString,int)), m_progressDialog, SLOT(slotNextTask(QString,int)));
@@ -669,7 +635,7 @@ void MainWindow::slotFrameSourceTasksFinished()
 }
 void MainWindow::slotCloseFrameSourceProgress()
 {
-    if (m_progressDialog != NULL) {
+    if (m_progressDialog != nullptr) {
         m_progressDialog->close();
     }
     //is right place ? should we check ?

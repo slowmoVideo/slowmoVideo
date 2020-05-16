@@ -22,13 +22,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include "abstractFlowSource_sV.h"
 //TODO: #include "defs_sV.hpp"
 
-#include <QDebug>
 #include <QTextStream>
-#if 0
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <QXmlQuery>
-#endif // qt5 
-#endif
 
 
 int XmlProjectRW_sV::saveProject(Project_sV *project, QString filename) noexcept(false)

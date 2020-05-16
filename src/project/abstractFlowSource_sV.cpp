@@ -10,7 +10,6 @@
 
 #include "abstractFlowSource_sV.h"
 
-#include <QtCore>
 #include <QDir>
 
 #include "project_sV.h"
@@ -37,11 +36,7 @@ void AbstractFlowSource_sV::cleardirectory(QDir dir)
     dir.setFilter( QDir::NoDotAndDotDot | QDir::Dirs );
     foreach( QString dirItem, dir.entryList() ) {
         QDir subDir( dir.absoluteFilePath( dirItem ) );
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
         subDir.removeRecursively();
-#else
-#warning  removeRecursively not define in QT4
-#endif
     }
 }
 
