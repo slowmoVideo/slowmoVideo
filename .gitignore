@@ -4,23 +4,16 @@
 install
 
 /*.png
-/slowmoVideo*.bz2
 flowScripts/*.avi
 flowScripts/*.pyc
 
-clips
-*/build
-
 slowmoVideo/docs/html
 slowmoVideo/docs/latex
-
-img/*.sVflow
-qtcreator*
 
 material/*.blend1
 material/*.blend2
 
 .DS_Store
 
-*build*
+/*build*
 .idea

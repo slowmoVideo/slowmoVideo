@@ -52,6 +52,7 @@ chmod +x linuxdeployqt-6-x86_64.AppImage
 
 
 # Build slowmoVideo
+cd /build
 mkdir appimage-build
 cd appimage-build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr
