@@ -32,46 +32,43 @@ src/slowmoUI/slowmoUI
 
 ### Building AppImage on Ubuntu 16.04
 
-This guide shows how to build a slowmoVideo AppImage in a Docker container with [linuxdeployqt release][ldq-r],
-in this example [version 6][ldq-6].
+This guide shows how to build a slowmoVideo AppImage in a Docker container with
+[linuxdeployqt release][ldq-r], in this example [version 6][ldq-6].
 
 See [Packaging native binaries][ai] for more information on AppImage packaging.
 
 ```bash
-# Run a docker container and mount the current directory to /build in the container
-docker run -it --rm -v $(pwd):/build ubuntu:16.04
+# Create the Docker image from the Dockerfile in this directory
+# This can take some time as it will build OpenCV from source.
+cd docs
+docker build . -name sv-appimage-builder
 
-# Install all packages that are required for building slowmoVideo
-apt update
-apt install wget build-essential cmake libopencv-dev qt5-default qttools5-dev-tools qtscript5-dev
+# Run the container.
+# By default, this will build the AppImage and copy it to /__build.
+# With the volume mount, the AppImage will be copied to the host. 
+docker run -it --rm -v $(pwd)/sv-appimage:/__build sv-appimage-builder
+```
 
-# Get linuxdeployqt and make it executable
-cd
-wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
-chmod +x linuxdeployqt-6-x86_64.AppImage
+If you want to compile a different version, run the steps manually inside the
+container, for example:
 
-
-# Build slowmoVideo
-cd /build
-mkdir appimage-build
-cd appimage-build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr
-make
-
-# Install slowmoVideo to the AppDir directory for AppImage
-make install DESTDIR=AppDir
-
-# Extract the linuxdeployqt AppImage when FUSE is not available in a docker container
-~/linuxdeployqt-6-x86_64.AppImage --appimage-extract
-
-# Create the AppImage
-squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
+```bash
+docker run -it --rm -v $(pwd)/sv-appimage:/__build sv-appimage-builder bash
+cd slowmoVideo
+git checkout v0.6
+cd /
+./docker-build-appimage.sh
+exit
 ```
 
 [ldq-r]: https://github.com/probonopd/linuxdeployqt/releases
 [ldq-6]: https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
 [ai]: https://docs.appimage.org/packaging-guide/from-source/native-binaries.html
 
+
+----
+
+*Content after here is not up-to-date. It may still work, but no guarantee!*
 
 
 ### Building for Windows
