@@ -266,12 +266,14 @@ void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
     qreal maxLMove = -100000;
     qreal maxUMove = 100000;
     qreal maxDMove = -100000;
-    const Node_sV *left = NULL;
+    const Node_sV *left = nullptr;
     const Node_sV *right;
-    for (int i = 0; i < m_list.size(); i++) {
-        right = &m_list.at(i);
+    for (const auto &i : m_list) {
+        right = &i;
 
         /*
+          An arbitrary selection of nodes can be selected.
+
           Get the maximum allowed horizontal movement distance here such that there is no
           overlapping. For moving the selected nodes to the left, only unselected nodes
           which are directly followed by a selected node need to be taken into account.
@@ -283,7 +285,7 @@ void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
          min(  ^1^,      ^-----2-----^    ) + minDist
 
          */
-        if (left != NULL) {
+        if (left != nullptr) {
             if (left->selected() && !right->selected()) {
                 // Move-right distance
                 maxRMove = qMin(maxRMove,
@@ -306,7 +308,7 @@ void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
 
         left = right;
     }
-    if (m_list.size() > 0 && m_list.at(0).selected()) {
+    if (!m_list.empty() && m_list.at(0).selected()) {
         // Do not allow to move nodes to x < 0
         maxLMove = qMax(maxLMove, -m_list.at(0).xUnmoved());
     }
@@ -317,9 +319,9 @@ void NodeList_sV::moveSelected(const Node_sV &time,bool snap)
                 qMax(maxLMove, qMin(maxRMove, time.x())),
                 qMax(maxDMove, qMin(maxUMove, time.y()))
                 );
-    for (int i = 0; i < m_list.size(); i++) {
-        if (m_list.at(i).selected()) {
-            m_list[i].move(newTime);
+    for (auto & i : m_list) {
+        if (i.selected()) {
+            i.move(newTime);
         }
     }
 }
