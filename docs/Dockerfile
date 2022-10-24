@@ -42,9 +42,7 @@ RUN mkdir /opencv/build \
     && make install
 
 # Get slowmoVideo and the linuxdeployqt tool (builds an AppImage from Qt apps)
-RUN git clone https://github.com/slowmoVideo/slowmoVideo.git /slowmoVideo \
-    && cd /slowmoVideo && git submodule update --init \
-    && wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage -O /linuxdeployqt.AppImage \
+RUN wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O /linuxdeployqt.AppImage \
     && chmod +x /linuxdeployqt.AppImage
 
 ADD docker-build-appimage.sh /
