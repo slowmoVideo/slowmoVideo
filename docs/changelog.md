@@ -2,6 +2,8 @@
 
 ## Upcoming
 
+## v0.6.1 – 2022-10-24
+
 This release supports OpenCV 4, which is e.g. shipped with Ubuntu 20.04.
 
 * Added support for OpenCV 4
