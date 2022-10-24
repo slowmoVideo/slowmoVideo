@@ -130,7 +130,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>(c) 2012–2020 Simon A. Eugster</string>
+        <string>(c) 2012–2022 Simon A. Eugster</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
