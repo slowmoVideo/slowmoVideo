@@ -42,10 +42,12 @@ See [Packaging native binaries][ai] for more information on AppImage packaging.
 # This can take some time as it will build OpenCV from source.
 cd docs
 docker build . -name sv-appimage-builder
+cd ..
 
 # Run the container.
 # By default, this will build the AppImage and copy it to /__build.
 # With the volume mount, the AppImage will be copied to the host. 
+mkdir sv-appimage
 docker run -it --rm -v $(pwd)/sv-appimage:/__build sv-appimage-builder
 ```
 
