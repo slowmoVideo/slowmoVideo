@@ -38,33 +38,13 @@ in this example [version 6][ldq-6].
 See [Packaging native binaries][ai] for more information on AppImage packaging.
 
 ```bash
-# Run a docker container and mount the current directory to /build in the container
-docker run -it --rm -v $(pwd):/build ubuntu:16.04
+# Create the docker image for building
+cd AppImage
+docker build . -t svbuild
+cd ..
 
-# Install all packages that are required for building slowmoVideo
-apt update
-apt install wget build-essential cmake libopencv-dev qt5-default qttools5-dev-tools qtscript5-dev
-
-# Get linuxdeployqt and make it executable
-cd
-wget https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
-chmod +x linuxdeployqt-6-x86_64.AppImage
-
-
-# Build slowmoVideo
-mkdir appimage-build
-cd appimage-build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr
-make
-
-# Install slowmoVideo to the AppDir directory for AppImage
-make install DESTDIR=AppDir
-
-# Extract the linuxdeployqt AppImage when FUSE is not available in a docker container
-~/linuxdeployqt-6-x86_64.AppImage --appimage-extract
-
-# Create the AppImage
-squashfs-root/AppRun AppDir/usr/share/applications/slowmoUI.desktop -appimage
+# Run the docker container and build slowmoVideo
+docker run -it --rm -v $(pwd):/_build svbuild sh -c 'cd /_build; AppImage/build-appimage.sh'
 ```
 
 [ldq-r]: https://github.com/probonopd/linuxdeployqt/releases

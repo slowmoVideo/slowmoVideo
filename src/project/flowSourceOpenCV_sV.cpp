@@ -18,7 +18,7 @@ the Free Software Foundation, either version 3 of the License, or
 #include <iostream>
 #include <fstream>
 
-#if CV_VERSION_MAJOR == 4
+#if CV_VERSION_EPOCH == 4
 #include <opencv2/optflow.hpp>
 #endif
 
@@ -163,7 +163,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
         cv::Mat prevgray, gray;
 
-#if CV_VERSION_MAJOR >= 4
+#if CV_VERSION_EPOCH >= 4
         prevgray = cv::imread(prevpath.toStdString(), IMREAD_GRAYSCALE);
         gray = cv::imread(path.toStdString(), IMREAD_GRAYSCALE);
         cv::UMat uprevgray, ugray;
@@ -179,7 +179,7 @@ FlowField_sV* FlowSourceOpenCV_sV::buildFlow(uint leftFrame, uint rightFrame, Fr
 
         {
             if (!prevgray.empty()) {
-#if CV_VERSION_MAJOR >= 4
+#if CV_VERSION_EPOCH >= 4
                 buildFlowOpenCV_4(uprevgray, ugray, flowFileName.toStdString());
 #elif CV_MAJOR_VERSION == 3
                 buildFlowOpenCV_3(uprevgray, ugray, flowFileName.toStdString());
@@ -227,7 +227,7 @@ void FlowSourceOpenCV_sV::dumpAlgosParams()
     }
 }
 
-#if CV_VERSION_MAJOR >= 4
+#if CV_VERSION_EPOCH >= 4
 void FlowSourceOpenCV_sV::buildFlowOpenCV_4(cv::UMat& uprevgray, cv::UMat& ugray, std::string flowfilename)
 {
     dumpAlgosParams();
