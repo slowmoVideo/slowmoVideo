@@ -45,4 +45,13 @@ RUN mkdir /opencv/build \
 RUN wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage -O /linuxdeployqt.AppImage \
     && chmod +x /linuxdeployqt.AppImage
 
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install newer version of Git
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:git-core/ppa && \
+    apt-get update && \
+    apt-get install -y git
+
 CMD cd /slowmoVideo && docs/docker-build-appimage.sh

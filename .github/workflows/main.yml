@@ -1,0 +1,35 @@
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    container:
+      image: granjow/slowmovideo-build-appimage:2212.1
+    steps:
+      - name: CI test
+        run: |
+          ls -lah
+          ls -lah ..
+          ls -lah /
+          ls -lah /__e
+          ls -lah /__w
+          pwd
+          git --version
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+      - run: git config --global --add safe.directory /__w/slowmoVideo/slowmoVideo
+      - name: gitversion
+        run: echo "SV_GIT_VERSION=$(git describe HEAD)" >> $GITHUB_ENV
+      - name: test
+        run: echo "Building version ${{ env.SV_GIT_VERSION }}"
+      - name: Build slowmoVideo AppImage
+        run: |
+          .github/build-appimage.sh
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v3
+        with:
+          name: slowmoVideo-${{ env.SV_GIT_VERSION }}
+          path: build/*.AppImage
