@@ -2,6 +2,10 @@
 
 ## Upcoming
 
+## v0.6.2 – 2022-12-19
+
+This release adds support for Dutch, contributed by [Vistaus](https://github.com/Vistaus).
+
 ## v0.6.1 – 2022-10-24
 
 This release supports OpenCV 4, which is e.g. shipped with Ubuntu 20.04.

@@ -1,5 +1,4 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/">
         <file alias="icons/iconAdd.png">res/iconAdd.png</file>
         <file alias="icons/iconSel.png">res/iconSel.png</file>
@@ -7,13 +6,16 @@
         <file alias="images/shutterFunc.png">res/shutterFunction.png</file>
         <file alias="icons/slowmoIcon.png">res/AppIcon.png</file>
     </qresource>
-    <qresource lang="de">
+    <qresource lang="de" prefix="/">
         <file alias="translations.qm">../tr/slowmoVideo_de.qm</file>
     </qresource>
-    <qresource lang="it">
+    <qresource lang="it" prefix="/">
         <file alias="translations.qm">../tr/slowmoVideo_it.qm</file>
     </qresource>
-    <qresource lang="fr">
+    <qresource lang="fr" prefix="/">
         <file alias="translations.qm">../tr/slowmoVideo_fr.qm</file>
+    </qresource>
+    <qresource lang="nl" prefix="/">
+        <file alias="translations.qm">../tr/slowmoVideo_nl.qm</file>
     </qresource>
 </RCC>

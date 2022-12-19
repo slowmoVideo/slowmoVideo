@@ -3,7 +3,7 @@
 slowmoVideo is a tool that uses optical flow for generating slow-motion videos.
 See [here][demos] for some demo videos.
 
-For the last changes, see the [Changelog](docs/changelog.md).
+For the last changes, see the [Changelog](CHANGELOG.md).
 
 
 ## Building
@@ -44,11 +44,12 @@ cd docs
 docker build . -name sv-appimage-builder
 cd ..
 
-# Run the container.
-# By default, this will build the AppImage and copy it to /__build.
-# With the volume mount, the AppImage will be copied to the host. 
-mkdir sv-appimage
-docker run -it --rm -v $(pwd)/sv-appimage:/__build sv-appimage-builder
+# Run the container to build slowmoVideo from the current directory.
+#
+# This will build the AppImage and copy it to /__build.
+# With the volume mount, the AppImage will be available on the host. 
+mkdir appimage
+docker run -it --rm -v $(pwd):/slowmoVideo -v $(pwd)/appimage:/__build sv-appimage-builder
 ```
 
 If you want to compile a different version, run the steps manually inside the

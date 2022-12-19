@@ -61,6 +61,9 @@ int main(int argc, char *argv[]) {
             } else if (arg == "--it") {
                 QLocale::setDefault(QLocale::Italian);
                 langUpdated = true;
+            } else if (arg == "--nl") {
+                QLocale::setDefault(QLocale::Dutch);
+                langUpdated = true;
             } else if (arg == "--no-stdout") {
                 logToStdout = false;
             } else {
